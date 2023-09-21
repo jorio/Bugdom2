@@ -736,7 +736,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* OPEN THE REZ-FORK */
 
-	fRefNum = FSpOpenResFile(specPtr,fsCurPerm);
+	fRefNum = FSpOpenResFile(specPtr,fsRdPerm);
 	if (fRefNum == -1)
 		DoFatalAlert("LoadPlayfield: FSpOpenResFile failed.  You seem to have a corrupt or missing file.  Please reinstall the game.");
 	UseResFile(fRefNum);
@@ -1132,7 +1132,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* OPEN THE DATA FORK */
 
-	iErr = FSpOpenDF(specPtr, fsCurPerm, &fRefNum);
+	iErr = FSpOpenDF(specPtr, fsRdPerm, &fRefNum);
 	if (iErr)
 		DoFatalAlert("ReadDataFromPlayfieldFile: FSpOpenDF failed!");
 
@@ -1450,7 +1450,7 @@ short		fRefNum;
 
 				/* OPEN THE DATA FORK */
 
-	iErr = FSpOpenDF(inSpec, fsCurPerm, &fRefNum);
+	iErr = FSpOpenDF(inSpec, fsRdPerm, &fRefNum);
 	if (iErr)
 		DoFatalAlert("LoadTunnel: FSpOpenDF failed!");
 

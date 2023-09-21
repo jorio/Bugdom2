@@ -1,7 +1,8 @@
 /****************************/
 /*   OPENGL SUPPORT.C	    */
-/* (c)2002 Pangea Software  */
 /*   By Brian Greenstone    */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -257,8 +258,27 @@ OGLSetupOutputType	*data;
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
 {
-	IMPLEMENT_ME();
+	GAME_ASSERT_MESSAGE(!gAGLContext, "GL context already exists");
+	GAME_ASSERT_MESSAGE(gSDLWindow, "Window must be created before the DC!");
 
+			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
+
+	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
+
+	if (!gAGLContext)
+		DoFatalAlert(SDL_GetError());
+
+	GAME_ASSERT(glGetError() == GL_NO_ERROR);
+
+
+			/* ACTIVATE CONTEXT */
+
+	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
+
+			/* ENABLE VSYNC */
+
+	SDL_GL_SetSwapInterval(gGamePrefs.vsync);
 #if 0
 
 AGLPixelFormat 	fmt;
@@ -382,6 +402,7 @@ static char			*s;
 			/* NO LONGER NEED PIXEL FORMAT */
 
 	aglDestroyPixelFormat(fmt);
+#endif
 
 
 
@@ -402,11 +423,13 @@ static char			*s;
 
 
 
+#if 0
  		/***************************/
 		/* GET OPENGL CAPABILITIES */
  		/***************************/
 
 	s = (char *)glGetString(GL_EXTENSIONS);					// get extensions list
+#endif
 
 
 
@@ -417,6 +440,7 @@ static char			*s;
 
 			/* SEE IF SUPPORT 1024x1024 TEXTURES */
 
+	GLuint maxTexSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 	if (maxTexSize < 1024)
 		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
@@ -427,11 +451,9 @@ static char			*s;
 	glClearColor(0,0,0, 1.0);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClear(GL_COLOR_BUFFER_BIT);
-	aglSwapBuffers(gAGLContext);
+	SDL_GL_SwapWindow(gSDLWindow);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(viewDefPtr->clearColor.r, viewDefPtr->clearColor.g, viewDefPtr->clearColor.b, 1.0);
-
-#endif
 }
 
 

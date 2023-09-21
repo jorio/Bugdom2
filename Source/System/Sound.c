@@ -1,7 +1,8 @@
 /****************************/
 /*     SOUND ROUTINES       */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -254,12 +255,8 @@ static EffectType	gEffectsTable[] =
 
 void InitSoundTools(void)
 {
-	IMPLEMENT_ME();
-#if 0
 OSErr			iErr;
 short			i;
-ExtSoundHeader	sndHdr;
-const double	crap = rate44khz;
 FSSpec			spec;
 
 	gNumLoopingEffects = 0;
@@ -276,60 +273,19 @@ FSSpec			spec;
 			/* ALLOC CHANNELS */
 			/******************/
 
-				/* MAKE DUMMY SOUND HEADER */
-
-	sndHdr.samplePtr 		= nil;
-    sndHdr.sampleRate		= rate44khz;
-    sndHdr.loopStart		= 0;
-    sndHdr.loopEnd			= 0;
-    sndHdr.encode			= extSH;
-    sndHdr.baseFrequency 	= 0;
-    sndHdr.numFrames		= 0;
-    sndHdr.numChannels		= 2;
-   	dtox80(&crap, &sndHdr.AIFFSampleRate);
-    sndHdr.markerChunk		= 0;
-    sndHdr.instrumentChunks	= 0;
-    sndHdr.AESRecording		= 0;
-    sndHdr.sampleSize		= 16;
-    sndHdr.futureUse1		= 0;
-    sndHdr.futureUse2		= 0;
-    sndHdr.futureUse3		= 0;
-    sndHdr.futureUse4		= 0;
-    sndHdr.sampleArea[0]		= 0;
-
 	for (gMaxChannels = 0; gMaxChannels < MAX_CHANNELS; gMaxChannels++)
 	{
 			/* NEW SOUND CHANNEL */
 
-		SndCommand 		mySndCmd;
-
-		iErr = SndNewChannel(&gSndChannel[gMaxChannels],sampledSynth,initMono+initNoInterp,NewSndCallBackUPP(CallBackFn));
+		iErr = SndNewChannel(&gSndChannel[gMaxChannels], sampledSynth, initStereo, nil);
 		if (iErr)												// if err, stop allocating channels
 			break;
 
 		gChannelInfo[gMaxChannels].isLooping = false;
-
-
-			/* FOR POST- SM 3.6.5 DO THIS! */
-
-		mySndCmd.cmd = soundCmd;
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = (long)&sndHdr;
-		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
-		{
-			DoAlert("InitSoundTools: SndDoImmediate failed! %d", iErr);
-		}
-
-
-		mySndCmd.cmd = reInitCmd;
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = initNoInterp|initStereo;
-		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
-		{
-			DoAlert("InitSoundTools: SndDoImmediate failed 2! %d", iErr);
-		}
 	}
 
+
+	SDL_Log("TODO: Copy snd init from nano 2");
 
 		/***********************/
 		/* LOAD DEFAULT SOUNDS */
@@ -337,7 +293,6 @@ FSSpec			spec;
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MAIN);
-#endif
 }
 
 
@@ -386,7 +341,7 @@ OSErr			iErr;
 
 			/* OPEN APPROPRIATE REZ FILE */
 
-	srcFile1 = FSpOpenResFile(spec, fsCurPerm);
+	srcFile1 = FSpOpenResFile(spec, fsRdPerm);
 	if (srcFile1 == -1)
 	{
 		DoFatalAlert("LoadSoundBank: OpenResFile failed! %d", ResError());

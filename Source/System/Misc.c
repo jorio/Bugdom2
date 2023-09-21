@@ -1,14 +1,14 @@
 /****************************/
 /*      MISC ROUTINES       */
-/* (c)1996-2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
 /***************/
 /* EXTERNALS   */
 /***************/
-
 
 #include <stdarg.h>
 #include "game.h"
@@ -28,9 +28,8 @@ extern	FSSpec				gDataSpec;
 /*    CONSTANTS             */
 /****************************/
 
-#define		ERROR_ALERT_ID		401
-
 #define	DEFAULT_FPS			10
+#define	MAX_FPS				300
 
 #define	USE_MALLOC		1
 
@@ -472,32 +471,44 @@ Ptr		p = ptr;
 
 void CalcFramesPerSecond(void)
 {
-	IMPLEMENT_ME();
-#if 0
-AbsoluteTime currTime,deltaTime;
-static AbsoluteTime time = {0,0};
-Nanoseconds	nano;
+static UnsignedWide time;
+UnsignedWide currTime;
+unsigned long deltaTime;
+float		fps;
 
-limit_speed:
+wait:
+	Microseconds(&currTime);
 
-	currTime = UpTime();
+	deltaTime = currTime.lo - time.lo;
 
-	deltaTime = SubAbsoluteFromAbsolute(currTime, time);
-	nano = AbsoluteToNanoseconds(deltaTime);
+	if (deltaTime == 0)
+	{
+		fps = DEFAULT_FPS;
+	}
+	else
+	{
+		fps = 1000000.0f / deltaTime;
 
-	gFramesPerSecond = 1000000.0f / (float)nano.lo;
-	gFramesPerSecond *= 1000.0f;
+		if (fps < DEFAULT_FPS)					// (avoid divide by 0's later)
+		{
+			fps = DEFAULT_FPS;
+		}
+		else if (fps > MAX_FPS)					// limit to avoid issue
+		{
+			if (fps - MAX_FPS > 1000)			// try to sneak in some sleep if we have 1 ms to spare
+			{
+				SDL_Delay(1);
+			}
+			goto wait;
+		}
+	}
 
-	if (gFramesPerSecond < DEFAULT_FPS)			// (avoid divide by 0's later)
-		gFramesPerSecond = DEFAULT_FPS;
-	gFramesPerSecondFrac = 1.0f/gFramesPerSecond;		// calc fractional for multiplication
-
-
-	if (gFramesPerSecond > 100)
-		goto limit_speed;
+#if _DEBUG
+	if (GetKeyState(SDL_SCANCODE_KP_PLUS))		// debug speed-up with KP_PLUS
+		fps = DEFAULT_FPS;
+#endif
 
 	time = currTime;	// reset for next time interval
-#endif
 }
 
 

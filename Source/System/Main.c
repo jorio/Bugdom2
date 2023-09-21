@@ -223,6 +223,7 @@ long 		keyboardScript, languageCode;
 	gGamePrefs.dontUseHID			= false;
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
+	gGamePrefs.vsync				= true;
 
 	for (i = 0; i < MAX_HTTP_NOTES; i++)
 		gGamePrefs.didThisNote[i] = false;
@@ -1157,10 +1158,13 @@ unsigned long	someLong;
 	HideRealCursor();
 
 
+	IMPLEMENT_ME_SOFT();
+#if 0
 		/* SHOW TITLES */
 
 	DoLegalScreen();
 	DoTitleScreen();
+#endif
 
 
 

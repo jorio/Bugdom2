@@ -85,6 +85,7 @@ typedef struct
 
 	Byte	monitorNum;
 	Byte	antialiasingLevel;
+	Boolean	vsync;
 }PrefsType;
 
 
