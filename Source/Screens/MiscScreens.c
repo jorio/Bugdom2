@@ -30,7 +30,6 @@ extern	float					gAnaglyphScaleFactor, gAnaglyphFocallength, gAnaglyphEyeSeparat
 /****************************/
 
 static void DisplayPicture_Draw(OGLSetupOutputType *info);
-static pascal OSStatus DoGameSettingsDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
 
 
 /****************************/
@@ -161,41 +160,6 @@ FSSpec	spec;
 #pragma mark -
 
 
-/****************** DO DEMO EXPIRED SCREEN **************************/
-
-void DoDemoExpiredScreen(void)
-{
-FSSpec	spec;
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoExpired", &spec);
-	DisplayPicture(&spec);
-
-	LaunchURL("http://www.pangeasoft.net/bug2/buy.html");
-
-	CleanQuit();
-}
-
-
-/*************** SHOW DEMO QUIT SCREEN **********************/
-
-void ShowDemoQuitScreen(void)
-{
-FSSpec	spec;
-
-	SaveDemoTimer();						// make sure to save this before we bail
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoQuit", &spec);
-	DisplayPicture(&spec);
-
-	if (IsInternetAvailable())				// if we've got TCP connection then launch URL
-	{
-		CleanupDisplay();								// unloads Draw Sprocket
-		LaunchURL("http://www.pangeasoft.net/bug2/buy.html");
-	}
-}
-
-
-
 /********************* DO LEVEL CHEAT DIALOG **********************/
 
 #if 0
@@ -256,6 +220,9 @@ Boolean			dialogDone = false;
 
 void DoGameOptionsDialog(void)
 {
+	IMPLEMENT_ME_SOFT();
+
+#if 0
 OSErr			err;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
 WindowRef 		dialogWindow = nil;
@@ -385,10 +352,11 @@ do_again:
 
 	CalcFramesPerSecond();				// reset this so things dont go crazy when we return
 	CalcFramesPerSecond();
-
+#endif
 }
 
 
+#if 0
 /****************** DO GAME SETTINGS DIALOG EVENT HANDLER *************************/
 
 static pascal OSStatus DoGameSettingsDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
@@ -442,6 +410,7 @@ HICommand 			command;
 
     return (result);
 }
+#endif
 
 
 

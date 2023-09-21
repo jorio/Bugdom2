@@ -11,9 +11,8 @@ extern	Boolean			gAltivec;
 //======================================================
 
 
-extern	void ShowSystemErr(long err);
-void	DoAlert(const char*);
-void	DoFatalAlert(const char*);
+void	DoAlert(const char* fmt, ...);
+void	DoFatalAlert(const char* fmt, ...);
 extern unsigned char	*NumToHex(unsigned short);
 extern unsigned char	*NumToHex2(unsigned long, short);
 extern unsigned char	*NumToDec(unsigned long);
@@ -24,33 +23,17 @@ extern	void FloatToString(float num, Str255 string);
 extern	Handle	AllocHandle(long size);
 extern	void *AllocPtr(long size);
 void *AllocPtrClear(long size);
-extern	void PStringToC(char *pString, char *cString);
 float StringToFloat(Str255 textStr);
 extern	void DrawCString(char *string);
 extern	void InitMyRandomSeed(void);
-extern	void VerifySystem(void);
 extern	float RandomFloat(void);
 u_short	RandomRange(unsigned short min, unsigned short max);
-extern	void RegulateSpeed(short fps);
-extern	void CopyPStr(ConstStr255Param	inSourceStr, StringPtr	outDestStr);
-extern	void ShowSystemErr_NonFatal(long err);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);
 
-void CopyPString(Str255 from, Str255 to);
-
 void SafeDisposePtr(void *ptr);
 void MyFlushEvents(void);
-
-StringPtr PStrCat(StringPtr dst, ConstStr255Param   src);
-StringPtr PStrCopy(StringPtr dst, ConstStr255Param   src);
-void ConvertIntToPStr(int num, StringPtr s);
-
-StringPtr PStrCat(StringPtr dst, ConstStr255Param   src);
-
-void CheckGameSerialNumber(void);
-
 
 
 short SwizzleShort(short *shortPtr);
@@ -64,3 +47,13 @@ void SwizzleUV(OGLTextureCoord *pt);
 
 void RGBtoHSV( float r, float g, float b, float *h, float *s, float *v );
 void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v );
+
+#if _DEBUG
+#define IMPLEMENT_ME_SOFT() SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "IMPLEMENT ME: %s:%d\n", __func__, __LINE__)
+#else
+#define IMPLEMENT_ME_SOFT()
+#endif
+#define IMPLEMENT_ME() DoFatalAlert("IMPLEMENT ME: %s:%d", __func__, __LINE__)
+
+#define GAME_ASSERT(condition) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, #condition); } while(0)
+#define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, message); } while(0)

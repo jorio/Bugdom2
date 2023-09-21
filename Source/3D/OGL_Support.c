@@ -11,6 +11,7 @@
 
 #include "game.h"
 
+extern	SDL_Window*		gSDLWindow;
 extern int				gNumObjectNodes,gNumPointers;
 extern	MOMaterialObject	*gMostRecentMaterial;
 extern	short			gNumSuperTilesDrawn,gNumActiveParticleGroups,gNumFencesDrawn,gNumTerrainDeformations,gNumWaterDrawn;
@@ -23,6 +24,9 @@ extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles,gNumLoopi
 /****************************/
 /*    PROTOTYPES            */
 /****************************/
+
+PFNGLACTIVETEXTUREPROC gGlActiveTextureProc;
+PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr);
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr);
@@ -60,7 +64,7 @@ Byte					gAnaglyphPass;
 u_char					gAnaglyphGreyTable[255];
 
 
-AGLDrawable		gAGLWin;
+// AGLDrawable		gAGLWin;
 AGLContext		gAGLContext = nil;
 
 static GLuint 			gFontList;
@@ -203,6 +207,16 @@ OGLSetupOutputType	*outputPtr;
 	OGL_UpdateCameraFromTo(outputPtr, &setupDefPtr->camera.from, &setupDefPtr->camera.to);
 
 	*outputHandle = outputPtr;											// return value to caller
+
+
+				/* GET GL PROCEDURES */
+				// Necessary on Windows
+
+	gGlActiveTextureProc = (PFNGLACTIVETEXTUREPROC) SDL_GL_GetProcAddress("glActiveTexture");
+	GAME_ASSERT(gGlActiveTextureProc);
+
+	gGlClientActiveTextureProc = (PFNGLCLIENTACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glClientActiveTexture");
+	GAME_ASSERT(gGlClientActiveTextureProc);
 }
 
 
@@ -223,9 +237,8 @@ OGLSetupOutputType	*data;
 
 	OGL_FreeFont();
 
-  	aglSetCurrentContext(nil);								// make context not current
-   	aglSetDrawable(data->drawContext, nil);
-	aglDestroyContext(data->drawContext);					// nuke the AGL context
+  	// aglSetCurrentContext(nil);								// make context not current
+	SDL_GL_DeleteContext(data->drawContext);				// nuke the AGL context
 
 
 		/* FREE MEMORY & NIL POINTER */
@@ -244,6 +257,10 @@ OGLSetupOutputType	*data;
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
 {
+	IMPLEMENT_ME();
+
+#if 0
+
 AGLPixelFormat 	fmt;
 GLboolean      mkc, ok;
 GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
@@ -414,6 +431,7 @@ static char			*s;
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(viewDefPtr->clearColor.r, viewDefPtr->clearColor.g, viewDefPtr->clearColor.b, 1.0);
 
+#endif
 }
 
 
@@ -544,7 +562,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 	if (!setupInfo->isActive)
 		DoFatalAlert("OGL_DrawScene isActive == false");
 
-  	aglSetCurrentContext(setupInfo->drawContext);			// make context active
+  	// aglSetCurrentContext(setupInfo->drawContext);			// make context active
 
 
 			/* INIT SOME STUFF */
@@ -774,7 +792,7 @@ do_anaglyph:
 
            /* SWAP THE BUFFS */
 
-	aglSwapBuffers(setupInfo->drawContext);					// end render loop
+	SDL_GL_SwapWindow(gSDLWindow);							// end render loop
 
 
 	if (gGamePrefs.anaglyph)
@@ -1370,90 +1388,6 @@ AGLContext agl_ctx = gAGLContext;
 
 #pragma mark -
 
-
-/**************** OGL BUFFER TO GWORLD ***********************/
-
-GWorldPtr OGL_BufferToGWorld(Ptr buffer, int width, int height, int bytesPerPixel)
-{
-Rect			r;
-GWorldPtr		gworld;
-PixMapHandle	gworldPixmap;
-long			gworldRowBytes,x,y,pixmapRowbytes;
-Ptr				gworldPixelPtr;
-unsigned long	*pix32Src,*pix32Dest;
-unsigned short	*pix16Src,*pix16Dest;
-OSErr			iErr;
-long			pixelSize;
-
-			/* CREATE GWORLD TO DRAW INTO */
-
-	switch(bytesPerPixel)
-	{
-		case	2:
-				pixelSize = 16;
-				break;
-
-		case	4:
-				pixelSize = 32;
-				break;
-	}
-
-	SetRect(&r,0,0,width,height);
-	iErr = NewGWorld(&gworld,pixelSize, &r, nil, nil, 0);
-	if (iErr)
-		DoFatalAlert("OGL_BufferToGWorld: NewGWorld failed!");
-
-	DoLockPixels(gworld);
-
-	gworldPixmap = GetGWorldPixMap(gworld);
-	LockPixels(gworldPixmap);
-
-	gworldRowBytes = (**gworldPixmap).rowBytes & 0x3fff;					// get GWorld's rowbytes
-	gworldPixelPtr = GetPixBaseAddr(gworldPixmap);							// get ptr to pixels
-
-	pixmapRowbytes = width * bytesPerPixel;
-
-
-			/* WRITE DATA INTO GWORLD */
-
-	switch(pixelSize)
-	{
-		case	32:
-				pix32Src = (unsigned long *)buffer;							// get 32bit pointers
-				pix32Dest = (unsigned long *)gworldPixelPtr;
-				for (y = 0; y <  height; y++)
-				{
-					for (x = 0; x < width; x++)
-						pix32Dest[x] = pix32Src[x];
-
-					pix32Dest += gworldRowBytes/4;							// next dest row
-					pix32Src += pixmapRowbytes/4;
-				}
-				break;
-
-		case	16:
-				pix16Src = (unsigned short *)buffer;						// get 16bit pointers
-				pix16Dest = (unsigned short *)gworldPixelPtr;
-				for (y = 0; y <  height; y++)
-				{
-					for (x = 0; x < width; x++)
-						pix16Dest[x] = pix16Src[x];
-
-					pix16Dest += gworldRowBytes/2;							// next dest row
-					pix16Src += pixmapRowbytes/2;
-				}
-				break;
-
-
-		default:
-				DoFatalAlert("OGL_BufferToGWorld: Only 32/16 bit textures supported right now.");
-
-	}
-
-	return(gworld);
-}
-
-
 /******************** OGL: CHECK ERROR ********************/
 
 GLenum OGL_CheckError(void)
@@ -1468,7 +1402,6 @@ AGLContext agl_ctx = gAGLContext;
 		switch(err)
 		{
 			case	GL_INVALID_ENUM:
-					DebugStr("xxxxxxxx");	//------------
 					DoAlert("OGL_CheckError: GL_INVALID_ENUM");
 					DoFatalAlert("This might mean you have incompatible video hardware or an outdated version of OpenGL installed.  Install the free OS 9.2.2 update from Apple's web site.");
 					break;
@@ -1494,8 +1427,7 @@ AGLContext agl_ctx = gAGLContext;
 					break;
 
 			default:
-					DoAlert("OGL_CheckError: some other error");
-					ShowSystemErr_NonFatal(err);
+					DoAlert("OGL_CheckError: some other error %d", err);
 		}
 	}
 
@@ -1616,8 +1548,6 @@ AGLContext agl_ctx = gAGLContext;
 
 void OGL_EnableLighting(void)
 {
-AGLContext agl_ctx = gAGLContext;
-
 	gMyState_Lighting = true;
 	glEnable(GL_LIGHTING);
 }
@@ -1626,8 +1556,6 @@ AGLContext agl_ctx = gAGLContext;
 
 void OGL_DisableLighting(void)
 {
-AGLContext agl_ctx = gAGLContext;
-
 	gMyState_Lighting = false;
 	glDisable(GL_LIGHTING);
 }
@@ -1639,12 +1567,13 @@ AGLContext agl_ctx = gAGLContext;
 
 static void OGL_InitFont(void)
 {
-AGLContext agl_ctx = gAGLContext;
-
+	IMPLEMENT_ME_SOFT();
+#if 0
 	gFontList = glGenLists(256);
 
     if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
 		DoFatalAlert("OGL_InitFont: aglUseFont failed");
+#endif
 }
 
 
@@ -1652,19 +1581,13 @@ AGLContext agl_ctx = gAGLContext;
 
 static void OGL_FreeFont(void)
 {
-
-AGLContext agl_ctx = gAGLContext;
 	glDeleteLists(gFontList, 256);
-
 }
 
 /**************** OGL_DRAW STRING ********************/
 
-void OGL_DrawString(Str255 s, GLint x, GLint y)
+void OGL_DrawString(const char* s, GLint x, GLint y)
 {
-
-AGLContext agl_ctx = gAGLContext;
-
 	OGL_PushState();
 
 	glMatrixMode (GL_MODELVIEW);
@@ -1711,78 +1634,3 @@ Str255	s;
 	OGL_DrawString(s,x,y);
 
 }
-
-#pragma mark -
-
-
-/********************* OGL:  CHECK RENDERER **********************/
-//
-// Returns: true if renderer for the requested device complies, false otherwise
-//
-
-Boolean OGL_CheckRenderer (GDHandle hGD, long* vram)
-{
-AGLRendererInfo info, head_info;
-GLint 			dAccel = 0;
-Boolean			gotit = false;
-
-			/**********************/
-			/* GET FIRST RENDERER */
-			/**********************/
-
-	head_info = aglQueryRendererInfo(&hGD, 1);
-	if(!head_info)
-	{
-		DoAlert("CheckRenderer: aglQueryRendererInfo failed");
-		DoFatalAlert("This problem occurs if you have run the faulty MacOS 9.2.1 updater.  To fix, simply delete all Nvidia extensions and reboot.");
-	}
-
-		/*******************************************/
-		/* SEE IF THERE IS AN ACCELERATED RENDERER */
-		/*******************************************/
-
-	info = head_info;
-
-	while (info)
-	{
-		aglDescribeRenderer(info, AGL_ACCELERATED, &dAccel);
-
-				/* GOT THE ACCELERATED RENDERER */
-
-		if (dAccel)
-		{
-			gotit = true;
-
-					/* GET VRAM */
-
-			aglDescribeRenderer (info, AGL_TEXTURE_MEMORY, (GLint*)vram);
-
-			break;
-		}
-
-
-				/* TRY NEXT ONE */
-
-		info = aglNextRendererInfo(info);
-	}
-
-
-
-			/***********/
-			/* CLEANUP */
-			/***********/
-
-	aglDestroyRendererInfo(head_info);
-
-	return(gotit);
-}
-
-#pragma mark -
-
-
-
-
-
-
-
-

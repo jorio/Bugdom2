@@ -24,7 +24,6 @@ extern	PrefsType			gGamePrefs;
 static short FindSilentChannel(void);
 static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, u_long *leftVolOut, u_long *rightVolOut);
 static void UpdateGlobalVolume(void);
-static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd);
 
 
 /****************************/
@@ -255,6 +254,8 @@ static EffectType	gEffectsTable[] =
 
 void InitSoundTools(void)
 {
+	IMPLEMENT_ME();
+#if 0
 OSErr			iErr;
 short			i;
 ExtSoundHeader	sndHdr;
@@ -316,8 +317,7 @@ FSSpec			spec;
 		mySndCmd.param2 = (long)&sndHdr;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
 		{
-			DoAlert("InitSoundTools: SndDoImmediate failed!");
-			ShowSystemErr_NonFatal(iErr);
+			DoAlert("InitSoundTools: SndDoImmediate failed! %d", iErr);
 		}
 
 
@@ -326,8 +326,7 @@ FSSpec			spec;
 		mySndCmd.param2 = initNoInterp|initStereo;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
 		{
-			DoAlert("InitSoundTools: SndDoImmediate failed 2!");
-			ShowSystemErr_NonFatal(iErr);
+			DoAlert("InitSoundTools: SndDoImmediate failed 2! %d", iErr);
 		}
 	}
 
@@ -338,6 +337,7 @@ FSSpec			spec;
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MAIN);
+#endif
 }
 
 
@@ -389,8 +389,7 @@ OSErr			iErr;
 	srcFile1 = FSpOpenResFile(spec, fsCurPerm);
 	if (srcFile1 == -1)
 	{
-		DoAlert("LoadSoundBank: OpenResFile failed!");
-		ShowSystemErr(ResError());
+		DoFatalAlert("LoadSoundBank: OpenResFile failed! %d", ResError());
 	}
 
 			/****************************/
@@ -410,11 +409,7 @@ OSErr			iErr;
 		if (gSndHandles[bankNum][i] == nil)
 		{
 			iErr = ResError();
-			DoAlert("LoadSoundBank: GetResource failed!");
-			if (iErr == memFullErr)
-				DoFatalAlert("LoadSoundBank: Out of Memory");
-			else
-				ShowSystemErr(iErr);
+			DoFatalAlert("LoadSoundBank: GetResource failed! %d", iErr);
 		}
 		DetachResource((Handle)gSndHandles[bankNum][i]);				// detach resource from rez file & make a normal Handle
 
@@ -712,8 +707,7 @@ u_long					leftVol, rightVol;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("Illegal sound number!");
-		ShowSystemErr(effectNum);
+		DoAlert("Illegal sound number! %d", effectNum);
 	}
 
 				/* CALC VOLUME */
@@ -753,8 +747,7 @@ u_long			leftVol, rightVol;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("Illegal sound number!");
-		ShowSystemErr(effectNum);
+		DoFatalAlert("Illegal sound number! %d", effectNum);
 	}
 
 				/* CALC VOLUME */
@@ -965,27 +958,6 @@ short PlayEffect(short effectNum)
 
 }
 
-/***************************** CALLBACKFN ***************************/
-//
-// Called by the Sound Manager at interrupt time to let us know that
-// the sound is done playing.
-//
-
-static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd)
-{
-SndCommand      theCmd;
-
-    // Play the sound again (loop it)
-
-    theCmd.cmd = bufferCmd;
-    theCmd.param1 = 0;
-    theCmd.param2 = cmd->param2;
-	SndDoCommand (chan, &theCmd, true);
-
-    // Just reuse the callBackCmd that got us here in the first place
-    SndDoCommand (chan, cmd, true);
-}
-
 /***************************** PLAY EFFECT PARMS ***************************/
 //
 // Plays an effect with parameters
@@ -995,6 +967,9 @@ SndCommand      theCmd;
 
 short  PlayEffect_Parms(short effectNum, u_long leftVolume, u_long rightVolume, unsigned long rateMultiplier)
 {
+	IMPLEMENT_ME_SOFT();
+	return -1;
+#if 0
 SndCommand 		mySndCmd;
 SndChannelPtr	chanPtr;
 short			theChan;
@@ -1013,8 +988,7 @@ SoundHeaderPtr   sndPtr;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("Illegal sound number!");
-		ShowSystemErr(effectNum);
+		DoFatalAlert("Illegal sound number! %d", effectNum);
 	}
 
 			/* LOOK FOR FREE CHANNEL */
@@ -1092,6 +1066,7 @@ SoundHeaderPtr   sndPtr;
 	gChannelInfo[theChan].leftVolume 	= leftVolume;		// remember requested volume (not the adjusted volume!)
 	gChannelInfo[theChan].rightVolume 	= rightVolume;
 	return(theChan);										// return channel #
+#endif
 }
 
 
@@ -1213,6 +1188,7 @@ void DoSoundMaintenance(void)
 	}
 
 
+#if 0
 		/* ALSO CHECK OPTIONS */
 
 	if (GetNewKeyState(KEY_F1))
@@ -1227,6 +1203,7 @@ void DoSoundMaintenance(void)
 	{
 		DoInputConfigDialog();
 	}
+#endif
 }
 
 

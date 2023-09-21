@@ -2,9 +2,7 @@
 // ogl_support.h
 //
 
-#ifndef OGL_SUP
-#define OGL_SUP
-
+#pragma once
 
 #define	MAX_FILL_LIGHTS		4
 #define	MAX_TEXTURES		300
@@ -260,7 +258,6 @@ void OGL_UpdateCameraFromTo(OGLSetupOutputType *setupInfo, const OGLPoint3D *fro
 void OGL_Texture_SetOpenGLTexture(GLuint textureName);
 GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType);
-GWorldPtr OGL_BufferToGWorld(Ptr buffer, int width, int height, int bytesPerPixel);
 GLenum OGL_CheckError(void);
 void OGL_GetCurrentViewport(const OGLSetupOutputType *setupInfo, int *x, int *y, int *w, int *h);
 
@@ -270,13 +267,6 @@ void OGL_PopState(void);
 void OGL_EnableLighting(void);
 void OGL_DisableLighting(void);
 
-void OGL_DrawString(Str255 s, GLint x, GLint y);
+void OGL_DrawString(const char* s, GLint x, GLint y);
 void OGL_DrawFloat(float f, GLint x, GLint y);
 void OGL_DrawInt(int f, GLint x, GLint y);
-
-Boolean OGL_CheckRenderer (GDHandle hGD, long* vram);
-
-
-
-
-#endif

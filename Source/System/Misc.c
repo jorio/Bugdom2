@@ -10,16 +10,15 @@
 /***************/
 
 
+#include <stdarg.h>
 #include "game.h"
 
-
-extern	Boolean		gG4,gShareware;
+extern	SDL_Window*	gSDLWindow;
+extern	Boolean		gG4;
 extern	Boolean		gHIDInitialized;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	int			gPolysThisFrame;
 extern	AGLContext		gAGLContext;
-extern	AGLDrawable		gAGLWin;
-extern	float			gDemoVersionTimer;
 extern	short	gPrefsFolderVRefNum;
 extern	long		gPrefsFolderDirID;
 extern	PrefsType			gGamePrefs;
@@ -48,90 +47,51 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 
 int		gNumPointers = 0;
 
-Str255  gSerialFileName = ":Bugdom2:Info";
+Boolean	gGameIsRegistered = true;
 
-Boolean	gGameIsRegistered = false;
-
-unsigned char	gRegInfo[64];
-
-Boolean	gSlowCPU = false;
-
-
-Boolean			gAltivec = false;
 
 
 /**********************/
 /*     PROTOTYPES     */
 /**********************/
 
-static Boolean ValidateSerialNumber(unsigned char *regInfo);
-static void DoSerialDialog(void);
-static pascal OSStatus SerialDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
-
-
-/****************** DO SYSTEM ERROR ***************/
-
-void ShowSystemErr(long err)
-{
-Str255		numStr;
-SInt16      alertItemHit;
-
-	Enter2D();
-	ConvertIntToPStr(err, numStr);
-
-	StandardAlert(kAlertStopAlert, numStr, NULL, NULL, &alertItemHit);
-
-	Exit2D();
-
-	ExitToShell();
-}
-
-/****************** DO SYSTEM ERROR : NONFATAL ***************/
-//
-// nonfatal
-//
-void ShowSystemErr_NonFatal(long err)
-{
-Str255		numStr;
-SInt16      alertItemHit;
-
-	Enter2D();
-	ConvertIntToPStr(err, numStr);
-
-	StandardAlert(kAlertStopAlert, numStr, NULL, NULL, &alertItemHit);
-
-	Exit2D();
-}
-
 
 /*********************** DO ALERT *******************/
 
-void DoAlert(const char* s)
+void DoAlert(const char* format, ...)
 {
-SInt16      alertItemHit;
-
 	Enter2D();
 
-	StandardAlert(kAlertStopAlert, s, NULL, NULL, &alertItemHit);
+	char message[1024];
+	va_list args;
+	va_start(args, format);
+	SDL_vsnprintf(message, sizeof(message), format, args);
+	va_end(args);
+
+	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, PROJECT_FULL_NAME " Alert: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, PROJECT_FULL_NAME, message, gSDLWindow);
 
 	Exit2D();
 }
-
-
 
 
 /*********************** DO FATAL ALERT *******************/
 
-void DoFatalAlert(const char* s)
+void DoFatalAlert(const char* format, ...)
 {
-SInt16      alertItemHit;
-
 	Enter2D();
 
-	StandardAlert(kAlertNoteAlert, s, NULL, NULL, &alertItemHit);
+	char message[1024];
+	va_list args;
+	va_start(args, format);
+	SDL_vsnprintf(message, sizeof(message), format, args);
+	va_end(args);
+
+	SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, PROJECT_FULL_NAME " Fatal Alert: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, PROJECT_FULL_NAME, message, gSDLWindow);
 
 	Exit2D();
-	ExitToShell();
+	CleanQuit();
 }
 
 
@@ -152,13 +112,6 @@ static Boolean	beenHere = false;
 
 		if (gGameViewInfoPtr)							// see if need to dispose this
 			OGL_DisposeWindowSetup(&gGameViewInfoPtr);
-
-		if (DEMO || (!gGameIsRegistered))
-		{
-			GammaFadeOut();
-			ShowDemoQuitScreen();
-
-		}
 
 		ShutdownSound();								// cleanup sound stuff
 	}
@@ -511,203 +464,6 @@ Ptr		p = ptr;
 
 #pragma mark -
 
-/******************* COPY P STRING ********************/
-
-void CopyPString(Str255 from, Str255 to)
-{
-short	i,n;
-
-	n = from[0];			// get length
-
-	for (i = 0; i <= n; i++)
-		to[i] = from[i];
-
-}
-
-
-/***************** P STRING TO C ************************/
-
-void PStringToC(char *pString, char *cString)
-{
-Byte	pLength,i;
-
-	pLength = pString[0];
-
-	for (i=0; i < pLength; i++)					// copy string
-		cString[i] = pString[i+1];
-
-	cString[pLength] = 0x00;					// add null character to end of c string
-}
-
-
-/***************** DRAW C STRING ********************/
-
-void DrawCString(char *string)
-{
-	while(*string != 0x00)
-		DrawChar(*string++);
-}
-
-
-/******************* VERIFY SYSTEM ******************/
-
-void VerifySystem(void)
-{
-OSErr	iErr;
-long		 cpuSpeed;
-NumVersion	vers;
-
-
-			/* SEE IF PROCESSOR IS G4 OR NOT */
-
-	gSlowCPU = false;														// assume not slow
-
-	gG4 = true;
-
-	if (!gG4)																// if not G4, check processor speed to see if on really fast G3
-	{
-		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);
-		if (iErr != noErr)
-			DoFatalAlert("VerifySystem: gestaltProcClkSpeed failed!");
-
-		if ((cpuSpeed/1000000) >= 600)										// must be at least 600mhz G3 for us to treat it like a G4
-			gG4 = true;
-		else
-		if ((cpuSpeed/1000000) <= 450)										// if 450 or less then it's a slow G3
-			gSlowCPU = true;
-	}
-
-
-		/* DETERMINE IF RUNNING ON OS X */
-
-	iErr = Gestalt(gestaltSystemVersion,(long *)&vers);
-	if (iErr != noErr)
-		DoFatalAlert("VerifySystem: gestaltSystemVersion failed!");
-
-//	if (vers.stage >= 0x10)													// see if at least OS 10
-//	{
-//		if ((vers.stage == 0x10) && (vers.nonRelRev < 0x40))				// must be at least OS 10.1 !!!
-//			DoFatalAlert("This game requires OS 10.4 or later to run on OS X.  Run Software Update in System Preferences to get the latest update.");
-//	}
-//	else
-//	{
-//		DoFatalAlert("This game requires at least Mac OS 10.4.");
-//	}
-
-
-#if 0
-			/* CHECK TIME-BOMB */
-	{
-		unsigned long secs;
-		DateTimeRec	d;
-
-		GetDateTime(&secs);
-		SecondsToDate(secs, &d);
-
-		if ((d.year > 2002) ||
-			((d.year == 2002) && (d.month > 10)))
-		{
-			DoFatalAlert("Sorry, but this beta has expired");
-		}
-	}
-#endif
-
-
-		/**********************/
-		/* SEE IF HAS ALTIVEC */
-		/**********************/
-
-	gAltivec = false;									// assume no altivec
-
-#if __BIG_ENDIAN__						// temp for now
-
-	SInt32	response;
-	long	flags;
-
-	if (!Gestalt(gestaltNativeCPUtype, &response))
-	{
-		if (response > gestaltCPU750)					// skip if on G3 or go into this if > G3
-		{
-			iErr = Gestalt(gestaltPowerPCProcessorFeatures,(long *)&flags);		// see if AltiVec available
-			if (iErr != noErr)
-				DoFatalAlert("VerifySystem: gestaltPowerPCProcessorFeatures failed!");
-			gAltivec = ((flags & (1<<gestaltPowerPCHasVectorInstructions)) != 0);
-		}
-	}
-#endif
-
-
-
-
-		/***************************************/
-		/* SEE IF QUICKEN SCHEDULER IS RUNNING */
-		/***************************************/
-
-	{
-		ProcessSerialNumber psn = {kNoProcess, kNoProcess};
-		ProcessInfoRec	info;
-		short			i;
-		Str255		s;
-		const char snitch[] = "Quicken Scheduler";
-
-		info.processName = s;
-		info.processInfoLength = sizeof(ProcessInfoRec);
-		info.processAppSpec = nil;
-
-		while(GetNextProcess(&psn) == noErr)
-		{
-			iErr = GetProcessInformation(&psn, &info);
-			if (iErr)
-				break;
-
-			if (s[0] != snitch[0])					// see if string matches
-				goto next_process2;
-
-			for (i = 1; i <= s[0]; i++)
-			{
-				if (s[i] != snitch[i])
-					goto next_process2;
-			}
-
-			DoAlert("IMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
-
-next_process2:;
-		}
-	}
-
-}
-
-
-/******************** REGULATE SPEED ***************/
-
-void RegulateSpeed(short fps)
-{
-u_long	n;
-static u_long oldTick = 0;
-
-	n = 60 / fps;
-	while ((TickCount() - oldTick) < n) {}			// wait for n ticks
-	oldTick = TickCount();							// remember current time
-}
-
-
-/************* COPY PSTR **********************/
-
-void CopyPStr(ConstStr255Param	inSourceStr, StringPtr	outDestStr)
-{
-short	dataLen = inSourceStr[0] + 1;
-
-	BlockMoveData(inSourceStr, outDestStr, dataLen);
-	outDestStr[0] = dataLen - 1;
-}
-
-
-
-
-
-#pragma mark -
-
-
 
 /************** CALC FRAMES PER SECOND *****************/
 //
@@ -716,6 +472,8 @@ short	dataLen = inSourceStr[0] + 1;
 
 void CalcFramesPerSecond(void)
 {
+	IMPLEMENT_ME();
+#if 0
 AbsoluteTime currTime,deltaTime;
 static AbsoluteTime time = {0,0};
 Nanoseconds	nano;
@@ -739,6 +497,7 @@ limit_speed:
 		goto limit_speed;
 
 	time = currTime;	// reset for next time interval
+#endif
 }
 
 
@@ -768,531 +527,11 @@ int		i;
 
 void MyFlushEvents(void)
 {
-//EventRecord 	theEvent;
-
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
-	FlushEventQueue(GetMainEventQueue());
-
-#if 0
-			/* POLL EVENT QUEUE TO BE SURE THINGS ARE FLUSHED OUT */
-
-	while (GetNextEvent(mDownMask|mUpMask|keyDownMask|keyUpMask|autoKeyMask, &theEvent));
-
-
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
-	FlushEventQueue(GetMainEventQueue());
-#endif
+	IMPLEMENT_ME_SOFT();
 }
 
 
 #pragma mark -
-
-
-
-/******************** PSTR CAT / COPY *************************/
-
-StringPtr PStrCat(StringPtr dst, ConstStr255Param   src)
-{
-SInt16 size = src[0];
-
-	if (0xff - dst[0] < size)
-		size = 0xff - dst[0];
-
-	BlockMoveData(&src[1], &dst[dst[0]], size);
-	dst[0] = dst[0] + size;
-
-	return dst;
-}
-
-StringPtr PStrCopy(StringPtr dst, ConstStr255Param   src)
-{
-	dst[0] = src[0]; BlockMoveData(&src[1], &dst[1], src[0]); return dst;
-}
-
-
-
-
-#pragma mark -
-
-
-/********************** CHECK GAME SERIAL NUMBER *************************/
-
-void CheckGameSerialNumber(void)
-{
-OSErr   iErr;
-FSSpec  spec;
-short		fRefNum;
-long        	numBytes = SERIAL_LENGTH;
-
-            /* GET SPEC TO REG FILE */
-
-	iErr = FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gSerialFileName, &spec);
-    if (iErr)
-        goto game_not_registered;
-
-
-            /*************************/
-            /* VALIDATE THE SERIAL FILE */
-            /*************************/
-
-            /* READ SERIAL DATA */
-
-    if (FSpOpenDF(&spec,fsRdPerm,&fRefNum) != noErr)
-        goto game_not_registered;
-
-	FSRead(fRefNum,&numBytes,gRegInfo);
-
-    FSClose(fRefNum);
-
-            /* VALIDATE IT */
-
-    if (!ValidateSerialNumber(gRegInfo))
-        goto game_not_registered;
-
-    gGameIsRegistered = true;
-
-    return;
-
-        /* GAME IS NOT REGISTERED YET, SO DO DIALOG */
-
-game_not_registered:
-
-    DoSerialDialog();
-
-    if (gGameIsRegistered)                                  // see if write out reg file
-    {
-	    FSpDelete(&spec);	                                // delete existing file if any
-	    iErr = FSpCreate(&spec,kGameID,'xxxx',-1);
-        if (iErr == noErr)
-        {
-        	numBytes = SERIAL_LENGTH;
-			FSpOpenDF(&spec,fsRdWrPerm,&fRefNum);
-			FSWrite(fRefNum,&numBytes,gRegInfo);
-		    FSClose(fRefNum);
-
-     	}
-    }
-
-
-}
-
-
-/********************* VALIDATE REGISTRATION NUMBER ******************/
-//
-// Return true if is valid
-//
-
-static Boolean ValidateSerialNumber(unsigned char *regInfo)
-{
-#define	NUM_PIRATE_SERIALS	19
-FSSpec	spec;
-u_long	customerID, checksum, i;
-u_long	seed0,seed1,seed2, validSerial, enteredSerial;
-u_char	shift;
-int		j,c;
-Handle	hand;
-const unsigned char pirateNumbers[NUM_PIRATE_SERIALS][SERIAL_LENGTH*2] =
-{
-	"A%A%A%A%A%A%M%M%M%M%M%M%",			// put "%" in there to confuse pirates scanning for this data
-	"C%E%N%D%R%M%H%C%Q%G%P%R%",
-	"G%C%R%H%K%J%Q%G%M%I%G%H%",
-	"G%N%L%G%F%M%H%K%C%N%K%F%",
-	"G%B%E%R%O%O%E%I%G%P%C%E%",
-	"G%I%P%H%J%Q%D%D%K%H%N%N%",
-	"G%D%H%Q%G%G%K%O%P%C%O%H%",
-	"G%N%D%I%F%C%G%J%G%I%N%L%",
-	"J%B%L%I%I%C%J%R%Q%J%C%G%",
-	"M%J%E%L%P%C%C%D%I%G%P%I%",
-	"P%A%B%L%K%4%9%H%E%Q%N%R%",
-	"H%F%O%P%F%L%I%C%R%H%R%R%",
-	"H%F%J%M%I%L%I%M%M%H%M%H%",
-	"I%Y%J%T%K%O%M%P%N%L%K%Q%",
-	"N%D%K%O%E%K%O%H%F%D%R%K%",
-	"O%P%J%S%J%M%I%I%R%G%F%R%",
-	"I%E%J%I%H%C%L%G%K%G%J%D%",
-	"I%Y%J%T%K%O%M%P%N%L%K%Q%",
-	"I%F%O%L%R%H%N%F%J%E%H%L%",
-};
-
-
-	if (gShareware)
-	{
-
-				/*************************/
-	            /* VALIDATE ENTERED CODE */
-	            /*************************/
-
-			/* CONVERT TO UPPER CASE */
-
-	    for (i = 0; i < SERIAL_LENGTH; i++)
-	    {
-	    	if ((regInfo[i] >= '0') && (regInfo[i] <= '9'))		// if any numbers then its a pirate number
-	    		return(false);
-
-			if ((regInfo[i] >= 'a') && (regInfo[i] <= 'z'))
-				regInfo[i] = 'A' + (regInfo[i] - 'a');
-		}
-
-
-	    	/* THE FIRST 4 DIGITS ARE THE CUSTOMER INDEX */
-
-	    customerID  = (regInfo[0] - 'G') * 0x1000;				// convert G,H,I,J, K,L,M,N, O,P,Q,R, S,T,U,V to 0x1000...0xf000
-	    customerID += (regInfo[1] - 'A') * 0x0100;				// convert A,B,C,D, E,F,G,H, I,J,K,L, M,N,O,P to 0x0100...0x0f00
-	    customerID += (regInfo[2] - 'C') * 0x0010;				// convert C,D,E,F, G,H,I,J, K,L,M,N, O,P,Q,R to 0x0010...0x00f0
-	    customerID += (regInfo[3] - 'G') * 0x0001;				// convert G,H,I,J, K,L,M,N, O,P,Q,R, S,T,U,V to 0x0001...0x000f
-
-		if (customerID < 200)									// there are no customers under 200 since we want to confuse pirates
-			return(false);
-		if (customerID > 40000)									// also assume not over 40,000
-			return(false);
-
-			/* NOW SEE WHAT THE SERIAL SHOULD BE */
-
-		seed0 = 0x2a80ce30;										// init random seed
-		seed1 = 0xf032343a;
-		seed2 = 0x8CA77EE9;
-
-		for (i = 0; i < customerID; i++)						// calculate the random serial
-  			seed2 ^= (((seed1 ^= (seed2>>5)*1568397607UL)>>7)+(seed0 = (seed0+1)*3141592621UL))*2435386481UL;
-
-		validSerial = seed2;
-
-
-			/* CONVERT ENTERED SERIAL STRING TO NUMBER */
-
-		shift = 0;
-		enteredSerial = 0;
-		for (i = SERIAL_LENGTH-1; i >= 4; i--)						// start @ last digit
-		{
-			u_long 	digit = regInfo[i] - 'C';					// convert C,D,E,F, G,H,I,J, K,L,M,N, O,P,Q,R to 0x0..0xf
-			enteredSerial += digit << shift;					// shift digit into posiion
-			shift += 4;											// set to insert next nibble
-		}
-
-				/* SEE IF IT MATCHES */
-
-		if (enteredSerial != validSerial)
-			return(false);
-
-
-
-				/**********************************/
-				/* CHECK FOR KNOWN PIRATE NUMBERS */
-				/**********************************/
-
-					/* FIRST VERIFY OUR TABLE */
-
-		if ((pirateNumbers[0][1] != '%') ||									// we do this to see if priates have cleared out our table
-			(pirateNumbers[2][0] != 'G') ||
-			(pirateNumbers[2][2] != 'C') ||
-			(pirateNumbers[1][0] != 'C') ||
-			(pirateNumbers[5][16] != 'K') ||
-			(pirateNumbers[2][12] != 'Q') ||
-			(pirateNumbers[7][12] != 'G') ||
-			(pirateNumbers[10][12] != '9') ||
-			(pirateNumbers[3][20] != 'K'))
-		{
-corrupt:
-			DoFatalAlert("This application is corrupt.  You should reinstall a fresh copy of the game.");
-			return(false);
-		}
-
-
-				/* CHECKSUM */
-
-		checksum = 0;
-		for (i = 0; i < NUM_PIRATE_SERIALS; i++)
-		{
-			for (j = 0; j < (SERIAL_LENGTH*2); j++)
-				checksum += (u_long)pirateNumbers[i][j];
-		}
-
-#if 0
-		ShowSystemErr(checksum);							// each time we change the table we need to update the hard-coded checksum
-#else
-		if (checksum != 25314)								// does the checksum match?
-			goto corrupt;
-
-#endif
-
-
-
-				/* THEN SEE IF THIS CODE IS IN THE TABLE */
-
-		for (j = 0; j < NUM_PIRATE_SERIALS; j++)
-		{
-			for (i = 0; i < SERIAL_LENGTH; i++)
-			{
-				if (regInfo[i] != pirateNumbers[j][i*2])					// see if doesn't match
-					goto next_code;
-			}
-
-					/* THIS CODE IS PIRATED */
-
-			return(false);
-
-	next_code:;
-		}
-
-
-				/*******************************/
-				/* SECONDARY CHECK IN REZ FILE */
-				/*******************************/
-				//
-				// The serials are stored in the Level 1 terrain file
-				//
-
-		if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Terrain:Level1_Garden.ter", &spec) == noErr)		// open rez fork
-		{
-			short fRefNum = FSpOpenResFile(&spec,fsRdPerm);
-
-			UseResFile(fRefNum);						// set app rez
-
-			c = Count1Resources('savs');						// count how many we've got stored
-			for (j = 0; j < c; j++)
-			{
-				hand = GetResource('savs',128+j);			// read the #
-
-				for (i = 0; i < SERIAL_LENGTH; i++)
-				{
-					if (regInfo[i] != (*hand)[i])			// see if doesn't match
-						goto next2;
-				}
-
-						/* THIS CODE IS PIRATED */
-
-				return(false);
-
-		next2:
-				ReleaseResource(hand);
-			}
-
-		}
-
-	    return(true);
-	}
-
-			/******************************************************/
-			/* THIS IS THE BOXED VERSION, SO VERIFY THE FAUX CODE */
-			/******************************************************/
-	else
-	{
-		int	i;
-		static unsigned char fauxCode[SERIAL_LENGTH] = "PANG00195846";
-
-		for (i = 0 ; i < SERIAL_LENGTH; i++)
-		{
-			if ((regInfo[i] >= 'a') && (regInfo[i] <= 'z'))		// conver to upper-case
-				regInfo[i] = 'A' + (regInfo[i] - 'a');
-
-			if (regInfo[i] != fauxCode[i])						// see if doesn't match
-				return(false);
-		}
-	    return(true);
-	}
-}
-
-
-
-/****************** DO SERIAL DIALOG *************************/
-
-		/* CHANGE NAME TO CONFUSE HACKERS */
-
-static void DoSerialDialog(void)
-{
-OSErr			err;
-EventHandlerRef	ref;
-
-EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
-
-const char		*rezNames[MAX_LANGUAGES] =
-{
-	"Shareware_English",
-	"Shareware_French",
-	"Shareware_German",
-	"Shareware_Spanish",
-	"Shareware_Italian",
-	"Shareware_Swedish",
-	"Shareware_Dutch",
-};
-
-const char		*retailRezNames[MAX_LANGUAGES] =
-{
-	"Retail_English",
-	"Retail_French",
-	"Retail_German",
-	"Retail_Spanish",
-	"Retail_Italian",
-	"Retail_Swedish",
-	"Retail_Dutch",
-};
-
-
-	Enter2D();
-
-    		/***************/
-    		/* INIT DIALOG */
-    		/***************/
-
-	if (gGamePrefs.language >= MAX_LANGUAGES)			// check for corruption
-		gGamePrefs.language = LANGUAGE_ENGLISH;
-
-
-				/* CREATE WINDOW FROM THE NIB */
-
-	if (gShareware)
-	{
-		err = CreateWindowFromNib(gNibs, CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
-								kCFStringEncodingMacRoman), &gDialogWindow);
-	}
-	else
-	{
-		err = CreateWindowFromNib(gNibs, CFStringCreateWithCString(nil, retailRezNames[gGamePrefs.language],
-								kCFStringEncodingMacRoman), &gDialogWindow);
-	}
-	if (err)
-		DoFatalAlert("GamepadInit: CreateWindowFromNib failed!");
-
-
-			/* CREATE NEW WINDOW EVENT HANDLER */
-
-    gWinEvtHandler = NewEventHandlerUPP(SerialDialog_EventHandler);
-    InstallWindowEventHandler(gDialogWindow, gWinEvtHandler, GetEventTypeCount(list), list, 0, &ref);
-
-
-
-			/* PROCESS THE DIALOG */
-
-    ShowWindow(gDialogWindow);
-	RunAppModalLoopForWindow(gDialogWindow);
-
-
-				/* CLEANUP */
-
-	DisposeEventHandlerUPP (gWinEvtHandler);
-	DisposeWindow (gDialogWindow);
-
-
-	Exit2D();
-}
-
-
-/****************** DO SERIAL DIALOG EVENT HANDLER *************************/
-//
-// main window event handling
-//
-
-static pascal OSStatus SerialDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
-{
-#pragma unused (myHandler, userData)
-OSStatus			result = eventNotHandledErr;
-ControlID 			idControl;
-ControlRef 			control;
-OSStatus 			err = noErr;
-HICommand 			command;
-Size				actualSize;
-
-	switch(GetEventKind(event))
-	{
-
-				/*******************/
-				/* PROCESS COMMAND */
-				/*******************/
-
-		case	kEventProcessCommand:
-				GetEventParameter (event, kEventParamDirectObject, kEventParamHICommand, NULL, sizeof(command), NULL, &command);
-				switch(command.commandID)
-				{
-							/******************/
-							/* "ENTER" BUTTON */
-							/******************/
-
-					case	'ok  ':
-
-								/* GET THE SERIAL STRING FROM THE TEXTEDIT CONTROL */
-
-						    idControl.signature = 'serl';
-						    idControl.id 		= 0;
-						    err = GetControlByID(gDialogWindow, &idControl, &control);
-							err |= GetControlData(control, 0, kControlEditTextTextTag, 64, gRegInfo, &actualSize);
-							if (err)
-						    	DoFatalAlert("GamepadInit_EventHandler: GetControlData failed!");
-
-
-									/* VALIDATE THE NUMBER */
-
-		                    if (ValidateSerialNumber(gRegInfo) == true)
-		                    {
-		                        gGameIsRegistered = true;
-		                        QuitAppModalLoopForWindow(gDialogWindow);
-		             		}
-		                    else
-		                    {
-		                        DoAlert("Sorry, that serial number is not valid.  Please try again.");
-		                    }
-		                    break;
-
-
-							/*****************/
-							/* "QUIT" BUTTON */
-							/*****************/
-
-					case	'quit':
-							ExitToShell();
-							break;
-
-
-							/*****************/
-							/* "DEMO" BUTTON */
-							/*****************/
-
-					case	'demo':
-	                        QuitAppModalLoopForWindow(gDialogWindow);
-							break;
-
-
-							/****************/
-							/* "URL" BUTTON */
-							/****************/
-
-					case	'url ':
-							if (LaunchURL("http://www.pangeasoft.net/bug2/serials.html") == noErr)
-			                    ExitToShell();
-			              	break;
-
-
-				}
-				break;
-    }
-
-    return (result);
-}
-
-
-#pragma mark -
-
-
-
-
-/********************* CONVERT INT TO PSTR *************************/
-
-void ConvertIntToPStr(int num, StringPtr s)
-{
-CFStringRef	cfstr;
-
-	cfstr = CFStringCreateWithFormat(kCFAllocatorDefault, nil, CFSTR("%d"), num);		// creates a CFString based on printf style formatting
-
-	if (!CFStringGetPascalString(cfstr, s, 255, kCFStringEncodingASCII))
-		DoFatalAlert("ConvertIntToPStr:  CFStringGetPascalString() failed!");
-
-}
-
-
-
-
-#pragma mark -
-
-
 
 
 /********************* SWIZZLE SHORT **************************/

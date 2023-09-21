@@ -11,7 +11,6 @@
 
 #include	"game.h"
 
-
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
 extern	float	gFramesPerSecondFrac;
@@ -20,7 +19,6 @@ extern	long	gPrefsFolderDirID;
 extern	Boolean				gMuteMusicFlag;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
-extern	AGLDrawable		gAGLWin;
 extern	AGLContext		gAGLContext;
 extern	Boolean			gISpActive;
 
@@ -31,29 +29,15 @@ extern	Boolean			gISpActive;
 static void MoveFadeEvent(ObjNode *theNode);
 
 static void CreateDisplayModeList(void);
-pascal void ModeListCallback(void *userData, DMListIndexType a, DMDisplayModeListEntryPtr displaymodeInfo);
-pascal void ShowVideoMenuSelection (DialogPtr dlogPtr, short item);
 static void CalcVRAMAfterBuffers(void);
 static void GetDisplayVRAM(void);
-static pascal OSStatus DoScreenModeDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
-static void BuildResolutionMenu(void);
 
 
 /****************************/
 /*    CONSTANTS             */
 /****************************/
 
-#define		DO_GAMMA	1
-
-typedef struct
-{
-	int		rezH,rezV;
-	int		hz;
-}VideoModeType;
-
-
-#define	MAX_VIDEO_MODES		50
-
+#define		DO_GAMMA	0
 
 /**********************/
 /*     VARIABLES      */
@@ -65,24 +49,7 @@ Boolean				gRealCursorVisible = true;
 u_long			gDisplayVRAM = 0;
 u_long			gVRAMAfterBuffers = 0;
 
-
-WindowRef 		gDialogWindow = nil;
-EventHandlerUPP gWinEvtHandler;
-
-
-WindowPtr		gGameWindow;
-GrafPtr			gGameWindowGrafPtr;
-GDHandle 		gGDevice;
-
-
-static short				gNumVideoModes = 0;
-static VideoModeType		gVideoModeList[MAX_VIDEO_MODES];
-
 long					gScreenXOffset,gScreenYOffset;
-Boolean					gLoadedDrawSprocket = false;
-
-CGrafPtr				gDisplayContextGrafPtr = nil;
-
 
 float		gGammaFadePercent = 1.0;
 
@@ -90,19 +57,17 @@ int				gGameWindowWidth, gGameWindowHeight;
 
 short			g2DStackDepth = 0;
 
-
 Boolean			gPlayFullScreen;
-static	CGDirectDisplayID	gCGDisplayID;
 
+#if 0
 CGGammaValue gOriginalRedTable[256];
 CGGammaValue gOriginalGreenTable[256];
 CGGammaValue gOriginalBlueTable[256];
 
-
 static CGGammaValue gGammaRedTable[256];
 static CGGammaValue gGammaGreenTable[256];
 static CGGammaValue gGammaBlueTable[256];
-
+#endif
 
 float		gGammaTweak = 1.0f;
 
@@ -111,14 +76,12 @@ float		gGammaTweak = 1.0f;
 
 void InitWindowStuff(void)
 {
-Rect				r;
-float				w,h;
-CFDictionaryRef 	refDisplayMode = 0;
-CGTableCount 		sampleCount;
-
-
 	gPlayFullScreen = true;				//!gGamePrefs.playInWindow;
 
+	IMPLEMENT_ME_SOFT();
+	gGameWindowWidth = 640;
+	gGameWindowHeight = 480;
+#if 0
 	if (gPlayFullScreen)
 	{
 
@@ -204,49 +167,9 @@ CGTableCount 		sampleCount;
 
 	gGameWindowWidth = r.right - r.left;
 	gGameWindowHeight = r.bottom - r.top;
-
-
+#endif
 }
 
-
-
-
-/*==============================================================================
-* Dobold ()
-* this is the user item procedure to make the thick outline around the default
-* button (assumed to be item 1)
-*=============================================================================*/
-
-pascal void DoBold (DialogPtr dlogPtr, short item)
-{
-short		itype;
-Handle		ihandle;
-Rect		irect;
-
-#pragma unused (item)
-
-	GetDialogItem (dlogPtr, 1, &itype, (Handle *)&ihandle, &irect);	/* get the buttons rect */
-	PenSize (3, 3);											/* make thick lines	*/
-	InsetRect (&irect, -4, -4);							/* grow rect a little   */
-	FrameRoundRect (&irect, 16, 16);						/* frame the button now */
-	PenNormal ();
-}
-
-/*==============================================================================
-* DoOutline ()
-* this is the user item procedure to make the thin outline around the given useritem
-*=============================================================================*/
-
-pascal void DoOutline (DialogPtr dlogPtr, short item)
-{
-short		itype;
-Handle		ihandle;
-Rect		irect;
-
-	GetDialogItem (dlogPtr, item, &itype, (Handle *)&ihandle, &irect);	// get the user item's rect
-	FrameRect (&irect);						// frame the button now
-	PenNormal();
-}
 
 
 #pragma mark -
@@ -370,9 +293,6 @@ void GammaOff(void)
 
 void CleanupDisplay(void)
 {
-	CGReleaseAllDisplays();
-
-	gDisplayContextGrafPtr = nil;
 }
 
 
@@ -448,6 +368,8 @@ float	speed = theNode->Speed * fps;
 
 	if (gPlayFullScreen)
 	{
+		IMPLEMENT_ME_SOFT();
+#if 0
 		int			i;
 
 	    for (i = 0; i < 256 ; i++)
@@ -458,8 +380,8 @@ float	speed = theNode->Speed * fps;
 	    }
 
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+#endif
 	}
-
 }
 
 
@@ -468,6 +390,8 @@ float	speed = theNode->Speed * fps;
 
 void GameScreenToBlack(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 Rect	r;
 
 	if (!gDisplayContextGrafPtr)
@@ -478,6 +402,7 @@ Rect	r;
 
 	GetPortBounds(gDisplayContextGrafPtr, &r);
 	EraseRect(&r);
+#endif
 }
 
 
@@ -488,6 +413,8 @@ Rect	r;
 
 void Enter2D(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 	ShowRealCursor();
 	MyFlushEvents();
 
@@ -518,7 +445,7 @@ void Enter2D(void)
 	}
 
 	GammaOn();
-
+#endif
 }
 
 
@@ -529,6 +456,8 @@ void Enter2D(void)
 
 void Exit2D(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 	g2DStackDepth--;
 	if (g2DStackDepth > 0)			// don't exit unless on final exit
 		return;
@@ -545,56 +474,7 @@ void Exit2D(void)
 				aglSetFullScreen(gAGLContext, 0, 0, 0, 0);		//re-enable GL
 		}
 	}
-
-}
-
-
-#pragma mark -
-
-/*********************** DUMP GWORLD 2 **********************/
-//
-//    copies to a destination RECT
-//
-
-void DumpGWorld2(GWorldPtr thisWorld, WindowPtr thisWindow,Rect *destRect)
-{
-PixMapHandle pm;
-GDHandle		oldGD;
-GWorldPtr		oldGW;
-Rect			r;
-
-	DoLockPixels(thisWorld);
-
-	GetGWorld (&oldGW,&oldGD);
-	pm = GetGWorldPixMap(thisWorld);
-	if ((pm == nil) | (*pm == nil) )
-		DoAlert("PixMap Handle or Ptr = Null?!");
-
-	SetPort(GetWindowPort(thisWindow));
-
-	ForeColor(blackColor);
-	BackColor(whiteColor);
-
-	GetPortBounds(thisWorld, &r);
-
-	CopyBits((BitMap *)*pm, GetPortBitMapForCopyBits(GetWindowPort(thisWindow)),
-			 &r,
-			 destRect,
-			 srcCopy, 0);
-
-	SetGWorld(oldGW,oldGD);								// restore gworld
-}
-
-
-/******************* DO LOCK PIXELS **************/
-
-void DoLockPixels(GWorldPtr world)
-{
-PixMapHandle pm;
-
-	pm = GetGWorldPixMap(world);
-	if (LockPixels(pm) == false)
-		DoFatalAlert("PixMap Went Bye,Bye?!");
+#endif
 }
 
 
@@ -618,6 +498,8 @@ u_long	start;
 
 void DoScreenModeDialog(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if false
 OSErr			err;
 EventHandlerRef	ref;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
@@ -809,300 +691,9 @@ do_it:
 
 	CalcVRAMAfterBuffers();
 	SavePrefs();
-}
-
-
-/****************** DO SCREEN MODE DIALOG EVENT HANDLER *************************/
-//
-// main window event handling
-//
-
-static pascal OSStatus DoScreenModeDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
-{
-#pragma unused (myHandler, userData)
-OSStatus		result = eventNotHandledErr;
-HICommand 		command;
-
-	switch(GetEventKind(event))
-	{
-
-				/*******************/
-				/* PROCESS COMMAND */
-				/*******************/
-
-		case	kEventProcessCommand:
-				GetEventParameter (event, kEventParamDirectObject, kEventParamHICommand, NULL, sizeof(command), NULL, &command);
-				switch(command.commandID)
-				{
-							/* "OK" BUTTON */
-
-					case	'ok  ':
-		                    QuitAppModalLoopForWindow(gDialogWindow);
-							break;
-
-							/* "QUIT" BUTTON */
-
-					case	'quit':
-		                    ExitToShell();
-							break;
-
-
-				}
-				break;
-    }
-
-    return (result);
-}
-
-
-
-/****************** BUILD RESOLUTION MENU *************************/
-
-static void BuildResolutionMenu(void)
-{
-Str255 		menuStrings[MAX_VIDEO_MODES];
-short		i, defaultItem = 1;
-Str32		s,t;
-
-	for (i=0; i < gNumVideoModes; i++)
-	{
-				/* BUILD MENU ITEM STRING */
-
-		NumToString(gVideoModeList[i].rezH, s);			// horiz rez
-		s[s[0]+1] = 'x';								// "x"
-		s[0]++;
-
-		NumToString(gVideoModeList[i].rezV, t);			// vert rez
-		BlockMove(&t[1], &s[s[0]+1], t[0]);
-		s[0] += t[0];
-
-		s[s[0]+1] = ' ';								// " "
-		s[0]++;
-
-		NumToString(gVideoModeList[i].hz, t);			// refresh hz
-		BlockMove(&t[1], &s[s[0]+1], t[0]);
-		s[0] += t[0];
-
-		s[s[0]+1] = 'h';								// "hz"
-		s[s[0]+2] = 'z';
-		s[0] += 2;
-
-		BlockMove(&s[0], &menuStrings[i][0], s[0]+1);
-
-			/* IS THIS THE CURRENT SETTING? */
-
-		if ((gVideoModeList[i].rezH == gGamePrefs.screenWidth) &&
-			(gVideoModeList[i].rezV == gGamePrefs.screenHeight) &&
-			(gVideoModeList[i].hz == gGamePrefs.hz))
-		{
-			defaultItem = i;
-		}
-	}
-
-
-			/* BUILD THE MENU FROM THE STRING LIST */
-
-	BuildControlMenu (gDialogWindow, 'rezm', 0, &menuStrings[0], gNumVideoModes, defaultItem);
-}
-
-
-/********************** BUILD CONTROL MENU ***************************/
-//
-// builds menu of id, based on text list of numitems number of strings
-//
-
-void BuildControlMenu(WindowRef window, SInt32 controlSig, SInt32 id, Str255 textList[], short numItems, short defaultSelection)
-{
-MenuHandle 	hMenu;
-Size 		tempSize;
-ControlID 	idControl;
-ControlRef 	control;
-short 		i;
-OSStatus 	err = noErr;
-
-    		/* GET MENU DATA */
-
-    idControl.signature = controlSig;
-    idControl.id 		= id;
-    GetControlByID(window, &idControl, &control);
-    GetControlData(control, kControlMenuPart, kControlPopupButtonMenuHandleTag, sizeof (MenuHandle), &hMenu, &tempSize);
-
-    	/* REMOVE ALL ITEMS FROM EXISTING MENU */
-
-    err = DeleteMenuItems(hMenu, 1, CountMenuItems (hMenu));
-
-
-			/* ADD NEW ITEMS TO THE MENU */
-
-    for (i = 0; i < numItems; i++)
-        AppendMenu(hMenu, textList[i]);
-
-
-			/* FORCE UPDATE OF MENU EXTENTS */
-
-    SetControlMaximum(control, numItems);
-
-	if (defaultSelection >= numItems)					// make sure default isn't over
-		defaultSelection = 0;
-
-	SetControlValue(control, defaultSelection+1);
-
-}
-
-
-
-#pragma mark -
-
-/********************* CREATE DISPLAY MODE LIST *************************/
-
-static void CreateDisplayModeList(void)
-{
-int					i, j, numDeviceModes;
-CFArrayRef 			modeList;
-CFDictionaryRef 	mode;
-long				width, height, dep;
-double				hz;
-
-			/* MAKE SURE IT SHOWS 640X480 */
-
-	gVideoModeList[0].rezH = 640;
-	gVideoModeList[0].rezV = 480;
-	gVideoModeList[0].hz = 60;
-	gNumVideoModes = 1;
-
-				/* GET MAIN MONITOR ID & VRAM FOR IT */
-
-	gCGDisplayID = CGMainDisplayID();
-	GetDisplayVRAM();										// calc the amount of vram on this device
-
-				/* GET LIST OF MODES FOR THIS MONITOR */
-
-	modeList = CGDisplayAvailableModes(gCGDisplayID);
-	if (modeList == nil)
-		DoFatalAlert("CreateDisplayModeList: CGDisplayAvailableModes failed!");
-
-	numDeviceModes = CFArrayGetCount(modeList);
-
-
-				/*********************/
-				/* EXTRACT MODE INFO */
-				/*********************/
-
-	for (i = 0; i < numDeviceModes; i++)
-    {
-    	CFNumberRef	number;
-    	Boolean		skip;
-
-        mode = CFArrayGetValueAtIndex( modeList, i );				  	// Pull the mode dictionary out of the CFArray
-		if (mode == nil)
-			DoFatalAlert("CreateDisplayModeList: CFArrayGetValueAtIndex failed!");
-
-		number = CFDictionaryGetValue(mode, kCGDisplayWidth);			// get width
-		CFNumberGetValue(number, kCFNumberLongType, &width) ;
-
-		number = CFDictionaryGetValue(mode, kCGDisplayHeight);	 		// get height
-		CFNumberGetValue(number, kCFNumberLongType, &height);
-
-		number = CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel);	// get depth
-		CFNumberGetValue(number, kCFNumberLongType, &dep);
-		if (dep != 32)
-			continue;
-
-		number = CFDictionaryGetValue(mode, kCGDisplayRefreshRate);		// get refresh rate
-		if (number == nil)
-			hz = 85;
-		else
-		{
-			CFNumberGetValue(number, kCFNumberDoubleType, &hz);
-			if (hz == 0)												// LCD's tend to return 0 since there's no real refresh rate
-				hz = 60;
-		}
-
-				/* IN LOW-VRAM SITUATIONS, DON'T ALLOW LARGE MODES */
-
-#if 0
-		if (gDisplayVRAM <= 0x4000000)				// if <= 64MB VRAM...
-		{
-			if (width > 1280)
-				continue;
-		}
-
-		if (gDisplayVRAM <= 0x2000000)				// if <= 32MB VRAM...
-		{
-			if (width > 1024)
-				continue;
-		}
 #endif
-
-					/***************************/
-					/* SEE IF ADD TO MODE LIST */
-					/***************************/
-
-					/* SEE IF IT'S A VALID MODE FOR US */
-
-		if (CFDictionaryGetValue(mode, kCGDisplayModeUsableForDesktopGUI) != kCFBooleanTrue)	// is it a displayable rez?
-			continue;
-
-
-						/* SEE IF ALREADY IN LIST */
-
-		skip = false;
-		for (j = 0; j < gNumVideoModes; j++)
-		{
-			if ((gVideoModeList[j].rezH == width) &&
-				(gVideoModeList[j].rezV == height) &&
-				(gVideoModeList[j].hz == hz))
-			{
-				skip = true;
-				break;
-			}
-		}
-
-		if (!skip)
-		{
-				/* THIS REZ NOT IN LIST YET, SO ADD */
-
-			if (gNumVideoModes < MAX_VIDEO_MODES)
-			{
-				gVideoModeList[gNumVideoModes].rezH = width;
-				gVideoModeList[gNumVideoModes].rezV = height;
-				gVideoModeList[gNumVideoModes].hz = hz;
-				gNumVideoModes++;
-			}
-		}
-	}
 }
 
-/******************** GET DISPLAY VRAM ***********************/
-
-static void GetDisplayVRAM(void)
-{
-io_service_t	port;
-CFTypeRef		classCode;
-
-			/* SEE HOW MUCH VRAM WE HAVE */
-
-	port = CGDisplayIOServicePort(gCGDisplayID);
-	classCode = IORegistryEntryCreateCFProperty(port, CFSTR(kIOFBMemorySizeKey), kCFAllocatorDefault, kNilOptions);
-
-	if (CFGetTypeID(classCode) == CFNumberGetTypeID())
-	{
-		CFNumberGetValue(classCode, kCFNumberSInt32Type, &gDisplayVRAM);
-	}
-	else
-		gDisplayVRAM = 0x8000000;				// if failed, then just assume 128MB VRAM to be safe
-
-
-			/* SET SOME PREFS IF THINGS ARE LOOKING LOW */
-
-	if (gDisplayVRAM <= 0x2000000)				// if <= 32MB VRAM...
-	{
-		gGamePrefs.depth = 16;
-	}
-
-
-	SavePrefs();
-}
 
 
 /*********************** CALC VRAM AFTER BUFFERS ***********************/
@@ -1128,11 +719,14 @@ int	bufferSpace;
 
 void HideRealCursor(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 	if (gRealCursorVisible)
 	{
 		CGDisplayHideCursor(gCGDisplayID);
 		gRealCursorVisible = false;
 	}
+#endif
 }
 
 
@@ -1140,11 +734,14 @@ void HideRealCursor(void)
 
 void ShowRealCursor(void)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 	if (!gRealCursorVisible)
 	{
 		CGDisplayShowCursor(gCGDisplayID);
 		gRealCursorVisible = true;
 	}
+#endif
 }
 
 

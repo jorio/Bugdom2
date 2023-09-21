@@ -11,6 +11,8 @@
 
 #include "game.h"
 
+SDL_Window*				gSDLWindow = NULL;
+
 extern	Boolean			gDrawLensFlare,gDisableHiccupTimer, gPlayerIsDead;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac;
@@ -26,7 +28,7 @@ extern	DeformationType	gDeformationList[];
 extern	long			gTerrainUnitWidth,gTerrainUnitDepth;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	int			gKindlingCount, gNumDrowningMiceRescued;
-extern	Boolean		gBurnKindling, gIgnoreBottleKeySnail, gGameIsRegistered,gSlowCPU;
+extern	Boolean		gBurnKindling, gIgnoreBottleKeySnail, gGameIsRegistered;
 extern	float					gAnaglyphScaleFactor, gAnaglyphFocallength, gAnaglyphEyeSeparation;
 
 
@@ -62,9 +64,9 @@ long	gPrefsFolderDirID;
 
 Boolean				gShareware = false;
 
-float				gDemoVersionTimer = 0;
-
-Boolean				gG4 = false;
+Boolean				gG4 = true;
+Boolean				gSlowCPU = false;
+Boolean				gAltivec = false;
 
 float				gGravity = NORMAL_GRAVITY;
 
@@ -101,9 +103,6 @@ float				gScratchF = 0;
 
 u_long				gScore,gLoadedScore;
 
-CFBundleRef 		gBundle = nil;
-IBNibRef 			gNibs = nil;
-
 
 //======================================================================================
 //======================================================================================
@@ -119,16 +118,6 @@ long		createdDirID;
 
 
 	MyFlushEvents();
-
-			/*****************/
-			/* INIT NIB INFO */
-			/*****************/
-
-	gBundle = CFBundleGetMainBundle();
-	if (gBundle == nil)
-		DoFatalAlert("ToolBoxInit: CFBundleGetMainBundle() failed!");
-	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
-		DoFatalAlert("ToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
 
 
 			/* CHECK PREFERENCES FOLDER */
@@ -151,26 +140,8 @@ long		createdDirID;
 		DoFatalAlert("The game's Data folder appears to be missing.  Please reinstall the game.");
 
 
-			/* DETERMINE IF SHAREWARE OR BOXED VERSION */
-			//
-			// The boxed version cannot play in demo mode, so it will not
-			// have the DemoQuit / DemoExpired image files.
-			//
-
-#if (!DEMO) && (!OEM)
-	{
-		FSSpec	spc;
-
-		if (FSMakeFSSpec(0, 0, ":Data:Images:DemoQuit", &spc) == noErr)
-			gShareware = true;
-		else
-			gShareware = false;
-	}
-#endif
-
 		/* FIRST VERIFY SYSTEM BEFORE GOING TOO FAR */
 
-	VerifySystem();
  	InitInput();
 
 
@@ -188,49 +159,6 @@ long		createdDirID;
 
 	OGL_Boot();
 
-
-			/* START QUICKTIME */
-
-	EnterMovies();
-
-
-
-			/************************************/
-            /* SEE IF GAME IS REGISTERED OR NOT */
-			/************************************/
-
-#if DEMO || APPSTORE || OEM
-	gGameIsRegistered = true;
-#else
-    CheckGameSerialNumber();
-#endif
-
-
-		/**********************************/
-		/* SEE IF SHOULD DO VERSION CHECK */
-		/**********************************/
-
-#if !DEMO
-	if (gGameIsRegistered || APPSTORE)					// only do HTTP if running full version in registered mode
-	{
-		DateTimeRec	dateTime;
-		u_long		seconds, seconds2;
-
-		GetTime(&dateTime);								// get date time
-		DateToSeconds(&dateTime, &seconds);
-
-		DateToSeconds(&gGamePrefs.lastVersCheckDate, &seconds2);
-
-		if ((seconds - seconds2) > 86400)				// see if 1 days have passed since last check
-		{
-			MyFlushEvents();
-			gGamePrefs.lastVersCheckDate = dateTime;	// update time
-			SavePrefs();
-
-			ReadHTTPData_VersionInfo();					// do version check (also checks serial #'s)
-		}
-	}
-#endif
 
 			/*********************************/
 			/* DO BOOT CHECK FOR SCREEN MODE */
@@ -251,6 +179,9 @@ long 		keyboardScript, languageCode;
 
 		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
 
+	IMPLEMENT_ME_SOFT();
+	gGamePrefs.language = LANGUAGE_ENGLISH;
+#if 0
 	keyboardScript = GetScriptManagerVariable(smKeyScript);
 	languageCode = GetScriptVariable(keyboardScript, smScriptLang);
 
@@ -279,6 +210,7 @@ long 		keyboardScript, languageCode;
 		default:
 				gGamePrefs.language 			= LANGUAGE_ENGLISH;
 	}
+#endif
 
 
 	gGamePrefs.version				= CURRENT_PREFS_VERS;
@@ -290,7 +222,7 @@ long 		keyboardScript, languageCode;
 	gGamePrefs.hz				= 0;
 	gGamePrefs.kiddieMode			= false;
 	gGamePrefs.deepZ				= true;
-	gGamePrefs.lastVersCheckDate.year = 0;
+//	gGamePrefs.lastVersCheckDate.year = 0;
 	gGamePrefs.anaglyph				=  false;
 	gGamePrefs.anaglyphColor		= false;
 	gGamePrefs.dontUseHID			= false;
@@ -468,9 +400,6 @@ static void PlayArea_Terrain(void)
 
 	while(true)
 	{
-		gDemoVersionTimer += gFramesPerSecondFrac;							// count the seconds for Demo or unregistered version
-
-
 					/* GET CONTROL INFORMATION FOR THIS FRAME */
 
 		UpdateInput();									// read local keys
@@ -501,6 +430,7 @@ static void PlayArea_Terrain(void)
 		if (GetNewKeyState(KEY_ESC))
 			DoPaused();
 
+#if 0
 		if (GetNewKeyState(KEY_F15))								// do screen-saver-safe paused mode
 		{
 			glFinish();
@@ -514,6 +444,7 @@ static void PlayArea_Terrain(void)
 
 			CalcFramesPerSecond();
 		}
+#endif
 
 
 		CalcFramesPerSecond();
@@ -1235,13 +1166,6 @@ unsigned long	someLong;
 	GetDateTime ((unsigned long *)(&someLong));		// init random seed
 	SetMyRandomSeed(someLong);
 	HideRealCursor();
-
-
-
-		/* SEE IF DEMO EXPIRED */
-
-	if (DEMO || (!gGameIsRegistered))
-		GetDemoTimer();
 
 
 		/* SHOW TITLES */

@@ -12,6 +12,8 @@
 
 #define AGLContext SDL_GLContext
 
+#include "version.h"
+
 #include "globals.h"
 #include "structs.h"
 

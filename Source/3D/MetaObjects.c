@@ -11,6 +11,11 @@
 
 #include "game.h"
 
+extern PFNGLACTIVETEXTUREPROC gGlActiveTextureProc;
+extern PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
+#define glActiveTextureARB gGlActiveTextureProc
+#define glClientActiveTextureARB gGlClientActiveTextureProc
+
 extern	Boolean			gMuteMusicFlag;
 extern	float			gCurrentAspectRatio;
 extern	SpriteType		*gSpriteGroupList[];
@@ -354,6 +359,8 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 
 static void SetMetaObjectToPicture(MOPictureObject *pictObj, OGLSetupOutputType *setupInfo, FSSpec *inData, int destPixelFormat)
 {
+	IMPLEMENT_ME_SOFT();
+#if 0
 GWorldPtr	gworld;
 int			width,height,depth,cellNum,numCells;
 int			horizCellSize, vertCellSize,segRow,segCol;
@@ -586,7 +593,7 @@ Rect		r;
 
 	DisposeGWorld (gworld);
 	SafeDisposePtr(buffer);
-
+#endif
 }
 
 
@@ -658,6 +665,8 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 
 void MO_SetPictureObjectCoordsToMouse(OGLSetupOutputType *info, MOPictureObject *obj)
 {
+	IMPLEMENT_ME();
+#if 0
 MOPictureData	*picData = &obj->objectData;				//  point to pic obj's data
 Point			pt;
 int				x,y,w,h;
@@ -672,7 +681,7 @@ int				x,y,w,h;
 
 	picData->drawCoord.x = -1.0f + (float)pt.h / (float)w * 2.0f;
 	picData->drawCoord.y = 1.0f - (float)pt.v / (float)h * 2.0f;
-
+#endif
 }
 
 
@@ -1997,6 +2006,9 @@ float				x,y,z;
 
 MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, OGLSetupOutputType *setupInfo, int destPixelFormat)
 {
+	IMPLEMENT_ME_SOFT();
+	return NULL;
+#if 0
 MetaObjectPtr	obj;
 MOMaterialData	matData;
 int				width,height,depth,destDepth;
@@ -2145,6 +2157,7 @@ Rect			r;
 	SafeDisposePtr(buffer);									// dispose of our copy of the buffer
 
 	return(obj);
+#endif
 }
 
 /*************** MO: GEOMETRY OFFSET UVS *********************/
@@ -2294,6 +2307,9 @@ MOVertexArrayObject	*vObj;
 
 MOMaterialObject *MO_LoadTextureObjectFromFile(OGLSetupOutputType *setupInfo, FSSpec *spec, Boolean useAlpha)
 {
+	IMPLEMENT_ME_SOFT();
+	return NULL;
+#if 0
 GWorldPtr		gworld = nil;
 OSErr			iErr;
 Rect			r;
@@ -2375,6 +2391,7 @@ MOMaterialObject	*obj;
 	DisposeGWorld(gworld);
 
 	return(obj);
+#endif
 }
 
 

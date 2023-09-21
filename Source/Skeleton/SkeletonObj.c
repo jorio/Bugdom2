@@ -11,7 +11,6 @@
 
 #include "game.h"
 
-extern	EventRecord			gTheEvent;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 
@@ -304,8 +303,7 @@ int					i;
 	skeletonDefPtr = gLoadedSkeletonsList[sourceSkeletonNum];				// get ptr to source skeleton definition info
 	if (skeletonDefPtr == nil)
 	{
-		DoAlert("MakeNewSkeletonBaseData: Skeleton data isnt loaded!");
-		ShowSystemErr(sourceSkeletonNum);
+		DoFatalAlert("MakeNewSkeletonBaseData: Skeleton data %d isn't loaded!", sourceSkeletonNum);
 	}
 
 

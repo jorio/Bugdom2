@@ -15,7 +15,7 @@ extern	float				gFramesPerSecondFrac,gLevelCompletedCoolDownTimer;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	PlayerInfoType	gPlayerInfo;
 extern	float	gTargetMaxSpeed, gScratchF, gFramesPerSecond;
-extern	float	gCurrentMaxSpeed,gDeathTimer, gDemoVersionTimer;
+extern	float	gCurrentMaxSpeed,gDeathTimer;
 extern	OGLPoint3D	gCoord;
 extern	OGLVector3D	gDelta;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
@@ -336,10 +336,6 @@ void PlayArea_Tunnel(void)
 
 	while(true)
 	{
-#if DEMO
-		gDemoVersionTimer += gFramesPerSecondFrac;							// count the seconds for DEMO
-#endif
-
 				/* GET CONTROL INFORMATION FOR THIS FRAME */
 
 		UpdateInput();

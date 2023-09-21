@@ -78,8 +78,6 @@ void ClearHighScores(void);
 void DrawScoreText(unsigned char *s, float x, float y, OGLSetupOutputType *info);
 
 void DoWinScreen(void);
-void DoDemoExpiredScreen(void);
-void ShowDemoQuitScreen(void);
 
 
 		/* LEVEL INTROS */

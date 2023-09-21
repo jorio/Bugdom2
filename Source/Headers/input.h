@@ -2,8 +2,7 @@
 // input.h
 //
 
-#ifndef __INPUT_H
-#define __INPUT_H
+#pragma once
 
 
 							// KEYBOARD DEFINES
@@ -208,14 +207,5 @@ Boolean AreAnyNewKeysPressed(void);
 
 void ShutdownHID(void);
 
-void DoInputConfigDialog(void);
-
 void BuildHIDControlSettings(HIDControlSettingsType *settings);
 void RestoreHIDControlSettings(HIDControlSettingsType *settings);
-
-
-
-#endif
-
-
-

@@ -109,6 +109,8 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
+			IMPLEMENT_ME();
+#if 0
 			EventRecord 	theEvent;
 
 			GetNextEvent(keyDownMask|autoKeyMask, &theEvent);							// poll event queue
@@ -157,6 +159,7 @@ void NewScore(void)
 				}
 
 			}
+#endif
 		}
 	}
 
