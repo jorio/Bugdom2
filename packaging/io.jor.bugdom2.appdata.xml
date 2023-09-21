@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.jor.bugdom2</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>CC-BY-NC-SA-4.0</project_license>
+  <name>Bugdom 2</name>
+  <summary>Bugdom 2</summary>
+  <developer_name>Pangea Software, Inc., Iliyas Jorio</developer_name>
+
+  <description>
+    <p>It has been three years since Rollie McFly rid the Bugdom of the evil King Thorax and his minions, but the Bugdom can still be dangerous place as our new hero Skip is about to find out. While on his way to visit his family on the far side of the Bugdom, a Bully Bee swooped down and stole Skip’s knapsack. Your job as Skip is to track down the Bully Bee and get your knapsack back. The chase takes place mostly in and around a house.</p>
+    <p>You will make new friends in the Bugdom who will help you through each area. Keep an eye out for Sam the Snail and Sally the Chipmunk. Sam will usually make you prove your worthiness before he will help you, but Sally is just interested in gathering acorns, so be sure to brings lots of those to her. Additionally, the same Buddy Bugs that helped Rollie McFly defeat King Thorax will help you defeat most mean enemy bugs that you encounter.</p>
+    <p>About this port: Bugdom 2 was released in 2002 by Pangea Software. This port aims to provide the best way to experience the game today. This port was made and re-released under permission from Pangea Software, Inc.</p>
+  </description>
+
+  <categories>
+    <category>Game</category>
+    <category>ActionGame</category>
+    <category>AdventureGame</category>
+  </categories>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">mild</content_attribute>
+    <content_attribute id="violence-fantasy">mild</content_attribute>
+  </content_rating>
+
+  <supports>
+    <control>keyboard</control>
+    <control>gamepad</control>
+    <control>pointing</control>
+  </supports>
+
+  <launchable type="desktop-id">io.jor.bugdom2.desktop</launchable>
+  <provides>
+    <id>io.jor.bugdom2.desktop</id>
+  </provides>
+
+  <screenshots>
+  </screenshots>
+
+  <url type="homepage">https://jorio.itch.io/bugdom2</url>
+  <url type="donation">https://ko-fi.com/jorio</url>
+  <url type="vcs-browser">https://github.com/jorio/Bugdom2</url>
+  <url type="bugtracker">https://github.com/jorio/Bugdom2/issues</url>
+
+  <releases>
+  </releases>
+</component>
