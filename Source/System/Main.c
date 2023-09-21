@@ -11,8 +11,6 @@
 
 #include "game.h"
 
-SDL_Window*				gSDLWindow = NULL;
-
 extern	Boolean			gDrawLensFlare,gDisableHiccupTimer, gPlayerIsDead;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac;
@@ -77,9 +75,6 @@ u_long				gAutoFadeStatusBits;
 OGLSetupOutputType		*gGameViewInfoPtr = nil;
 
 PrefsType			gGamePrefs;
-
-FSSpec				gDataSpec;
-
 
 OGLVector3D			gWorldSunDirection = { .5, -.35, .8};		// also serves as lense flare vector
 OGLColorRGBA		gFillColor1 = { .6, .6, .6, 1};
@@ -226,14 +221,8 @@ long 		keyboardScript, languageCode;
 	gGamePrefs.anaglyph				=  false;
 	gGamePrefs.anaglyphColor		= false;
 	gGamePrefs.dontUseHID			= false;
-	gGamePrefs.reserved[0] 			= 0;
-	gGamePrefs.reserved[1] 			= 0;
-	gGamePrefs.reserved[2] 			= 0;
-	gGamePrefs.reserved[3] 			= 0;
-	gGamePrefs.reserved[4] 			= 0;
-	gGamePrefs.reserved[5] 			= 0;
-	gGamePrefs.reserved[6] 			= 0;
-	gGamePrefs.reserved[7] 			= 0;
+	gGamePrefs.monitorNum			= 0;
+	gGamePrefs.antialiasingLevel	= 0;
 
 	for (i = 0; i < MAX_HTTP_NOTES; i++)
 		gGamePrefs.didThisNote[i] = false;
@@ -1135,7 +1124,7 @@ static void CleanupLevel(void)
 /************************************************************/
 
 
-int main(void)
+void GameMain(void)
 {
 unsigned long	someLong;
 
@@ -1187,7 +1176,3 @@ unsigned long	someLong;
 	}
 
 }
-
-
-
-

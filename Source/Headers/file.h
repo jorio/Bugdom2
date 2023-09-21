@@ -83,7 +83,8 @@ typedef struct
 	Boolean	dontUseHID;
 	// HIDControlSettingsType	controlSettings;
 
-	int		reserved[8];
+	Byte	monitorNum;
+	Byte	antialiasingLevel;
 }PrefsType;
 
 

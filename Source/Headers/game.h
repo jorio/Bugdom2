@@ -53,3 +53,7 @@
 #include "bones.h"
 #include "vaportrails.h"
 #include "dialog.h"
+
+extern PrefsType gGamePrefs;
+extern FSSpec gDataSpec;
+extern SDL_Window* gSDLWindow;
