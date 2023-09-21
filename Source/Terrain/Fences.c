@@ -216,7 +216,7 @@ float					sink;
 
 
 	if (gNumFences > MAX_FENCES)
-		DoFatalAlert("\pPrimeFences: gNumFences > MAX_FENCES");
+		DoFatalAlert("PrimeFences: gNumFences > MAX_FENCES");
 
 
 			/******************************/
@@ -234,13 +234,13 @@ float					sink;
 		sprite = gFenceTexture[type][1];						// get sprite info
 
 		if (sprite > gNumSpritesInGroupList[group])
-			DoFatalAlert("\pPrimeFences: illegal fence sprite");
+			DoFatalAlert("PrimeFences: illegal fence sprite");
 
 		if (numNubs == 1)
-			DoFatalAlert("\pPrimeFences: numNubs == 1");
+			DoFatalAlert("PrimeFences: numNubs == 1");
 
 		if (numNubs > MAX_NUBS_IN_FENCE)
-			DoFatalAlert("\pPrimeFences: numNubs > MAX_NUBS_IN_FENCE");
+			DoFatalAlert("PrimeFences: numNubs > MAX_NUBS_IN_FENCE");
 
 		sink = gFenceSink[type];								// get fence sink factor
 
@@ -255,7 +255,7 @@ float					sink;
 
 		fence->sectionVectors = (OGLVector2D *)AllocPtr(sizeof(OGLVector2D) * (numNubs-1));		// alloc array to hold vectors
 		if (fence->sectionVectors == nil)
-			DoFatalAlert("\pPrimeFences: AllocPtr failed!");
+			DoFatalAlert("PrimeFences: AllocPtr failed!");
 
 		for (i = 0; i < (numNubs-1); i++)
 		{
@@ -270,7 +270,7 @@ float					sink;
 
 		fence->sectionNormals = (OGLVector2D *)AllocPtr(sizeof(OGLVector2D) * (numNubs-1));		// alloc array to hold vectors
 		if (fence->sectionNormals == nil)
-			DoFatalAlert("\pPrimeFences: AllocPtr failed!");
+			DoFatalAlert("PrimeFences: AllocPtr failed!");
 
 		for (i = 0; i < (numNubs-1); i++)
 		{

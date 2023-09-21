@@ -388,7 +388,7 @@ io_iterator_t 	hidObjectIterator 	= nil;
 IOReturn 		ioReturnValue 		= kIOReturnSuccess;
 
 	if (gHIDInitialized)
-		DoFatalAlert("\pMyInitHID: HID already initialized!");
+		DoFatalAlert("MyInitHID: HID already initialized!");
 
 
 	gNumHIDDevices = 0;											// nothing in our device list yet
@@ -397,14 +397,14 @@ IOReturn 		ioReturnValue 		= kIOReturnSuccess;
 
 	ioReturnValue = IOMasterPort(bootstrap_port, &gHID_MasterPort);
 	if (ioReturnValue != kIOReturnSuccess)
-		DoFatalAlert("\pMyInitHID: IOMasterPort failed!");
+		DoFatalAlert("MyInitHID: IOMasterPort failed!");
 
 
 			/* CREATE AN ITERATION LIST OF HID DEVICES */
 
 	FindHIDDevices(gHID_MasterPort, &hidObjectIterator);
 	if (hidObjectIterator == nil)
-		DoFatalAlert("\pMyInitHID:  no HID Devices found!");
+		DoFatalAlert("MyInitHID:  no HID Devices found!");
 
 
 			/***************************************************/
@@ -498,7 +498,7 @@ IOReturn 				ioReturnValue = kIOReturnSuccess;
 
 	if ((ioReturnValue != kIOReturnSuccess) || (*hidObjectIterator == nil))
 	{
-		DoAlert("\pFindHIDDevices: No matching HID class devices found!");
+		DoAlert("FindHIDDevices: No matching HID class devices found!");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -540,7 +540,7 @@ Boolean					allowThisDevice;
 		if ((result != KERN_SUCCESS) || (properties == nil))
 			continue;
 //		{
-//			DoAlert("\pParseAllHIDDevices: IORegistryEntryCreateCFProperties failed!");
+//			DoAlert("ParseAllHIDDevices: IORegistryEntryCreateCFProperties failed!");
 //			DoHIDSucksDialog();
 //			ExitToShell();
 //		}
@@ -630,7 +630,7 @@ error:
 
 		ioReturnValue = IOObjectRelease(hidDevice);
 		if (ioReturnValue != kIOReturnSuccess)
-			DoFatalAlert("\pParseAllHIDDevices: IOObjectRelease failed!");
+			DoFatalAlert("ParseAllHIDDevices: IOObjectRelease failed!");
 	}
 
 }
@@ -668,7 +668,7 @@ long		vendorID, productID;
 	if (!object)
 	{
 //		CFShow(properties);		//---------
-//		DoAlert("\pAddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDProductKey) This is a known bug in OS X, but ** Rebooting your computer should fix this. **");
+//		DoAlert("AddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDProductKey) This is a known bug in OS X, but ** Rebooting your computer should fix this. **");
 //		DoHIDSucksDialog();
 //		ExitToShell();
 
@@ -689,12 +689,12 @@ long		vendorID, productID;
 	if (!object)
 	{
 		vendorID = usagePage;												// set some bogus vendorID
-//		DoAlert("\pAddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDVendorIDKey)");
+//		DoAlert("AddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDVendorIDKey)");
 	}
 	else
 	if (!CFNumberGetValue(object, kCFNumberLongType, &vendorID))			// extract the Vendor ID value
 	{
-		DoAlert("\pAddHIDDeviceToList: CFNumberGetValue failed!");
+		DoAlert("AddHIDDeviceToList: CFNumberGetValue failed!");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -703,12 +703,12 @@ long		vendorID, productID;
 	if (!object)
 	{
 		productID = usage;
-//		DoAlert("\pAddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDProductIDKey)");
+//		DoAlert("AddHIDDeviceToList: CFDictionaryGetValue failed! (kIOHIDProductIDKey)");
 	}
 	else
 	if (!CFNumberGetValue(object, kCFNumberLongType, &productID))			// extract the Product ID value
 	{
-		DoAlert("\pAddHIDDeviceToList: CFNumberGetValue failed!");
+		DoAlert("AddHIDDeviceToList: CFNumberGetValue failed!");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -785,7 +785,7 @@ IOReturn 				ioReturnValue;
 													&plugInInterface,	&score);
 	if (ioReturnValue != kIOReturnSuccess)
 	{
-		DoAlert("\pCreateHIDDeviceInterface: IOCreatePlugInInterfaceForService failed!");
+		DoAlert("CreateHIDDeviceInterface: IOCreatePlugInInterfaceForService failed!");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -797,7 +797,7 @@ IOReturn 				ioReturnValue;
 	plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID)hidDeviceInterface);
 	if (plugInResult != S_OK)
 	{
-		DoAlert("\pCreateHIDDeviceInterface: Couldn�t create HID class device interface");
+		DoAlert("CreateHIDDeviceInterface: Couldn�t create HID class device interface");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -810,7 +810,7 @@ IOReturn 				ioReturnValue;
 	ioReturnValue = (**hidDeviceInterface)->open(*hidDeviceInterface, 0);
 	if (ioReturnValue != kIOReturnSuccess)
 	{
-		DoAlert("\pCreateHIDDeviceInterface: Couldn�t open device interface");
+		DoAlert("CreateHIDDeviceInterface: Couldn�t open device interface");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -1571,7 +1571,7 @@ long number;
 
 	if (object == nil)											// see if was passed something bad
 	{
-		DoAlert("\pGetCFNumberFromObject: object == nil");
+		DoAlert("GetCFNumberFromObject: object == nil");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -1618,7 +1618,7 @@ const char		*rezNames[MAX_LANGUAGES] =
 
 	if (gNumHIDDevices == 0)
 	{
-		DoAlert("\pOS X says you don't have any input devices.  If this is not true, try rebooting.");
+		DoAlert("OS X says you don't have any input devices.  If this is not true, try rebooting.");
 		DoHIDSucksDialog();
 		return;
 	}
@@ -1637,7 +1637,7 @@ const char		*rezNames[MAX_LANGUAGES] =
     err = CreateWindowFromNib(gNibs, CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
     						kCFStringEncodingMacRoman), &gHIDConfigWindow);
 	if (err)
-		DoFatalAlert("\pDoInputConfigDialog: CreateWindowFromNib failed!");
+		DoFatalAlert("DoInputConfigDialog: CreateWindowFromNib failed!");
 
 
 			/* SET DIALOG MENUS */
@@ -1778,7 +1778,7 @@ MenuItemIndex	menuItemIndex;
     idControl.id 		= id;
     err = GetControlByID(window, &idControl, &control);
 	if (err)
-		DoFatalAlert("\pBuildMenuFromCStrings: GetControlByID failed!");
+		DoFatalAlert("BuildMenuFromCStrings: GetControlByID failed!");
 
     GetControlData(control, kControlMenuPart, kControlPopupButtonMenuHandleTag, sizeof (MenuHandle), &hMenu, &tempSize);
 
@@ -1786,7 +1786,7 @@ MenuItemIndex	menuItemIndex;
 
     err = DeleteMenuItems(hMenu, 1, CountMenuItems (hMenu));
 	if (err)
-		DoFatalAlert("\pBuildMenuFromCStrings: DeleteMenuItems failed!");
+		DoFatalAlert("BuildMenuFromCStrings: DeleteMenuItems failed!");
 
 
 			/* ADD NEW ITEMS TO THE MENU */
@@ -1799,7 +1799,7 @@ MenuItemIndex	menuItemIndex;
 
 		err = AppendMenuItemTextWithCFString(hMenu, cfString, 0, 0, &menuItemIndex);			// append to menu
 		if (err)
-			DoFatalAlert("\pBuildMenuFromCStrings: AppendMenuItemTextWithCFString failed!");
+			DoFatalAlert("BuildMenuFromCStrings: AppendMenuItemTextWithCFString failed!");
 
 		CFRelease(cfString);																	// dispose of the ref to the CF String
 	}
@@ -1909,7 +1909,7 @@ HICommand 			command;
 							/* HELP / DONT USE HIT ? */
 
 					case	'nhlp':
-							DoAlert("\pOnly check the Don't use HID for Input checkbox if your keyboard is not working with it unchecked.  In this mode your custom control configuration is ignored and you cannot use input devices.  Only the default keyboard setup works.");
+							DoAlert("Only check the Don't use HID for Input checkbox if your keyboard is not working with it unchecked.  In this mode your custom control configuration is ignored and you cannot use input devices.  Only the default keyboard setup works.");
 							break;
 
 
@@ -2256,7 +2256,7 @@ ControlRef 				control;
 		result = (*hidDeviceInterface)->getElementValue(hidDeviceInterface,	cookie, &hidEvent);		// poll this element
 		if (result)
 		{
-			DoAlert("\pIdleTimerCallback: getElementValue failed!");
+			DoAlert("IdleTimerCallback: getElementValue failed!");
 			DoHIDSucksDialog();
 			ExitToShell();
 		}
@@ -2384,7 +2384,7 @@ short	n, d, keyboardDevice, e;
 
 	if (keyboardDevice == -1)											// verify that we have a keyboard
 	{
-		DoAlert("\pCannot initialize default game controls because no keyboard was found.  Try rebooting.");
+		DoAlert("Cannot initialize default game controls because no keyboard was found.  Try rebooting.");
 		DoHIDSucksDialog();
 		return;
 	}
@@ -2697,7 +2697,7 @@ long	d, e, n;
 
 	if (!gHIDInitialized)										// verify that we've got legit data to build
 	{
-		DoFatalAlert("\pBuildHIDControlSettings: HID isn't initialized!");
+		DoFatalAlert("BuildHIDControlSettings: HID isn't initialized!");
 	}
 
 
@@ -2781,7 +2781,7 @@ long	d, e, n;
 long	matchingDevice;
 
 	if (!gHIDInitialized)												// verify that we've got legit data already
-		DoFatalAlert("\pRestoreHIDControlSettings: HID isn't initialized!");
+		DoFatalAlert("RestoreHIDControlSettings: HID isn't initialized!");
 
 			/* VERIFY THAT WE'VE STILL GOT THE SAME CONSTANTS */
 
@@ -3106,7 +3106,7 @@ EventTypeSpec	list[] = {   { kEventClassWindow, kEventWindowClose },
 
     err = CreateWindowFromNib(gNibs, CFSTR ("HIDSucks"), &sucksDialogWindow);
 	if (err)
-		DoFatalAlert("\pDoHIDSucksDialog: CreateWindowFromNib failed!");
+		DoFatalAlert("DoHIDSucksDialog: CreateWindowFromNib failed!");
 
 
 			/* CREATE NEW WINDOW EVENT HANDLER */

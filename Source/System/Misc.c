@@ -48,7 +48,7 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 
 int		gNumPointers = 0;
 
-Str255  gSerialFileName = "\p:Bugdom2:Info";
+Str255  gSerialFileName = ":Bugdom2:Info";
 
 Boolean	gGameIsRegistered = false;
 
@@ -106,7 +106,7 @@ SInt16      alertItemHit;
 
 /*********************** DO ALERT *******************/
 
-void DoAlert(Str255 s)
+void DoAlert(const char* s)
 {
 SInt16      alertItemHit;
 
@@ -122,7 +122,7 @@ SInt16      alertItemHit;
 
 /*********************** DO FATAL ALERT *******************/
 
-void DoFatalAlert(Str255 s)
+void DoFatalAlert(const char* s)
 {
 SInt16      alertItemHit;
 
@@ -401,11 +401,11 @@ OSErr	err;
 	hand = NewHandle(size);							// alloc in APPL
 	if (hand == nil)
 	{
-		DoAlert("\pAllocHandle: using temp mem");
+		DoAlert("AllocHandle: using temp mem");
 		hand = TempNewHandle(size,&err);			// try TEMP mem
 		if (hand == nil)
 		{
-			DoAlert("\pAllocHandle: failed!");
+			DoAlert("AllocHandle: failed!");
 			return(nil);
 		}
 		else
@@ -432,7 +432,7 @@ u_long	*cookiePtr;
 	pr = NewPtr(size);
 #endif
 	if (pr == nil)
-		DoFatalAlert("\pAllocPtr: NewPtr failed");
+		DoFatalAlert("AllocPtr: NewPtr failed");
 
 	cookiePtr = (u_long *)pr;
 
@@ -465,7 +465,7 @@ u_long	*cookiePtr;
 #endif
 
 	if (pr == nil)
-		DoFatalAlert("\pAllocPtr: NewPtr failed");
+		DoFatalAlert("AllocPtr: NewPtr failed");
 
 	cookiePtr = (u_long *)pr;
 
@@ -494,7 +494,7 @@ Ptr		p = ptr;
 	cookiePtr = (u_long *)p;
 
 	if (*cookiePtr != 'FACE')
-		DoFatalAlert("\pSafeSafeDisposePtr: invalid cookie!");
+		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
 
 	*cookiePtr = 0;
 
@@ -568,7 +568,7 @@ NumVersion	vers;
 	{
 		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);
 		if (iErr != noErr)
-			DoFatalAlert("\pVerifySystem: gestaltProcClkSpeed failed!");
+			DoFatalAlert("VerifySystem: gestaltProcClkSpeed failed!");
 
 		if ((cpuSpeed/1000000) >= 600)										// must be at least 600mhz G3 for us to treat it like a G4
 			gG4 = true;
@@ -582,16 +582,16 @@ NumVersion	vers;
 
 	iErr = Gestalt(gestaltSystemVersion,(long *)&vers);
 	if (iErr != noErr)
-		DoFatalAlert("\pVerifySystem: gestaltSystemVersion failed!");
+		DoFatalAlert("VerifySystem: gestaltSystemVersion failed!");
 
 //	if (vers.stage >= 0x10)													// see if at least OS 10
 //	{
 //		if ((vers.stage == 0x10) && (vers.nonRelRev < 0x40))				// must be at least OS 10.1 !!!
-//			DoFatalAlert("\pThis game requires OS 10.4 or later to run on OS X.  Run Software Update in System Preferences to get the latest update.");
+//			DoFatalAlert("This game requires OS 10.4 or later to run on OS X.  Run Software Update in System Preferences to get the latest update.");
 //	}
 //	else
 //	{
-//		DoFatalAlert("\pThis game requires at least Mac OS 10.4.");
+//		DoFatalAlert("This game requires at least Mac OS 10.4.");
 //	}
 
 
@@ -607,7 +607,7 @@ NumVersion	vers;
 		if ((d.year > 2002) ||
 			((d.year == 2002) && (d.month > 10)))
 		{
-			DoFatalAlert("\pSorry, but this beta has expired");
+			DoFatalAlert("Sorry, but this beta has expired");
 		}
 	}
 #endif
@@ -630,7 +630,7 @@ NumVersion	vers;
 		{
 			iErr = Gestalt(gestaltPowerPCProcessorFeatures,(long *)&flags);		// see if AltiVec available
 			if (iErr != noErr)
-				DoFatalAlert("\pVerifySystem: gestaltPowerPCProcessorFeatures failed!");
+				DoFatalAlert("VerifySystem: gestaltPowerPCProcessorFeatures failed!");
 			gAltivec = ((flags & (1<<gestaltPowerPCHasVectorInstructions)) != 0);
 		}
 	}
@@ -648,7 +648,7 @@ NumVersion	vers;
 		ProcessInfoRec	info;
 		short			i;
 		Str255		s;
-		const char snitch[] = "\pQuicken Scheduler";
+		const char snitch[] = "Quicken Scheduler";
 
 		info.processName = s;
 		info.processInfoLength = sizeof(ProcessInfoRec);
@@ -669,7 +669,7 @@ NumVersion	vers;
 					goto next_process2;
 			}
 
-			DoAlert("\pIMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
+			DoAlert("IMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
 
 next_process2:;
 		}
@@ -993,7 +993,7 @@ const unsigned char pirateNumbers[NUM_PIRATE_SERIALS][SERIAL_LENGTH*2] =
 			(pirateNumbers[3][20] != 'K'))
 		{
 corrupt:
-			DoFatalAlert("\pThis application is corrupt.  You should reinstall a fresh copy of the game.");
+			DoFatalAlert("This application is corrupt.  You should reinstall a fresh copy of the game.");
 			return(false);
 		}
 
@@ -1042,7 +1042,7 @@ corrupt:
 				// The serials are stored in the Level 1 terrain file
 				//
 
-		if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Terrain:Level1_Garden.ter", &spec) == noErr)		// open rez fork
+		if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Terrain:Level1_Garden.ter", &spec) == noErr)		// open rez fork
 		{
 			short fRefNum = FSpOpenResFile(&spec,fsRdPerm);
 
@@ -1151,7 +1151,7 @@ const char		*retailRezNames[MAX_LANGUAGES] =
 								kCFStringEncodingMacRoman), &gDialogWindow);
 	}
 	if (err)
-		DoFatalAlert("\pGamepadInit: CreateWindowFromNib failed!");
+		DoFatalAlert("GamepadInit: CreateWindowFromNib failed!");
 
 
 			/* CREATE NEW WINDOW EVENT HANDLER */
@@ -1216,7 +1216,7 @@ Size				actualSize;
 						    err = GetControlByID(gDialogWindow, &idControl, &control);
 							err |= GetControlData(control, 0, kControlEditTextTextTag, 64, gRegInfo, &actualSize);
 							if (err)
-						    	DoFatalAlert("\pGamepadInit_EventHandler: GetControlData failed!");
+						    	DoFatalAlert("GamepadInit_EventHandler: GetControlData failed!");
 
 
 									/* VALIDATE THE NUMBER */
@@ -1228,7 +1228,7 @@ Size				actualSize;
 		             		}
 		                    else
 		                    {
-		                        DoAlert("\pSorry, that serial number is not valid.  Please try again.");
+		                        DoAlert("Sorry, that serial number is not valid.  Please try again.");
 		                    }
 		                    break;
 
@@ -1256,7 +1256,7 @@ Size				actualSize;
 							/****************/
 
 					case	'url ':
-							if (LaunchURL("\phttp://www.pangeasoft.net/bug2/serials.html") == noErr)
+							if (LaunchURL("http://www.pangeasoft.net/bug2/serials.html") == noErr)
 			                    ExitToShell();
 			              	break;
 
@@ -1283,7 +1283,7 @@ CFStringRef	cfstr;
 	cfstr = CFStringCreateWithFormat(kCFAllocatorDefault, nil, CFSTR("%d"), num);		// creates a CFString based on printf style formatting
 
 	if (!CFStringGetPascalString(cfstr, s, 255, kCFStringEncodingASCII))
-		DoFatalAlert("\pConvertIntToPStr:  CFStringGetPascalString() failed!");
+		DoFatalAlert("ConvertIntToPStr:  CFStringGetPascalString() failed!");
 
 }
 

@@ -12,8 +12,8 @@ extern	Boolean			gAltivec;
 
 
 extern	void ShowSystemErr(long err);
-extern void	DoAlert(Str255);
-extern void	DoFatalAlert(Str255);
+void	DoAlert(const char*);
+void	DoFatalAlert(const char*);
 extern unsigned char	*NumToHex(unsigned short);
 extern unsigned char	*NumToHex2(unsigned long, short);
 extern unsigned char	*NumToDec(unsigned long);

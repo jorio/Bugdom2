@@ -126,9 +126,9 @@ long		createdDirID;
 
 	gBundle = CFBundleGetMainBundle();
 	if (gBundle == nil)
-		DoFatalAlert("\pToolBoxInit: CFBundleGetMainBundle() failed!");
+		DoFatalAlert("ToolBoxInit: CFBundleGetMainBundle() failed!");
 	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
-		DoFatalAlert("\pToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
+		DoFatalAlert("ToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
 
 
 			/* CHECK PREFERENCES FOLDER */
@@ -136,9 +136,9 @@ long		createdDirID;
 	iErr = FindFolder(kOnSystemDisk,kPreferencesFolderType,kDontCreateFolder,			// locate the folder
 					&gPrefsFolderVRefNum,&gPrefsFolderDirID);
 	if (iErr != noErr)
-		DoAlert("\pWarning: Cannot locate the Preferences folder.");
+		DoAlert("Warning: Cannot locate the Preferences folder.");
 
-	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"\pBugdom2",&createdDirID);		// make folder in there
+	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"Bugdom2",&createdDirID);		// make folder in there
 
 
 
@@ -146,9 +146,9 @@ long		createdDirID;
 
 	SetDefaultDirectory();							// be sure to get the default directory
 
-	iErr = FSMakeFSSpec(0, 0, "\p:Data:Images", &gDataSpec);
+	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
 	if (iErr)
-		DoFatalAlert("\pThe game's Data folder appears to be missing.  Please reinstall the game.");
+		DoFatalAlert("The game's Data folder appears to be missing.  Please reinstall the game.");
 
 
 			/* DETERMINE IF SHAREWARE OR BOXED VERSION */
@@ -161,7 +161,7 @@ long		createdDirID;
 	{
 		FSSpec	spc;
 
-		if (FSMakeFSSpec(0, 0, "\p:Data:Images:DemoQuit", &spc) == noErr)
+		if (FSMakeFSSpec(0, 0, ":Data:Images:DemoQuit", &spc) == noErr)
 			gShareware = true;
 		else
 			gShareware = false;

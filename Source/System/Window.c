@@ -131,7 +131,7 @@ CGTableCount 		sampleCount;
 																	gGamePrefs.hz,
 																	NULL);
 		if (refDisplayMode == nil)
-			DoFatalAlert("\pInitWindowStuff: CGDisplayBestModeForParameters failed!");
+			DoFatalAlert("InitWindowStuff: CGDisplayBestModeForParameters failed!");
 
 
 				/* SWITCH TO IT */
@@ -188,7 +188,7 @@ CGTableCount 		sampleCount;
 			r.bottom = 480;
 		}
 
-		gGameWindow = NewCWindow(nil, &r, "\p", false, plainDBox, (WindowPtr)-1L, false, 0);
+		gGameWindow = NewCWindow(nil, &r, "", false, plainDBox, (WindowPtr)-1L, false, 0);
 
 
 		gGameWindowGrafPtr = GetWindowPort(gGameWindow);
@@ -568,7 +568,7 @@ Rect			r;
 	GetGWorld (&oldGW,&oldGD);
 	pm = GetGWorldPixMap(thisWorld);
 	if ((pm == nil) | (*pm == nil) )
-		DoAlert("\pPixMap Handle or Ptr = Null?!");
+		DoAlert("PixMap Handle or Ptr = Null?!");
 
 	SetPort(GetWindowPort(thisWindow));
 
@@ -594,7 +594,7 @@ PixMapHandle pm;
 
 	pm = GetGWorldPixMap(world);
 	if (LockPixels(pm) == false)
-		DoFatalAlert("\pPixMap Went Bye,Bye?!");
+		DoFatalAlert("PixMap Went Bye,Bye?!");
 }
 
 
@@ -686,7 +686,7 @@ do_it:
     err = CreateWindowFromNib(gNibs, CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
     						kCFStringEncodingMacRoman), &gDialogWindow);
 	if (err)
-		DoFatalAlert("\pDoScreenModeDialog: CreateWindowFromNib failed!");
+		DoFatalAlert("DoScreenModeDialog: CreateWindowFromNib failed!");
 
 
 			/* CREATE NEW WINDOW EVENT HANDLER */
@@ -979,7 +979,7 @@ double				hz;
 
 	modeList = CGDisplayAvailableModes(gCGDisplayID);
 	if (modeList == nil)
-		DoFatalAlert("\pCreateDisplayModeList: CGDisplayAvailableModes failed!");
+		DoFatalAlert("CreateDisplayModeList: CGDisplayAvailableModes failed!");
 
 	numDeviceModes = CFArrayGetCount(modeList);
 
@@ -995,7 +995,7 @@ double				hz;
 
         mode = CFArrayGetValueAtIndex( modeList, i );				  	// Pull the mode dictionary out of the CFArray
 		if (mode == nil)
-			DoFatalAlert("\pCreateDisplayModeList: CFArrayGetValueAtIndex failed!");
+			DoFatalAlert("CreateDisplayModeList: CFArrayGetValueAtIndex failed!");
 
 		number = CFDictionaryGetValue(mode, kCGDisplayWidth);			// get width
 		CFNumberGetValue(number, kCFNumberLongType, &width) ;

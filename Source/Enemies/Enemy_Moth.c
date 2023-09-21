@@ -607,7 +607,7 @@ Boolean PrimeMothPath(long splineNum, SplineItemType *itemPtr)
 int	pathNum = itemPtr->parm[0];
 
 	if (pathNum >= MAX_MOTH_PATHS)
-		DoFatalAlert("\pPrimeMothPath: pathNum > MAX_MOTH_PATHS");
+		DoFatalAlert("PrimeMothPath: pathNum > MAX_MOTH_PATHS");
 
 	gMothPaths[pathNum] = splineNum;					// remember which spline this moth path is
 

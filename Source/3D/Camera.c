@@ -436,7 +436,7 @@ Boolean			snapTo = false;
 
 	skeleton = playerObj->Skeleton;
 	if (!skeleton)
-		DoFatalAlert("\pMoveCamera: player has no skeleton!");
+		DoFatalAlert("MoveCamera: player has no skeleton!");
 
 
 				/******************/

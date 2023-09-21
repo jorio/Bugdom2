@@ -231,7 +231,7 @@ MOTriangleIndecies		*t;
 
 			/* NOTHING FREE */
 
-//	DoFatalAlert("\pNewConfettiGroup: no free groups!");
+//	DoFatalAlert("NewConfettiGroup: no free groups!");
 	return(-1);
 }
 
@@ -248,7 +248,7 @@ short	p,group;
 	group = def->groupNum;
 
 	if ((group < 0) || (group >= MAX_CONFETTI_GROUPS))
-		DoFatalAlert("\pAddConfettiToGroup: illegal group #");
+		DoFatalAlert("AddConfettiToGroup: illegal group #");
 
 	if (gConfettiGroups[group] == nil)
 	{

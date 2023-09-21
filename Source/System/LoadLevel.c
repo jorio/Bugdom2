@@ -72,63 +72,63 @@ FSSpec	spec;
 
 const Str63	terrainFiles[NUM_LEVELS] =
 {
-	"\p:Terrain:Level1_Garden.ter",
-	"\p:Terrain:Level2_SideWalk.ter",
-	"\p:Terrain:Level3_DogHair.ter",
-	"\p",
-	"\p:Terrain:Level5_PlayRoom.ter",
+	":Terrain:Level1_Garden.ter",
+	":Terrain:Level2_SideWalk.ter",
+	":Terrain:Level3_DogHair.ter",
+	"",
+	":Terrain:Level5_PlayRoom.ter",
 
-	"\p:Terrain:Level6_Closet.ter",
-	"\p",
-	"\p:Terrain:Level8_Garbage.ter",
-	"\p:Terrain:Level9_Balsa.ter",
-	"\p:Terrain:Level10_Park.ter",
+	":Terrain:Level6_Closet.ter",
+	"",
+	":Terrain:Level8_Garbage.ter",
+	":Terrain:Level9_Balsa.ter",
+	":Terrain:Level10_Park.ter",
 };
 
  const Str63	levelModelFiles[NUM_LEVELS] =
 {
-	"\p:Models:Level1_Garden.bg3d",
-	"\p:Models:Level2_Sidewalk.bg3d",
-	"\p:Models:Level1_Garden.bg3d",
-	"\p",
-	"\p:Models:Level5_Playroom.bg3d",
+	":Models:Level1_Garden.bg3d",
+	":Models:Level2_Sidewalk.bg3d",
+	":Models:Level1_Garden.bg3d",
+	"",
+	":Models:Level5_Playroom.bg3d",
 
-	"\p:Models:Level6_Closet.bg3d",
-	"\p",
-	"\p:Models:Level8_Garbage.bg3d",
-	"\p:Models:Level9_Balsa.bg3d",
-	"\p:Models:Level10_Park.bg3d"
+	":Models:Level6_Closet.bg3d",
+	"",
+	":Models:Level8_Garbage.bg3d",
+	":Models:Level9_Balsa.bg3d",
+	":Models:Level10_Park.bg3d"
 };
 
  const Str63	levelSpriteFiles[NUM_LEVELS] =
 {
-	"\p:Sprites:Level1_Garden.sprites",
-	"\p:Sprites:Level2_Sidewalk.sprites",
-	"\p:Sprites:Level3_DogHair.sprites",
-	"\p",
-	"\p:Sprites:Level5_Playroom.sprites",
+	":Sprites:Level1_Garden.sprites",
+	":Sprites:Level2_Sidewalk.sprites",
+	":Sprites:Level3_DogHair.sprites",
+	"",
+	":Sprites:Level5_Playroom.sprites",
 
-	"\p:Sprites:Level6_Closet.sprites",
-	"\p",
-	"\p:Sprites:Level8_Garbage.sprites",
-	"\p:Sprites:Level9_Balsa.sprites",
-	"\p:Sprites:Level10_Park.sprites",
+	":Sprites:Level6_Closet.sprites",
+	"",
+	":Sprites:Level8_Garbage.sprites",
+	":Sprites:Level9_Balsa.sprites",
+	":Sprites:Level10_Park.sprites",
 };
 
 
  const Str63	levelSoundFiles[NUM_LEVELS] =
 {
-	"\p:Audio:Garden.sounds",
-	"\p:Audio:Garden.sounds",
-	"\p:Audio:Fido.sounds",
-	"\p",
-	"\p:Audio:Playroom.sounds",
+	":Audio:Garden.sounds",
+	":Audio:Garden.sounds",
+	":Audio:Fido.sounds",
+	"",
+	":Audio:Playroom.sounds",
 
-	"\p:Audio:Closet.sounds",
-	"\p",
-	"\p:Audio:Garbage.sounds",
-	"\p:Audio:Balsa.sounds",
-	"\p:Audio:Park.sounds",
+	":Audio:Closet.sounds",
+	"",
+	":Audio:Garbage.sounds",
+	":Audio:Balsa.sounds",
+	":Audio:Park.sounds",
 };
 
 
@@ -147,7 +147,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 			/* LOAD GLOBAL BG3D GEOMETRY */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, setupInfo);
 
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
@@ -178,13 +178,13 @@ const Str63	terrainFiles[NUM_LEVELS] =
 		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:infobar.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:global.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
 
 
@@ -322,7 +322,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 				break;
 
 		default:
-				DoFatalAlert("\pSorry, Bud!  That level doesn't exist yet.");
+				DoFatalAlert("Sorry, Bud!  That level doesn't exist yet.");
 	}
 }
 
@@ -333,7 +333,7 @@ void LoadFoliage(OGLSetupOutputType *setupInfo)
 {
 FSSpec	spec;
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:Foliage.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Foliage.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_FOLIAGE, setupInfo);
 
 	if (gG4)
@@ -783,7 +783,7 @@ FSSpec	spec, bg3dSpec;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Plumbing.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Plumbing.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
 
 
@@ -791,22 +791,22 @@ FSSpec	spec, bg3dSpec;
 
 	if (gLevelNum == LEVEL_NUM_PLUMBING)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:Level4_Plumbing.sprites", &spec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level4_Plumbing.sprites", &spec);
 		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
 	}
 	else
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:Level7_Gutter.sprites", &spec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level7_Gutter.sprites", &spec);
 		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:infobar.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:global.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
 
 
@@ -832,8 +832,8 @@ FSSpec	spec, bg3dSpec;
 
 	if (gLevelNum == LEVEL_NUM_PLUMBING)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:Level4_Plumbing.bg3d", &bg3dSpec);
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Tunnels:Plumbing.tun", &spec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level4_Plumbing.bg3d", &bg3dSpec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Plumbing.tun", &spec);
 
 		LoadTunnel(&spec, &bg3dSpec, setupInfo);
 
@@ -845,8 +845,8 @@ FSSpec	spec, bg3dSpec;
 
 	else
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:Level7_Gutter.bg3d", &bg3dSpec);
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Tunnels:Gutter.tun", &spec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level7_Gutter.bg3d", &bg3dSpec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Gutter.tun", &spec);
 		LoadTunnel(&spec, &bg3dSpec, setupInfo);
 
 //		SetSphereMapInfoOnMaterialObject(gTunnelTextureObj,	MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);

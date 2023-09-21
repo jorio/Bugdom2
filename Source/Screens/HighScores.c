@@ -63,7 +63,7 @@ enum
 /*    VARIABLES            */
 /***************************/
 
-static Str32	gHighScoresFileName = "\p:Bugdom2:HighScores";
+static Str32	gHighScoresFileName = ":Bugdom2:HighScores";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -235,20 +235,20 @@ ObjNode				*newObj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:Dialog.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:HighScores.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:HighScores.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES, gGameViewInfoPtr);
 
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:highscores.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:highscores.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES, gGameViewInfoPtr);
 
 
@@ -533,7 +533,7 @@ long				count;
 		ClearHighScores();
 	else
 	if (iErr)
-		DoFatalAlert("\pLoadHighScores: Error opening High Scores file!");
+		DoFatalAlert("LoadHighScores: Error opening High Scores file!");
 	else
 	{
 		count = sizeof(HighScoreType) * NUM_SCORES;
@@ -574,7 +574,7 @@ long				count;
 	if (iErr)
 	{
 err:
-		DoAlert("\pUnable to Save High Scores file!");
+		DoAlert("Unable to Save High Scores file!");
 		return;
 	}
 
