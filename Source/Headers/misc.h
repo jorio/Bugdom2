@@ -27,7 +27,7 @@ float StringToFloat(Str255 textStr);
 extern	void DrawCString(char *string);
 extern	void InitMyRandomSeed(void);
 extern	float RandomFloat(void);
-u_short	RandomRange(unsigned short min, unsigned short max);
+uint16_t	RandomRange(unsigned short min, unsigned short max);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);
@@ -36,11 +36,11 @@ void SafeDisposePtr(void *ptr);
 void MyFlushEvents(void);
 
 
-short SwizzleShort(short *shortPtr);
-long SwizzleLong(long *longPtr);
-float SwizzleFloat(float *floatPtr);
-u_long SwizzleULong(u_long *longPtr);
-u_short SwizzleUShort(u_short *shortPtr);
+int16_t SwizzleShort(const int16_t *shortPtr);
+int32_t SwizzleLong(const int32_t *longPtr);
+float SwizzleFloat(const float *floatPtr);
+uint32_t SwizzleULong(const uint32_t *longPtr);
+uint16_t SwizzleUShort(const uint16_t *shortPtr);
 void SwizzlePoint3D(OGLPoint3D *pt);
 void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
@@ -49,7 +49,7 @@ void RGBtoHSV( float r, float g, float b, float *h, float *s, float *v );
 void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v );
 
 #if _DEBUG
-#define IMPLEMENT_ME_SOFT() SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "IMPLEMENT ME: %s:%d\n", __func__, __LINE__)
+#define IMPLEMENT_ME_SOFT() { static int _warnings = 0; if (!_warnings++) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "IMPLEMENT ME: %s:%d\n", __func__, __LINE__); }
 #else
 #define IMPLEMENT_ME_SOFT()
 #endif

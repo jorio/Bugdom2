@@ -4,7 +4,11 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
+#include <stdint.h>
 
+#if !defined(__LITTLE_ENDIAN__) && !(__BIG_ENDIAN__)
+#define __LITTLE_ENDIAN__ 1
+#endif
 
 #define	DEMO	0
 #define	OEM		0

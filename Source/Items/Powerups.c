@@ -17,7 +17,7 @@ extern	OGLVector3D			gDelta;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits;
+extern	uint32_t				gAutoFadeStatusBits;
 extern	Boolean				gG4, gIgnoreBottleKeySnail;
 extern	PlayerInfoType		gPlayerInfo;
 extern	int					gLevelNum;

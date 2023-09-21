@@ -18,7 +18,7 @@ extern	long			gPrefsFolderDirID;
 extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
 extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
 extern	FSSpec			gDataSpec;
-extern	u_long			gScore,gLoadedScore;
+extern	uint32_t			gScore,gLoadedScore;
 extern	float			gTerrainPolygonSize,gMapToUnitValue;
 extern	float			**gMapYCoords,**gMapYCoordsOriginal;
 extern	Byte			**gMapSplitMode;
@@ -27,7 +27,7 @@ extern	short			**gSuperTileTextureGrid;
 extern	FenceDefType	*gFenceList;
 extern	long			gNumFences,gNumSplines,gNumWaterPatches;
 extern	int				gLevelNum,gNumTunnelItems,gNumTunnelSplinePoints,gNumTunnelSections,gNumLineMarkers;
-extern	u_short			**gAttributeGrid;
+extern	uint16_t			**gAttributeGrid;
 extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	PrefsType			gGamePrefs;
 extern	AGLContext		gAGLContext;
@@ -49,7 +49,7 @@ extern	Boolean					gDisableHiccupTimer;
 
 static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo);
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
-static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
+static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 
 static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum, OGLSetupOutputType *setupInfo);
 
@@ -70,8 +70,8 @@ static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short f
 
 typedef struct
 {
-	u_long		version;
-	u_long		score;
+	uint32_t		version;
+	uint32_t		score;
 	short		realLevel;
 	short		numLives;
 	float		health;
@@ -113,7 +113,7 @@ typedef	struct
 
 typedef struct
 {
-	u_short			type;				// type of fence
+	uint16_t			type;				// type of fence
 	short			numNubs;			// # nubs in fence
 	FencePointType	**nubList;			// handle to nub list
 	Rect			bBox;				// bounding box of fence area
@@ -318,7 +318,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	for (i=0; i < numJoints; i++)
 	{
 		File_BoneDefinitionType	*bonePtr;
-		u_short					*indexPtr;
+		uint16_t					*indexPtr;
 
 			/* READ BONE DATA */
 
@@ -340,11 +340,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 			/* ALLOC THE POINT & NORMALS SUB-ARRAYS */
 
-		skeleton->Bones[i].pointList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numPointsAttachedToBone);
+		skeleton->Bones[i].pointList = (uint16_t *)AllocPtr(sizeof(uint16_t) * (int)skeleton->Bones[i].numPointsAttachedToBone);
 		if (skeleton->Bones[i].pointList == nil)
 			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/pointList failed!");
 
-		skeleton->Bones[i].normalList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numNormalsAttachedToBone);
+		skeleton->Bones[i].normalList = (uint16_t *)AllocPtr(sizeof(uint16_t) * (int)skeleton->Bones[i].numNormalsAttachedToBone);
 		if (skeleton->Bones[i].normalList == nil)
 			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/normalList failed!");
 
@@ -354,7 +354,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		if (hand == nil)
 			DoFatalAlert("Error reading BonP resource!");
 		HLock(hand);
-		indexPtr = (u_short *)(*hand);
+		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY POINT INDEX ARRAY INTO BONE STRUCT */
 
@@ -369,7 +369,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		if (hand == nil)
 			DoFatalAlert("Error reading BonN resource!");
 		HLock(hand);
-		indexPtr = (u_short *)(*hand);
+		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY NORMAL INDEX ARRAY INTO BONE STRUCT */
 
@@ -1173,7 +1173,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* USE PACKED PIXEL TYPE */
 
-		ConvertTexture16To16((u_short *)tempBuffer16, width, height);
+		ConvertTexture16To16((uint16_t *)tempBuffer16, width, height);
 		matData.pixelSrcFormat 	= GL_BGRA_EXT;
 		matData.pixelDstFormat 	= GL_RGBA;
 		matData.textureName[0] 	= OGL_TextureMap_Load(tempBuffer16, width, height,
@@ -1220,11 +1220,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 // Simply flips Y since OGL Textures are screwey
 //
 
-static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height)
+static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 {
 int		x,y;
-u_short	pixel,*bottom;
-u_short	*dest;
+uint16_t	pixel,*bottom;
+uint16_t	*dest;
 
 
 	bottom = textureBuffer + ((height - 1) * width);

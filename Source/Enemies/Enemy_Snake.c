@@ -17,7 +17,7 @@ extern	short					gNumEnemies,gNumCollisions,gNumTerrainItems;
 extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	float					gDeathTimer;
 extern	OGLVector3D			gDelta;
-extern	u_long		gAutoFadeStatusBits;
+extern	uint32_t		gAutoFadeStatusBits;
 extern	CollisionRec	gCollisionList[];
 extern	MOVertexArrayData	**gLocalTriMeshesOfSkelType;
 extern	Boolean				gFreezeCameraFromXZ,gPlayerIsDead,gFreezeCameraFromY;

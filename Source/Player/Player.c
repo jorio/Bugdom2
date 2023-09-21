@@ -19,7 +19,7 @@ extern	float					gFramesPerSecondFrac,gBestCheckpointAim;
 extern	short					gNumCollisions;
 extern	CollisionRec			gCollisionList[];
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	u_long 					gAutoFadeStatusBits,gScore;
+extern	uint32_t 					gAutoFadeStatusBits,gScore;
 extern	int						gLevelNum,gScratch;
 extern	Boolean				gFreezeCameraFromXZ,gFreezeCameraFromY,gPlayingFromSavedGame;
 extern	Boolean				gEnableSnakes,gResetRideBall, gGameOver;

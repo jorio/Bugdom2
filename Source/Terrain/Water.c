@@ -14,9 +14,8 @@ extern	OGLVector3D	gDelta;
 extern	float		gAutoFadeStartDist,gAutoFadeRange_Frac,gAutoFadeEndDist,gFramesPerSecondFrac,gGlobalTransparency;
 extern	FSSpec		gDataSpec;
 extern	SpriteType	*gSpriteGroupList[];
-extern	long		gNumSpritesInGroupList[];
 extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	u_long		gGlobalMaterialFlags;
+extern	uint32_t		gGlobalMaterialFlags;
 extern	Boolean		gG4;
 extern	float		gMapToUnitValue;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
@@ -314,8 +313,8 @@ float					y,centerX,centerZ;
 static void MakeWaterGeometry(void)
 {
 int						i, f;
-u_short					type;
-u_long					numNubs;
+uint16_t					type;
+uint32_t					numNubs;
 WaterDefType			*water;
 float					minX,minY,minZ,maxX,maxY,maxZ;
 double					x,y,z;

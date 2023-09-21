@@ -23,7 +23,7 @@ extern	int				gLevelNum;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	OGLPoint3D	gCoord;
 extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
+extern	uint32_t			gScore,gGlobalMaterialFlags;
 extern	NewConfettiGroupDefType	gNewConfettiGroupDef;
 extern	float					gAnaglyphScaleFactor, gAnaglyphFocallength, gAnaglyphEyeSeparation;
 

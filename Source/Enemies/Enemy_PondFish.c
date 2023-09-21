@@ -18,7 +18,7 @@ extern	float					gFramesPerSecondFrac, gFramesPerSecond, gDeathTimer;
 extern	OGLPoint3D				gCoord;
 extern	OGLVector3D				gDelta;
 extern	ObjNode					*gFirstNodePtr;
-extern	u_long				gAutoFadeStatusBits;
+extern	uint32_t				gAutoFadeStatusBits;
 
 
 /****************************/

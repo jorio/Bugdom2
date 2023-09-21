@@ -22,7 +22,7 @@ extern	SuperTileItemIndexType	**gSuperTileItemIndexGrid;
 extern	int						gLevelNum,gScratch;
 extern	PlayerInfoType			gPlayerInfo;
 extern	FenceDefType			*gFenceList;
-extern	u_long					gGameFrameNum;
+extern	uint32_t					gGameFrameNum;
 extern	AGLContext		gAGLContext;
 extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	float					gFramesPerSecond, gFramesPerSecondFrac;
@@ -38,7 +38,7 @@ extern	Byte				gAnaglyphPass;
 static short GetFreeSuperTileMemory(void);
 static inline void ReleaseSuperTileObject(short superTileNum);
 static void CalcNewItemDeleteWindow(void);
-static u_short	BuildTerrainSuperTile(long	startCol, long startRow);
+static uint16_t	BuildTerrainSuperTile(long	startCol, long startRow);
 static void ReleaseAllSuperTiles(void);
 static void DoSuperTileDeformation(SuperTileMemoryType *superTile);
 static void UpdateTerrainDeformationFunctions(void);
@@ -80,7 +80,7 @@ float			**gVertexShading = nil;					// vertex shading grid
 
 MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 
-//u_short			**gAttributeGrid = nil;
+//uint16_t			**gAttributeGrid = nil;
 
 long			gNumSuperTilesDeep,gNumSuperTilesWide;	  		// dimensions of terrain in terms of supertiles
 static long		gCurrentSuperTileRow,gCurrentSuperTileCol;
@@ -551,10 +551,10 @@ int	i;
 // OUTPUT: index to supertile
 //
 
-static u_short	BuildTerrainSuperTile(long	startCol, long startRow)
+static uint16_t	BuildTerrainSuperTile(long	startCol, long startRow)
 {
 long	 			row,col,row2,col2,numPoints,i;
-u_short				superTileNum;
+uint16_t				superTileNum;
 float				height,miny,maxy;
 MOVertexArrayData	*meshData;
 SuperTileMemoryType	*superTilePtr;

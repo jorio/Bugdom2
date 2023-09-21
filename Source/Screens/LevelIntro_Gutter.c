@@ -22,7 +22,7 @@ extern	OGLSetupOutputType	*gGameViewInfoPtr;
 extern	int				gLevelNum;
 extern	OGLPoint3D	gCoord;
 extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
+extern	uint32_t			gScore,gGlobalMaterialFlags;
 extern	Byte	gSprinklerMode;
 extern	float	gSprinklerPopUpOffset,gSprinklerTimer;
 

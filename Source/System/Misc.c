@@ -40,7 +40,7 @@ extern	FSSpec				gDataSpec;
 /**********************/
 
 
-u_long 	gSeed0 = 0, gSeed1 = 0, gSeed2 = 0;
+uint32_t 	gSeed0 = 0, gSeed1 = 0, gSeed2 = 0;
 
 float	gFramesPerSecond, gFramesPerSecondFrac;
 
@@ -158,10 +158,10 @@ unsigned long MyRandomLong(void)
 // THE RANGE *IS* INCLUSIVE OF MIN AND MAX
 //
 
-u_short	RandomRange(unsigned short min, unsigned short max)
+uint16_t	RandomRange(unsigned short min, unsigned short max)
 {
-u_short		qdRdm;											// treat return value as 0-65536
-u_long		range, t;
+uint16_t		qdRdm;											// treat return value as 0-65536
+uint32_t		range, t;
 
 	qdRdm = MyRandomLong();
 	range = max+1 - min;
@@ -374,7 +374,7 @@ OSErr	err;
 void *AllocPtr(long size)
 {
 Ptr	pr;
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -386,7 +386,7 @@ u_long	*cookiePtr;
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (u_long *)pr;
+	cookiePtr = (uint32_t *)pr;
 
 	*cookiePtr++ = 'FACE';
 	*cookiePtr++ = 'PTR2';
@@ -406,7 +406,7 @@ u_long	*cookiePtr;
 void *AllocPtrClear(long size)
 {
 Ptr	pr;
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -419,7 +419,7 @@ u_long	*cookiePtr;
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (u_long *)pr;
+	cookiePtr = (uint32_t *)pr;
 
 	*cookiePtr++ = 'FACE';
 	*cookiePtr++ = 'PTC2';
@@ -438,12 +438,12 @@ u_long	*cookiePtr;
 
 void SafeDisposePtr(void *ptr)
 {
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 Ptr		p = ptr;
 
 	p -= 16;					// back up to pt to cookie
 
-	cookiePtr = (u_long *)p;
+	cookiePtr = (uint32_t *)p;
 
 	if (*cookiePtr != 'FACE')
 		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
@@ -508,6 +508,11 @@ wait:
 		fps = DEFAULT_FPS;
 #endif
 
+	// SDL_Log("FPS: %f\n", fps);
+
+	gFramesPerSecond = fps;
+	gFramesPerSecondFrac = 1.0f / fps;
+
 	time = currTime;	// reset for next time interval
 }
 
@@ -547,32 +552,22 @@ void MyFlushEvents(void)
 
 /********************* SWIZZLE SHORT **************************/
 
-short SwizzleShort(short *shortPtr)
+int16_t SwizzleShort(const int16_t *shortPtr)
 {
-short	theShort = *shortPtr;
-
-#if __LITTLE_ENDIAN__
-
-	Byte	b1 = theShort & 0xff;
-	Byte	b2 = (theShort & 0xff00) >> 8;
-
-	theShort = (b1 << 8) | b2;
-#endif
-
-	return(theShort);
+	return (int16_t)SwizzleUShort((const uint16_t *)shortPtr);
 }
 
 
 /********************* SWIZZLE USHORT **************************/
 
-u_short SwizzleUShort(u_short *shortPtr)
+uint16_t SwizzleUShort(const uint16_t *shortPtr)
 {
-u_short	theShort = *shortPtr;
+uint16_t	theShort = *shortPtr;
 
 #if __LITTLE_ENDIAN__
 
-	Byte	b1 = theShort & 0xff;
-	Byte	b2 = (theShort & 0xff00) >> 8;
+	uint32_t	b1 = theShort & 0xff;
+	uint32_t	b2 = (theShort & 0xff00) >> 8;
 
 	theShort = (b1 << 8) | b2;
 #endif
@@ -584,37 +579,24 @@ u_short	theShort = *shortPtr;
 
 /********************* SWIZZLE LONG **************************/
 
-long SwizzleLong(long *longPtr)
+int32_t SwizzleLong(const int32_t *longPtr)
 {
-long	theLong = *longPtr;
-
-#if __LITTLE_ENDIAN__
-
-	Byte	b1 = theLong & 0xff;
-	Byte	b2 = (theLong & 0xff00) >> 8;
-	Byte	b3 = (theLong & 0xff0000) >> 16;
-	Byte	b4 = (theLong & 0xff000000) >> 24;
-
-	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-
-#endif
-
-	return(theLong);
+	return (int32_t) SwizzleULong((const uint32_t*) longPtr);
 }
 
 
 /********************* SWIZZLE U LONG **************************/
 
-u_long SwizzleULong(u_long *longPtr)
+uint32_t SwizzleULong(const uint32_t *longPtr)
 {
-u_long	theLong = *longPtr;
+uint32_t	theLong = *longPtr;
 
 #if __LITTLE_ENDIAN__
 
-	Byte	b1 = theLong & 0xff;
-	Byte	b2 = (theLong & 0xff00) >> 8;
-	Byte	b3 = (theLong & 0xff0000) >> 16;
-	Byte	b4 = (theLong & 0xff000000) >> 24;
+	uint32_t	b1 = theLong & 0xff;
+	uint32_t	b2 = (theLong & 0xff00) >> 8;
+	uint32_t	b3 = (theLong & 0xff0000) >> 16;
+	uint32_t	b4 = (theLong & 0xff000000) >> 24;
 
 	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
 
@@ -627,14 +609,15 @@ u_long	theLong = *longPtr;
 
 /********************* SWIZZLE FLOAT **************************/
 
-float SwizzleFloat(float *floatPtr)
+float SwizzleFloat(const float *floatPtr)
 {
-float	*theFloat;
-u_long	bytes = SwizzleULong((u_long *)floatPtr);
+	const void* blob = floatPtr;
 
-	theFloat = (float *)&bytes;
+	uint32_t theLong = SwizzleULong((const uint32_t *) blob);
 
-	return(*theFloat);
+	blob = &theLong;
+
+	return *((const float *) blob);
 }
 
 

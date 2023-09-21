@@ -18,7 +18,7 @@ extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	OGLVector3D		gRecentTerrainNormal;
 extern	PlayerInfoType	gPlayerInfo;
-extern	u_long			gAutoFadeStatusBits;
+extern	uint32_t			gAutoFadeStatusBits;
 extern	PrefsType			gGamePrefs;
 extern	SpriteType	*gSpriteGroupList[];
 
@@ -49,7 +49,7 @@ typedef struct
 	Byte				ownerTrailNum;							// index so owner can have multiple trails
 
 	Byte				type;								// type of trail to create
-	u_short				numSegments;						// # segments in trail
+	uint16_t				numSegments;						// # segments in trail
 	OGLPoint3D			points[MAX_TRAIL_SEGMENTS];			// segment points
 	OGLColorRGBA		color[MAX_TRAIL_SEGMENTS];			// each segment has a color+alpha value to fade
 
@@ -410,7 +410,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo)
 {
-u_long	w,p,n;
+uint32_t	w,p,n;
 float	size,dist;
 AGLContext agl_ctx = setupInfo->drawContext;
 

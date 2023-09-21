@@ -24,8 +24,8 @@ enum
 
 typedef struct		// NOTE: MUST MATCH OREOTERRAIN DATA!!!
 {
-	u_short			type;							// type of water
-	u_long			flags;							// flags
+	uint16_t			type;							// type of water
+	uint32_t			flags;							// flags
 	long			height;							// height offset or hard-wired index
 	short			numNubs;						// # nubs in water
 	long			reserved;						// for future use

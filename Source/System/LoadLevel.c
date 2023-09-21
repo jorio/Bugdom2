@@ -18,7 +18,7 @@ extern	long			gPrefsFolderDirID;
 extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
 extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
 extern	FSSpec			gDataSpec;
-extern	u_long			gScore,gLoadedScore;
+extern	uint32_t			gScore,gLoadedScore;
 extern	SpriteType		*gSpriteGroupList[];
 extern	float			**gMapYCoords,**gMapYCoordsOriginal;
 extern	Byte			**gMapSplitMode;

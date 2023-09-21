@@ -17,7 +17,7 @@ extern	int						gNumEnemies;
 extern	float					gFramesPerSecondFrac,gGlobalTransparency;
 extern	OGLVector3D			gDelta;
 extern	signed char			gNumEnemyOfKind[];
-extern	u_long		gAutoFadeStatusBits;
+extern	uint32_t		gAutoFadeStatusBits;
 extern	SparkleType	gSparkles[];
 extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
 extern	int					gLevelNum,gMaxEnemies;
@@ -796,7 +796,7 @@ float					rot;
 static void MoveToySoldierGrenade(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
-u_short	sides;
+uint16_t	sides;
 
 			/* SEE IF ITS STILL AROUND */
 

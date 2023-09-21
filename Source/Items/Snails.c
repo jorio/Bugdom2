@@ -16,7 +16,7 @@ extern	OGLPoint3D			gCoord;
 extern	OGLVector3D			gDelta;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits,gGlobalMaterialFlags;
+extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
 extern	PlayerInfoType		gPlayerInfo;
 extern	int					gLevelNum,gNumPuzzlePiecesFit, gGatheredRedClovers,gNumFoodOnBasket, gNumCaughtFish, gKindlingCount, gNumFreedBees;
 extern	AGLContext		gAGLContext;

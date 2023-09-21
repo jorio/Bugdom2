@@ -29,8 +29,8 @@ typedef struct
 	OGLVector3D		rot;
 	OGLVector3D		positionOffset;			// offset relative to the spline point it's attached to
 
-	u_long			flags;
-	u_long			parms[3];
+	uint32_t			flags;
+	uint32_t			parms[3];
 
 }TunnelItemDefType;
 

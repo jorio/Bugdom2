@@ -17,7 +17,7 @@ extern	PlayerInfoType	gPlayerInfo;
 extern	OGLVector3D			gDelta;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLVector3D			gRecentTerrainNormal;
-extern	u_long		gAutoFadeStatusBits;
+extern	uint32_t		gAutoFadeStatusBits;
 extern	short				gNumCollisions, gNumTerrainItems;
 extern	SuperTileStatus	**gSuperTileStatusGrid;
 extern	NewParticleGroupDefType	gNewParticleGroupDef;

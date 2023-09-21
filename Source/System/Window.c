@@ -46,8 +46,8 @@ static void GetDisplayVRAM(void);
 Boolean				gRealCursorVisible = true;
 
 
-u_long			gDisplayVRAM = 0;
-u_long			gVRAMAfterBuffers = 0;
+uint32_t			gDisplayVRAM = 0;
+uint32_t			gVRAMAfterBuffers = 0;
 
 long					gScreenXOffset,gScreenYOffset;
 
@@ -480,9 +480,9 @@ void Exit2D(void)
 
 /********************** WAIT **********************/
 
-void Wait(u_long ticks)
+void Wait(uint32_t ticks)
 {
-u_long	start;
+uint32_t	start;
 
 	start = TickCount();
 

@@ -18,7 +18,7 @@ extern	OGLPoint3D			gCoord;
 extern	OGLVector3D			gDelta;
 extern	short				gNumCollisions;
 extern	CollisionRec		gCollisionList[];
-extern	u_long		gAutoFadeStatusBits;
+extern	uint32_t		gAutoFadeStatusBits;
 extern	OGLVector3D		gRecentTerrainNormal;
 extern	int					gLevelNum, gNumViri;
 extern	Boolean				gG4;
@@ -235,7 +235,7 @@ float	x,z;
 // OUTPUT: true = was deleted
 //
 
-Boolean DoEnemyCollisionDetect(ObjNode *theEnemy, u_long ctype, Boolean useBBoxBottom)
+Boolean DoEnemyCollisionDetect(ObjNode *theEnemy, uint32_t ctype, Boolean useBBoxBottom)
 {
 float	terrainY,distToFloor,bottomOff;
 int		i;

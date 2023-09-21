@@ -14,9 +14,9 @@ extern	OGLVector3D	gDelta;
 extern	float		gAutoFadeStartDist,gAutoFadeRange_Frac,gAutoFadeEndDist,gFramesPerSecondFrac;
 extern	FSSpec		gDataSpec;
 extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	long		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
+extern	int32_t		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
 extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	u_long		gGlobalMaterialFlags,gAutoFadeStatusBits;
+extern	uint32_t		gGlobalMaterialFlags,gAutoFadeStatusBits;
 extern	int			gLevelNum;
 extern	Byte		gDebugMode;
 extern	float		gMapToUnitValue;
@@ -314,7 +314,7 @@ float					sink;
 static void MakeFenceGeometry(void)
 {
 int						f, group, sprite;
-u_short					type;
+uint16_t					type;
 float					u,height,aspectRatio,textureUOff;
 long					i,numNubs,j;
 FenceDefType			*fence;

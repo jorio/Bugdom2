@@ -18,7 +18,7 @@ extern	MOMaterialObject	*gMostRecentMaterial;
 extern	short			gNumSuperTilesDrawn,gNumActiveParticleGroups,gNumFencesDrawn,gNumTerrainDeformations,gNumWaterDrawn;
 extern	float			gFramesPerSecond,gCameraStartupTimer,gScratchF,gGlobalTransparency;
 extern	Byte			gDebugMode;
-extern	u_long			gGlobalMaterialFlags;
+extern	uint32_t			gGlobalMaterialFlags;
 extern	PrefsType			gGamePrefs;
 extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles,gNumLoopingEffects;
 
@@ -35,7 +35,7 @@ static void OGL_CreateLights(OGLLightDefType *lightDefPtr);
 static void OGL_InitFont(void);
 static void OGL_FreeFont(void);
 
-static void ColorBalanceRGBForAnaglyph(u_long *rr, u_long *gg, u_long *bb);
+static void ColorBalanceRGBForAnaglyph(uint32_t *rr, uint32_t *gg, uint32_t *bb);
 static void	ConvertTextureToColorAnaglyph(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType);
 static void	ConvertTextureToGrey(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType);
 
@@ -62,7 +62,7 @@ float					gAnaglyphScaleFactor 	= 1.0f;
 float					gAnaglyphFocallength	= 200.0f;
 float					gAnaglyphEyeSeparation 	= 25.0f;
 Byte					gAnaglyphPass;
-u_char					gAnaglyphGreyTable[255];
+uint8_t					gAnaglyphGreyTable[255];
 
 
 // AGLDrawable		gAGLWin;
@@ -187,9 +187,13 @@ OGLSetupOutputType	*outputPtr;
 				/* SETUP */
 
 	OGL_CreateDrawContext(&setupDefPtr->view);
-	OGL_SetStyles(setupDefPtr);
-	OGL_CreateLights(&setupDefPtr->lights);
+	OGL_CheckError();
 
+	OGL_SetStyles(setupDefPtr);
+	OGL_CheckError();
+
+	OGL_CreateLights(&setupDefPtr->lights);
+	OGL_CheckError();
 
 				/* PASS BACK INFO */
 
@@ -218,6 +222,8 @@ OGLSetupOutputType	*outputPtr;
 
 	gGlClientActiveTextureProc = (PFNGLCLIENTACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glClientActiveTexture");
 	GAME_ASSERT(gGlClientActiveTextureProc);
+
+	OGL_CheckError();
 }
 
 
@@ -301,7 +307,7 @@ static char			*s;
 	{
 		if (gGamePrefs.anaglyphColor)
 		{
-			u_long	r,g,b;
+			uint32_t	r,g,b;
 
 			r = viewDefPtr->clearColor.r * 255.0f;
 			g = viewDefPtr->clearColor.g * 255.0f;
@@ -454,6 +460,8 @@ static char			*s;
 	SDL_GL_SwapWindow(gSDLWindow);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(viewDefPtr->clearColor.r, viewDefPtr->clearColor.g, viewDefPtr->clearColor.b, 1.0);
+
+	OGL_CheckError();
 }
 
 
@@ -469,12 +477,13 @@ AGLContext agl_ctx = gAGLContext;
 	glEnable(GL_CULL_FACE);									// activate culling
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);									// CCW is front face
-	glEnable(GL_DITHER);
+
+	// glEnable(GL_DITHER);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		// set default blend func
 	glDisable(GL_BLEND);									// but turn it off by default
 
-	glHint(GL_TRANSFORM_HINT_APPLE, GL_FASTEST);
+	// glHint(GL_TRANSFORM_HINT_APPLE, GL_FASTEST);
 	glDisable(GL_RESCALE_NORMAL);
 
     glHint(GL_FOG_HINT, GL_NICEST);		// pixel accurate fog?
@@ -503,6 +512,7 @@ AGLContext agl_ctx = gAGLContext;
 	else
 		glDisable(GL_FOG);
 
+	OGL_CheckError();
 }
 
 
@@ -869,12 +879,10 @@ AGLContext agl_ctx = gAGLContext;
 			/* GET A UNIQUE TEXTURE NAME & INITIALIZE IT */
 
 	glGenTextures(1, &textureName);
-	if (OGL_CheckError())
-		DoFatalAlert("OGL_TextureMap_Load: glGenTextures failed!");
+	OGL_CheckError();
 
 	glBindTexture(GL_TEXTURE_2D, textureName);				// this is now the currently active texture
-	if (OGL_CheckError())
-		DoFatalAlert("OGL_TextureMap_Load: glBindTexture failed!");
+	OGL_CheckError();
 
 
 				/* LOAD TEXTURE AND/OR MIPMAPS */
@@ -895,8 +903,7 @@ AGLContext agl_ctx = gAGLContext;
 
 			/* SEE IF RAN OUT OF MEMORY WHILE COPYING TO OPENGL */
 
-	if (OGL_CheckError())
-		DoFatalAlert("OGL_TextureMap_Load: glTexImage2D failed!");
+	OGL_CheckError();
 
 
 				/* SET THIS TEXTURE AS CURRENTLY ACTIVE FOR DRAWING */
@@ -916,19 +923,19 @@ static void	ConvertTextureToGrey(void *imageMemory, short width, short height, G
 {
 long	x,y;
 float	r,g,b;
-u_long	a,q,rq,bq;
-u_long   redCal = DEFAULT_ANAGLYPH_R;
-u_long   blueCal =  DEFAULT_ANAGLYPH_B;
+uint32_t	a,q,rq,bq;
+uint32_t   redCal = DEFAULT_ANAGLYPH_R;
+uint32_t   blueCal =  DEFAULT_ANAGLYPH_B;
 
 
 	if (dataType == GL_UNSIGNED_INT_8_8_8_8_REV)
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = pix32[x];
+				uint32_t	pix = pix32[x];
 
 				r = (float)((pix >> 16) & 0xff) / 255.0f * .299f;
 				g = (float)((pix >> 8) & 0xff) / 255.0f * .586f;
@@ -954,12 +961,12 @@ u_long   blueCal =  DEFAULT_ANAGLYPH_B;
 	else
 	if ((dataType == GL_UNSIGNED_BYTE) && (srcFormat == GL_RGBA))
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = SwizzleULong(&pix32[x]);
+				uint32_t	pix = SwizzleULong(&pix32[x]);
 
 				r = (float)((pix >> 24) & 0xff) / 255.0f * .299f;
 				g = (float)((pix >> 16) & 0xff) / 255.0f * .586f;
@@ -984,12 +991,12 @@ u_long   blueCal =  DEFAULT_ANAGLYPH_B;
 	else
 	if (dataType == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 	{
-		u_short	*pix16 = (u_short *)imageMemory;
+		uint16_t	*pix16 = (uint16_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_short	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
+				uint16_t	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
 
 				r = (float)((pix >> 10) & 0x1f) / 31.0f * .299f;
 				g = (float)((pix >> 5) & 0x1f) / 31.0f * .586f;
@@ -1027,7 +1034,7 @@ u_long   blueCal =  DEFAULT_ANAGLYPH_B;
 
 /******************* COLOR BALANCE RGB FOR ANAGLYPH *********************/
 
-void ColorBalanceRGBForAnaglyph(u_long *rr, u_long *gg, u_long *bb)
+void ColorBalanceRGBForAnaglyph(uint32_t *rr, uint32_t *gg, uint32_t *bb)
 {
 #if 1
 
@@ -1134,17 +1141,17 @@ float   fr, fg, fb;
 static void	ConvertTextureToColorAnaglyph(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType)
 {
 long	x,y;
-u_long	r,g,b;
-u_long	a;
+uint32_t	r,g,b;
+uint32_t	a;
 
 	if (dataType == GL_UNSIGNED_INT_8_8_8_8_REV)
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = pix32[x]; //SwizzleULong(&pix32[x]);
+				uint32_t	pix = pix32[x]; //SwizzleULong(&pix32[x]);
 
 				a = ((pix >> 24) & 0xff);
 				r = ((pix >> 16) & 0xff);
@@ -1162,12 +1169,12 @@ u_long	a;
 	else
 	if ((dataType == GL_UNSIGNED_BYTE) && (srcFormat == GL_RGBA))
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = SwizzleULong(&pix32[x]);
+				uint32_t	pix = SwizzleULong(&pix32[x]);
 
 				a = ((pix >> 0) & 0xff);
 				r = ((pix >> 24) & 0xff);
@@ -1186,12 +1193,12 @@ u_long	a;
 	else
 	if (dataType == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 	{
-		u_short	*pix16 = (u_short *)imageMemory;
+		uint16_t	*pix16 = (uint16_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_short	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
+				uint16_t	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
 
 				r = ((pix >> 10) & 0x1f) << 3;			// load 5 bits per channel & convert to 8 bits
 				g = ((pix >> 5) & 0x1f) << 3;
@@ -1412,48 +1419,26 @@ AGLContext agl_ctx = gAGLContext;
 
 /******************** OGL: CHECK ERROR ********************/
 
-GLenum OGL_CheckError(void)
+GLenum OGL_CheckError_Impl(const char* file, const int line)
 {
-GLenum	err;
-AGLContext agl_ctx = gAGLContext;
-
-
-	err = glGetError();
-	if (err != GL_NO_ERROR)
+	GLenum error = glGetError();
+	if (error != 0)
 	{
-		switch(err)
+		const char* text;
+		switch (error)
 		{
-			case	GL_INVALID_ENUM:
-					DoAlert("OGL_CheckError: GL_INVALID_ENUM");
-					DoFatalAlert("This might mean you have incompatible video hardware or an outdated version of OpenGL installed.  Install the free OS 9.2.2 update from Apple's web site.");
-					break;
-
-			case	GL_INVALID_VALUE:
-					DoAlert("OGL_CheckError: GL_INVALID_VALUE");
-					break;
-
-			case	GL_INVALID_OPERATION:
-					DoAlert("OGL_CheckError: GL_INVALID_OPERATION");
-					break;
-
-			case	GL_STACK_OVERFLOW:
-					DoAlert("OGL_CheckError: GL_STACK_OVERFLOW");
-					break;
-
-			case	GL_STACK_UNDERFLOW:
-					DoAlert("OGL_CheckError: GL_STACK_UNDERFLOW");
-					break;
-
-			case	GL_OUT_OF_MEMORY:
-					DoAlert("OGL_CheckError: GL_OUT_OF_MEMORY  (increase your Virtual Memory setting!)");
-					break;
-
+			case	GL_INVALID_ENUM:		text = "invalid enum"; break;
+			case	GL_INVALID_VALUE:		text = "invalid value"; break;
+			case	GL_INVALID_OPERATION:	text = "invalid operation"; break;
+			case	GL_STACK_OVERFLOW:		text = "stack overflow"; break;
+			case	GL_STACK_UNDERFLOW:		text = "stack underflow"; break;
 			default:
-					DoAlert("OGL_CheckError: some other error %d", err);
+				text = "";
 		}
-	}
 
-	return(err);
+		DoFatalAlert("OpenGL error 0x%x (%s)\nin %s:%d", error, text, file, line);
+	}
+	return error;
 }
 
 

@@ -14,7 +14,7 @@
 extern	float	gCurrentAspectRatio,gGlobalTransparency;
 extern	int		gPolysThisFrame;
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
-extern	u_long			gGlobalMaterialFlags;
+extern	uint32_t			gGlobalMaterialFlags;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -33,7 +33,7 @@ extern	u_long			gGlobalMaterialFlags;
 /*********************/
 
 SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-long		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];		// note:  this must be long's since that's what we read from the sprite file!
+int32_t		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];		// note:  this must be int32_t's since that's what we read from the sprite file!
 
 
 
@@ -112,7 +112,7 @@ MOMaterialData	matData;
 
 		/* READ # SPRITES IN THIS FILE */
 
-	count = sizeof(long);
+	count = sizeof(gNumSpritesInGroupList[groupNum]);
 	FSRead(refNum, &count, &gNumSpritesInGroupList[groupNum]);
 
 	gNumSpritesInGroupList[groupNum] = SwizzleLong(&gNumSpritesInGroupList[groupNum]);
@@ -131,20 +131,20 @@ MOMaterialData	matData;
 
 	for (i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
 	{
-		long		bufferSize;
-		u_char *buffer;
+		int32_t	bufferSize;
+		uint8_t *buffer;
 
 			/* READ WIDTH/HEIGHT, ASPECT RATIO */
 
-		count = sizeof(int);
+		count = sizeof(gSpriteGroupList[groupNum][i].width);
 		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].width);
 		gSpriteGroupList[groupNum][i].width = SwizzleLong(&gSpriteGroupList[groupNum][i].width);
 
-		count = sizeof(int);
+		count = sizeof(gSpriteGroupList[groupNum][i].height);
 		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].height);
 		gSpriteGroupList[groupNum][i].height = SwizzleLong(&gSpriteGroupList[groupNum][i].height);
 
-		count = sizeof(float);
+		count = sizeof(gSpriteGroupList[groupNum][i].aspectRatio);
 		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].aspectRatio);
 		gSpriteGroupList[groupNum][i].aspectRatio = SwizzleFloat(&gSpriteGroupList[groupNum][i].aspectRatio);
 
@@ -182,7 +182,7 @@ MOMaterialData	matData;
 		if (gSpriteGroupList[groupNum][i].srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 		{
 			int		q;
-			u_short *pix = (u_short *)buffer;
+			uint16_t *pix = (uint16_t *)buffer;
 			for (q = 0; q < (count/2); q++)
 			{
 				pix[q] = SwizzleUShort(&pix[q]);
@@ -226,7 +226,7 @@ MOMaterialData	matData;
 		else
 		if ((matData.pixelSrcFormat == GL_RGB) && (matData.pixelDstFormat == GL_RGB5_A1))
 		{
-			u_short	*buff16 = (u_short *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
+			uint16_t	*buff16 = (uint16_t *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
 
 			ConvertTexture24To16(buffer, buff16, matData.width, matData.height);
 			matData.textureName[0] = OGL_TextureMap_Load(buff16, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
@@ -297,7 +297,7 @@ MOSpriteSetupData	spriteData;
 	spriteData.type 	= newObjDef->type;								// set group subtype
 
 
-	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (u_long)setupInfo, &spriteData);
+	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (uint32_t)setupInfo, &spriteData);
 	if (!spriteMO)
 		DoFatalAlert("MakeSpriteObject: MO_CreateNewObjectOfType failed!");
 
@@ -339,7 +339,7 @@ MOSpriteObject		*spriteMO;
 	spriteData.group	= theNode->Group;							// set group
 	spriteData.type 	= type;										// set group subtype
 
-	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (u_long)setupInfo, &spriteData);
+	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (uint32_t)setupInfo, &spriteData);
 	if (!spriteMO)
 		DoFatalAlert("ModifySpriteObjectFrame: MO_CreateNewObjectOfType failed!");
 
@@ -413,7 +413,7 @@ MOMaterialObject	*m;
 
 /************************** DRAW SPRITE ************************/
 
-void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags, const OGLSetupOutputType *setupInfo)
+void DrawSprite(int	group, int type, float x, float y, float scale, float rot, uint32_t flags, const OGLSetupOutputType *setupInfo)
 {
 AGLContext agl_ctx = setupInfo->drawContext;
 

@@ -2,8 +2,7 @@
 // bg3d.h
 //
 
-#ifndef __BG3D
-#define __BG3D
+#pragma once
 
 #define	MAX_MULTITEXTURE_LAYERS		4			// max # of multi texture layers supported
 												// WARNING: changing this may alter file format!!
@@ -70,11 +69,11 @@ enum
 
 typedef struct
 {
-	u_long	width,height;					// dimensions of texture
+	uint32_t	width,height;					// dimensions of texture
 	GLint	srcPixelFormat;					// OGL format (GL_RGBA, etc.) for internal
 	GLint	dstPixelFormat;					// format for VRAM
-	u_long	bufferSize;						// size of texture data to follow
-	u_long	reserved[4];					// for future use
+	uint32_t	bufferSize;						// size of texture data to follow
+	uint32_t	reserved[4];					// for future use
 }BG3DTextureHeader;
 
 
@@ -91,13 +90,13 @@ enum
 
 typedef struct
 {
-	u_long	type;								// geometry type
-	long	numMaterials;						// # material layers
-	u_long	layerMaterialNum[MAX_MULTITEXTURE_LAYERS];	// index into material list
-	u_long	flags;								// flags
-	u_long	numPoints;							// (if applicable)
-	u_long	numTriangles;						// (if applicable)
-	u_long	reserved[4];						// for future use
+	uint32_t	type;								// geometry type
+	uint32_t	numMaterials;						// # material layers
+	uint32_t	layerMaterialNum[MAX_MULTITEXTURE_LAYERS];	// index into material list
+	uint32_t	flags;								// flags
+	uint32_t	numPoints;							// (if applicable)
+	uint32_t	numTriangles;						// (if applicable)
+	uint32_t	reserved[4];						// for future use
 }BG3DGeometryHeader;
 
 
@@ -108,13 +107,9 @@ void InitBG3DManager(void);
 void ImportBG3D(FSSpec *spec, int groupNum, OGLSetupOutputType *setupInfo);
 void DisposeBG3DContainer(int groupNum);
 void DisposeAllBG3DContainers(void);
-void BG3D_SetContainerMaterialFlags(short group, short type, short geometryNum, u_long flags);
-void	ConvertTexture24To16(u_char *srcBuff24, u_short *destBuff16, int width, int height);
-void BG3D_SphereMapGeomteryMaterial(short group, short type, short geometryNum, u_short combineMode, u_short envMapNum);
-void SetSphereMapInfoOnVertexArrayData(MOVertexArrayData *va, u_short combineMode, u_short envMapNum);
-void SetSphereMapInfoOnVertexArrayObject(MOVertexArrayObject *mo, u_short combineMode, u_short envMapNum);
-void SetSphereMapInfoOnMaterialObject(MOMaterialObject *mat, u_short combineMode, u_short envMapNum);
-
-
-#endif
-
+void BG3D_SetContainerMaterialFlags(short group, short type, short geometryNum, uint32_t flags);
+void	ConvertTexture24To16(uint8_t *srcBuff24, uint16_t *destBuff16, int width, int height);
+void BG3D_SphereMapGeomteryMaterial(short group, short type, short geometryNum, uint16_t combineMode, uint16_t envMapNum);
+void SetSphereMapInfoOnVertexArrayData(MOVertexArrayData *va, uint16_t combineMode, uint16_t envMapNum);
+void SetSphereMapInfoOnVertexArrayObject(MOVertexArrayObject *mo, uint16_t combineMode, uint16_t envMapNum);
+void SetSphereMapInfoOnMaterialObject(MOMaterialObject *mat, uint16_t combineMode, uint16_t envMapNum);

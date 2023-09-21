@@ -24,10 +24,10 @@ extern	int				gLevelNum, gSuperTileActiveRange;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	OGLPoint3D	gCoord;
 extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
+extern	uint32_t			gScore,gGlobalMaterialFlags;
 extern	float			 gTerrainPolygonSize;
 extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	u_long				gAutoFadeStatusBits;
+extern	uint32_t				gAutoFadeStatusBits;
 extern	float		gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac;
 extern	ChannelInfoType				gChannelInfo[];
 
@@ -260,7 +260,7 @@ ObjNode			*fly;
 
 	for (i = 0; i < 20; i++)
 	{
-		u_long	volL,volR;
+		uint32_t	volL,volR;
 
 		gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
 		gNewObjectDefinition.type 		= TITLE_SObjType_Fly;
@@ -331,7 +331,7 @@ float	r,speed;
 	{
 		if (fly->EffectChannel != -1)
 		{
-			u_long volL, volR;
+			uint32_t volL, volR;
 
 			volL = gChannelInfo[fly->EffectChannel].leftVolume;							// get current left volume
 			volL -= fps;																// dim

@@ -70,7 +70,7 @@ float				gGravity = NORMAL_GRAVITY;
 
 Byte				gDebugMode = 0;				// 0 == none, 1 = fps, 2 = all
 
-u_long				gAutoFadeStatusBits;
+uint32_t				gAutoFadeStatusBits;
 
 OGLSetupOutputType		*gGameViewInfoPtr = nil;
 
@@ -79,7 +79,7 @@ PrefsType			gGamePrefs;
 OGLVector3D			gWorldSunDirection = { .5, -.35, .8};		// also serves as lense flare vector
 OGLColorRGBA		gFillColor1 = { .6, .6, .6, 1};
 
-u_long				gGameFrameNum = 0;
+uint32_t				gGameFrameNum = 0;
 float				gGameLevelTimer = 0;
 
 Boolean				gPlayingFromSavedGame = false;
@@ -96,7 +96,7 @@ float				gBestCheckpointAim;
 int					gScratch = 0;
 float				gScratchF = 0;
 
-u_long				gScore,gLoadedScore;
+uint32_t				gScore,gLoadedScore;
 
 
 //======================================================================================

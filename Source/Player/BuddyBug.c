@@ -19,7 +19,7 @@ extern	short					gNumCollisions;
 extern	CollisionRec			gCollisionList[];
 extern	unsigned long 			gScore;
 extern	float 					gCameraDistFromMe;
-extern	u_long 					gAutoFadeStatusBits;
+extern	uint32_t 					gAutoFadeStatusBits;
 
 /****************************/
 /*    PROTOTYPES            */

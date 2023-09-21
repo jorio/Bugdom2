@@ -19,7 +19,7 @@ extern PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
 extern	Boolean			gMuteMusicFlag;
 extern	float			gCurrentAspectRatio;
 extern	SpriteType		*gSpriteGroupList[];
-extern	long			gNumSpritesInGroupList[];
+extern	int32_t			gNumSpritesInGroupList[];
 extern	int				gPolysThisFrame,gVRAMUsedThisFrame;
 extern	Boolean			gMyState_Lighting;
 extern	AGLContext		gAGLContext;
@@ -34,9 +34,9 @@ extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 /*    PROTOTYPES            */
 /****************************/
 
-static MetaObjectPtr AllocateEmptyMetaObject(u_long type, u_long subType);
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType);
 static void SetMetaObjectToGroup(MOGroupObject *groupObj);
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data);
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data);
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
@@ -69,7 +69,7 @@ int					gNumMetaObjects = 0;
 
 float				gGlobalTransparency = 1;			// 0 == clear, 1 = opaque
 OGLColorRGB			gGlobalColorFilter = {1,1,1};
-u_long				gGlobalMaterialFlags = 0;
+uint32_t				gGlobalMaterialFlags = 0;
 
 MOMaterialObject	*gMostRecentMaterial;
 
@@ -94,7 +94,7 @@ void MO_InitHandler(void)
 //
 
 
-MetaObjectPtr	MO_CreateNewObjectOfType(u_long type, u_long subType, void *data)
+MetaObjectPtr	MO_CreateNewObjectOfType(uint32_t type, uint32_t subType, void *data)
 {
 MetaObjectPtr	mo;
 
@@ -149,7 +149,7 @@ MetaObjectPtr	mo;
 // allocates an empty meta object and connects it to the linked list
 //
 
-static MetaObjectPtr AllocateEmptyMetaObject(u_long type, u_long subType)
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType)
 {
 MetaObjectHeader	*mo;
 int					size;
@@ -261,7 +261,7 @@ static void SetMetaObjectToGroup(MOGroupObject *groupObj)
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
 
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data)
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data)
 {
 	switch(subType)
 	{
@@ -369,7 +369,7 @@ PixMapHandle 	hPixMap;
 int			bytesPerPixel;
 MOPictureData	*picData = &pictObj->objectData;
 Ptr			buffer,pictMapAddr;
-u_long		bufferRowBytes,pictRowBytes;
+uint32_t		bufferRowBytes,pictRowBytes;
 MOMaterialData	matData;
 Rect		r;
 
@@ -389,7 +389,7 @@ Rect		r;
 
 	hPixMap = GetGWorldPixMap(gworld);							// get gworld's pixmap
 	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
+	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
 
 	depth = (*hPixMap)->pixelSize;								// get pixel bitdepth
 	if (depth == 32)
@@ -518,9 +518,9 @@ Rect		r;
 
 			if (depth == 32)
 			{
-				u_long	r,g,b,a;
+				uint32_t	r,g,b,a;
 				int		x,y;
-				u_long	pixels, *dest = (u_long *)destPtr, *src = (u_long *)srcPtr;
+				uint32_t	pixels, *dest = (uint32_t *)destPtr, *src = (uint32_t *)srcPtr;
 
 				for (y = 0; y < vertCellSize; y++)
 				{
@@ -850,7 +850,7 @@ void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data, const OGLSetupOu
 {
 Boolean		useTexture = false, multiTexture = false, texGen = false;
 AGLContext 	agl_ctx = setupInfo->drawContext;
-u_long 		materialFlags;
+uint32_t 		materialFlags;
 short		i;
 Boolean		needNormals;
 
@@ -978,9 +978,9 @@ use_current:
 
 				if (materialFlags & BG3D_MATERIALFLAG_MULTITEXTURE)
 				{
-					u_short	multiTextureMode 	= gMostRecentMaterial->objectData.multiTextureMode;
-					u_short	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
-					u_short	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
+					uint16_t	multiTextureMode 	= gMostRecentMaterial->objectData.multiTextureMode;
+					uint16_t	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
+					uint16_t	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
 
 					if (envMapNum >= gNumSpritesInGroupList[SPRITE_GROUP_SPHEREMAPS])
 						DoFatalAlert("MO_DrawGeometry_VertexArray: illegal envMapNum");
@@ -1173,7 +1173,7 @@ OGLColorRGBA		*diffuseColor,diffColor2;
 Boolean				textureHasAlpha = false;
 Boolean				alreadySet;
 AGLContext agl_ctx = setupInfo->drawContext;
-u_long				matFlags;
+uint32_t				matFlags;
 
 			/* SEE IF THIS MATERIAL IS ALREADY SET AS CURRENT */
 
@@ -2016,7 +2016,7 @@ GWorldPtr 		pGWorld;
 PixMapHandle 	hPixMap;
 Ptr				buffer;
 Ptr 			pictMapAddr;
-u_long 			pictRowBytes;
+uint32_t 			pictRowBytes;
 int				y,x;
 Boolean			destHasAlpha;
 Rect			r;
@@ -2075,7 +2075,7 @@ Rect			r;
 		DoFatalAlert("MO_GetTextureFromResource: AllocPtr failed!");
 
 	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
+	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
 	pictMapAddr += pictRowBytes * (height-1);						// start @ bottom to flip texture
 
 
@@ -2083,11 +2083,11 @@ Rect			r;
 
 	if (depth == 32)
 	{
-		u_long	r,g,b,a;
-		u_long	pixels, *dest, *src;
+		uint32_t	r,g,b,a;
+		uint32_t	pixels, *dest, *src;
 
-		src = (u_long *)pictMapAddr;
-		dest = (u_long *)buffer;
+		src = (uint32_t *)pictMapAddr;
+		dest = (uint32_t *)buffer;
 
 		for (y = 0; y < height; y++)
 		{
@@ -2315,11 +2315,11 @@ OSErr			iErr;
 Rect			r;
 Ptr				buffer;
 Ptr				pictMapAddr;
-u_long			pictRowBytes;
+uint32_t			pictRowBytes;
 int				x,y;
 PixMapHandle 	hPixMap;
 int				width,height;
-u_long			*destPtr,*srcPtr;
+uint32_t			*destPtr,*srcPtr;
 MOMaterialObject	*obj;
 
 
@@ -2347,21 +2347,21 @@ MOMaterialObject	*obj;
 
 
 	buffer = AllocPtr(width * height * 4);									// allocate buffer
-	destPtr = (u_long *)buffer;
+	destPtr = (uint32_t *)buffer;
 	destPtr += (height-1) * width;											// start ptr at bottom of buffer
 
 	hPixMap = GetGWorldPixMap(gworld);										// get gworld's pixmap
 	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
+	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
 
-	srcPtr = (u_long *)pictMapAddr;
+	srcPtr = (uint32_t *)pictMapAddr;
 
 	for (y = 0; y < height; y++)
 	{
 		for (x = 0; x < width; x++)
 		{
-			u_long	r,g,b,a;
-			u_long pixels = srcPtr[x];										// get 32-bit pixel
+			uint32_t	r,g,b,a;
+			uint32_t pixels = srcPtr[x];										// get 32-bit pixel
 
 			if (useAlpha)
 				a = (pixels & 0xff000000) >> 24;

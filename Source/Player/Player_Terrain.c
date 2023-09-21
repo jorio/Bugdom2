@@ -1666,7 +1666,7 @@ static Boolean DoSkipCollisionDetect(ObjNode *theNode, Boolean useBBoxForTerrain
 {
 short		i;
 ObjNode		*hitObj;
-u_char		sides;
+uint8_t		sides;
 float		distToFloor, terrainY;
 float		bottomOff;
 Boolean		killed = false;

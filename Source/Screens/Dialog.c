@@ -19,7 +19,7 @@ extern	long					gTerrainUnitWidth,gTerrainUnitDepth;
 extern	OGLColorRGB				gGlobalColorFilter;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	u_long					gGlobalMaterialFlags;
+extern	uint32_t					gGlobalMaterialFlags;
 extern	SpriteType	*gSpriteGroupList[];
 extern	AGLContext		gAGLContext;
 extern	PrefsType			gGamePrefs;

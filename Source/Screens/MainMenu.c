@@ -23,7 +23,7 @@ extern	int				gLevelNum;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	OGLPoint3D	gCoord;
 extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
+extern	uint32_t			gScore,gGlobalMaterialFlags;
 extern	HighScoreType	gHighScores[NUM_SCORES];
 extern	OGLColorRGB			gGlobalColorFilter;
 
@@ -185,6 +185,7 @@ int		i;
 	viewDef.lights.fillColor[1].b 	= .0;
 
 	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_CheckError();
 
 
 				/************/

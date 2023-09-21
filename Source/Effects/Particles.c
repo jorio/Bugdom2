@@ -21,7 +21,7 @@ extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
 extern	OGLVector3D		gRecentTerrainNormal;
 extern	OGLPoint3D		gEarCoords;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	u_long				gAutoFadeStatusBits;
+extern	uint32_t				gAutoFadeStatusBits;
 extern	Boolean				gGameOver;
 extern	int					gLevelNum;
 
@@ -356,7 +356,7 @@ got_it:
 
 static void MoveParticleGroups(ObjNode *theNode)
 {
-u_long		flags;
+uint32_t		flags;
 long		i,n,p,j;
 float		fps = gFramesPerSecondFrac;
 float		y,baseScale,oneOverBaseScaleSquared,gravity;
@@ -620,7 +620,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 		if (gParticleGroups[g])
 		{
-			u_long	allAim = gParticleGroups[g]->flags & PARTICLE_FLAGS_ALLAIM;
+			uint32_t	allAim = gParticleGroups[g]->flags & PARTICLE_FLAGS_ALLAIM;
 
 			geoData = &gParticleGroups[g]->geometryObj->objectData;			// get pointer to geometry object data
 			vertexColors = geoData->colorsByte;								// get pointer to vertex color array
@@ -757,7 +757,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 /**************** VERIFY PARTICLE GROUP MAGIC NUM ******************/
 
-Boolean VerifyParticleGroupMagicNum(short group, u_long magicNum)
+Boolean VerifyParticleGroupMagicNum(short group, uint32_t magicNum)
 {
 	if (gParticleGroups[group] == nil)
 		return(false);
@@ -774,10 +774,10 @@ Boolean VerifyParticleGroupMagicNum(short group, u_long magicNum)
 // INPUT:	inFlags = flags to check particle types against
 //
 
-Boolean ParticleHitObject(ObjNode *theNode, u_short inFlags)
+Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags)
 {
 int		i,p;
-u_long	flags;
+uint32_t	flags;
 OGLPoint3D	*coord;
 
 	for (i = 0; i < MAX_PARTICLE_GROUPS; i++)
@@ -1219,7 +1219,7 @@ int		particleGroup, magicNum;
 /****************** BURN FIRE ************************/
 
 void BurnFire(ObjNode *theNode, float x, float y, float z, Boolean doSmoke,
-			short particleType, float scale, u_long moreFlags)
+			short particleType, float scale, uint32_t moreFlags)
 {
 int		i;
 float	fps = gFramesPerSecondFrac;

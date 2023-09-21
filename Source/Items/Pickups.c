@@ -16,7 +16,7 @@ extern	OGLPoint3D			gCoord;
 extern	OGLVector3D			gDelta;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits;
+extern	uint32_t				gAutoFadeStatusBits;
 extern	Boolean				gG4;
 extern	int					gLevelNum;
 extern	float				gCameraDistFromMe,gCameraLookAtYOff;

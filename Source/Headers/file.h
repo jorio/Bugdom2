@@ -24,27 +24,13 @@ typedef struct
 
 typedef struct
 {
-	long 				parentBone;			 		// index to previous bone
-	unsigned char		name[32];					// text string name for bone
-	OGLPoint3D			coord;						// absolute coord (not relative to parent!)
-	u_short				numPointsAttachedToBone;	// # vertices/points that this bone has
-	u_short				numNormalsAttachedToBone;	// # vertex normals this bone has
-	u_long				reserved[8];				// reserved for future use
+	int32_t 				parentBone;			 		// index to previous bone
+	char					name[32];					// text string name for bone
+	OGLPoint3D				coord;						// absolute coord (not relative to parent!)
+	uint16_t				numPointsAttachedToBone;	// # vertices/points that this bone has
+	uint16_t				numNormalsAttachedToBone;	// # vertex normals this bone has
+	uint32_t				reserved[8];				// reserved for future use
 }File_BoneDefinitionType;
-
-
-
-			/* Joit */
-
-typedef struct
-{
-	OGLVector3D		maxRot;						// max rot values of joint
-	OGLVector3D		minRot;						// min rot values of joint
-	long 			parentBone; 		// index to previous link joint definition
-	unsigned char	name[32];						// text string name for joint
-	long			limbIndex;					// index into limb list
-}Joit_Rez_Type;
-
 
 
 
@@ -79,7 +65,7 @@ typedef struct
 	Byte	didThisNote[MAX_HTTP_NOTES];
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
-	u_long	version;
+	uint32_t	version;
 	Boolean	dontUseHID;
 	// HIDControlSettingsType	controlSettings;
 
