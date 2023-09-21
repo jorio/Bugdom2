@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include "vaportrails.h"
-#include <AGL/aglmacro.h>
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond;
 extern	OGLPoint3D			gCoord;

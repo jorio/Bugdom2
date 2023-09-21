@@ -3,8 +3,7 @@
 /**********************/
 
 
-#include "3dmath.h"
-#include "infobar.h"
+#include "game.h"
 
 /***************/
 /* EXTERNALS   */

@@ -9,12 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include <AGL/aglmacro.h>
-#include "tunnel.h"
-#include "3dmath.h"
-#include "infobar.h"
-#include "vaportrails.h"
-#include "dialog.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gLevelCompletedCoolDownTimer;
 extern	NewObjectDefinitionType	gNewObjectDefinition;

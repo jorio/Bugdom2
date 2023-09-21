@@ -9,14 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "windows.h"
-#include "3dmath.h"
-#include "mainmenu.h"
-#include "infobar.h"
-#include "vaportrails.h"
-#include "tunnel.h"
-#include "dialog.h"
-#include "internet.h"
+#include "game.h"
 
 extern	Boolean			gDrawLensFlare,gDisableHiccupTimer, gPlayerIsDead;
 extern	NewObjectDefinitionType	gNewObjectDefinition;

@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
-#include "3dmath.h"
-#include "bones.h"
-#include "infobar.h"
+#include "game.h"
 
 extern	OGLBoundingBox			gWaterBBox[];
 extern	ObjNode					*gFirstNodePtr, *gCurrentCarryingMoth, *gSuckingVacuume;

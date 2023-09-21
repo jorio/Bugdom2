@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include <AGL/aglmacro.h>
-
-
-#include "3dmath.h"
+#include "game.h"
 
 extern int				gNumObjectNodes,gNumPointers;
 extern	MOMaterialObject	*gMostRecentMaterial;

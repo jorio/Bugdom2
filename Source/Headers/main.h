@@ -2,12 +2,9 @@
 // main.h
 //
 
-#ifndef __MAIN
-#define __MAIN
+#pragma once
 
 #define	GAME_FOV		1.2f
-
-
 
 #define	DEFAULT_ANAGLYPH_R	0xd8
 #define	DEFAULT_ANAGLYPH_G	0x90
@@ -47,14 +44,9 @@ enum
 
 //=================================================
 
-extern	IBNibRef 			gNibs;
-extern	CFBundleRef 		gBundle;
-
 int main(void);
 extern	void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
 void DrawArea(OGLSetupOutputType *setupInfo);
 void StartLevelCompletion(float coolDownTimer);
-
-#endif

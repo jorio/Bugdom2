@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include "infobar.h"
-#include "tunnel.h"
+#include "game.h"
 
 extern	OGLPoint2D				gBestCheckpointCoord;
 extern	OGLPoint3D				gCoord;

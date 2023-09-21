@@ -9,8 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "windows.h"
-#include "3dmath.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	FSSpec		gDataSpec;

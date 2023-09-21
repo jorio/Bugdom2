@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include <AGL/aglmacro.h>
-#include "bones.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	OGLPoint3D			gCoord;

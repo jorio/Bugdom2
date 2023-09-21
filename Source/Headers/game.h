@@ -1,30 +1,16 @@
+#pragma once
+
+#include "Pomme.h"
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 
 
-
-		/* MY BUILD OPTIONS */
-
-#define	TARGET_API_MAC_CARBON				1
-
-#define	DEMO	1
+#define	DEMO	0
 #define	OEM		0
-#define APPSTORE	1
+#define APPSTORE	0
 
-
-		/* HEADERS */
-
-#include <Carbon/Carbon.h>
-
-#include <IOKit/IOKitLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <IOKit/hid/IOHIDLib.h>
-#include <IOKit/hid/IOHIDKeys.h>
-#include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
-
-
-#include <Quicktime/Movies.h>
-#include <AGL/agl.h>
-#include <AGL/glu.h>
-#include <OpenGL/glext.h>
+#define AGLContext SDL_GLContext
 
 #include "globals.h"
 #include "structs.h"
@@ -49,17 +35,19 @@
 #include "effects.h"
 #include "camera.h"
 #include "collision.h"
-#include 	"input.h"
+#include "input.h"
 #include "file.h"
 #include "fences.h"
 #include "splineitems.h"
 #include "items.h"
-#include "windows.h"
+#include "window.h"
 #include "enemy.h"
 #include "water.h"
 #include "miscscreens.h"
-
-
-
-
-
+#include "3dmath.h"
+#include "infobar.h"
+#include "tunnel.h"
+#include "lzss.h"
+#include "bones.h"
+#include "vaportrails.h"
+#include "dialog.h"

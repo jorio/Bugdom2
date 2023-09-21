@@ -148,6 +148,23 @@ if(NOT MSVC)
 		-Wno-unknown-pragmas
 		-Wno-unused-function
 		-Wstrict-aliasing=2
+		#----------------------------------------
+		-Wno-unused-parameter
+		-Wno-missing-braces
+		-Wno-unused-but-set-variable
+		-Wno-implicit-function-declaration
+		-Wno-unused-variable
+		-Wno-old-style-declaration
+		-Wno-pointer-to-int-cast
+		-Wno-incompatible-pointer-types
+		-Wno-pointer-sign
+		-Wno-shadow
+		-Wno-int-conversion
+		-Wno-sequence-point
+		-Wno-switch-outside-range
+		-Wno-absolute-value
+		-Wno-char-subscripts
+		-Wno-missing-field-initializers
 	)
 
 	# Sanitizers in debug mode (Linux only)

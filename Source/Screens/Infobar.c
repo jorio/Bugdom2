@@ -9,11 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include	"infobar.h"
-#include <AGL/aglmacro.h>
-#include	"dialog.h"
-#include	"3dmath.h"
-
+#include "game.h"
 
 extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
 extern	int						gLevelNum,gSlotCarRacingMode,gNumAntHills, gNumAntHillsDestroyed;

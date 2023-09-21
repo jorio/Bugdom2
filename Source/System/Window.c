@@ -9,7 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include	"windows.h"
+#include	"game.h"
 
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;

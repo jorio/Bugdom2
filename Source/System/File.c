@@ -9,9 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include 	"bones.h"
-#include 	"lzss.h"
-#include 	"tunnel.h"
+#include "game.h"
 
 extern	short			gCurrentSong;
 extern	short			gNumTerrainItems;

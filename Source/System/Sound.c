@@ -9,8 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "3dmath.h"
-#include "windows.h"
+#include "game.h"
 
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	FSSpec				gDataSpec;

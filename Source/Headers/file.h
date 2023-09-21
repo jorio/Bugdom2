@@ -75,13 +75,13 @@ typedef struct
 	Byte	language;
 	Boolean	kiddieMode;
 	Boolean	deepZ;
-	DateTimeRec	lastVersCheckDate;
+	// DateTimeRec	lastVersCheckDate;
 	Byte	didThisNote[MAX_HTTP_NOTES];
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
 	u_long	version;
 	Boolean	dontUseHID;
-	HIDControlSettingsType	controlSettings;
+	// HIDControlSettingsType	controlSettings;
 
 	int		reserved[8];
 }PrefsType;

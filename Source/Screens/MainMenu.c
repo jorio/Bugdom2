@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include "dialog.h"
-#include "infobar.h"
-#include <AGL/aglmacro.h>
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	FSSpec		gDataSpec;

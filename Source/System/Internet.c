@@ -10,7 +10,7 @@
 /***************/
 
 
-#include "internet.h"
+#include "game.h"
 
 extern	PrefsType	gGamePrefs;
 extern	unsigned char	gRegInfo[64];

@@ -9,11 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "windows.h"
-#include "3dmath.h"
-#include <AGL/aglmacro.h>
-#include "infobar.h"
-
+#include "game.h"
 
 extern	float	gCurrentAspectRatio,gGlobalTransparency;
 extern	int		gPolysThisFrame;

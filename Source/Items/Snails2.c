@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
-#include "3dmath.h"
-#include "dialog.h"
-#include "mobjtypes.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond;
 extern	OGLPoint3D			gCoord;

@@ -8,10 +8,7 @@
 /* EXTERNALS   */
 /***************/
 
-
-#include "3dmath.h"
-#include	"infobar.h"
-#include <AGL/aglmacro.h>
+#include "game.h"
 
 extern	OGLMatrix4x4			gViewToFrustumMatrix,gWorldToViewMatrix;
 extern	NewObjectDefinitionType	gNewObjectDefinition;

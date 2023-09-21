@@ -9,7 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "lzss.h"
+#include "game.h"
 
 
 /**********************/

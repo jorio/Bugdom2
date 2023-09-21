@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "windows.h"
-#include "3dmath.h"
-#include "bones.h"
+#include "game.h"
 
 extern	EventRecord			gTheEvent;
 extern	NewObjectDefinitionType	gNewObjectDefinition;

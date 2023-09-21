@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include "terrain.h"
-#include "infobar.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	FSSpec		gDataSpec;

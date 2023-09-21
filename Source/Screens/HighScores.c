@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "mainmenu.h"
-#include "infobar.h"
-#include "dialog.h"
+#include "game.h"
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gGlobalTransparency;

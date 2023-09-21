@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-//#include <pictutils.h>
-#include <AGL/aglmacro.h>
-
-#include "3dmath.h"
+#include "game.h"
 
 extern	Boolean			gMuteMusicFlag;
 extern	float			gCurrentAspectRatio;

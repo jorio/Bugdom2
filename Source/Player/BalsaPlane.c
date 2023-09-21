@@ -9,8 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-#include "dialog.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio;
 extern	float				gPlayerToCameraAngle, gDeathTimer,  gDragonflyY;

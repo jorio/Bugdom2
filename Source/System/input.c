@@ -4,11 +4,11 @@
 /* By Brian Greenstone      */
 /****************************/
 
-#include <mach/mach_port.h>
-
 /***************/
 /* EXTERNALS   */
 /***************/
+
+#include "game.h"
 
 extern	AGLContext		gAGLContext;
 extern	float			gFramesPerSecondFrac,gFramesPerSecond,gScratchF;
@@ -797,7 +797,7 @@ IOReturn 				ioReturnValue;
 	plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID)hidDeviceInterface);
 	if (plugInResult != S_OK)
 	{
-		DoAlert("\pCreateHIDDeviceInterface: CouldnÕt create HID class device interface");
+		DoAlert("\pCreateHIDDeviceInterface: Couldnï¿½t create HID class device interface");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -810,7 +810,7 @@ IOReturn 				ioReturnValue;
 	ioReturnValue = (**hidDeviceInterface)->open(*hidDeviceInterface, 0);
 	if (ioReturnValue != kIOReturnSuccess)
 	{
-		DoAlert("\pCreateHIDDeviceInterface: CouldnÕt open device interface");
+		DoAlert("\pCreateHIDDeviceInterface: Couldnï¿½t open device interface");
 		DoHIDSucksDialog();
 		ExitToShell();
 	}
@@ -897,7 +897,7 @@ const char * c = CFStringGetCStringPtr(object, CFStringGetSystemEncoding());
 
 	if (c)
 	{
-//		printf(Ò%sÓ, c);
+//		printf(ï¿½%sï¿½, c);
 	}
 	else
 	{
@@ -907,7 +907,7 @@ const char * c = CFStringGetCStringPtr(object, CFStringGetSystemEncoding());
 		{
 			if (CFStringGetCString(object,	buffer,	bufferSize,	CFStringGetSystemEncoding()))
 			{
-//				printf(Ò%sÓ, buffer);
+//				printf(ï¿½%sï¿½, buffer);
 			}
 			free(buffer);
 		}

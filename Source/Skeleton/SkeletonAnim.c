@@ -9,8 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "bones.h"
-#include "3dmath.h"
+#include "game.h"
 
 extern	EventRecord			gTheEvent;
 extern	float				gFramesPerSecondFrac;

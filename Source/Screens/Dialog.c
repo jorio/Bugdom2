@@ -9,10 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include	"infobar.h"
-#include "3dmath.h"
-#include <AGL/aglmacro.h>
-#include "dialog.h"
+#include "game.h"
 
 
 extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;

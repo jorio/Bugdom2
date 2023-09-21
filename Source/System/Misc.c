@@ -10,7 +10,7 @@
 /***************/
 
 
-#include "internet.h"
+#include "game.h"
 
 
 extern	Boolean		gG4,gShareware;
