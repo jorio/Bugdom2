@@ -2,8 +2,7 @@
 // Terrain.h
 //
 
-#ifndef TERRAIN_H
-#define TERRAIN_H
+#pragma once
 
 #include "main.h"
 
@@ -154,8 +153,8 @@ enum
 
 typedef struct
 {
-	short	unused;
-	short	infoBits;
+	int16_t	unused;
+	int16_t	infoBits;
 
 	float	x[2],z[2];			// the two endpoints
 }LineMarkerDefType;
@@ -196,12 +195,3 @@ void UpdateDeformationCoords(short defNum, float x, float z);
 
 void DoItemShadowCasting(OGLSetupOutputType *setupInfo);
 Boolean SeeIfCrossedLineMarker(ObjNode *theNode, int *whichLine);
-
-
-#endif
-
-
-
-
-
-

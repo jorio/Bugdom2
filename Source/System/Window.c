@@ -81,6 +81,7 @@ void InitWindowStuff(void)
 	IMPLEMENT_ME_SOFT();
 	gGameWindowWidth = 640;
 	gGameWindowHeight = 480;
+	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
 #if 0
 	if (gPlayFullScreen)
 	{

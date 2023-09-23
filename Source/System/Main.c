@@ -130,9 +130,9 @@ long		createdDirID;
 
 	SetDefaultDirectory();							// be sure to get the default directory
 
-	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
-	if (iErr)
-		DoFatalAlert("The game's Data folder appears to be missing.  Please reinstall the game.");
+//	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
+//	if (iErr)
+//		DoFatalAlert("The game's Data folder appears to be missing.  Please reinstall the game.");
 
 
 		/* FIRST VERIFY SYSTEM BEFORE GOING TOO FAR */

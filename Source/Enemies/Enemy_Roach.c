@@ -123,16 +123,16 @@ enum
 #define	ButtTimer			SpecialF[2]
 
 
-#define	ThrowSpear			Flag[0]					// set by animation when spear should be thrown
-#define PickUpNow			Flag[0]					// set by anim when pickup should occur
+#define	ThrowSpear			Flag[0]				// set by animation when spear should be thrown
+#define PickUpNow			Flag[0]				// set by anim when pickup should occur
 
-#define	HasSpear				Flag[1]				// true if this guy has a bottle spear
-#define	ThrownSpear			Special[0]			// objnode of thrown spear
+#define	HasSpear			Flag[1]				// true if this guy has a bottle spear
+#define	ThrownSpear			SpecialObjPtr[0]	// objnode of thrown spear
 
 
 		/* SPEAR */
 
-#define SpearOwner			Special[0]			// objnode of ant who threw spear
+#define SpearOwner			SpecialObjPtr[0]	// objnode of ant who threw spear
 #define	PrevSides			Special[1]
 
 
@@ -299,8 +299,8 @@ float	dist;
 
 						/* VERIFY SPEAR */
 
-				spear = (ObjNode *)theNode->ThrownSpear;												// get objnode of spear
-				if ((spear->SpearOwner != (int)theNode) || (spear->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
+				spear = theNode->ThrownSpear;												// get objnode of spear
+				if ((spear->SpearOwner != theNode) || (spear->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
 				{
 					theNode->Mode = ROACH_MODE_NONE;
 					break;
@@ -418,8 +418,8 @@ ObjNode		*spear;
 
 			/* VERIFY SPEAR */
 
-	spear = (ObjNode *)theNode->ThrownSpear;												// get objnode of spear
-	if ((spear->SpearOwner != (int)theNode) || (spear->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
+	spear = theNode->ThrownSpear;												// get objnode of spear
+	if ((spear->SpearOwner != theNode) || (spear->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
 	{
 		theNode->Mode = ROACH_MODE_NONE;
 	}
@@ -518,8 +518,8 @@ ObjNode	*spearObj;
 
 				/* VERIFY SPEAR */
 
-		spearObj = (ObjNode *)theNode->ThrownSpear;												// get objnode of spear
-		if ((spearObj->SpearOwner == (int)theNode) && (spearObj->CType != INVALID_NODE_FLAG))	// make sure spear obj is valid
+		spearObj = theNode->ThrownSpear;													// get objnode of spear
+		if ((spearObj->SpearOwner == theNode) && (spearObj->CType != INVALID_NODE_FLAG))	// make sure spear obj is valid
 			DeleteObject(spearObj);																// delete the old spear
 
 		GiveRoachASpear(theNode);																// give it a new spear (even if old is invalid)
@@ -938,8 +938,8 @@ OGLMatrix4x4			m;
 
 		/* SETUP NEW LINKS TO REMEMBER SPEAR */
 
-	enemy->ThrownSpear = (int)spear;		// remember the ObjNode to the spear so I can go get it
-	spear->SpearOwner = (int)enemy;		// remember node of ant
+	enemy->ThrownSpear = spear;		// remember the ObjNode to the spear so I can go get it
+	spear->SpearOwner = enemy;		// remember node of ant
 
 
 		/* DETACH FROM CHAIN */

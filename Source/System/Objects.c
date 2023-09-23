@@ -771,7 +771,7 @@ custom_draw:
 
 			/* NEXT NODE */
 next:
-		theNode = (ObjNode *)theNode->NextNode;
+		theNode = theNode->NextNode;
 	}while (theNode != nil);
 
 
@@ -1616,7 +1616,7 @@ ObjNode	*heldObj = gPlayerInfo.heldObject;
 			}
 		}
 next:
-		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
+		thisNodePtr = thisNodePtr->NextNode;		// next node
 	}
 	while (thisNodePtr != nil);
 
@@ -1648,7 +1648,7 @@ float	d,minDist = 10000000;
 				best = thisNodePtr;
 			}
 		}
-		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
+		thisNodePtr = thisNodePtr->NextNode;		// next node
 	}
 	while (thisNodePtr != nil);
 

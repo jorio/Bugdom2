@@ -129,11 +129,11 @@ typedef struct
 
 typedef struct
 {
-	int					numMaterials;						// # material layers used in geometry (if negative, then use current texture)
+	int32_t				numMaterials;						// # material layers used in geometry (if negative, then use current texture)
 	MOMaterialObject 	*materials[MAX_MATERIAL_LAYERS];	// a reference to a material meta object
 
-	long				numPoints;							// # vertices in the model
-	long				numTriangles;						// # triangls in the model
+	int32_t				numPoints;							// # vertices in the model
+	int32_t				numTriangles;						// # triangls in the model
 	OGLPoint3D			*points;							// ptr to array of vertex x,y,z coords
 	OGLVector3D			*normals;							// ptr to array of vertex normals
 	OGLTextureCoord		*uvs[MAX_MATERIAL_LAYERS];			// ptr to array of vertex uv's for each layer
@@ -142,7 +142,6 @@ typedef struct
 	MOTriangleIndecies	*triangles;						// ptr to array of triangle triad indecies
 
 	OGLBoundingBox		bBox;								// local BBox
-
 }MOVertexArrayData;
 
 typedef struct

@@ -86,7 +86,7 @@ enum
 
 int		gNumCaughtFish;
 
-#define	TargetLure		Special[0]
+#define	TargetLure		SpecialObjPtr[0]
 
 #define RippleTimer		SpecialF[0]
 #define	AttackTimer		SpecialF[1]
@@ -312,7 +312,7 @@ attack:
 		case	PONDFISH_MODE_GETLURE:
 				if (VerifyTargetLure(theNode))								// if lure is still kosher then go for it
 				{
-					ObjNode	*lure = (ObjNode *)theNode->TargetLure;
+					ObjNode	*lure = theNode->TargetLure;
 					float	r;
 
 					TurnObjectTowardTarget(theNode, &gCoord, lure->Coord.x, lure->Coord.z, PONDFISH_TURN_SPEED*5, false);
@@ -619,7 +619,7 @@ ObjNode		*lure;
 				{
 					/* GOT IT */
 
-					fish->TargetLure = (int)lure;
+					fish->TargetLure = lure;
 					fish->Mode = PONDFISH_MODE_GETLURE;
 					return;
 				}
@@ -641,7 +641,7 @@ static Boolean VerifyTargetLure(ObjNode *fish)
 {
 ObjNode	*lure;
 
-	lure = (ObjNode *)fish->TargetLure;									// get objnode of target lure
+	lure = fish->TargetLure;											// get objnode of target lure
 	if (lure == nil)
 		goto bad_lure;
 

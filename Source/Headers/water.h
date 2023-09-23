@@ -2,8 +2,7 @@
 // water.h
 //
 
-#ifndef WATER_H
-#define WATER_H
+#pragma once
 
 #define	MAX_WATER_POINTS	100			// note:  cannot change this without breaking data files!!
 
@@ -24,11 +23,12 @@ enum
 
 typedef struct		// NOTE: MUST MATCH OREOTERRAIN DATA!!!
 {
-	uint16_t			type;							// type of water
-	uint32_t			flags;							// flags
-	long			height;							// height offset or hard-wired index
-	short			numNubs;						// # nubs in water
-	long			reserved;						// for future use
+	uint16_t		type;							// type of water
+	Byte			_padding0[2];
+	uint32_t		flags;							// flags
+	int32_t			height;							// height offset or hard-wired index
+	int16_t			numNubs;						// # nubs in water
+	Byte			_padding1[6];
 	OGLPoint2D		nubList[MAX_WATER_POINTS];		// nub list
 
 	float			hotSpotX,hotSpotZ;				// hot spot coords
@@ -58,7 +58,3 @@ void StopRainEffect(void);
 	/* RIPPLE */
 
 void CreateNewRipple(float x, float z, float baseScale, float scaleSpeed, float fadeRate);
-
-#endif
-
-

@@ -202,7 +202,6 @@ MetaObjectPtr 	newObj;
 			DoFatalAlert("ParseBG3DFile: FSRead failed");
 
 		tag = SwizzleULong(&tag);
-		SDL_Log("%s: Read tag 0x%08x", __func__, tag);
 
 
 			/* HANDLE THE TAG */
@@ -282,7 +281,7 @@ static void ReadMaterialFlags(short refNum)
 {
 long				count,i;
 MOMaterialData		data;
-uint32_t				flags;
+uint32_t			flags;
 
 			/* READ FLAGS */
 

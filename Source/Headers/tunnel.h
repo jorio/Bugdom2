@@ -2,6 +2,8 @@
 // tunnel.h
 //
 
+#pragma once
+
 #define	MAX_TUNNEL_SECTIONS		200
 
 
@@ -20,18 +22,17 @@ typedef struct
 
 typedef struct
 {
-	long			type;
+	int32_t			type;
 
-	long			splineIndex;			// index into spline's point list to where this item is attached
-	long			sectionNum;				// which geometry section does that point belong to?
+	int32_t			splineIndex;			// index into spline's point list to where this item is attached
+	int32_t			sectionNum;				// which geometry section does that point belong to?
 
 	float			scale;
 	OGLVector3D		rot;
 	OGLVector3D		positionOffset;			// offset relative to the spline point it's attached to
 
-	uint32_t			flags;
-	uint32_t			parms[3];
-
+	uint32_t		flags;
+	uint32_t		parms[3];
 }TunnelItemDefType;
 
 

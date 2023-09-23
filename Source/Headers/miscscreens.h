@@ -50,7 +50,7 @@ enum
 typedef struct
 {
 	unsigned char	name[MAX_NAME_LENGTH+1];
-	unsigned long	score;
+	uint32_t		score;
 }HighScoreType;
 
 #define	DARKEN_PANE_Z	450.0f

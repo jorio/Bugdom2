@@ -39,7 +39,7 @@ typedef struct
 typedef struct
 {
 	Str32	animName;
-	short	numAnimEvents;
+	int16_t	numAnimEvents;
 }SkeletonFile_AnimHeader_Type;
 
 

@@ -77,7 +77,7 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-#define	TargetSnail		Special[0]							// which snail this snail shell is thrown to
+// #define	TargetSnail		SpecialObjPtr[0]							// which snail this snail shell is thrown to
 
 #define	HasDroppedKey	Flag[0]
 #define	KeyColor		Special[1]
@@ -777,7 +777,7 @@ do_default:
 
 	held->Rot.y = r;
 
-	held->TargetSnail = (long)snail;							// remember which snail it's going to
+	held->TargetSnail = snail;							// remember which snail it's going to
 	held->MoveCall = MoveSnailShellToSnail;				// put into special move mode
 }
 #endif

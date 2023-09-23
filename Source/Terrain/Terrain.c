@@ -74,7 +74,7 @@ long			gTerrainTileWidth,gTerrainTileDepth;			// width & depth of terrain in til
 long			gTerrainUnitWidth,gTerrainUnitDepth;			// width & depth of terrain in world units (see gTerrainPolygonSize)
 
 long			gNumUniqueSuperTiles;
-short		 	**gSuperTileTextureGrid = nil;			// 2d array
+int16_t		 	**gSuperTileTextureGrid = nil;			// 2d array
 
 float			**gVertexShading = nil;					// vertex shading grid
 

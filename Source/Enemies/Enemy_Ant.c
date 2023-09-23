@@ -235,7 +235,7 @@ float	dist;
 
 			/* VERIFY FOOD */
 
-	food = (ObjNode *)theNode->ChainNode;
+	food = theNode->ChainNode;
 	if (food == nil)
 		goto bad_food;
 	if (food->CType == INVALID_NODE_FLAG)			// see if isnt valid anymore

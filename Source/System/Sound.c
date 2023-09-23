@@ -634,7 +634,7 @@ SndCommand 		mySndCmd;
 		mySndCmd.cmd = bufferCmd;									// start it
 		mySndCmd.param1 = 0;
 		mySndCmd.param2 = ((long)*gSndHandles[SOUND_BANK_SONG][0])+gSndOffsets[SOUND_BANK_SONG][0];
-	    SndDoCommand(gSndChannel[gSongChannel], &mySndCmd, true);
+	    SndDoImmediate(gSndChannel[gSongChannel], &mySndCmd);
 	}
 }
 
@@ -922,10 +922,6 @@ short PlayEffect(short effectNum)
 
 short  PlayEffect_Parms(short effectNum, uint32_t leftVolume, uint32_t rightVolume, unsigned long rateMultiplier)
 {
-	// IMPLEMENT_ME_SOFT();
-	// return -1;
-#if 1
-	puts("Play Effect Parms");
 SndCommand 		mySndCmd;
 SndChannelPtr	chanPtr;
 short			theChan;
@@ -1009,7 +1005,7 @@ static UInt32          loopStart, loopEnd;
     	mySndCmd.cmd = callBackCmd;										// let us know when the buffer is done playing
     	mySndCmd.param1 = 0;
     	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
-    	SndDoCommand(chanPtr, &mySndCmd, true);
+    	SndDoImmediate(chanPtr, &mySndCmd, true);
 
     	gChannelInfo[theChan].isLooping = true;
     	gNumLoopingEffects++;
@@ -1024,7 +1020,6 @@ static UInt32          loopStart, loopEnd;
 	gChannelInfo[theChan].leftVolume 	= leftVolume;		// remember requested volume (not the adjusted volume!)
 	gChannelInfo[theChan].rightVolume 	= rightVolume;
 	return(theChan);										// return channel #
-#endif
 }
 
 

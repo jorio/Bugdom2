@@ -597,6 +597,9 @@ AGLContext agl_ctx = setupInfo->drawContext;
   	// aglSetCurrentContext(setupInfo->drawContext);			// make context active
 
 
+	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+	
+
 			/* INIT SOME STUFF */
 
 

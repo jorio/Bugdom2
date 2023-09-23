@@ -132,12 +132,12 @@ short	gNumKilledFleas = 0;
 #define	HopNow				Flag[2]					// set by anim when hop should occur
 
 #define	HasCap				Flag[1]				// true if this guy has a bottle cap
-#define	ThrownCap			Special[0]			// objnode of thrown cap
+#define	ThrownCap			SpecialObjPtr[0]		// objnode of thrown cap
 
 
 		/* CAP */
 
-#define CapOwner			Special[0]			// objnode of ant who threw spear
+#define CapOwner			SpecialObjPtr[0]		// objnode of ant who threw spear
 #define	PrevSides			Special[1]
 
 
@@ -316,8 +316,8 @@ float	dist;
 
 						/* VERIFY CAP */
 
-				cap = (ObjNode *)theNode->ThrownCap;												// get objnode of cap
-				if ((cap->CapOwner != (int)theNode) || (cap->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
+				cap = theNode->ThrownCap;														// get objnode of cap
+				if ((cap->CapOwner != theNode) || (cap->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
 				{
 					theNode->Mode = FLEA_MODE_NONE;
 					break;
@@ -404,8 +404,8 @@ ObjNode		*cap;
 
 						/* VERIFY CAP */
 
-				cap = (ObjNode *)theNode->ThrownCap;												// get objnode of spear
-				if ((cap->CapOwner != (int)theNode) || (cap->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
+				cap = theNode->ThrownCap;														// get objnode of spear
+				if ((cap->CapOwner != theNode) || (cap->CType == INVALID_NODE_FLAG))			// see if isnt valid anymore
 				{
 					theNode->Mode = FLEA_MODE_NONE;
 					break;
@@ -590,9 +590,9 @@ ObjNode	*spearObj;
 
 				/* VERIFY CAP */
 
-		spearObj = (ObjNode *)theNode->ThrownCap;												// get objnode of spear
-		if ((spearObj->CapOwner == (int)theNode) && (spearObj->CType != INVALID_NODE_FLAG))		// make sure spear obj is valid
-			DeleteObject(spearObj);																// delete the old spear
+		spearObj = theNode->ThrownCap;														// get objnode of spear
+		if ((spearObj->CapOwner == theNode) && (spearObj->CType != INVALID_NODE_FLAG))		// make sure spear obj is valid
+			DeleteObject(spearObj);															// delete the old spear
 
 		GiveFleaACap(theNode);																// give it a new spear (even if old is invalid)
 	}
@@ -1029,8 +1029,8 @@ float					rot;
 
 		/* SETUP NEW LINKS TO REMEMBER CAP */
 
-	enemy->ThrownCap = (int)cap;		// remember the ObjNode to the spear so I can go get it
-	cap->CapOwner = (int)enemy;		// remember node of ant
+	enemy->ThrownCap = cap;		// remember the ObjNode to the spear so I can go get it
+	cap->CapOwner = enemy;		// remember node of ant
 
 
 		/* DETACH FROM CHAIN */

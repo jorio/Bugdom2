@@ -23,7 +23,6 @@ extern	SpriteType		*gSpriteGroupList[];
 extern	float			**gMapYCoords,**gMapYCoordsOriginal;
 extern	Byte			**gMapSplitMode;
 extern	TerrainItemEntryType 	**gMasterItemList;
-extern	short			**gSuperTileTextureGrid;
 extern	FenceDefType	*gFenceList;
 extern	long			gNumFences,gNumSplines,gNumWaterPatches;
 extern	int				gLevelNum,gNumTunnelItems,gNumTunnelSplinePoints,gNumTunnelSections;

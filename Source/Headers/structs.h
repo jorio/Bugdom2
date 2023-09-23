@@ -46,11 +46,22 @@ typedef	struct
 typedef struct
 {
 	float			placement;			// where on spline to start item (0=front, 1.0 = end)
-	uint16_t			type;
+	uint16_t		type;
 	Byte			parm[4];
-	uint16_t			flags;
+	uint16_t		flags;
 }SplineItemType;
 
+typedef struct
+{
+	int16_t			numNubs;			// # nubs in spline
+	int32_t			junk1;				// ptr to nub list
+	int32_t			numPoints;			// # points in spline
+	int32_t			junk2;				// ptr to calculated spline points
+	int16_t			numItems;			// # items on the spline
+	int32_t			junk3;				// ptr to spline items
+
+	Rect			bBox;				// bounding box of spline area
+}File_SplineDefType;
 
 typedef struct
 {
@@ -87,16 +98,16 @@ typedef struct
 
 typedef struct
 {
-	long 				parentBone;			 			// index to previous bone
-	void				*ignored1;
-	OGLMatrix4x4		ignored2;
-	void				*ignored3;
-	unsigned char		ignored4[32];
+	int32_t				parentBone;			 			// index to previous bone
+	// void				*ignored1;
+	// OGLMatrix4x4		ignored2;
+	// void				*ignored3;
+	// unsigned char	ignored4[32];
 	OGLPoint3D			coord;							// absolute coord (not relative to parent!)
-	uint16_t				numPointsAttachedToBone;		// # vertices/points that this bone has
-	uint16_t				*pointList;						// indecies into gDecomposedPointList
-	uint16_t				numNormalsAttachedToBone;		// # vertex normals this bone has
-	uint16_t				*normalList;					// indecies into gDecomposedNormalsList
+	uint16_t			numPointsAttachedToBone;		// # vertices/points that this bone has
+	uint16_t			*pointList;						// indecies into gDecomposedPointList
+	uint16_t			numNormalsAttachedToBone;		// # vertex normals this bone has
+	uint16_t			*normalList;					// indecies into gDecomposedNormalsList
 }BoneDefinitionType;
 
 
@@ -109,8 +120,8 @@ typedef struct
 
 	Byte		numRefs;							// # of places this point is used in the geometry data
 	Byte		whichTriMesh[MAX_POINT_REFS];		// index to trimeshes
-	short		whichPoint[MAX_POINT_REFS];			// index into pointlist of triMesh above
-	short		whichNormal[MAX_POINT_REFS];		// index into gDecomposedNormalsList
+	int16_t		whichPoint[MAX_POINT_REFS];			// index into pointlist of triMesh above
+	int16_t		whichNormal[MAX_POINT_REFS];		// index into gDecomposedNormalsList
 }DecomposedPointType;
 
 
@@ -119,8 +130,8 @@ typedef struct
 
 typedef struct
 {
-	long		tick;					// time at which this state exists
-	long		accelerationMode;		// mode of in/out acceleration
+	int32_t		tick;					// time at which this state exists
+	int32_t		accelerationMode;		// mode of in/out acceleration
 	OGLPoint3D	coord;					// current 3D coords of joint (relative to link)
 	OGLVector3D	rotation;				// current rotation values of joint (relative to link)
 	OGLVector3D	scale;					// current scale values of joint mesh
@@ -131,7 +142,7 @@ typedef struct
 
 typedef struct
 {
-	signed char			numKeyFrames[MAX_ANIMS];				// # keyframes
+	int8_t				numKeyFrames[MAX_ANIMS];				// # keyframes
 	JointKeyframeType 	**keyFrames;							// 2D array of keyframe data keyFrames[anim#][keyframe#]
 }JointKeyFrameHeader;
 
@@ -139,7 +150,7 @@ typedef struct
 
 typedef struct
 {
-	short	time;
+	int16_t	time;
 	Byte	type;
 	Byte	value;
 }AnimEventType;
@@ -216,10 +227,11 @@ typedef struct
 
 typedef struct
 {
-	uint32_t							x,y;
-	uint16_t							type;
+	uint32_t						x;
+	uint32_t						y;
+	uint16_t						type;
 	Byte							parm[4];
-	uint16_t							flags;
+	uint16_t						flags;
 }TerrainItemEntryType;
 
 
@@ -239,14 +251,14 @@ struct ObjNode
 	struct ObjNode	*ShadowNode;		// ptr to node's shadow (if any)
 	struct ObjNode	*MPlatform;			// current moving platform
 
-	uint16_t			Slot;				// sort value
+	uint16_t		Slot;				// sort value
 	Byte			Genre;				// obj genre
 	int				Type;				// obj type
 	int				Group;				// obj group
 	int				Kind;				// kind
 	int				Mode;				// mode
 	int				What;				// what
-	uint32_t			StatusBits;			// various status bits
+	uint32_t		StatusBits;			// various status bits
 
 			/* MOVE/DRAW CALLBACKS */
 
@@ -302,6 +314,7 @@ struct ObjNode
 	signed char		Flag[6];
 	long			Special[6];
 	float			SpecialF[6];
+	struct ObjNode*	SpecialObjPtr[2];
 	float			Timer;				// misc use timer
 
 	float			Health;				// health 0..1

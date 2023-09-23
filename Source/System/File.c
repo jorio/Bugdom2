@@ -23,7 +23,7 @@ extern	float			gTerrainPolygonSize,gMapToUnitValue;
 extern	float			**gMapYCoords,**gMapYCoordsOriginal;
 extern	Byte			**gMapSplitMode;
 extern	TerrainItemEntryType 	**gMasterItemList;
-extern	short			**gSuperTileTextureGrid;
+extern	int16_t			**gSuperTileTextureGrid;
 extern	FenceDefType	*gFenceList;
 extern	long			gNumFences,gNumSplines,gNumWaterPatches;
 extern	int				gLevelNum,gNumTunnelItems,gNumTunnelSplinePoints,gNumTunnelSections,gNumLineMarkers;
@@ -84,17 +84,17 @@ typedef struct
 typedef struct
 {
 	NumVersion	version;							// version of file
-	long		numItems;							// # items in map
-	long		mapWidth;							// width of map
-	long		mapHeight;							// height of map
+	int32_t		numItems;							// # items in map
+	int32_t		mapWidth;							// width of map
+	int32_t		mapHeight;							// height of map
 	float		tileSize;							// 3D unit size of a tile
 	float		minY,maxY;							// min/max height values
-	long		numSplines;							// # splines
-	long		numFences;							// # fences
-	long		numUniqueSuperTiles;				// # unique supertile
-	long        numWaterPatches;                    // # water patches
-	long		numCheckpoints;						// # checkpoints
-	long        unused[10];
+	int32_t		numSplines;							// # splines
+	int32_t		numFences;							// # fences
+	int32_t		numUniqueSuperTiles;				// # unique supertile
+	int32_t		numWaterPatches;                    // # water patches
+	int32_t		numCheckpoints;						// # checkpoints
+	int32_t		unused[10];
 }PlayfieldHeaderType;
 
 
@@ -107,15 +107,15 @@ typedef struct
 
 typedef	struct
 {
-	long		x,z;
+	int32_t		x,z;
 }FencePointType;
 
 
 typedef struct
 {
-	uint16_t			type;				// type of fence
-	short			numNubs;			// # nubs in fence
-	FencePointType	**nubList;			// handle to nub list
+	uint16_t		type;				// type of fence
+	int16_t			numNubs;			// # nubs in fence
+	int32_t			junk;			// handle to nub list
 	Rect			bBox;				// bounding box of fence area
 }FileFenceDefType;
 
@@ -126,11 +126,11 @@ typedef struct
 {
 	NumVersion	version;							// version of file
 	Boolean		fullPipe;							// flag true if 360 degree pipe
-	long			numNubs;							// # spline nubs
-	long			numSplinePoints;					// # points in giant spline
-	long			numSections;						// # pieces of geometry to load
-	long			numItems;							// # items on spline
-	long        unused[16];
+	int32_t		numNubs;							// # spline nubs
+	int32_t		numSplinePoints;					// # points in giant spline
+	int32_t		numSections;						// # pieces of geometry to load
+	int32_t		numItems;							// # items on spline
+	int32_t		unused[16];
 }TunnelFileHeaderType;
 
 
@@ -865,8 +865,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];
 			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];
 			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);
-
-
 		}
 	}
 
@@ -881,13 +879,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	hand = GetResource('Spln',1000);
 	if (hand)
 	{
-		SplineDefType	*splinePtr = (SplineDefType *)*hand;
+		File_SplineDefType	*splinePtr = (File_SplineDefType *)*hand;
 
-		DetachResource(hand);
-		HLockHi(hand);
-		gSplineList = (SplineDefType **)hand;
+		gSplineList = NewHandleClear(sizeof(SplineDefType) * gNumSplines);				// allocate memory for spline data
 
-		for (i = 0; i < gNumSplines; i++)
+		for (int i = 0; i < gNumSplines; i++)
 		{
 			(*gSplineList)[i].numNubs = SwizzleShort(&splinePtr[i].numNubs);
 			(*gSplineList)[i].numPoints = SwizzleLong(&splinePtr[i].numPoints);
@@ -899,9 +895,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			(*gSplineList)[i].bBox.right = SwizzleShort(&splinePtr[i].bBox.right);
 		}
 
+		ReleaseResource(hand);																// nuke the rez
 	}
 	else
+	{
 		gNumSplines = 0;
+		gSplineList = nil;
+	}
 
 
 			/* READ SPLINE POINT LIST */
@@ -969,7 +969,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{
 		FileFenceDefType *inData;
 
-		gFenceList = (FenceDefType *)AllocPtr(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
+		gFenceList = (FenceDefType *)AllocPtrClear(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
 		if (gFenceList == nil)
 			DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
 
@@ -985,7 +985,10 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		ReleaseResource(hand);
 	}
 	else
+	{
 		gNumFences = 0;
+		gFenceList = NULL;
+	}
 
 
 			/* READ FENCE NUB LIST */
@@ -998,7 +1001,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		{
    			FencePointType *fileFencePoints = (FencePointType *)*hand;
 
-			gFenceList[i].nubList = (OGLPoint3D *)AllocPtr(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
+			gFenceList[i].nubList = (OGLPoint3D *)AllocPtrClear(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
 			if (gFenceList[i].nubList == nil)
 				DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
 
@@ -1056,7 +1059,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	}
 	else
+	{
 		gNumWaterPatches = 0;
+		gWaterListHandle = NULL;
+		gWaterList = NULL;
+	}
 
 
 
@@ -1141,8 +1148,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	for (i = 0; i < gNumUniqueSuperTiles; i++)
 	{
 		static long	sizeoflong = 4;
-		long	compressedSize,decompressedSize;
-		long	width,height;
+		int32_t	compressedSize,decompressedSize;
+		int32_t	width,height;
 		MOMaterialData	matData;
 
 
@@ -1472,9 +1479,10 @@ static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short f
 {
 TunnelFileHeaderType	header;
 OSErr					iErr;
-long					size,w,h;
+long					size;
+int32_t					w,h;
 Ptr						buffer;
-long					aliasSize;
+int32_t					aliasSize;
 int						i, j;
 MOVertexArrayData		data;
 
@@ -1488,6 +1496,7 @@ MOVertexArrayData		data;
 	iErr = FSRead(fRefNum, &size, &header);
 	if (iErr)
 		DoFatalAlert("ReadDataFromTunnelFile: error reading!");
+	GAME_ASSERT(size == sizeof(header));
 
 	header.numNubs			= SwizzleLong(&header.numNubs);
 
@@ -1539,7 +1548,7 @@ MOVertexArrayData		data;
 
 		/* READ TUNNEL TEXTURE */
 
-	size = sizeof(long);												// read this texture's dimensions
+	size = sizeof(int32_t);												// read this texture's dimensions
 	FSRead(fRefNum, &size, &w);
 	w = SwizzleLong(&w);
 	FSRead(fRefNum, &size, &h);
@@ -1554,7 +1563,7 @@ MOVertexArrayData		data;
 
 		/* READ WATER TEXTURE */
 
-	size = sizeof(long);												// read this texture's dimensions
+	size = sizeof(int32_t);												// read this texture's dimensions
 	FSRead(fRefNum, &size, &w);
 	w = SwizzleLong(&w);
 	FSRead(fRefNum, &size, &h);
@@ -1627,10 +1636,10 @@ MOVertexArrayData		data;
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
-		size = sizeof(long);									// read # vertices
+		size = sizeof(int32_t);									// read # vertices
 		iErr |= FSRead(fRefNum, &size, &data.numPoints);
 		data.numPoints = SwizzleLong(&data.numPoints);
-		size = sizeof(long);									// read # triangles
+		size = sizeof(int32_t);									// read # triangles
 		iErr |= FSRead(fRefNum, &size, &data.numTriangles);
 		data.numTriangles = SwizzleLong(&data.numTriangles);
 
@@ -1679,11 +1688,11 @@ MOVertexArrayData		data;
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
-		size = sizeof(long);									// read # vertices
+		size = sizeof(int32_t);									// read # vertices
 		iErr |= FSRead(fRefNum, &size, &data.numPoints);
 		data.numPoints = SwizzleLong(&data.numPoints);
 
-		size = sizeof(long);									// read # triangles
+		size = sizeof(int32_t);									// read # triangles
 		iErr |= FSRead(fRefNum, &size, &data.numTriangles);
 		data.numTriangles = SwizzleLong(&data.numTriangles);
 
