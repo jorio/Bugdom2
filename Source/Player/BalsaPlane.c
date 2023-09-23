@@ -11,21 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio;
-extern	float				gPlayerToCameraAngle, gDeathTimer,  gDragonflyY;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	Boolean				gG4,gHeadOnScarecrow,gDoGlidingAtApex, gFreezeCameraFromXZ, gFreezeCameraFromY;
-extern	int					gLevelNum;
-extern	short				gNumEnemies, gNumTerrainItems;
-extern	AGLContext		gAGLContext;
-extern	ObjNode				*gFirstNodePtr;
-extern	TerrainItemEntryType 	**gMasterItemList;
-
 
 /****************************/
 /*    PROTOTYPES            */

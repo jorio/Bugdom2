@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gTerrainPolygonSize;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	Boolean				gG4,gHeadOnScarecrow,gResetRideBall;
-extern	PlayerInfoType		gPlayerInfo;
-extern	int					gLevelNum,gNumBowlingPinsDown, gDialogSoundEffect;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	short				gNumEnemies, gDialogSoundChannel;
-extern	AGLContext		gAGLContext;
-
 
 /****************************/
 /*    PROTOTYPES            */

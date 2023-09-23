@@ -13,16 +13,6 @@
 #include <stdarg.h>
 #include "game.h"
 
-extern	SDL_Window*	gSDLWindow;
-extern	Boolean		gG4;
-extern	Boolean		gHIDInitialized;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	int			gPolysThisFrame;
-extern	AGLContext		gAGLContext;
-extern	short	gPrefsFolderVRefNum;
-extern	long		gPrefsFolderDirID;
-extern	PrefsType			gGamePrefs;
-extern	FSSpec				gDataSpec;
 
 /****************************/
 /*    CONSTANTS             */
@@ -45,8 +35,6 @@ uint32_t 	gSeed0 = 0, gSeed1 = 0, gSeed2 = 0;
 float	gFramesPerSecond, gFramesPerSecondFrac;
 
 int		gNumPointers = 0;
-
-Boolean	gGameIsRegistered = true;
 
 
 

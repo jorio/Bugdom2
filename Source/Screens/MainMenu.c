@@ -11,22 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	FSSpec		gDataSpec;
-extern	Boolean		gGameOver;
-extern	KeyMap gKeyMap,gNewKeys;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	Boolean		gSongPlayingFlag,DisableAnimSounds, gPlayingFromSavedGame;
-extern	PrefsType	gGamePrefs;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	int				gLevelNum;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	uint32_t			gScore,gGlobalMaterialFlags;
-extern	HighScoreType	gHighScores[NUM_SCORES];
-extern	OGLColorRGB			gGlobalColorFilter;
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -447,14 +431,12 @@ static void DoMenuControls(void)
 					break;
 
 			case	1:
-#if !DEMO
 					if (LoadSavedGame())
 					{
 						gPlayNow = true;
 						gPlayingFromSavedGame = true;
 						GameScreenToBlack();
 					}
-#endif
 					break;
 
 			case	2:
@@ -798,7 +780,6 @@ ObjNode	*pane;
 
 static void DrawHighScores(OGLSetupOutputType *info)
 {
-AGLContext agl_ctx = info->drawContext;
 float	y;
 int		i,j,n;
 Str32	s;
@@ -938,9 +919,6 @@ static void MoveDarkenPane(ObjNode *theNode)
 
 static void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
-
-
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);
 	glEnable(GL_BLEND);
@@ -954,16 +932,4 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	glDisable(GL_BLEND);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

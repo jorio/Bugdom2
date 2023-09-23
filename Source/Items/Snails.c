@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	PlayerInfoType		gPlayerInfo;
-extern	int					gLevelNum,gNumPuzzlePiecesFit, gGatheredRedClovers,gNumFoodOnBasket, gNumCaughtFish, gKindlingCount, gNumFreedBees;
-extern	AGLContext		gAGLContext;
-extern	ObjNode				*gFirstNodePtr;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	short			gNumCollisions,gNumTerrainItems;
-extern	CollisionRec	gCollisionList[];
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	Boolean				gShowRedClovers, gBurnKindling, gShowFish, gShowFood, gStartedSiliconDoor, gPoppedSodaCan;
-extern	int					gScratch, gNumDrowningMiceRescued, gNumDrowingMiceToRescue, gTotalRedClovers;
-
 
 /****************************/
 /*    PROTOTYPES            */

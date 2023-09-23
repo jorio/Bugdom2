@@ -11,16 +11,7 @@
 
 #include	"game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
-extern	float	gFramesPerSecondFrac;
-extern	short	gPrefsFolderVRefNum,gCurrentSong;
-extern	long	gPrefsFolderDirID;
-extern	Boolean				gMuteMusicFlag;
-extern	PrefsType			gGamePrefs;
-extern	Boolean			gSongPlayingFlag;
-extern	AGLContext		gAGLContext;
-extern	Boolean			gISpActive;
+
 
 /****************************/
 /*    PROTOTYPES            */

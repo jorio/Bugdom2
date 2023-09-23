@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gLevelCompletedCoolDownTimer;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	PlayerInfoType	gPlayerInfo;
-extern	float	gTargetMaxSpeed, gScratchF, gFramesPerSecond;
-extern	float	gCurrentMaxSpeed,gDeathTimer;
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	uint32_t					gGameFrameNum;
-extern	Boolean					gGameOver,gLevelCompleted,gDrawLensFlare,gPlayerIsDead,gG4;
-extern	uint32_t					gAutoFadeStatusBits;
-extern	int						gLevelNum;
-extern	OGLVector3D			gWorldSunDirection;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	OGLColorRGB			gGlobalColorFilter;
-extern	ObjNode				*gFirstNodePtr;
-extern	float					gAnaglyphScaleFactor, gAnaglyphFocallength, gAnaglyphEyeSeparation;
-extern	PrefsType			gGamePrefs;
 
 /**********************/
 /*     PROTOTYPES     */
@@ -87,8 +69,6 @@ float	gTunnelWaterTextureScroll = 0;
 
 int					gNumTunnelItems = 0;
 TunnelItemDefType	*gTunnelItemList = nil;
-
-Boolean				gTunnelIsFullPipe = false;
 
 float				gPlayerTunnelIndex;
 
@@ -419,7 +399,6 @@ void PlayArea_Tunnel(void)
 
 void DrawTunnel(OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
 int			i,t;
 
 	OGL_PushState();

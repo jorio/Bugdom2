@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	ObjNode					*gCurrentNode,*gFirstNodePtr;
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	short				gNumCollisions;
-extern	CollisionRec		gCollisionList[];
-extern	uint32_t		gAutoFadeStatusBits;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	int					gLevelNum, gNumViri;
-extern	Boolean				gG4;
-extern	ObjNode				*gCurrentCarryingMoth, *gKillerDragonFly;
-
 
 /****************************/
 /*    PROTOTYPES            */

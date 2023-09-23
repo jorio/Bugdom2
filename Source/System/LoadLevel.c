@@ -11,31 +11,6 @@
 
 #include 	"game.h"
 
-extern	short			gCurrentSong;
-extern	short			gNumTerrainItems;
-extern	short			gPrefsFolderVRefNum;
-extern	long			gPrefsFolderDirID;
-extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
-extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
-extern	FSSpec			gDataSpec;
-extern	uint32_t			gScore,gLoadedScore;
-extern	SpriteType		*gSpriteGroupList[];
-extern	float			**gMapYCoords,**gMapYCoordsOriginal;
-extern	Byte			**gMapSplitMode;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	FenceDefType	*gFenceList;
-extern	long			gNumFences,gNumSplines,gNumWaterPatches;
-extern	int				gLevelNum,gNumTunnelItems,gNumTunnelSplinePoints,gNumTunnelSections;
-extern	PrefsType			gGamePrefs;
-extern	AGLContext		gAGLContext;
-extern	Boolean			gMuteMusicFlag,gMuteMusicFlag;
-extern	WaterDefType	**gWaterListHandle, *gWaterList;
-extern	Boolean			gPlayingFromSavedGame,gG4,gTunnelIsFullPipe,gSlowCPU;
-extern	MOMaterialObject	*gTunnelTextureObj;
-extern	TunnelItemDefType	*gTunnelItemList;
-extern	MOVertexArrayObject	*gTunnelSectionObjects[];
-extern	MOVertexArrayObject	*gTunnelSectionWaterObjects[];
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -227,9 +202,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 				/* FLEA */
 
-#if !DEMO
 	LoadASkeleton(SKELETON_TYPE_FLEA, setupInfo);
-#endif
 
 				/* BUMBLE BEE */
 

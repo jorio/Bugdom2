@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	OGLPoint3D			gCoord;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLVector3D			gDelta;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec		gDataSpec;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	PlayerInfoType	gPlayerInfo;
-extern	OGLPoint3D		gEarCoords;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLColorRGB		gGlobalColorFilter;
-extern	MOVertexArrayData	**gLocalTriMeshesOfSkelType;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -425,7 +412,6 @@ del:
 void DrawShards(const OGLSetupOutputType *setupInfo)
 {
 long	i;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;

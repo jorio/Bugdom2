@@ -12,18 +12,6 @@
 #include "game.h"
 
 
-extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
-extern	int						gLevelNum;
-extern	FSSpec					gDataSpec;
-extern	long					gTerrainUnitWidth,gTerrainUnitDepth;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	uint32_t					gGlobalMaterialFlags;
-extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
-extern	PrefsType			gGamePrefs;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/
@@ -907,7 +895,6 @@ void DrawDialogMessage(const OGLSetupOutputType *setupInfo)
 {
 int		i;
 float	x,y,leftX;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 			/* UPDATE ANY CURRENT VOICE */
 

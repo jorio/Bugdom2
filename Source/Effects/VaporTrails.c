@@ -11,16 +11,6 @@
 
 #include "game.h"
 
-extern	float			gFramesPerSecondFrac,gFramesPerSecond,gPlayerToCameraAngle;
-extern	OGLPoint3D		gCoord;
-extern	OGLVector3D		gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	PlayerInfoType	gPlayerInfo;
-extern	uint32_t			gAutoFadeStatusBits;
-extern	PrefsType			gGamePrefs;
-extern	SpriteType	*gSpriteGroupList[];
 
 /****************************/
 /*    PROTOTYPES            */
@@ -356,7 +346,6 @@ Byte	trailType = gVaporTrails[t].type;
 void DrawVaporTrails(OGLSetupOutputType *setupInfo)
 {
 int		i;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 
 	OGL_PushState();
@@ -412,7 +401,6 @@ static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo)
 {
 uint32_t	w,p,n;
 float	size,dist;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 
 	n = gVaporTrails[i].numSegments;						// get # segments

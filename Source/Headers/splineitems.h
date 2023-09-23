@@ -2,12 +2,6 @@
 // splineitems.h
 //
 
-
-extern	SplineDefType	**gSplineList;
-
-
-//=====================================================
-
 void PrimeSplines(void);
 void GetCoordOnSplineFromIndex(SplineDefType *splinePtr, float findex, float *x, float *z);
 void GetCoordOnSpline(SplineDefType *splinePtr, float placement, float *x, float *z);

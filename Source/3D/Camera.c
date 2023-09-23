@@ -11,22 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	float					gFramesPerSecond,gFramesPerSecondFrac,gCurrentAspectRatio;
-extern	OGLVector3D				gWorldSunDirection;
-extern	CollisionRec			gCollisionList[];
-extern	FSSpec					gDataSpec;
-extern	OGLMatrix4x4			gWorldToWindowMatrix;
-extern	float					gGlobalTransparency,gTerrainTileDepth,gTerrainPolygonSize, gAnaglyphEyeSeparation;
-extern	SpriteType				*gSpriteGroupList[];
-extern	OGLColorRGB			gGlobalColorFilter;
-extern	int						gLevelNum;
-extern	float					gScratchF,gPlayerTunnelIndex,gTerrainSuperTileUnitSize;
-extern	PrefsType			gGamePrefs;
-extern	TunnelSplinePointType	*gTunnelSplinePoints;
-extern	int				gGameWindowWidth, gGameWindowHeight,gScratch;
-extern	Boolean					gSlowCPU;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -71,8 +55,6 @@ enum
 static OGLCameraPlacement	gAnaglyphCameraBackup;		// backup of original camera info before offsets applied
 
 Boolean				gDrawLensFlare = true, gFreezeCameraFromXZ = false, gFreezeCameraFromY = false;
-
-float				gCameraStartupTimer;
 
 float				gPlayerToCameraAngle = 0.0f;
 static float		gCameraLookAtAccel,gCameraFromAccelY,gCameraFromAccel;
@@ -126,7 +108,6 @@ float			dx,dy,length;
 OGLVector3D		axis,lookAtVector,sunVector;
 static OGLColorRGBA	transColor = {1,1,1,1};
 int				px,py,pw,ph;
-AGLContext 		agl_ctx = gGameViewInfoPtr->drawContext;
 
 	if (!gDrawLensFlare)
 		return;

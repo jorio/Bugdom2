@@ -3,26 +3,11 @@
 /****************************/
 
 
-#include "game.h"
-
 /***************/
 /* EXTERNALS   */
 /***************/
 
-extern	long	gTerrainTileWidth,gTerrainTileDepth;
-extern	long	gNumSuperTilesDeep,gNumSuperTilesWide;
-extern	long	gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
-extern	OGLPoint3D	gCoord;
-extern	PlayerInfoType	gPlayerInfo;
-extern	OGLVector3D				gRecentTerrainNormal;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	SuperTileStatus			**gSuperTileStatusGrid;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac,gTerrainSuperTileUnitSize,gMapToUnitValue;
-extern	SuperTileMemoryType	gSuperTileMemoryList[];
-extern	float					gTerrainSuperTileUnitSizeFrac,gTerrainPolygonSize;
-extern	float			**gVertexShading;
-extern	int				gLevelNum;
+#include "game.h"
 
 
 /****************************/

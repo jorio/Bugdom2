@@ -12,15 +12,6 @@
 
 #include "game.h"
 
-extern	SDL_Window*		gSDLWindow;
-extern int				gNumObjectNodes,gNumPointers;
-extern	MOMaterialObject	*gMostRecentMaterial;
-extern	short			gNumSuperTilesDrawn,gNumActiveParticleGroups,gNumFencesDrawn,gNumTerrainDeformations,gNumWaterDrawn;
-extern	float			gFramesPerSecond,gCameraStartupTimer,gScratchF,gGlobalTransparency;
-extern	Byte			gDebugMode;
-extern	uint32_t			gGlobalMaterialFlags;
-extern	PrefsType			gGamePrefs;
-extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles,gNumLoopingEffects;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -64,9 +55,7 @@ float					gAnaglyphEyeSeparation 	= 25.0f;
 Byte					gAnaglyphPass;
 uint8_t					gAnaglyphGreyTable[255];
 
-
-// AGLDrawable		gAGLWin;
-AGLContext		gAGLContext = nil;
+SDL_GLContext			gAGLContext = NULL;
 
 static GLuint 			gFontList;
 
@@ -293,7 +282,6 @@ GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32,
 GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib2[] 		= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_ALL_RENDERERS, AGL_NONE};
-AGLContext agl_ctx;
 GLint			maxTexSize;
 static char			*s;
 
@@ -371,8 +359,6 @@ static char			*s;
 	gAGLContext = aglCreateContext(fmt, nil);
 	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
 		DoFatalAlert("OGL_CreateDrawContext: aglCreateContext failed!");
-
-	agl_ctx = gAGLContext;
 
 	if (gPlayFullScreen)
 	{
@@ -471,7 +457,6 @@ static char			*s;
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr)
 {
 OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
-AGLContext agl_ctx = gAGLContext;
 
 
 	glEnable(GL_CULL_FACE);									// activate culling
@@ -527,7 +512,6 @@ static void OGL_CreateLights(OGLLightDefType *lightDefPtr)
 {
 int		i;
 GLfloat	ambient[4];
-AGLContext agl_ctx = gAGLContext;
 
 	OGL_EnableLighting();
 
@@ -587,7 +571,6 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *))
 {
 int	x,y,w,h;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 	if (setupInfo == nil)										// make sure it's legit
 		DoFatalAlert("OGL_DrawScene setupInfo == nil");
@@ -868,7 +851,6 @@ GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType)
 {
 GLuint	textureName;
-AGLContext agl_ctx = gAGLContext;
 
 
 	if (gGamePrefs.anaglyph)
@@ -1233,8 +1215,6 @@ uint32_t	a;
 
 void OGL_Texture_SetOpenGLTexture(GLuint textureName)
 {
-AGLContext agl_ctx = gAGLContext;
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	if (OGL_CheckError())
 		DoFatalAlert("OGL_Texture_SetOpenGLTexture: glPixelStorei failed!");
@@ -1333,7 +1313,6 @@ float	aspect;
 OGLCameraPlacement	*placement;
 int		temp, w, h, i;
 OGLLightDefType	*lights;
-AGLContext agl_ctx = gAGLContext;
 
 	OGL_GetCurrentViewport(setupInfo, &temp, &temp, &w, &h);
 
@@ -1453,7 +1432,6 @@ GLenum OGL_CheckError_Impl(const char* file, const int line)
 void OGL_PushState(void)
 {
 int	i;
-AGLContext agl_ctx = gAGLContext;
 
 		/* PUSH MATRIES WITH OPENGL */
 
@@ -1493,7 +1471,6 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_PopState(void)
 {
 int		i;
-AGLContext agl_ctx = gAGLContext;
 
 		/* RETREIVE OPENGL MATRICES */
 

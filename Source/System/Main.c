@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	Boolean			gDrawLensFlare,gDisableHiccupTimer, gPlayerIsDead;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float			gFramesPerSecond,gFramesPerSecondFrac,gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac;
-extern	float			gTerrainPolygonSize, gDeathTimer;
-extern	OGLPoint3D	gCoord;
-extern	ObjNode				*gFirstNodePtr;
-extern	short		gNumSuperTilesDrawn;
-extern	float		gGlobalTransparency;
-extern	int			gNumObjectNodes,gSuperTileActiveRange, gNumFoodOnBasket,gNumCaughtFish;
-extern	PrefsType	gGamePrefs;
-extern	short	gNumTerrainDeformations;
-extern	DeformationType	gDeformationList[];
-extern	long			gTerrainUnitWidth,gTerrainUnitDepth;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	int			gKindlingCount, gNumDrowningMiceRescued;
-extern	Boolean		gBurnKindling, gIgnoreBottleKeySnail, gGameIsRegistered;
-extern	float					gAnaglyphScaleFactor, gAnaglyphFocallength, gAnaglyphEyeSeparation;
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -89,7 +71,6 @@ float				gLevelCompletedCoolDownTimer = 0;
 
 int					gLevelNum;
 
-short				gBestCheckpointNum;
 OGLPoint2D			gBestCheckpointCoord;
 float				gBestCheckpointAim;
 
@@ -176,6 +157,7 @@ long 		keyboardScript, languageCode;
 
 	IMPLEMENT_ME_SOFT();
 	gGamePrefs.language = LANGUAGE_ENGLISH;
+	gGamePrefs.language = LANGUAGE_FRENCH;
 #if 0
 	keyboardScript = GetScriptManagerVariable(smKeyScript);
 	languageCode = GetScriptVariable(keyboardScript, smScriptLang);
@@ -264,15 +246,11 @@ const short songs[] =
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
+		gLevelNum = LEVEL_NUM_PARK;
 
-#if !DEMO
-		if (gGameIsRegistered)					// only allow cheating if game is registered
-		{
 //			if (GetKeyState(KEY_F10))		// see if do Level cheat
 //				if (DoLevelCheatDialog())
 //					CleanQuit();
-		}
-#endif
 	}
 
 	GammaFadeOut();
@@ -306,9 +284,6 @@ const short songs[] =
 		CleanupLevel();
 		GameScreenToBlack();
 
-		if (DEMO || (!gGameIsRegistered))				// only allow this one level if not registered or is demo
-			break;
-
 			/***************/
 			/* SEE IF LOST */
 			/***************/
@@ -328,13 +303,10 @@ const short songs[] =
 
 	}
 
-#if !DEMO
-
 
 			/* DO HIGH SCORES */
 
 	NewScore();
-#endif
 
 	gPlayingFromSavedGame = false;
 }
@@ -600,7 +572,6 @@ static void InitArea(void)
 	gGameLevelTimer 	= 0;
 	gGameOver 			= false;
 	gLevelCompleted 	= false;
-	gBestCheckpointNum	= -1;
 
 
 	gGravity = NORMAL_GRAVITY;					// assume normal gravity

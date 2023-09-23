@@ -2,9 +2,7 @@
 // player.h
 //
 
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
-
+#pragma once
 
 #define	MAX_BUDDY_BUGS			10
 
@@ -218,10 +216,6 @@ typedef struct
 }PlayerInfoType;
 
 
-
-extern	PlayerInfoType	gPlayerInfo;
-
-
 //=======================================================
 
 void InitPlayerInfo_Game(void);
@@ -286,6 +280,3 @@ void KillPlayerOnBalsaPlane(ObjNode *skip);
 void ResetPlayerOnBalsaPlane(ObjNode *player);
 void BurnPlane(ObjNode *theNode);
 void CountAntHills(void);
-
-
-#endif

@@ -12,11 +12,6 @@
 
 #include "game.h"
 
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec				gDataSpec;
-extern	float		gFramesPerSecondFrac;
-extern	PrefsType			gGamePrefs;
-
 
 /****************************/
 /*    PROTOTYPES            */

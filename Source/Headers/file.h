@@ -97,7 +97,6 @@ void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
-void GetDemoTimer(void);
 void SetDefaultDirectory(void);
 
 Boolean SaveGame(void);

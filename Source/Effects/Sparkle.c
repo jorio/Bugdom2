@@ -11,18 +11,6 @@
 
 #include "game.h"
 
-extern	float			gFramesPerSecondFrac,gFramesPerSecond,gPlayerToCameraAngle;
-extern	OGLPoint3D		gCoord;
-extern	OGLVector3D		gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	PlayerInfoType	gPlayerInfo;
-extern	uint32_t			gAutoFadeStatusBits;
-extern	PrefsType			gGamePrefs;
-extern	SpriteType	*gSpriteGroupList[];
-extern	const OGLPoint3D gPlayerMuzzleTipOff;
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -117,7 +105,6 @@ uint32_t	flags;
 int		i;
 float	dot,separation;
 OGLMatrix4x4	m;
-AGLContext agl_ctx = setupInfo->drawContext;
 OGLVector3D	v;
 OGLPoint3D	where;
 OGLVector3D	aim;

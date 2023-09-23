@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	int					gLevelNum,gSlotCarRacingMode;
-extern	AGLContext		gAGLContext;
-extern	ObjNode				*gFirstNodePtr;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	short			gNumCollisions;
-extern	CollisionRec	gCollisionList[];
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	Boolean			gNotifyOfSlotCarWin;
 
 /****************************/
 /*    PROTOTYPES            */

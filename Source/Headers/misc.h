@@ -2,15 +2,6 @@
 // misc.h
 //
 
-#define SERIAL_LENGTH      12
-
-
-extern	Boolean			gAltivec;
-
-
-//======================================================
-
-
 void	DoAlert(const char* fmt, ...);
 void	DoFatalAlert(const char* fmt, ...);
 extern unsigned char	*NumToHex(unsigned short);

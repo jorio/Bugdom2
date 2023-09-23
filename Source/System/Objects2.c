@@ -11,22 +11,6 @@
 
 #include "game.h"
 
-extern	OGLBoundingBox	gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	float		gFramesPerSecondFrac,gGlobalTransparency;
-extern	ObjNode		*gFirstNodePtr;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLPoint3D	gCoord;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	uint32_t		gAutoFadeStatusBits;
-extern	PrefsType	gGamePrefs;
-extern	FSSpec		gDataSpec;
-extern	OGLMatrix4x4			gViewToFrustumMatrix,gWorldToViewMatrix,gWorldToFrustumMatrix;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	OGLColorRGB			gGlobalColorFilter;
-extern	OGLVector3D	gDelta;
-extern	int			gLevelNum;
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -589,7 +573,6 @@ int		kind;
 static void DrawShadow(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 int	shadowType = theNode->Kind;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 
 	OGL_PushState();

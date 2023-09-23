@@ -11,10 +11,6 @@
 
 #include "game.h"
 
-extern	float	gCurrentAspectRatio,gGlobalTransparency;
-extern	int		gPolysThisFrame;
-extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
-extern	uint32_t			gGlobalMaterialFlags;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -415,9 +411,6 @@ MOMaterialObject	*m;
 
 void DrawSprite(int	group, int type, float x, float y, float scale, float rot, uint32_t flags, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
-
-
 			/* SET STATE */
 
 	OGL_PushState();								// keep state

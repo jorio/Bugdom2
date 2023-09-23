@@ -10,10 +10,6 @@
 
 #include "game.h"
 
-extern	AGLContext		gAGLContext;
-extern	float			gFramesPerSecondFrac,gFramesPerSecond,gScratchF;
-extern	PrefsType			gGamePrefs;
-
 
 /**********************/
 /*     PROTOTYPES     */
@@ -47,7 +43,7 @@ static	float					gReadMouseDeltasTimer = 0;
 
 Boolean		gMouseButtonState = false, gMouseNewButtonState = false;
 
-KeyMapByteArray gKeyMap,gNewKeys,gOldKeys;
+static KeyMapByteArray gKeyMap,gNewKeys,gOldKeys;
 
 
 

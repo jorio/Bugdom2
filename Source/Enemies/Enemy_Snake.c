@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLPoint3D				gCoord;
-extern	short					gNumEnemies,gNumCollisions,gNumTerrainItems;
-extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	float					gDeathTimer;
-extern	OGLVector3D			gDelta;
-extern	uint32_t		gAutoFadeStatusBits;
-extern	CollisionRec	gCollisionList[];
-extern	MOVertexArrayData	**gLocalTriMeshesOfSkelType;
-extern	Boolean				gFreezeCameraFromXZ,gPlayerIsDead,gFreezeCameraFromY;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	int					gLevelNum;
-
 
 /****************************/
 /*    PROTOTYPES            */

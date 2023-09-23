@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGravity,gPlayerBottomOff,gGlobalTransparency;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits;
-extern	Boolean				gG4;
-extern	int					gLevelNum;
-extern	float				gCameraDistFromMe,gCameraLookAtYOff;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	short				gNumCollisions;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	OGLBoundingBox			gWaterBBox[];
 
 /****************************/
 /*    PROTOTYPES            */

@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
-extern	int						gLevelNum,gSlotCarRacingMode,gNumAntHills, gNumAntHillsDestroyed;
-extern	FSSpec					gDataSpec;
-extern	long					gTerrainUnitWidth,gTerrainUnitDepth;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	PrefsType			gGamePrefs;
-extern	uint32_t					gGlobalMaterialFlags;
-extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
-extern	short					gTotalTicks, gTotalFleas, gNumKilledFleas, gNumKilledTicks;
-extern	float					gSlotCarStartTimer;
-extern	int						gTotalRedClovers, gGatheredRedClovers, gNumCaughtFish, gNumFoodOnBasket, gNumMice;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -144,8 +130,6 @@ void DisposeInfobar(void)
 
 void SetInfobarSpriteState(void)
 {
-AGLContext agl_ctx = gAGLContext;
-
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
@@ -167,8 +151,6 @@ AGLContext agl_ctx = gAGLContext;
 
 void DrawInfobar(OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
-
 	if (gHideInfobar)
 		return;
 
@@ -255,7 +237,6 @@ AGLContext agl_ctx = gAGLContext;
 
 void DrawInfobarSprite(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -283,7 +264,6 @@ float				aspect;
 
 static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -315,7 +295,6 @@ float				aspect;
 
 void DrawInfobarSprite2(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -343,7 +322,6 @@ float				aspect;
 
 void DrawInfobarSprite2_Centered(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -373,7 +351,6 @@ float				aspect;
 
 static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect, xoff, yoff;
 OGLPoint2D			p[4];

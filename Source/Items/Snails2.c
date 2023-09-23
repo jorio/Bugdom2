@@ -11,23 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	uint32_t				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	PlayerInfoType		gPlayerInfo;
-extern	int					gLevelNum, gScratch;
-extern	AGLContext		gAGLContext;
-extern	ObjNode				*gFirstNodePtr;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	short			gNumCollisions,gNumTerrainItems;
-extern	CollisionRec	gCollisionList[];
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	Boolean				gSolidTriggerKeepDelta, gShowRedClovers;
-extern	Byte				gFoodTypes[];
 
 /****************************/
 /*    PROTOTYPES            */

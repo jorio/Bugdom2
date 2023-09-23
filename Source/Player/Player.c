@@ -11,28 +11,6 @@
 
 #include "game.h"
 
-extern	OGLPoint2D				gBestCheckpointCoord;
-extern	OGLPoint3D				gCoord;
-extern	OGLVector3D				gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac,gBestCheckpointAim;
-extern	short					gNumCollisions;
-extern	CollisionRec			gCollisionList[];
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	uint32_t 					gAutoFadeStatusBits,gScore;
-extern	int						gLevelNum,gScratch;
-extern	Boolean				gFreezeCameraFromXZ,gFreezeCameraFromY,gPlayingFromSavedGame;
-extern	Boolean				gEnableSnakes,gResetRideBall, gGameOver;
-extern	float				gGlobalTransparency,gTargetMaxSpeed,gCurrentMaxSpeed;
-extern	PrefsType			gGamePrefs;
-extern	SparkleType			gSparkles[];
-extern	SpriteType			*gSpriteGroupList[];
-extern	float				gCameraDistFromMe;
-extern	OGLBoundingBox		gWaterBBox[];
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	NewParticleGroupDefType	gNewParticleGroupDef;
-extern	ObjNode				*gKillerDragonFly;
-
 
 /****************************/
 /*    PROTOTYPES            */

@@ -11,15 +11,6 @@
 
 #include "game.h"
 
-extern	OGLPoint3D				gCoord;
-extern	OGLVector3D				gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac;
-extern	short					gNumCollisions;
-extern	CollisionRec			gCollisionList[];
-extern	unsigned long 			gScore;
-extern	float 					gCameraDistFromMe;
-extern	uint32_t 					gAutoFadeStatusBits;
 
 /****************************/
 /*    PROTOTYPES            */

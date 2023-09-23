@@ -11,16 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float			gFramesPerSecond,gFramesPerSecondFrac,gGlobalTransparency;
-extern	short	gPrefsFolderVRefNum;
-extern	long	gPrefsFolderDirID;
-extern	FSSpec	gDataSpec;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	uint32_t			gScore,gGlobalMaterialFlags,gLoadedScore;
-extern	Boolean			gPlayingFromSavedGame,gAllowAudioKeys;
-extern	AGLContext		gAGLContext;
-extern	OGLColorRGB			gGlobalColorFilter;
 
 /****************************/
 /*    PROTOTYPES            */

@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLVector3D			gDelta;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec		gDataSpec;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	OGLPoint3D		gEarCoords;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	uint32_t				gAutoFadeStatusBits;
-extern	Boolean				gGameOver;
-extern	int					gLevelNum;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -595,7 +582,6 @@ MOVertexArrayData	*geoData;
 OGLPoint3D		v[4],*camCoords,*coord;
 static const OGLVector3D up = {0,1,0};
 OGLBoundingBox	bbox;
-AGLContext agl_ctx = setupInfo->drawContext;
 
 #pragma unused(theNode)
 

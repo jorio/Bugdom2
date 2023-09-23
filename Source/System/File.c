@@ -11,37 +11,6 @@
 
 #include "game.h"
 
-extern	short			gCurrentSong;
-extern	short			gNumTerrainItems;
-extern	short			gPrefsFolderVRefNum;
-extern	long			gPrefsFolderDirID;
-extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
-extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
-extern	FSSpec			gDataSpec;
-extern	uint32_t			gScore,gLoadedScore;
-extern	float			gTerrainPolygonSize,gMapToUnitValue;
-extern	float			**gMapYCoords,**gMapYCoordsOriginal;
-extern	Byte			**gMapSplitMode;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	int16_t			**gSuperTileTextureGrid;
-extern	FenceDefType	*gFenceList;
-extern	long			gNumFences,gNumSplines,gNumWaterPatches;
-extern	int				gLevelNum,gNumTunnelItems,gNumTunnelSplinePoints,gNumTunnelSections,gNumLineMarkers;
-extern	uint16_t			**gAttributeGrid;
-extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
-extern	PrefsType			gGamePrefs;
-extern	AGLContext		gAGLContext;
-extern	Boolean			gLowMemMode,gMuteMusicFlag,gMuteMusicFlag;
-extern	WaterDefType	**gWaterListHandle, *gWaterList;
-extern	Boolean			gPlayingFromSavedGame,gG4,gTunnelIsFullPipe;
-extern	MOMaterialObject	*gTunnelTextureObj;
-extern	TunnelItemDefType	*gTunnelItemList;
-extern	MOVertexArrayObject	*gTunnelSectionObjects[];
-extern	MOVertexArrayObject	*gTunnelSectionWaterObjects[];
-extern	TunnelSplinePointType	*gTunnelSplinePoints;
-extern	LineMarkerDefType		gLineMarkerList[];
-extern	Boolean					gDisableHiccupTimer;
-
 
 /****************************/
 /*    PROTOTYPES            */
@@ -515,11 +484,7 @@ long		count;
 				/* READ FILE */
 				/*************/
 
-#if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:DemoPreferences3", &file);
-#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences3", &file);
-#endif
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		return(iErr);
@@ -583,11 +548,7 @@ long				count;
 
 				/* CREATE BLANK FILE */
 
-#if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:DemoPreferences3", &file);
-#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences3", &file);
-#endif
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, kGameID, 'Pref', smSystemScript);					// create blank file
 	if (iErr)
@@ -1503,7 +1464,7 @@ MOVertexArrayData		data;
 
 			/* EXTRACT HEADER DATA */
 
-	gTunnelIsFullPipe 			= header.fullPipe;
+//	gTunnelIsFullPipe 			= header.fullPipe;
 	gNumTunnelItems				= SwizzleLong(&header.numItems);
 	gNumTunnelSplinePoints		= SwizzleLong(&header.numSplinePoints);
 	gNumTunnelSections			= SwizzleLong(&header.numSections);

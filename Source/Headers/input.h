@@ -186,15 +186,6 @@ typedef struct
 
 
 
-
-			/* EXTERNS */
-
-extern	InputNeedType	gControlNeeds[];
-extern	Boolean			gMouseButtonState, gMouseNewButtonState, gHIDInitialized;
-
-
-
-
 //============================================================================================
 
 

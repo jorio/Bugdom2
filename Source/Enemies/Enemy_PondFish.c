@@ -11,15 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	int						gNumEnemies, gMaxEnemies;
-extern	signed char				gNumEnemyOfKind[NUM_ENEMY_KINDS];
-extern	float					gFramesPerSecondFrac, gFramesPerSecond, gDeathTimer;
-extern	OGLPoint3D				gCoord;
-extern	OGLVector3D				gDelta;
-extern	ObjNode					*gFirstNodePtr;
-extern	uint32_t				gAutoFadeStatusBits;
-
 
 /****************************/
 /*    PROTOTYPES            */

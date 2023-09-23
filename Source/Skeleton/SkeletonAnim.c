@@ -11,11 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac;
-extern	PlayerInfoType	gPlayerInfo;
-extern	OGLPoint3D	gCoord;
-extern	int					gLevelNum;
-
 
 /****************************/
 /*    PROTOTYPES            */

@@ -3,16 +3,12 @@
 /****************************/
 
 
-#include "game.h"
-
 /***************/
 /* EXTERNALS   */
 /***************/
 
-extern	uint8_t	gTerrainScrollBuffer[MAX_SUPERTILES_DEEP][MAX_SUPERTILES_WIDE];
-extern	float	gFramesPerSecondFrac,gFramesPerSecond,gMapToUnitValue,gTerrainSuperTileUnitSizeFrac;
-extern	SuperTileStatus	**gSuperTileStatusGrid;
-extern	long		gTerrainTileDepth, gTerrainTileWidth, gNumSuperTilesDeep, gNumSuperTilesWide;
+#include "game.h"
+
 
 /****************************/
 /*    PROTOTYPES            */
