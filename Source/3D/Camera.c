@@ -449,7 +449,7 @@ Boolean			snapTo = false;
 			/* SEE IF TOGGLE CAMERA MODE */
 			/*****************************/
 
-	if (gControlNeeds[kNeed_CameraMode].newButtonPress)
+	if (IsNeedDown(kNeed_CameraMode))
 	{
 		gCameraMode++;										// inc to next mode
 		if (gCameraMode >= MAX_CAMERA_MODES)
@@ -605,14 +605,14 @@ Boolean			snapTo = false;
 
 		if (lookAtObj == nil)
 		{
-			if (gControlNeeds[kNeed_CameraLeft].value)
+			if (GetNeedAnalogValue(kNeed_CameraLeft))
 			{
 				OGLMatrix3x3_SetRotate(&m, fps * -6.0f);
 				OGLVector2D_Transform(&pToC, &m, &pToC);
 				snapTo = true;
 			}
 			else
-			if (gControlNeeds[kNeed_CameraRight].value)
+			if (GetNeedAnalogValue(kNeed_CameraRight))
 			{
 				OGLMatrix3x3_SetRotate(&m, fps * 6.0f);
 				OGLVector2D_Transform(&pToC, &m, &pToC);

@@ -152,31 +152,19 @@ long		createdDirID;
 
 void InitDefaultPrefs(void)
 {
-int			i;
-long 		keyboardScript, languageCode;
-
-		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
+	SDL_zero(gGamePrefs);
 
 	gGamePrefs.language				= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.version				= CURRENT_PREFS_VERS;
-	gGamePrefs.difficulty			= 0;
-	gGamePrefs.showScreenModeDialog = true;
-	gGamePrefs.depth				= 32;
-	gGamePrefs.screenWidth			= 800;
-	gGamePrefs.screenHeight			= 600;
-	gGamePrefs.hz				= 0;
 	gGamePrefs.kiddieMode			= false;
-	gGamePrefs.deepZ				= true;
-//	gGamePrefs.lastVersCheckDate.year = 0;
-	gGamePrefs.anaglyph				=  false;
+	gGamePrefs.anaglyph				= false;
 	gGamePrefs.anaglyphColor		= false;
-	gGamePrefs.dontUseHID			= false;
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
 
-	for (i = 0; i < MAX_HTTP_NOTES; i++)
-		gGamePrefs.didThisNote[i] = false;
+	_Static_assert(sizeof(gGamePrefs.bindings) == sizeof(kDefaultInputBindings), "input binding size mismatch: prefs vs defaults");
+	SDL_memcpy(&gGamePrefs.bindings, &kDefaultInputBindings, sizeof(kDefaultInputBindings));
 }
 
 
@@ -357,11 +345,11 @@ static void PlayArea_Terrain(void)
 
 			/* SEE IF PAUSED */
 
-		if (GetNewKeyState(KEY_ESC))
+		if (IsNeedDown(kNeed_UIPause))
 			DoPaused();
 
 #if 0
-		if (GetNewKeyState(KEY_F15))								// do screen-saver-safe paused mode
+		if (IsKeyDown(SDL_SCANCODE_F15))								// do screen-saver-safe paused mode
 		{
 			glFinish();
 
@@ -370,7 +358,7 @@ static void PlayArea_Terrain(void)
 				EventRecord	e;
 				WaitNextEvent(everyEvent,&e, 0, 0);
 				UpdateInput();
-			}while(!GetNewKeyState(KEY_F15));
+			}while(!IsKeyDown(SDL_SCANCODE_F15));
 
 			CalcFramesPerSecond();
 		}
@@ -388,12 +376,14 @@ static void PlayArea_Terrain(void)
 
 				/* CHEATS */
 
-		if (GetKeyState(KEY_APPLE))
+#if !_DEBUG
+		if (IsKeyActive(SDL_SCANCODE_LGUI) || IsKeyActive(SDL_SCANCODE_RGUI))
+#endif
 		{
-			if (GetNewKeyState(KEY_F10))			// win level cheat
+			if (IsKeyDown(SDL_SCANCODE_F10))			// win level cheat
 				break;
 
-			if (GetNewKeyState(KEY_HELP))			// get health & stuff
+			if (IsKeyDown(SDL_SCANCODE_HELP) || IsKeyDown(SDL_SCANCODE_INSERT))		// get health & stuff
 			{
 				gPlayerInfo.health = 1.0;
 				gPlayerInfo.glidePower = 1.0;

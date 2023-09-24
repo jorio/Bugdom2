@@ -697,9 +697,8 @@ static void CalcVRAMAfterBuffers(void)
 {
 int	bufferSpace;
 
-	bufferSpace = gGamePrefs.screenWidth * gGamePrefs.screenHeight * 2 * 2;		// calc main pixel/z buffers @ 16-bit
-	if (gGamePrefs.depth == 32)
-		bufferSpace *= 2;
+	bufferSpace = gGameWindowWidth * gGameWindowHeight * 2 * 2;		// calc main pixel/z buffers @ 16-bit
+	bufferSpace *= 2;	// 32-bit
 
 	gVRAMAfterBuffers = gDisplayVRAM - bufferSpace;
 }

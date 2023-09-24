@@ -258,7 +258,7 @@ float	timer;
 
 	timer = 11.0f;
 
-	while(!AreAnyNewKeysPressed())
+	while(!UserWantsOut())
 	{
 		const float fps = gFramesPerSecondFrac;
 

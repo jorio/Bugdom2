@@ -208,13 +208,13 @@ Boolean	continueGame = false;
 
 		/* SEE IF CHANGE SELECTION */
 
-	if (GetNewKeyState(KEY_UP) && (gPausedMenuSelection > 0))
+	if (IsNeedDown(kNeed_UIUp) && (gPausedMenuSelection > 0))
 	{
 		gPausedMenuSelection--;
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
 	}
 	else
-	if (GetNewKeyState(KEY_DOWN) && (gPausedMenuSelection < 2))
+	if (IsNeedDown(kNeed_UIDown) && (gPausedMenuSelection < 2))
 	{
 		gPausedMenuSelection++;
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
@@ -224,7 +224,7 @@ Boolean	continueGame = false;
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
 
-	if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
+	if (IsNeedDown(kNeed_UIConfirm))
 	{
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/2,NORMAL_CHANNEL_RATE);
 
@@ -252,7 +252,7 @@ Boolean	continueGame = false;
 			/*****************************/
 
 	else
-	if (GetNewKeyState(KEY_ESC))
+	if (IsNeedDown(kNeed_UIPause))
 	{
 		continueGame = true;
 	}

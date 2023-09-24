@@ -402,6 +402,7 @@ static void DrawVaporTrail_ColorStreak(int	i)
 uint32_t	w,p,n;
 float	size,dist;
 
+puts(__func__);		// TODO: is this ever used by bugdom 2?
 
 	n = gVaporTrails[i].numSegments;						// get # segments
 	if (n > MAX_TRAIL_SEGMENTS)
@@ -415,7 +416,7 @@ float	size,dist;
 			gGameView->cameraPlacement.cameraLocation.x, gGameView->cameraPlacement.cameraLocation.z);
 	size *= 700.0f / dist;
 
-	w = (float)(gGamePrefs.screenHeight / 15) * size;
+	w = (float)(gGameWindowHeight / 15) * size;
 
 	if (w > 60)
 		w = 60;

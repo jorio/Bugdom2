@@ -46,46 +46,26 @@ typedef struct
 
 		/* PREFERENCES */
 
-#define	MAX_HTTP_NOTES	1000
-
-#define	CURRENT_PREFS_VERS	0xA0E1
+#define	CURRENT_PREFS_VERS	0xA0E2
 
 typedef struct
 {
-	Byte	difficulty;
-	Boolean	showScreenModeDialog;
-	short	depth;
-	int		screenWidth;
-	int		screenHeight;
-	double	hz;
+	uint32_t	version;
+
 	Byte	language;
 	Boolean	kiddieMode;
-	Boolean	deepZ;
-	// DateTimeRec	lastVersCheckDate;
-	Byte	didThisNote[MAX_HTTP_NOTES];
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
-	uint32_t	version;
-	Boolean	dontUseHID;
-	// HIDControlSettingsType	controlSettings;
 
 	Byte	monitorNum;
 	Byte	antialiasingLevel;
 	Boolean	vsync;
+	Boolean	fullscreen;
+
+	Byte	rumbleIntensity;
+	Byte	mouseSensitivityLevel;
+	InputBinding	bindings[NUM_CONTROL_NEEDS];
 }PrefsType;
-
-
-
-		/* SAVE PLAYER */
-
-typedef struct
-{
-	Byte		numAgesCompleted;		// encode # ages in lower 4 bits, and stage in upper 4 bits
-	Str255		playerName;
-}SavePlayerType;
-
-
-
 
 
 //=================================================

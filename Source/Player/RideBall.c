@@ -295,7 +295,7 @@ ObjNode	*ball = gPlayerInfo.ridingBall;
 			/* SEE IF PLAYER WANTS OFF */
 			/***************************/
 
-	if (gControlNeeds[kNeed_Jump].newButtonPress)										// see if user pressed the key
+	if (IsNeedDown(kNeed_Jump))										// see if user pressed the key
 	{
 		gDelta.y = 1600;
 		gPlayerInfo.ridingBall = nil;

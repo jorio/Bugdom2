@@ -402,7 +402,7 @@ float	timer;
 
 		CalcFramesPerSecond();
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 		{
 			gAbortTitle = true;
 			break;
@@ -477,7 +477,7 @@ Byte	swatMode = 0;
 
 		CalcFramesPerSecond();
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 		{
 			gAbortTitle = true;
 			break;
@@ -617,7 +617,7 @@ ObjNode	*newObj;
 
 		CalcFramesPerSecond();
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 		{
 			gAbortTitle = true;
 			break;

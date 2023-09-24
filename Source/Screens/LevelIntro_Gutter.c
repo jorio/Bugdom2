@@ -199,7 +199,7 @@ OGLPoint3D		p;
 
 	timer = 14.0f;
 
-	while(!AreAnyNewKeysPressed())
+	while(!UserWantsOut())
 	{
 		const float fps = gFramesPerSecondFrac;
 

@@ -182,12 +182,12 @@ float	r,w;
 
 				/* WEAPONS */
 
-	if (gControlNeeds[kNeed_Kick].newButtonPress)						// see if shoot
+	if (IsNeedDown(kNeed_Kick))						// see if shoot
 	{
 		PlaneShootBullet(plane);
 	}
 	else
-	if (gControlNeeds[kNeed_PickupDrop].newButtonPress)					// see if drop bomb
+	if (IsNeedDown(kNeed_PickupDrop))					// see if drop bomb
 	{
 		PlaneDropBomb(plane);
 	}

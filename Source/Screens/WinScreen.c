@@ -316,7 +316,7 @@ float	timer = 0.0f;
 		timer += fps;
 		if (timer >= 9.0f)
 		{
-			if (AreAnyNewKeysPressed())
+			if (UserWantsOut())
 				break;
 		}
 		if (timer >= 30.0f)

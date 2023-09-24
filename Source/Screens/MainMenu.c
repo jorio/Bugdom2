@@ -396,7 +396,7 @@ float	charTimer = 2.0f;
 
 static void DoMenuControls(void)
 {
-	if (GetNewKeyState(KEY_RIGHT) || GetNewKeyState(KEY_UP))
+	if (IsNeedDown(kNeed_UIUp) || IsNeedDown(kNeed_UINext))
 	{
 		gInactivityTimer = 0;
 		gSelectedIcon--;
@@ -405,8 +405,7 @@ static void DoMenuControls(void)
 
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
 	}
-	else
-	if (GetNewKeyState(KEY_LEFT) || GetNewKeyState(KEY_DOWN))
+	else if (IsNeedDown(kNeed_UIDown) || IsNeedDown(kNeed_UIPrev))
 	{
 		gInactivityTimer = 0;
 		gSelectedIcon++;
@@ -418,8 +417,7 @@ static void DoMenuControls(void)
 
 			/* SEE IF SELECT */
 
-	else
-	if (GetNewKeyState(KEY_SPACE) || GetNewKeyState(KEY_RETURN))
+	else if (IsNeedDown(kNeed_UIConfirm))
 	{
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/3,NORMAL_CHANNEL_RATE * 3/2);
 
@@ -680,7 +678,7 @@ ObjNode	*newObj, *pane;
 	newObj->Mode = 0;								// fade-in mode
 
 	UpdateInput();
-	while(!AreAnyNewKeysPressed())
+	while(!UserWantsOut())
 	{
 		CalcFramesPerSecond();
 		UpdateInput();
@@ -751,7 +749,7 @@ ObjNode	*pane;
 		/*************************/
 
 	UpdateInput();
-	while(!AreAnyNewKeysPressed())
+	while(!UserWantsOut())
 	{
 		UpdateInput();
 

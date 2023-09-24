@@ -183,6 +183,8 @@ retryVideo:
 
 static void Shutdown()
 {
+	SetMacLinearMouse(false);
+
 	Pomme::Shutdown();
 
 	if (gSDLWindow)

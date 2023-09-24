@@ -52,7 +52,7 @@ elseif(APPLE)
 endif()
 
 set(POMME_NO_VIDEO true)
-# set(POMME_NO_INPUT true) #---------------------
+set(POMME_NO_INPUT true)
 set(POMME_NO_GRAPHICS true)
 set(POMME_NO_QD3D true)
 

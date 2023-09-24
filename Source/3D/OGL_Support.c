@@ -589,9 +589,9 @@ int	x,y,w,h;
 
 	if (gDebugMode)
 	{
-		gVRAMUsedThisFrame = gGameWindowWidth * gGameWindowHeight * (gGamePrefs.depth / 8);				// backbuffer size
-		gVRAMUsedThisFrame += gGameWindowWidth * gGameWindowHeight * 2;										// z-buffer size
-		gVRAMUsedThisFrame += gGamePrefs.screenWidth * gGamePrefs.screenHeight * (gGamePrefs.depth / 8);	// display size
+		gVRAMUsedThisFrame = gGameWindowWidth * gGameWindowHeight * (32 / 8);				// backbuffer size
+		gVRAMUsedThisFrame += gGameWindowWidth * gGameWindowHeight * 2;						// z-buffer size
+		//gVRAMUsedThisFrame += gGamePrefs.screenWidth * gGamePrefs.screenHeight * (gGamePrefs.depth / 8);	// display size
 	}
 
 
@@ -689,7 +689,7 @@ do_anaglyph:
 		/* SEE IF SHOW DEBUG INFO */
 		/**************************/
 
-	if (GetNewKeyState(KEY_F8))
+	if (IsKeyDown(SDL_SCANCODE_F8))
 	{
 		if (++gDebugMode > 3)
 			gDebugMode = 0;

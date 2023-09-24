@@ -670,20 +670,19 @@ static void DoSaveSelect(void)
 	gSaveGame = true;
 	MakeDarkenPane();
 
-	while((!GetNewKeyState(KEY_SPACE)) && (!GetNewKeyState(KEY_RETURN)))
+	while (!IsNeedDown(kNeed_UIConfirm))
 	{
 		CalcFramesPerSecond();
 		UpdateInput();
 
 				/* SEE IF USER CHANGE SELECTION */
 
-		if (GetNewKeyState(KEY_LEFT) && (!gSaveGame))
+		if (IsNeedDown(kNeed_UIPrev) && !gSaveGame)
 		{
 			gSaveGame = true;
 			gSaveWobble = 0;
 		}
-		else
-		if (GetNewKeyState(KEY_RIGHT) && gSaveGame)
+		else if (IsNeedDown(kNeed_UINext) && gSaveGame)
 		{
 			gSaveGame = false;
 			gSaveWobble = 0;

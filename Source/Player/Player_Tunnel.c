@@ -337,7 +337,7 @@ void PlayArea_Tunnel(void)
 
 			/* SEE IF PAUSED */
 
-		if (GetNewKeyState(KEY_ESC))
+		if (IsNeedDown(kNeed_UIPause))
 			DoPaused();
 
 		CalcFramesPerSecond();
@@ -349,18 +349,20 @@ void PlayArea_Tunnel(void)
 
 				/* CHEATS */
 
-		if (GetKeyState(KEY_APPLE))
+#if !_DEBUG
+		if (IsKeyActive(SDL_SCANCODE_LGUI) || IsKeyActive(SDL_SCANCODE_RGUI))
+#endif
 		{
-			if (GetNewKeyState(KEY_F10))			// win level cheat
+			if (IsKeyDown(SDL_SCANCODE_F10))			// win level cheat
 				break;
+		}
 
-			if (GetNewKeyState(KEY_HELP))			// get health & stuff
-			{
-				gPlayerInfo.health = 1.0;
-				gPlayerInfo.glidePower = 1.0;
-				if (gPlayerInfo.lives < 3)
-					gPlayerInfo.lives = 3;
-			}
+		if (IsCheatKeyComboDown())						// get health & stuff
+		{
+			gPlayerInfo.health = 1.0;
+			gPlayerInfo.glidePower = 1.0;
+			if (gPlayerInfo.lives < 3)
+				gPlayerInfo.lives = 3;
 		}
 
 

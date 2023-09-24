@@ -218,7 +218,7 @@ Boolean		buddyAttract = false;
 			}
 		}
 
-		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;				// next node
+		thisNodePtr = thisNodePtr->NextNode;				// next node
 	}
 	while (thisNodePtr != nil);
 

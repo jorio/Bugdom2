@@ -481,7 +481,7 @@ long		count;
 				/* READ FILE */
 				/*************/
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences3", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences4", &file);
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		return(iErr);
@@ -500,9 +500,6 @@ long		count;
 			/* VERIFY PREFS */
 			/****************/
 
-	if ((gGamePrefs.depth != 16) && (gGamePrefs.depth != 32))
-		goto err;
-
 	if (gGamePrefs.version != CURRENT_PREFS_VERS)
 		goto err;
 
@@ -510,9 +507,6 @@ long		count;
 		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
 
 	IMPLEMENT_ME_SOFT();
-#if 0
-	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
-#endif
 
 
 	return(noErr);
@@ -535,9 +529,6 @@ long				count;
 
 		/* GET THE CURRENT CONTROL SETTINGS */
 
-	if (!gHIDInitialized)								// can't save prefs unless HID is initialized!
-		return;
-
 	IMPLEMENT_ME_SOFT();
 #if 0
 	BuildHIDControlSettings(&gGamePrefs.controlSettings);
@@ -545,7 +536,7 @@ long				count;
 
 				/* CREATE BLANK FILE */
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences3", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences4", &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, kGameID, 'Pref', smSystemScript);					// create blank file
 	if (iErr)

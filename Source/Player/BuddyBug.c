@@ -129,7 +129,7 @@ void SeeIfLaunchBuddyBug(void)
 ObjNode	*buddy;
 int		i;
 
-	if (!gControlNeeds[kNeed_LaunchBuddy].newButtonPress)							// see if do it
+	if (!IsNeedDown(kNeed_LaunchBuddy))							// see if do it
 		return;
 
 	if (gPlayerInfo.numBuddyBugs == 0)								// see if have any buddies

@@ -1108,11 +1108,12 @@ SndChannelPtr			chanPtr;
 void DoSoundMaintenance(void)
 {
 
+#if 0
 	if (gAllowAudioKeys)
 	{
 					/* SEE IF TOGGLE MUSIC */
 
-		if (GetNewKeyState(KEY_M))
+		if (IsKeyDown(SDL_SCANCODE_M))
 		{
 			ToggleMusic();
 		}
@@ -1135,11 +1136,9 @@ void DoSoundMaintenance(void)
 		}
 	}
 
-
-#if 0
 		/* ALSO CHECK OPTIONS */
 
-	if (GetNewKeyState(KEY_F1))
+	if (IsKeyDown(SDL_SCANCODE_F1))
 	{
 		DoGameOptionsDialog();
 	}
@@ -1147,7 +1146,7 @@ void DoSoundMaintenance(void)
 		/* AND CONTROL SETTINGS */
 
 	else
-	if (GetNewKeyState(KEY_F2))
+	if (IsKeyDown(SDL_SCANCODE_F2))
 	{
 		DoInputConfigDialog();
 	}

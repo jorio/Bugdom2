@@ -37,6 +37,7 @@
 #include "camera.h"
 #include "collision.h"
 #include "input.h"
+#include "inputsdl.h"
 #include "file.h"
 #include "fences.h"
 #include "splineitems.h"
@@ -67,7 +68,6 @@ extern	Boolean					gFreezeCameraFromXZ;
 extern	Boolean					gFreezeCameraFromY;
 extern	Boolean					gG4;
 extern	Boolean					gGameOver;
-extern	Boolean					gHIDInitialized;
 extern	Boolean					gHeadOnScarecrow;
 extern	Boolean					gIgnoreBottleKeySnail;
 extern	Boolean					gLevelCompleted;
@@ -96,7 +96,6 @@ extern	CollisionRec			gCollisionList[];
 extern	FSSpec					gDataSpec;
 extern	FenceDefType			*gFenceList;
 extern	HighScoreType			gHighScores[NUM_SCORES];
-extern	InputNeedType			gControlNeeds[NUM_CONTROL_NEEDS];
 extern	LineMarkerDefType		gLineMarkerList[];
 extern	MOMaterialObject		*gMostRecentMaterial;
 extern	MOMaterialObject		*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
@@ -144,6 +143,7 @@ extern	TunnelItemDefType		*gTunnelItemList;
 extern	TunnelSplinePointType	*gTunnelSplinePoints;
 extern	WaterDefType			**gWaterListHandle;
 extern	WaterDefType			*gWaterList;
+extern	const InputBinding		kDefaultInputBindings[NUM_CONTROL_NEEDS];
 extern	float					**gMapYCoords;
 extern	float					**gMapYCoordsOriginal;
 extern	float					**gVertexShading;

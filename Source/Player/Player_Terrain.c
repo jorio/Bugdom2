@@ -470,7 +470,7 @@ static void MovePlayer_Gliding(ObjNode *theNode)
 
 			/* SEE IF END GLIDING */
 
-	if (gControlNeeds[kNeed_Jump].newButtonPress || (theNode->StatusBits & STATUS_BIT_ONGROUND))
+	if (IsNeedDown(kNeed_Jump) || (theNode->StatusBits & STATUS_BIT_ONGROUND))
 		EndGliding(theNode);
 
 			/* DO ACTION CONTROL */
@@ -1343,7 +1343,7 @@ Boolean				killed = false;
 
 				/* SEE IF ALSO APPLY KEY THRUST */
 
-	if (gControlNeeds[kNeed_AutoWalk].value)										// see if forward thrust
+	if (IsNeedActive(kNeed_AutoWalk))										// see if forward thrust
 	{
 		float	rot = theNode->Rot.y;
 		gDelta.x += sin(rot) * (fps * -KEY_THRUST);
@@ -1779,7 +1779,7 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 			/* SEE IF DO PICKUP / DROP */
 			/***************************/
 
-	if (gControlNeeds[kNeed_PickupDrop].newButtonPress)
+	if (IsNeedDown(kNeed_PickupDrop))
 	{
 				/* TRY DROPPING */
 
@@ -1800,7 +1800,7 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 			/* SEE IF DO KICK */
 			/******************/
 	else
-	if (gControlNeeds[kNeed_Kick].newButtonPress)
+	if (IsNeedDown(kNeed_Kick))
 	{
 		if (!gPlayerInfo.heldObject)												// cannot kick if holding something
 		{
@@ -1829,7 +1829,7 @@ Boolean	isJumping, isFalling;
 			/* SEE IF PRESSED JUMP BUTTON */
 			/******************************/
 
-	if (gControlNeeds[kNeed_Jump].newButtonPress)										// see if user pressed the key
+	if (IsNeedDown(kNeed_Jump))										// see if user pressed the key
 	{
 		isJumping = IsPlayerDoingJumpAnim(theNode);
 		isFalling = IsPlayerDoingFallAnim(theNode);
