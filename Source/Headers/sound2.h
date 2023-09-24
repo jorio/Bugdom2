@@ -8,7 +8,6 @@ typedef struct
 	short	effectNum;
 	float	volumeAdjust;
 	float	leftVolume, rightVolume;
-	Boolean	isLooping;
 }ChannelInfoType;
 
 
@@ -498,9 +497,7 @@ extern void	KillSong(void);
 extern	short PlayEffect(short effectNum);
 short PlayEffect_Parms3D(short effectNum, OGLPoint3D *where, uint32_t rateMultiplier, float volumeAdjust);
 extern void	ToggleMusic(void);
-extern void	DoSoundMaintenance(void);
 extern	void LoadSoundBank(FSSpec *spec, long bankNum);
-extern	void WaitEffectsSilent(void);
 extern	void DisposeSoundBank(short bankNum);
 short PlayEffect_Parms(short effectNum, uint32_t leftVolume, uint32_t rightVolume, unsigned long rateMultiplier);
 void ChangeChannelVolume(short channel, float leftVol, float rightVol);
@@ -510,9 +507,4 @@ Boolean IsEffectChannelPlaying(short chanNum);
 void UpdateListenerLocation(void);
 void ChangeChannelRate(short channel, long rateMult);
 Boolean StopAChannelIfEffectNum(short *channelNum, short effectNum);
-
-
-
-
-
-
+void PauseAllChannels(Boolean pause);

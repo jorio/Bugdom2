@@ -204,7 +204,6 @@ extern	int						gNumFreedBees;
 extern	int						gNumKilledFleas;
 extern	int						gNumKilledTicks;
 extern	int						gNumLineMarkers;
-extern	int						gNumLoopingEffects;
 extern	int						gNumMice;
 extern	int						gNumObjectNodes;
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];

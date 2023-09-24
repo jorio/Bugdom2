@@ -72,8 +72,6 @@ Boolean						gSongPlayingFlag = false;
 Boolean						gLoopSongFlag = true;
 Boolean						gAllowAudioKeys = true;
 
-int							gNumLoopingEffects;
-
 Boolean				gMuteMusicFlag = false;
 short				gCurrentSong = -1;
 short				gSongChannel = -1;
@@ -251,18 +249,14 @@ static EffectType	gEffectsTable[] =
 void InitSoundTools(void)
 {
 OSErr			iErr;
-short			i;
 FSSpec			spec;
-
-	gNumLoopingEffects = 0;
 
 	gMaxChannels = 0;
 	gMostRecentChannel = -1;
 
 			/* INIT BANK INFO */
 
-	for (i = 0; i < MAX_SOUND_BANKS; i++)
-		gNumSndsInBank[i] = 0;
+	SDL_zeroa(gNumSndsInBank);
 
 			/******************/
 			/* ALLOC CHANNELS */
@@ -275,8 +269,6 @@ FSSpec			spec;
 		iErr = SndNewChannel(&gSndChannel[gMaxChannels], sampledSynth, initStereo, nil);
 		if (iErr)												// if err, stop allocating channels
 			break;
-
-		gChannelInfo[gMaxChannels].isLooping = false;
 	}
 
 
@@ -326,8 +318,7 @@ OSErr			iErr;
 
 	StopAllEffectChannels();
 
-	if (bankNum >= MAX_SOUND_BANKS)
-		DoFatalAlert("LoadSoundBank: bankNum >= MAX_SOUND_BANKS");
+	GAME_ASSERT(bankNum < MAX_SOUND_BANKS);
 
 			/* DISPOSE OF EXISTING BANK */
 
@@ -369,6 +360,10 @@ OSErr			iErr;
 				/* GET OFFSET INTO IT */
 
 		GetSoundHeaderOffset(gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
+
+				/* PRE-DECOMPRESS IT */
+
+		Pomme_DecompressSoundResource(&gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
 	}
 
 	CloseResFile(srcFile1);
@@ -425,12 +420,6 @@ short		c = *channelNum;
 
 	*channelNum = -1;
 
-	if (gChannelInfo[c].isLooping)
-	{
-		gNumLoopingEffects--;
-		gChannelInfo[c].isLooping = false;
-	}
-
 	gChannelInfo[c].effectNum = -1;
 }
 
@@ -472,26 +461,6 @@ short		i;
 	}
 }
 
-
-/****************** WAIT EFFECTS SILENT *********************/
-
-void WaitEffectsSilent(void)
-{
-short	i;
-Boolean	isBusy;
-SCStatus				theStatus;
-
-	do
-	{
-		isBusy = 0;
-		for (i=0; i < gMaxChannels; i++)
-		{
-			SndChannelStatus(gSndChannel[i],sizeof(SCStatus),&theStatus);	// get channel info
-			isBusy |= theStatus.scChannelBusy;
-		}
-	}while(isBusy);
-}
-
 #pragma mark -
 
 /******************** PLAY SONG ***********************/
@@ -507,7 +476,7 @@ OSErr 	iErr;
 FSSpec	spec;
 int		volume;
 
-Str32	songNames[] =
+static const char* songNames[] =
 {
 	":Audio:Intro.song",
 	":Audio:Theme.song",
@@ -556,8 +525,7 @@ float	volumeTweaks[]=
 			/******************************/
 
 	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID,songNames[songNum], &spec);
-	if (iErr)
-		DoFatalAlert("PlaySong: song file not found");
+	GAME_ASSERT(!iErr);
 
 
 
@@ -744,14 +712,11 @@ short			c;
 
 			/* SEE IF SOUND HAS COMPLETED */
 
-	if (!gChannelInfo[c].isLooping)										// loopers wont complete, duh.
+	SndChannelStatus(gSndChannel[c],sizeof(SCStatus),&theStatus);	// get channel info
+	if (!theStatus.scChannelBusy)									// see if channel not busy
 	{
-		SndChannelStatus(gSndChannel[c],sizeof(SCStatus),&theStatus);	// get channel info
-		if (!theStatus.scChannelBusy)									// see if channel not busy
-		{
-			StopAChannel(channel);							// make sure it's really stopped (OS X sound manager bug)
-			return(true);
-		}
+		StopAChannel(channel);							// make sure it's really stopped (OS X sound manager bug)
+		return(true);
 	}
 
 			/* UPDATE THE THING */
@@ -922,8 +887,6 @@ short			theChan;
 Byte			bankNum,soundNum;
 OSErr			myErr;
 uint32_t			lv2,rv2;
-static UInt32          loopStart, loopEnd;
-// SoundHeaderPtr   sndPtr;
 
 
 
@@ -985,28 +948,6 @@ static UInt32          loopStart, loopEnd;
 	mySndCmd.param2 	= rateMultiplier;
 	SndDoImmediate(chanPtr, &mySndCmd);
 
-
-
-    		/* SEE IF THIS IS A LOOPING EFFECT */
-
-	IMPLEMENT_ME_SOFT(); (void) loopStart; (void) loopEnd;
-#if 0
-    sndPtr = (SoundHeaderPtr)(((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum]);
-    loopStart = sndPtr->loopStart;
-    loopEnd = sndPtr->loopEnd;
-    if ((loopStart + 1) < loopEnd)
-    {
-    	mySndCmd.cmd = callBackCmd;										// let us know when the buffer is done playing
-    	mySndCmd.param1 = 0;
-    	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
-    	SndDoImmediate(chanPtr, &mySndCmd, true);
-
-    	gChannelInfo[theChan].isLooping = true;
-    	gNumLoopingEffects++;
-	}
-	else
-#endif
-		gChannelInfo[theChan].isLooping = false;
 
 			/* SET MY INFO */
 
@@ -1096,64 +1037,6 @@ SndChannelPtr			chanPtr;
 
 
 
-#pragma mark -
-
-
-/******************** DO SOUND MAINTENANCE *************/
-//
-// 		UpdateInput() must have already been called
-//
-
-void DoSoundMaintenance(void)
-{
-
-#if 0
-	if (gAllowAudioKeys)
-	{
-					/* SEE IF TOGGLE MUSIC */
-
-		if (IsKeyDown(SDL_SCANCODE_M))
-		{
-			ToggleMusic();
-		}
-
-
-				/* SEE IF CHANGE VOLUME */
-
-		if (GetKeyState(KEY_PLUS))
-		{
-			gGlobalVolume += .5f * gFramesPerSecondFrac;
-			UpdateGlobalVolume();
-		}
-		else
-		if (GetKeyState(KEY_MINUS))
-		{
-			gGlobalVolume -= .5f * gFramesPerSecondFrac;
-			if (gGlobalVolume < 0.0f)
-				gGlobalVolume = 0.0f;
-			UpdateGlobalVolume();
-		}
-	}
-
-		/* ALSO CHECK OPTIONS */
-
-	if (IsKeyDown(SDL_SCANCODE_F1))
-	{
-		DoGameOptionsDialog();
-	}
-
-		/* AND CONTROL SETTINGS */
-
-	else
-	if (IsKeyDown(SDL_SCANCODE_F2))
-	{
-		DoInputConfigDialog();
-	}
-#endif
-}
-
-
-
 /******************** FIND SILENT CHANNEL *************************/
 
 static short FindSilentChannel(void)
@@ -1169,9 +1052,6 @@ SCStatus	theStatus;
 
 	do
 	{
-		if (gChannelInfo[theChan].isLooping)				// see if this channel is playing a looping effect
-			goto next;
-
 		myErr = SndChannelStatus(gSndChannel[theChan],sizeof(SCStatus),&theStatus);	// get channel info
 		if (myErr)
 			goto next;
@@ -1206,13 +1086,19 @@ SCStatus	theStatus;
 }
 
 
+/*************** PAUSE ALL SOUND CHANNELS **************/
 
+void PauseAllChannels(Boolean pause)
+{
+	SndCommand cmd = { .cmd = pause ? pommePausePlaybackCmd : pommeResumePlaybackCmd };
 
+	for (int c = 0; c < gMaxChannels; c++)
+	{
+		SndDoImmediate(gSndChannel[c], &cmd);
+	}
 
-
-
-
-
+//	SndDoImmediate(gMusicChannel, &cmd);
+}
 
 
 

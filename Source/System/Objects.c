@@ -326,10 +326,6 @@ void MoveObjects(void)
 {
 ObjNode		*thisNodePtr;
 
-			/* CALL SOUND MAINTENANCE HERE FOR CONVENIENCE */
-
-	DoSoundMaintenance();
-
 
 	if (gFirstNodePtr == nil)								// see if there are any objects
 		return;
@@ -340,8 +336,7 @@ ObjNode		*thisNodePtr;
 	{
 				/* VERIFY NODE */
 
-		if (thisNodePtr->CType == INVALID_NODE_FLAG)
-			DoFatalAlert("MoveObjects: CType == INVALID_NODE_FLAG");
+		GAME_ASSERT(thisNodePtr->CType != INVALID_NODE_FLAG);
 
 		gCurrentNode = thisNodePtr;							// set current object node
 		gNextNode	 = thisNodePtr->NextNode;				// get next node now (cuz current node might get deleted)

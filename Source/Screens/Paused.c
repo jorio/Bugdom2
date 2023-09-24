@@ -46,15 +46,9 @@ static short	gPausedMenuSelection;
 
 void DoPaused(void)
 {
-Boolean	oldMute = gMuteMusicFlag;
-
-
-
 	gPausedMenuSelection = 0;
 
-	if (!gMuteMusicFlag)							// see if pause music
-		ToggleMusic();
-
+	PauseAllChannels(true);
 
 
 				/*************/
@@ -77,15 +71,9 @@ Boolean	oldMute = gMuteMusicFlag;
 		UpdateInput();
 		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);		// need to call this to keep supertiles active
 		OGL_DrawScene(DrawPaused);
-
 	}
 
-
-
-	if (!oldMute)									// see if restart music
-		ToggleMusic();
-
-
+	PauseAllChannels(false);
 }
 
 
