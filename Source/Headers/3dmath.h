@@ -407,14 +407,38 @@ Boolean	neg;
 
 
 
+/****************** OGLVECTOR3D CROSS NO PIN ******************/
+
+static inline void OGLVector3D_Cross_NoPin(const OGLVector3D* v1, const OGLVector3D* v2, OGLVector3D* result)
+{
+	float rx = (v1->y * v2->z) - (v1->z * v2->y);
+	float ry = (v1->z * v2->x) - (v1->x * v2->z);
+	float rz = (v1->x * v2->y) - (v1->y * v2->x);
+
+	result->x = rx;
+	result->y = ry;
+	result->z = rz;
+}
 
 
+/****************** OGLVECTOR3D DOT NO PIN ******************/
 
+static inline float OGLVector3D_Dot_NoPin(const OGLVector3D	*v1, const OGLVector3D	*v2)
+{
+	return ((v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z));
+}
 
+#pragma mark -
 
+void OGL_SetGluPerspectiveMatrix(
+		OGLMatrix4x4* m,
+		float fov,
+		float aspect,
+		float hither,
+		float yon);
 
-
-
-
-
-
+void OGL_SetGluLookAtMatrix(
+		OGLMatrix4x4* m,
+		const OGLPoint3D* eye,
+		const OGLPoint3D* target,
+		const OGLVector3D* upDir);

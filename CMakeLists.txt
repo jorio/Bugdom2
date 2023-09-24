@@ -94,7 +94,6 @@ set(GAME_LIBRARIES
 	Pomme
 	${SDL2_LIBRARIES}
 	OpenGL::GL
-	OpenGL::GLU  #---------------------------------------------
 )
 
 if(WIN32)
