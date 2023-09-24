@@ -17,7 +17,7 @@
 /****************************/
 
 static Boolean NavigatePausedMenu(void);
-static void DrawPaused(OGLSetupOutputType *setupInfo);
+static void DrawPaused(void);
 
 
 
@@ -78,7 +78,7 @@ static const char *gPausedStrings[MAX_LANGUAGES][3] =
 
 		/* SWEDISH */
 	{
-		"Återuppta Spelet",
+		"ÔøΩteruppta Spelet",
 		"Dra dig ur Spelet",
 		"Avsluta",
 	},
@@ -127,7 +127,7 @@ Boolean	oldMute = gMuteMusicFlag;
 		CalcFramesPerSecond();
 		UpdateInput();
 		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);		// need to call this to keep supertiles active
-		OGL_DrawScene(gGameViewInfoPtr, DrawPaused);
+		OGL_DrawScene(DrawPaused);
 
 	}
 
@@ -142,7 +142,7 @@ Boolean	oldMute = gMuteMusicFlag;
 
 /*********************** DRAW PAUSED ***************************/
 
-static void DrawPaused(OGLSetupOutputType *setupInfo)
+static void DrawPaused(void)
 {
 float	x,y,leftX;
 float	dotX,dotY;
@@ -155,11 +155,11 @@ static float	dotAlpha = 1.0f;
 	{
 		case	LEVEL_NUM_PLUMBING:
 		case	LEVEL_NUM_GUTTER:
-				DrawTunnel(setupInfo);
+				DrawTunnel();
 				break;
 
 		default:
-				DrawArea(setupInfo);
+				DrawArea();
 
 	}
 
@@ -179,7 +179,7 @@ static float	dotAlpha = 1.0f;
 
 	x = (640-PAUSED_FRAME_WIDTH)/2;
 	y = 210;
-	DrawInfobarSprite2(x, y, PAUSED_FRAME_WIDTH, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PausedFrame, setupInfo);
+	DrawInfobarSprite2(x, y, PAUSED_FRAME_WIDTH, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PausedFrame);
 
 
 				/* DRAW TEXT */
@@ -211,7 +211,7 @@ static float	dotAlpha = 1.0f;
 			char	c = gPausedStrings[gGamePrefs.language][j][i];	// get char
 			int		texNum = CharToSprite(c);						// convert to texture #
 			if (texNum != -1)
-				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum, setupInfo);
+				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
 
 			x += GetCharSpacing(c, LETTER_SPACING);
 			i++;
@@ -233,7 +233,7 @@ static float	dotAlpha = 1.0f;
 	glDisable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	DrawInfobarSprite2(dotX, dotY, 16, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PausedDot, setupInfo);
+	DrawInfobarSprite2(dotX, dotY, 16, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PausedDot);
 
 	gGlobalTransparency = 1.0f;
 

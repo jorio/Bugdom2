@@ -162,20 +162,20 @@ OGLSetupInputType	viewDef;
 		viewDef.lights.ambientColor.b 		= .4;
 	}
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 			/*************/
 			/* LOAD DATA */
 			/*************/
 
-	LoadLevelArt_Tunnel(gGameViewInfoPtr);
-	InitInfobar(gGameViewInfoPtr);
+	LoadLevelArt_Tunnel();
+	InitInfobar();
 
 			/* INIT OTHER MANAGERS */
 
 	InitEnemyManager();
-	InitEffects(gGameViewInfoPtr);
+	InitEffects();
 	InitVaporTrails();
 	InitSparkles();
 	InitDialogManager();						// init all help messages
@@ -328,7 +328,7 @@ void PlayArea_Tunnel(void)
 
 			/* DRAW IT ALL */
 
-		OGL_DrawScene(gGameViewInfoPtr,DrawTunnel);
+		OGL_DrawScene(DrawTunnel);
 
 
 			/**************/
@@ -397,7 +397,7 @@ void PlayArea_Tunnel(void)
 
 /*********************** DRAW TUNNEL ************************/
 
-void DrawTunnel(OGLSetupOutputType *setupInfo)
+void DrawTunnel(void)
 {
 int			i,t;
 
@@ -418,7 +418,7 @@ int			i,t;
 	{
 		if (OGL_IsBBoxVisible(&gTunnelSectionObjects[i]->objectData.bBox, nil))
 		{
-			MO_DrawObject(gTunnelSectionObjects[i], setupInfo);
+			MO_DrawObject(gTunnelSectionObjects[i]);
 		}
 	}
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
@@ -456,11 +456,11 @@ int			i,t;
 		}
 				/* SUBMIT TEXTURE */
 
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][PLUMBING_SObjType_Water0 + t].materialObject, setupInfo);
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][PLUMBING_SObjType_Water0 + t].materialObject);
 	}
 	else
 	{
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][GUTTER_SObjType_Water0].materialObject, setupInfo);
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][GUTTER_SObjType_Water0].materialObject);
 
 	}
 
@@ -470,7 +470,7 @@ int			i,t;
 	{
 		if (OGL_IsBBoxVisible(&gTunnelSectionWaterObjects[i]->objectData.bBox, nil))
 		{
-			MO_DrawObject(gTunnelSectionWaterObjects[i], setupInfo);
+			MO_DrawObject(gTunnelSectionWaterObjects[i]);
 		}
 	}
 
@@ -490,13 +490,7 @@ int			i,t;
 			/* DRAW THE REGULAR CACHE OF OBJECTS AND EFFECTS */
 			/*************************************************/
 
-	DrawArea(setupInfo);
-
-
-
-
-
-
+	DrawArea();
 }
 
 #pragma mark -

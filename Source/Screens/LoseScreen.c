@@ -18,7 +18,7 @@
 
 static void SetupLoseScreen(void);
 static void FreeLoseScreen(void);
-static void DrawLoseCallback(OGLSetupOutputType *info);
+static void DrawLoseCallback(void);
 static void ProcessLose(void);
 static void MoveMenuFlower(ObjNode *theNode);
 static void MoveLoseBee(ObjNode *bee);
@@ -135,7 +135,7 @@ int			i;
 	viewDef.lights.fillColor[1].g 	= .8;
 	viewDef.lights.fillColor[1].b 	= .1;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -147,27 +147,27 @@ int			i;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:losescreen.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LOSESCREEN, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LOSESCREEN);
 
-	LoadFoliage(gGameViewInfoPtr);
+	LoadFoliage();
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:LoseScreen.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_LOSE, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_LOSE);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_HOBOBAG, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE);
+	LoadASkeleton(SKELETON_TYPE_HOBOBAG);
 
 
 				/* LOAD AUDIO */
@@ -213,7 +213,7 @@ int			i;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .99f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .99f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -263,7 +263,7 @@ int			i;
 	gNewObjectDefinition.moveCall 	= MoveGameOverText;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 500;
-	newObj = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	newObj = MakeSpriteObject(&gNewObjectDefinition);
 
 	newObj->Timer = 3.0f;
 	newObj->ColorFilter.a = 0;
@@ -284,7 +284,7 @@ static void FreeLoseScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LOSE);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -308,12 +308,12 @@ float	timer = 25.0f;
 				/* MOVE */
 
 		MoveObjects();
-		OGL_MoveCameraFromTo(gGameViewInfoPtr, 0, 0, -35.0f * fps, 0,0, -35.0f * fps);
+		OGL_MoveCameraFromTo(0, 0, -35.0f * fps, 0, 0, -35.0f * fps);
 
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLoseCallback);
+		OGL_DrawScene(DrawLoseCallback);
 
 
 		timer -= fps;
@@ -326,10 +326,10 @@ float	timer = 25.0f;
 
 /***************** DRAW LOSE CALLBACK *******************/
 
-static void DrawLoseCallback(OGLSetupOutputType *info)
+static void DrawLoseCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 }
 

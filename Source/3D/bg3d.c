@@ -47,7 +47,6 @@ static void ReadBoundingBox(short refNum);
 /*    VARIABLES      */
 /*********************/
 
-static OGLSetupOutputType	*gBG3D_CurrentDrawContext = nil;
 static int					gBG3D_GroupStackIndex;
 static MOGroupObject		*gBG3D_GroupStack[BG3D_GROUP_STACK_SIZE];
 static MOGroupObject		*gBG3D_CurrentGroup;
@@ -83,7 +82,7 @@ int	i;
 //			because all imported textures are named with OpenGL and loaded into OpenGL!
 //
 
-void ImportBG3D(FSSpec *spec, int groupNum, OGLSetupOutputType *setupInfo)
+void ImportBG3D(FSSpec *spec, int groupNum)
 {
 short				refNum;
 int					i;
@@ -93,7 +92,6 @@ MOGroupData			*data;
 
 			/* INIT SOME VARIABLES */
 
-	gBG3D_CurrentDrawContext	= setupInfo;
 	gBG3D_CurrentMaterialObj 	= nil;
 	gBG3D_CurrentGeometryObj	= nil;
 	gBG3D_GroupStackIndex		= 0;			// init the group stack
@@ -294,7 +292,6 @@ uint32_t			flags;
 
 		/* INIT NEW MATERIAL DATA */
 
-	data.setupInfo				= gBG3D_CurrentDrawContext;		// remember which draw context this material is assigned to
 	data.flags 					= flags;
 	data.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE;
 	data.multiTextureCombine	= MULTI_TEXTURE_COMBINE_MODULATE;

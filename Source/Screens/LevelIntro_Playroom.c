@@ -18,7 +18,7 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(OGLSetupOutputType *info);
+static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveIntroSoldier(ObjNode *theNode);
 
@@ -105,7 +105,7 @@ int		i,x;
 	viewDef.lights.fillColor[0].g 	= .9;
 	viewDef.lights.fillColor[0].b 	= .8;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -115,17 +115,17 @@ int		i,x;
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 	for (i = 0; i < 7; i++)
 	{
@@ -134,12 +134,12 @@ int		i,x;
 	}
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level5_Playroom.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 
 				/* SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TOYSOLDIER, 0,
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
@@ -242,7 +242,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -267,15 +267,15 @@ float	timer;
 
 				/* MOVE */
 
-		gGameViewInfoPtr->cameraPlacement.cameraLocation.x += 20.0f * fps;
-		gGameViewInfoPtr->cameraPlacement.pointOfInterest.x += 20.0f * fps;
+		gGameView->cameraPlacement.cameraLocation.x += 20.0f * fps;
+		gGameView->cameraPlacement.pointOfInterest.x += 20.0f * fps;
 
 		MoveObjects();
 		MoveShards();
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLevelIntroCallback);
+		OGL_DrawScene(DrawLevelIntroCallback);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -286,10 +286,10 @@ float	timer;
 
 /***************** DRAW LEVELINTRO CALLBACK *******************/
 
-static void DrawLevelIntroCallback(OGLSetupOutputType *info)
+static void DrawLevelIntroCallback(void)
 {
-	DrawObjects(info);
-	DrawShards(info);
+	DrawObjects();
+	DrawShards();
 }
 
 

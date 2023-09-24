@@ -18,7 +18,7 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(OGLSetupOutputType *info);
+static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveIntroHive(ObjNode *theNode);
 static void MoveIntroBee(ObjNode *bee);
@@ -107,7 +107,7 @@ static OGLPoint3D doorOff = {-135, 350, -50};
 	viewDef.lights.fillColor[0].g 	= .9;
 	viewDef.lights.fillColor[0].b 	= .8;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -117,26 +117,26 @@ static OGLPoint3D doorOff = {-135, 350, -50};
 			/* LOAD SPRITES */
 
 //	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+//	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 //	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":sprite//s:spheremap.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+//	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level10_Park.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 
 				/* BUMBLE BEE */
 
-	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_HOBOBAG, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE);
+	LoadASkeleton(SKELETON_TYPE_HOBOBAG);
 
 
 
@@ -153,7 +153,7 @@ static OGLPoint3D doorOff = {-135, 350, -50};
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -232,7 +232,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -265,13 +265,13 @@ OGLPoint3D		p;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gHive->Coord, 0, .05f * gFramesPerSecondFrac, 0);
-		OGLPoint3D_Transform(&gGameViewInfoPtr->cameraPlacement.cameraLocation, &m, &p);
-		OGL_UpdateCameraFromTo(gGameViewInfoPtr, &p, nil);
+		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
+		OGL_UpdateCameraFromTo(&p, nil);
 
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLevelIntroCallback);
+		OGL_DrawScene(DrawLevelIntroCallback);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -282,10 +282,10 @@ OGLPoint3D		p;
 
 /***************** DRAW LEVELINTRO CALLBACK *******************/
 
-static void DrawLevelIntroCallback(OGLSetupOutputType *info)
+static void DrawLevelIntroCallback(void)
 {
-	DrawObjects(info);
-	DrawShards(info);
+	DrawObjects();
+	DrawShards();
 }
 
 

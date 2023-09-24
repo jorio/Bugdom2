@@ -41,7 +41,7 @@ typedef struct
 
 void InitArea_Tunnels(void);
 void PlayArea_Tunnel(void);
-void DrawTunnel(OGLSetupOutputType *setupInfo);
+void DrawTunnel(void);
 void DisposeTunnelData(void);
 void CreatePlayerModel_Tunnel(int	tunnelIndex);
 void InitTunnelItems(void);

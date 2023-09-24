@@ -16,8 +16,8 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo);
-static void DrawVaporTrail_SmokeColumn(int	i, OGLSetupOutputType *setupInfo);
+static void DrawVaporTrail_ColorStreak(int	i);
+static void DrawVaporTrail_SmokeColumn(int	i);
 static void CreateSmokeColumnRing(int trailNum, int segmentNum);
 static void DeleteVaporTrailSegment(int t, int	seg, int num);
 
@@ -343,7 +343,7 @@ Byte	trailType = gVaporTrails[t].type;
 
 /*************************** DRAW VAPOR TRAILS ******************************/
 
-void DrawVaporTrails(OGLSetupOutputType *setupInfo)
+void DrawVaporTrails(void)
 {
 int		i;
 
@@ -373,11 +373,11 @@ int		i;
 		switch(gVaporTrails[i].type)
 		{
 			case	VAPORTRAIL_TYPE_COLORSTREAK:
-					DrawVaporTrail_ColorStreak(i, setupInfo);
+					DrawVaporTrail_ColorStreak(i);
 					break;
 
 			case	VAPORTRAIL_TYPE_SMOKECOLUMN:
-					DrawVaporTrail_SmokeColumn(i, setupInfo);
+					DrawVaporTrail_SmokeColumn(i);
 					break;
 
 			default:
@@ -397,7 +397,7 @@ int		i;
 
 /************************** DRAW VAPOR TRAIL:  COLOR STREAK **************************/
 
-static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo)
+static void DrawVaporTrail_ColorStreak(int	i)
 {
 uint32_t	w,p,n;
 float	size,dist;
@@ -410,8 +410,9 @@ float	size,dist;
 			/* SET LINE SIZE */
 
 	size = gVaporTrails[i].size;							// get size of trail
-	dist = CalcQuickDistance(gVaporTrails[i].points[n-1].x, gVaporTrails[i].points[n-1].z,
-								setupInfo->cameraPlacement.cameraLocation.x,setupInfo->cameraPlacement.cameraLocation.z);
+	dist = CalcQuickDistance(
+			gVaporTrails[i].points[n-1].x, gVaporTrails[i].points[n-1].z,
+			gGameView->cameraPlacement.cameraLocation.x, gGameView->cameraPlacement.cameraLocation.z);
 	size *= 700.0f / dist;
 
 	w = (float)(gGamePrefs.screenHeight / 15) * size;
@@ -438,7 +439,7 @@ float	size,dist;
 /************************** DRAW VAPOR TRAIL:  SMOKE COLUMN **************************/
 
 
-static void DrawVaporTrail_SmokeColumn(int	i, OGLSetupOutputType *setupInfo)
+static void DrawVaporTrail_SmokeColumn(int i)
 {
 int				p,j,n,pointNum;
 float			u,v,uOff;
@@ -554,8 +555,8 @@ float			fps = gFramesPerSecondFrac;
 
 	OGL_PushState();
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_GreySmoke].materialObject, setupInfo);		// activate material
-	MO_DrawGeometry_VertexArray(&gSmokeColumnMesh, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_GreySmoke].materialObject);		// activate material
+	MO_DrawGeometry_VertexArray(&gSmokeColumnMesh);
 
 	OGL_PopState();
 }

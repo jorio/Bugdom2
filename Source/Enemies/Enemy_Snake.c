@@ -19,7 +19,7 @@
 static void MoveSnakeGenerator(ObjNode *theNode);
 static Boolean StartSnake(ObjNode *generator);
 static void UpdateSnakes(ObjNode *theNode);
-static void DrawSnakes(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawSnakes(ObjNode *theNode);
 static void SnakeAtePlayer(int snakeNum, ObjNode *head, ObjNode *player);
 
 
@@ -420,7 +420,7 @@ Boolean	runAway;
 
 /******************** DRAW SNAKES ****************************/
 
-static void DrawSnakes(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawSnakes(ObjNode *theNode)
 {
 int				i,p,j,pointNum,numRingsCreated;
 float			u,v,s;
@@ -587,7 +587,7 @@ Boolean			runAway = gPlayerInfo.ridingBall || (!gEnableSnakes);						// see if s
 				/* SUBMIT VERTEX ARRAY */
 				/***********************/
 
-		MO_DrawGeometry_VertexArray(&gSnakeMesh, setupInfo);
+		MO_DrawGeometry_VertexArray(&gSnakeMesh);
 
 
 	}

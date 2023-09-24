@@ -54,7 +54,7 @@ Byte				gDebugMode = 0;				// 0 == none, 1 = fps, 2 = all
 
 uint32_t				gAutoFadeStatusBits;
 
-OGLSetupOutputType		*gGameViewInfoPtr = nil;
+OGLSetupOutputType		*gGameView = nil;
 
 PrefsType			gGamePrefs;
 
@@ -379,7 +379,7 @@ static void PlayArea_Terrain(void)
 			/* DRAW IT ALL */
 
 
-		OGL_DrawScene(gGameViewInfoPtr,DrawArea);
+		OGL_DrawScene(DrawArea);
 
 
 
@@ -471,19 +471,19 @@ static void PlayArea_Terrain(void)
 
 /****************** DRAW AREA *******************************/
 
-void DrawArea(OGLSetupOutputType *setupInfo)
+void DrawArea(void)
 {
 		/* DRAW OBJECTS & TERAIN */
 
-	DrawObjects(setupInfo);												// draw objNodes which includes fences, terrain, etc.
+	DrawObjects();												// draw objNodes which includes fences, terrain, etc.
 
 			/* DRAW MISC */
 
-	DrawShards(setupInfo);												// draw shards
-	DrawVaporTrails(setupInfo);											// draw vapor trails
-	DrawSparkles(setupInfo);											// draw light sparkles
-	DrawLensFlare(setupInfo);											// draw lens flare
-	DrawInfobar(setupInfo);												// draw infobar last
+	DrawShards();												// draw shards
+	DrawVaporTrails();											// draw vapor trails
+	DrawSparkles();											// draw light sparkles
+	DrawLensFlare();											// draw lens flare
+	DrawInfobar();												// draw infobar last
 
 
 
@@ -543,10 +543,10 @@ float	decay = (1.0f / 2600.0f);			// decay based on upper margin
 
 
 	start = .0f + (y * decay);
-	start *= gGameViewInfoPtr->yon;
+	start *= gGameView->yon;
 
 	end = .8f + (y * decay);
-	end *= gGameViewInfoPtr->yon;
+	end *= gGameView->yon;
 
 	if (start > end)
 		start = end;
@@ -936,7 +936,7 @@ OGLSetupInputType	viewDef;
 
 
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 			/**********************/
@@ -952,8 +952,8 @@ OGLSetupInputType	viewDef;
 				break;
 
 		default:
-				gAutoFadeStartDist	= gGameViewInfoPtr->yon * .80;
-				gAutoFadeEndDist	= gGameViewInfoPtr->yon * .95f;
+				gAutoFadeStartDist	= gGameView->yon * .80;
+				gAutoFadeEndDist	= gGameView->yon * .95f;
 	}
 
 
@@ -979,13 +979,13 @@ OGLSetupInputType	viewDef;
 			// NOTE: only call this *after* draw context is created!
 			//
 
-	LoadLevelArt_Explore(gGameViewInfoPtr);
-	InitInfobar(gGameViewInfoPtr);
+	LoadLevelArt_Explore();
+	InitInfobar();
 
 			/* INIT OTHER MANAGERS */
 
 	InitEnemyManager();
-	InitEffects(gGameViewInfoPtr);
+	InitEffects();
 	InitVaporTrails();
 	InitSparkles();
 	InitItemsManager();
@@ -1084,7 +1084,7 @@ static void CleanupLevel(void)
 
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!
+	OGL_DisposeWindowSetup(&gGameView);	// do this last!
 }
 
 

@@ -14,10 +14,10 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawFences(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
-static void SubmitFence(int f, const OGLSetupOutputType *setupInfo, float camX, float camZ);
+static void DrawFences(ObjNode *theNode);
+static void SubmitFence(int f, float camX, float camZ);
 static void MakeFenceGeometry(void);
-static void DrawFenceNormals(short f, const OGLSetupOutputType *setupInfo);
+static void DrawFenceNormals(short f);
 
 
 /****************************/
@@ -437,7 +437,7 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 
 /********************* DRAW FENCES ***********************/
 
-static void DrawFences(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawFences(ObjNode *theNode)
 {
 long			f,type;
 float			cameraX, cameraZ;
@@ -458,8 +458,8 @@ float			cameraX, cameraZ;
 
 			/* GET CAMERA COORDS */
 
-	cameraX = setupInfo->cameraPlacement.cameraLocation.x;
-	cameraZ = setupInfo->cameraPlacement.cameraLocation.z;
+	cameraX = gGameView->cameraPlacement.cameraLocation.x;
+	cameraZ = gGameView->cameraPlacement.cameraLocation.z;
 
 
 			/* SET GLOBAL MATERIAL FLAGS */
@@ -490,12 +490,12 @@ float			cameraX, cameraZ;
 
 				/* SUBMIT GEOMETRY */
 
-			SubmitFence(f, setupInfo, cameraX, cameraZ);
+			SubmitFence(f, cameraX, cameraZ);
 			gNumFencesDrawn++;
 
 			if (gDebugMode == 2)
 			{
-				DrawFenceNormals(f, setupInfo);
+				DrawFenceNormals(f);
 			}
 		}
 	}
@@ -506,13 +506,13 @@ float			cameraX, cameraZ;
 
 /****************** DRAW FENCE NORMALS ***************************/
 
-static void DrawFenceNormals(short f, const OGLSetupOutputType *setupInfo)
+static void DrawFenceNormals(short f)
 {
 int				i,numNubs;
 OGLPoint3D		*nubs;
 OGLVector2D		*normals;
 float			x,y,z,nx,nz;
-#pragma unused (setupInfo)
+#pragma unused ()
 
 	OGL_PushState();
 	glDisable(GL_TEXTURE_2D);
@@ -550,7 +550,7 @@ float			x,y,z,nx,nz;
 // Visibility checks have already been done, so there's a good chance the fence is visible
 //
 
-static void SubmitFence(int f, const OGLSetupOutputType *setupInfo, float camX, float camZ)
+static void SubmitFence(int f, float camX, float camZ)
 {
 int						doAutoFade = gAutoFadeStatusBits;
 float					dist,alpha, autoFadeStart = gAutoFadeStartDist;
@@ -615,7 +615,7 @@ Boolean					overrideAlphaFunc = false;
 
 		/* ACTIVATE MATERIAL */
 
-	MO_DrawMaterial(gFenceMaterials[f], setupInfo);
+	MO_DrawMaterial(gFenceMaterials[f]);
 
 	if (overrideAlphaFunc)				// override alpha func settings if any vertex alphas are not opaque
 		glAlphaFunc(GL_NOTEQUAL, 0);
@@ -623,7 +623,7 @@ Boolean					overrideAlphaFunc = false;
 
 			/* SUBMIT GEO */
 
-	MO_DrawGeometry_VertexArray(&gFenceTriMeshData[f], setupInfo);
+	MO_DrawGeometry_VertexArray(&gFenceTriMeshData[f]);
 }
 
 

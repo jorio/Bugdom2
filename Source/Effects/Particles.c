@@ -19,7 +19,7 @@
 static void DeleteParticleGroup(long groupNum);
 static void MoveParticleGroups(ObjNode *theNode);
 
-static void DrawParticleGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawParticleGroup(ObjNode *theNode);
 static void MoveBlobDroplet(ObjNode *theNode);
 
 
@@ -55,10 +55,9 @@ short			gNumActiveParticleGroups = 0;
 
 /************************* INIT EFFECTS ***************************/
 
-void InitEffects(OGLSetupOutputType *setupInfo)
+void InitEffects(void)
 {
-
-	InitParticleSystem(setupInfo);
+	InitParticleSystem();
 	InitConfettiManager();
 	InitShardSystem();
 	InitRainEffect();
@@ -76,7 +75,7 @@ void InitEffects(OGLSetupOutputType *setupInfo)
 
 /************************ INIT PARTICLE SYSTEM **************************/
 
-void InitParticleSystem(OGLSetupOutputType *setupInfo)
+void InitParticleSystem(void)
 {
 short	i;
 FSSpec	spec;
@@ -95,7 +94,7 @@ ObjNode	*obj;
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
@@ -573,7 +572,7 @@ OGLVector3D	*delta;
 
 /**************** DRAW PARTICLE GROUPS *********************/
 
-static void DrawParticleGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawParticleGroup(ObjNode *theNode)
 {
 float				scale,baseScale;
 long				g,p,n,i;
@@ -597,7 +596,7 @@ OGLBoundingBox	bbox;
 	glEnable(GL_BLEND);
 	SetColor4f(1,1,1,1);													// full white & alpha to start with
 
-	camCoords = &gGameViewInfoPtr->cameraPlacement.cameraLocation;
+	camCoords = &gGameView->cameraPlacement.cameraLocation;
 
 	for (g = 0; g < MAX_PARTICLE_GROUPS; g++)
 	{
@@ -728,7 +727,7 @@ OGLBoundingBox	bbox;
 					/* DRAW IT */
 
 				glBlendFunc(src, dst);											// set blending mode
-				MO_DrawObject(gParticleGroups[g]->geometryObj, setupInfo);		// draw geometry
+				MO_DrawObject(gParticleGroups[g]->geometryObj);		// draw geometry
 			}
 		}
 	}

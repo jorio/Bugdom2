@@ -96,7 +96,7 @@ int			i,n;
 	viewDef.lights.fillColor[0].g 	= 1.0;
 	viewDef.lights.fillColor[0].b 	= .9;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -106,10 +106,10 @@ int			i,n;
 			/* LOAD SPRITES */
 
 //	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+//	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 //	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":sprite//s:spheremap.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+//	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 				/* LOAD AUDIO */
 
@@ -120,18 +120,18 @@ int			i,n;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level10_Park.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 
 				/* SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_HOUSEFLY, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_HOUSEFLY);
 
 
 
@@ -148,7 +148,7 @@ int			i,n;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -247,7 +247,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -280,7 +280,7 @@ OGLVector2D		v;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gCan->Coord, 0, .2 * fps, 0);
-		OGLPoint3D_Transform(&gGameViewInfoPtr->cameraPlacement.cameraLocation, &m, &p);
+		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
 
 		v.x = gCan->Coord.x - p.x;										// also move toward can
 		v.y = gCan->Coord.z - p.z;
@@ -289,12 +289,12 @@ OGLVector2D		v;
 		p.x += v.x * (fps * 25.0f);
 		p.z += v.y * (fps * 25.0f);
 
-		OGL_UpdateCameraFromTo(gGameViewInfoPtr, &p, nil);
+		OGL_UpdateCameraFromTo(&p, nil);
 
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -335,7 +335,7 @@ OGLMatrix4x4	m;
 
 static void MoveGarbageTitle(ObjNode *theNode)
 {
-	theNode->Rot.y = PI+CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->Coord.x, theNode->Coord.z, gGameViewInfoPtr->cameraPlacement.cameraLocation.x, gGameViewInfoPtr->cameraPlacement.cameraLocation.z);
+	theNode->Rot.y = PI+CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->Coord.x, theNode->Coord.z, gGameView->cameraPlacement.cameraLocation.x, gGameView->cameraPlacement.cameraLocation.z);
 
 	UpdateObjectTransforms(theNode);
 

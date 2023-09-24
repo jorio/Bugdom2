@@ -18,7 +18,7 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(OGLSetupOutputType *info);
+static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 
 
@@ -103,7 +103,7 @@ ObjNode	*newObj;
 	viewDef.lights.fillColor[0].g 	= .7;
 	viewDef.lights.fillColor[0].b 	= .8;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -113,7 +113,7 @@ ObjNode	*newObj;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 
 			/*******************/
@@ -149,7 +149,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -175,13 +175,13 @@ float	timer;
 				/* MOVE */
 
 		MoveObjects();
-		OGL_MoveCameraFrom(gGameViewInfoPtr, 0, 0, -160.0f * fps);
+		OGL_MoveCameraFrom(0, 0, -160.0f * fps);
 
 
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLevelIntroCallback);
+		OGL_DrawScene(DrawLevelIntroCallback);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -192,9 +192,9 @@ float	timer;
 
 /***************** DRAW LEVELINTRO CALLBACK *******************/
 
-static void DrawLevelIntroCallback(OGLSetupOutputType *info)
+static void DrawLevelIntroCallback(void)
 {
-	DrawObjects(info);
+	DrawObjects();
 }
 
 

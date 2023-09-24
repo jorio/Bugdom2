@@ -193,5 +193,5 @@ short NewSuperTileDeformation(DeformationType *data);
 void DeleteTerrainDeformation(short	i);
 void UpdateDeformationCoords(short defNum, float x, float z);
 
-void DoItemShadowCasting(OGLSetupOutputType *setupInfo);
+void DoItemShadowCasting(void);
 Boolean SeeIfCrossedLineMarker(ObjNode *theNode, int *whichLine);

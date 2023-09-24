@@ -18,7 +18,7 @@
 
 static void DeleteConfettiGroup(long groupNum);
 static void MoveConfettiGroups(ObjNode *theNode);
-static void DrawConfettiGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawConfettiGroup(ObjNode *theNode);
 
 /****************************/
 /*    CONSTANTS             */
@@ -403,7 +403,7 @@ OGLVector3D	*delta;
 
 /**************** DRAW CONFETTI GROUPS *********************/
 
-static void DrawConfettiGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawConfettiGroup(ObjNode *theNode)
 {
 float				scale,baseScale;
 long				g,p,n,i;
@@ -533,7 +533,7 @@ OGLBoundingBox	bbox;
 drawme:
 					/* DRAW IT */
 
-				MO_DrawObject(gConfettiGroups[g]->geometryObj, setupInfo);						// draw geometry
+				MO_DrawObject(gConfettiGroups[g]->geometryObj);						// draw geometry
 			}
 		}
 	}

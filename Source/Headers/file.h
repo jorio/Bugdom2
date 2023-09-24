@@ -90,12 +90,12 @@ typedef struct
 
 //=================================================
 
-SkeletonDefType *LoadSkeletonFile(short skeletonType, OGLSetupOutputType *setupInfo);
+SkeletonDefType *LoadSkeletonFile(short skeletonType);
 extern	void	OpenGameFile(Str255 filename,short *fRefNumPtr, Str255 errString);
 extern	OSErr LoadPrefs(PrefsType *prefBlock);
 void SavePrefs(void);
 
-void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
+void LoadPlayfield(FSSpec *specPtr);
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
 void SetDefaultDirectory(void);
 
@@ -103,12 +103,12 @@ Boolean SaveGame(void);
 Boolean LoadSavedGame(void);
 
 
-void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec, OGLSetupOutputType *setupInfo);
+void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec);
 
-void LoadLevelArt_Explore(OGLSetupOutputType *setupInfo);
-void LoadLevelArt_Tunnel(OGLSetupOutputType *setupInfo);
+void LoadLevelArt_Explore(void);
+void LoadLevelArt_Tunnel(void);
 
-void LoadFoliage(OGLSetupOutputType *setupInfo);
+void LoadFoliage(void);
 
 
 

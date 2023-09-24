@@ -786,7 +786,7 @@ int		i;
 			/* LOAD THE SPRITES FOR THE DIALOGS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
 }
 
 
@@ -891,7 +891,7 @@ int		language = gGamePrefs.language;
 
 /************************ DRAW DIALOG MESSAGE ********************/
 
-void DrawDialogMessage(const OGLSetupOutputType *setupInfo)
+void DrawDialogMessage(void)
 {
 int		i;
 float	x,y,leftX;
@@ -973,14 +973,14 @@ float	x,y,leftX;
 
 	x = (640-DIALOG_FRAME_WIDTH)/2 + 5.0f;
 	y = 410.0f;
-	DrawInfobarSprite2(x, y, DIALOG_FRAME_WIDTH, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_Frame, setupInfo);
+	DrawInfobarSprite2(x, y, DIALOG_FRAME_WIDTH, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_Frame);
 
 
 			/* DRAW ICON */
 
 	if (gCurrentDialogIconGroup != -1)						// see if has icon
 	{
-		DrawInfobarSprite2(x+6, y+6, DIALOG_ICON_WIDTH, gCurrentDialogIconGroup, gCurrentDialogIconFrame, setupInfo);
+		DrawInfobarSprite2(x+6, y+6, DIALOG_ICON_WIDTH, gCurrentDialogIconGroup, gCurrentDialogIconFrame);
 	}
 
 
@@ -1027,7 +1027,7 @@ float	x,y,leftX;
 			char	c = gCurrentDialogString[i];
 			int	texNum = CharToSprite(c);
 			if (texNum != -1)
-				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum, setupInfo);
+				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
 
 			x += GetCharSpacing(c, LETTER_SPACING);
 		}

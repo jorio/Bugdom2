@@ -18,7 +18,7 @@
 
 static void SetupMainMenuScreen(void);
 static void FreeMainMenuScreen(void);
-static void DrawMainMenuCallback(OGLSetupOutputType *info);
+static void DrawMainMenuCallback(void);
 static void ProcessMainMenu(void);
 static void MoveMenuFlower(ObjNode *theNode);
 static void MoveMenuCharacter(ObjNode *theNode);
@@ -29,9 +29,9 @@ static void MoveMenuLogo(ObjNode *theNode);
 static void DoCredits(void);
 static void MoveCredits(ObjNode *theNode);
 static void DoHighScores(void);
-static void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawDarkenPane(ObjNode *theNode);
 static void MoveDarkenPane(ObjNode *theNode);
-static void DrawHighScores(OGLSetupOutputType *info);
+static void DrawHighScores(void);
 
 
 /****************************/
@@ -168,7 +168,7 @@ int		i;
 	viewDef.lights.fillColor[1].g 	= .5;
 	viewDef.lights.fillColor[1].b 	= .0;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 	OGL_CheckError();
 
 
@@ -181,41 +181,41 @@ int		i;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:mainmenu.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_MAINMENU, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_MAINMENU);
 
-	LoadFoliage(gGameViewInfoPtr);
+	LoadFoliage();
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:MainMenu.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_MAINMENU, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_MAINMENU);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SKIP_EXPLORE, 0,				// set sphere map on geometry texture
 									1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
 
 
-	LoadASkeleton(SKELETON_TYPE_MOUSE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_MOUSE);
 
-	LoadASkeleton(SKELETON_TYPE_GNOME, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_GNOME);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_GNOME, 0,
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
 
@@ -242,7 +242,7 @@ int		i;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .90f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .90f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
@@ -259,7 +259,7 @@ int		i;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 480;
-	gMenuFlower = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	gMenuFlower = MakeSpriteObject(&gNewObjectDefinition);
 
 
 
@@ -285,7 +285,7 @@ int		i;
 		gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 	    = ICON_SCALE;
-		newObj = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+		newObj = MakeSpriteObject(&gNewObjectDefinition);
 
 		newObj->Kind = i;
 	}
@@ -304,7 +304,7 @@ int		i;
 	gNewObjectDefinition.moveCall 	= MoveMenuLogo;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 150;
-	gMenuLogo = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	gMenuLogo = MakeSpriteObject(&gNewObjectDefinition);
 
 	gMenuLogo->ColorFilter.a = 0;						// hide for now
 
@@ -343,7 +343,7 @@ static void FreeMainMenuScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_MAINMENU);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -
@@ -381,7 +381,7 @@ float	charTimer = 2.0f;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 
 				/* DO USER INPUT */
 
@@ -468,15 +468,15 @@ static void DoMenuControls(void)
 
 /***************** DRAW MAINMENU CALLBACK *******************/
 
-static void DrawMainMenuCallback(OGLSetupOutputType *info)
+static void DrawMainMenuCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 			/* DRAW HIGH SCORES */
 
 	if (gDrawHighScores)
-		DrawHighScores(info);
+		DrawHighScores();
 
 }
 
@@ -674,7 +674,7 @@ ObjNode	*newObj, *pane;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 500;
-	newObj = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	newObj = MakeSpriteObject(&gNewObjectDefinition);
 
 	newObj->ColorFilter.a = 0;						// dim out
 	newObj->Mode = 0;								// fade-in mode
@@ -691,7 +691,7 @@ ObjNode	*newObj, *pane;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 	}
 
 	newObj->Mode = 1;								// fade out mode
@@ -765,7 +765,7 @@ ObjNode	*pane;
 
 			/* DRAW STUFF */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 	}
 
 
@@ -778,7 +778,7 @@ ObjNode	*pane;
 
 /****************** DRAW HIGH SCORES ***********************/
 
-static void DrawHighScores(OGLSetupOutputType *info)
+static void DrawHighScores(void)
 {
 float	y;
 int		i,j,n;
@@ -807,7 +807,7 @@ Str32	s;
 	{
 				/* DRAW NAME */
 
-		DrawScoreText(gHighScores[i].name, 150,y,info);
+		DrawScoreText(gHighScores[i].name, 150, y);
 
 				/* DRAW SCORE */
 
@@ -822,7 +822,7 @@ Str32	s;
 
 			s[0] = SCORE_DIGITS;
 		}
-		DrawScoreText(s, 350,y,info);
+		DrawScoreText(s, 350, y);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
 	}
@@ -842,7 +842,7 @@ Str32	s;
 
 /***************** DRAW SCORE TEXT ***********************/
 
-void DrawScoreText(unsigned char *s, float x, float y, OGLSetupOutputType *info)
+void DrawScoreText(unsigned char *s, float x, float y)
 {
 int	n,i,texNum;
 
@@ -852,13 +852,10 @@ int	n,i,texNum;
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
 		if (texNum != -1)
-			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, texNum, info);
+			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, texNum);
 
 		x += GetCharSpacing(s[i], SCORE_TEXT_SPACING);
 	}
-
-
-
 }
 
 
@@ -917,7 +914,7 @@ static void MoveDarkenPane(ObjNode *theNode)
 
 /********************** DRAW DARKEN PANE *****************************/
 
-static void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawDarkenPane(ObjNode *theNode)
 {
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);

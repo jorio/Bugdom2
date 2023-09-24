@@ -16,14 +16,14 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void LoadLevelArt_Playroom(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Garden(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Sidewalk(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Fido(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Closet(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Balsa(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Park(OGLSetupOutputType *setupInfo);
-static void LoadLevelArt_Garbage(OGLSetupOutputType *setupInfo);
+static void LoadLevelArt_Playroom(void);
+static void LoadLevelArt_Garden(void);
+static void LoadLevelArt_Sidewalk(void);
+static void LoadLevelArt_Fido(void);
+static void LoadLevelArt_Closet(void);
+static void LoadLevelArt_Balsa(void);
+static void LoadLevelArt_Park(void);
+static void LoadLevelArt_Garbage(void);
 
 
 /****************************/
@@ -39,7 +39,7 @@ static void LoadLevelArt_Garbage(OGLSetupOutputType *setupInfo);
 
 /************************** LOAD LEVEL ART: EXPLORE ***************************/
 
-void LoadLevelArt_Explore(OGLSetupOutputType *setupInfo)
+void LoadLevelArt_Explore(void)
 {
 FSSpec	spec;
 
@@ -121,7 +121,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 			/* LOAD GLOBAL BG3D GEOMETRY */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, setupInfo);
+	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
 	{
@@ -139,7 +139,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	if (levelModelFiles[gLevelNum][0] > 0)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelModelFiles[gLevelNum], &spec);
-		ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, setupInfo);
+		ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 	}
 
 
@@ -148,22 +148,22 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	if (levelSpriteFiles[gLevelNum][0] > 0)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSpriteFiles[gLevelNum], &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
+		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
 	}
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 			/* LOAD PLAYER SKELETON */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE);
 
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
 	{
@@ -179,7 +179,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 			/* LOAD SNAIL */
 
-	LoadASkeleton(SKELETON_TYPE_SNAIL, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_SNAIL);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SNAIL, 0,
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -188,32 +188,32 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 			/* LOAD CHIPMUNK */
 
-	LoadASkeleton(SKELETON_TYPE_CHIPMUNK, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_CHIPMUNK);
 
 
 			/* LOAD BUDDYBUG */
 
-	LoadASkeleton(SKELETON_TYPE_BUDDYBUG, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_BUDDYBUG);
 
 				/* HOUSEFLY */
 
-	LoadASkeleton(SKELETON_TYPE_HOUSEFLY, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_HOUSEFLY);
 
 
 				/* FLEA */
 
-	LoadASkeleton(SKELETON_TYPE_FLEA, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FLEA);
 
 				/* BUMBLE BEE */
 
-	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE);
 
-	LoadASkeleton(SKELETON_TYPE_HOBOBAG, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_HOBOBAG);
 
 
 			/* LOAD CHECKPOINT */
 
-	LoadASkeleton(SKELETON_TYPE_CHECKPOINT, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_CHECKPOINT);
 	if (gG4)
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_CHECKPOINT, 0,
@@ -224,8 +224,8 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 			/* LOAD MOUSETRAP */
 
-	LoadASkeleton(SKELETON_TYPE_MOUSETRAP, setupInfo);
-	LoadASkeleton(SKELETON_TYPE_MOUSE, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_MOUSETRAP);
+	LoadASkeleton(SKELETON_TYPE_MOUSE);
 
 
 
@@ -237,7 +237,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	if (terrainFiles[gLevelNum][0] > 0)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, terrainFiles[gLevelNum], &spec);
-		LoadPlayfield(&spec, setupInfo);
+		LoadPlayfield(&spec);
 	}
 
 
@@ -261,35 +261,35 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_GNOMEGARDEN:
-				LoadLevelArt_Garden(setupInfo);
+				LoadLevelArt_Garden();
 				break;
 
 		case	LEVEL_NUM_SIDEWALK:
-				LoadLevelArt_Sidewalk(setupInfo);
+				LoadLevelArt_Sidewalk();
 				break;
 
 		case	LEVEL_NUM_FIDO:
-				LoadLevelArt_Fido(setupInfo);
+				LoadLevelArt_Fido();
 				break;
 
 		case	LEVEL_NUM_PLAYROOM:
-				LoadLevelArt_Playroom(setupInfo);
+				LoadLevelArt_Playroom();
 				break;
 
 		case	LEVEL_NUM_CLOSET:
-				LoadLevelArt_Closet(setupInfo);
+				LoadLevelArt_Closet();
 				break;
 
 		case	LEVEL_NUM_GARBAGE:
-				LoadLevelArt_Garbage(setupInfo);
+				LoadLevelArt_Garbage();
 				break;
 
 		case	LEVEL_NUM_BALSA:
-				LoadLevelArt_Balsa(setupInfo);
+				LoadLevelArt_Balsa();
 				break;
 
 		case	LEVEL_NUM_PARK:
-				LoadLevelArt_Park(setupInfo);
+				LoadLevelArt_Park();
 				break;
 
 		default:
@@ -300,12 +300,12 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 /********************** LOAD FOLIAGE **************************/
 
-void LoadFoliage(OGLSetupOutputType *setupInfo)
+void LoadFoliage(void)
 {
 FSSpec	spec;
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Foliage.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_FOLIAGE, setupInfo);
+	ImportBG3D(&spec, MODEL_GROUP_FOLIAGE);
 
 	if (gG4)
 	{
@@ -325,10 +325,10 @@ FSSpec	spec;
 
 /********************* LOAD LEVEL ART: GARDEN **********************/
 
-static void LoadLevelArt_Garden(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Garden(void)
 {
 
-	LoadASkeleton(SKELETON_TYPE_GNOME, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_GNOME);
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_GNOME, 0,
@@ -339,7 +339,7 @@ static void LoadLevelArt_Garden(OGLSetupOutputType *setupInfo)
 
 									/* EVIL PLANT */
 
-	LoadASkeleton(SKELETON_TYPE_EVILPLANT, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_EVILPLANT);
 
 	if (!gSlowCPU)
 	{
@@ -353,7 +353,7 @@ static void LoadLevelArt_Garden(OGLSetupOutputType *setupInfo)
 
 							/* LOAD THE FOLIAGE MODELS */
 
-	LoadFoliage(setupInfo);
+	LoadFoliage();
 
 
 
@@ -385,17 +385,17 @@ static void LoadLevelArt_Garden(OGLSetupOutputType *setupInfo)
 
 /********************* LOAD LEVEL ART: SIDEWALK **********************/
 
-static void LoadLevelArt_Sidewalk(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Sidewalk(void)
 {
 int	i;
 
-	LoadASkeleton(SKELETON_TYPE_GNOME, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_GNOME);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_GNOME, 0,
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
 
 								/* LOAD SNAKE HEAD */
 
-	LoadASkeleton(SKELETON_TYPE_SNAKEHEAD, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_SNAKEHEAD);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SNAKEHEAD, 0,
 									0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
@@ -404,7 +404,7 @@ int	i;
 
 							/* LOAD THE FOLIAGE MODELS */
 
-	LoadFoliage(setupInfo);
+	LoadFoliage();
 
 
 							/* MAKE LOCAL STUFF SHINEY */
@@ -450,11 +450,11 @@ int	i;
 
 /********************* LOAD LEVEL ART: FIDO **********************/
 
-static void LoadLevelArt_Fido(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Fido(void)
 {
 
 
-	LoadASkeleton(SKELETON_TYPE_TICK, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_TICK);
 	if (!gSlowCPU)
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TICK, 0,
@@ -467,7 +467,7 @@ static void LoadLevelArt_Fido(OGLSetupOutputType *setupInfo)
 
 /********************* LOAD LEVEL ART: GARBAGE **********************/
 
-static void LoadLevelArt_Garbage(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Garbage(void)
 {
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, GARBAGE_ObjType_Can,
@@ -500,35 +500,35 @@ static void LoadLevelArt_Garbage(OGLSetupOutputType *setupInfo)
 
 				/* ROACH */
 
-	LoadASkeleton(SKELETON_TYPE_ROACH, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_ROACH);
 
 
 				/* FLEA */
 
-	LoadASkeleton(SKELETON_TYPE_FLEA, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FLEA);
 
 
 				/* DRAGONFLY */
 
-	LoadASkeleton(SKELETON_TYPE_DRAGONFLY, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_DRAGONFLY);
 
 }
 
 
 /********************* LOAD LEVEL ART: PARK **********************/
 
-static void LoadLevelArt_Park(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Park(void)
 {
 int		i;
 
 							/* LOAD THE FOLIAGE MODELS */
 
-	LoadFoliage(setupInfo);
+	LoadFoliage();
 
 
 				/* ANT */
 
-	LoadASkeleton(SKELETON_TYPE_ANT, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_ANT);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ANT, 0,				// set sphere map on geometry texture
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
 
@@ -536,14 +536,14 @@ int		i;
 				/* FISH */
 
 
-	LoadASkeleton(SKELETON_TYPE_FISH, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FISH);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_FISH, 0,				// set sphere map on geometry texture
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
 
 				/* FROG */
 
-	LoadASkeleton(SKELETON_TYPE_FROG, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FROG);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_FROG, 0,				// set sphere map on geometry texture
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
@@ -573,10 +573,10 @@ int		i;
 
 /********************* LOAD LEVEL ART: PLAYROOM **********************/
 
-static void LoadLevelArt_Playroom(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Playroom(void)
 {
 
-	LoadASkeleton(SKELETON_TYPE_OTTO, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_OTTO);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
 								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -584,7 +584,7 @@ static void LoadLevelArt_Playroom(OGLSetupOutputType *setupInfo)
 
 				/* SOLDIER */
 
-	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER);
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TOYSOLDIER, 0,
@@ -648,21 +648,21 @@ static void LoadLevelArt_Playroom(OGLSetupOutputType *setupInfo)
 
 /********************* LOAD LEVEL ART: CLOSET **********************/
 
-static void LoadLevelArt_Closet(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Closet(void)
 {
 				/* ROACH */
 
-	LoadASkeleton(SKELETON_TYPE_ROACH, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_ROACH);
 
 
 				/* MOTH */
 
-	LoadASkeleton(SKELETON_TYPE_MOTH, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_MOTH);
 
 
 				/* COMPUTER BUG */
 
-	LoadASkeleton(SKELETON_TYPE_COMPUTERBUG, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_COMPUTERBUG);
 
 	if (gG4)
 	{
@@ -688,7 +688,7 @@ static void LoadLevelArt_Closet(OGLSetupOutputType *setupInfo)
 
 				/* SOLDIER */
 
-	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_TOYSOLDIER);
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TOYSOLDIER, 0,
@@ -723,21 +723,21 @@ static void LoadLevelArt_Closet(OGLSetupOutputType *setupInfo)
 
 /********************* LOAD LEVEL ART: BALSA **********************/
 
-static void LoadLevelArt_Balsa(OGLSetupOutputType *setupInfo)
+static void LoadLevelArt_Balsa(void)
 {
 				/* DRAGONFLY */
 
-	LoadASkeleton(SKELETON_TYPE_DRAGONFLY, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_DRAGONFLY);
 
 				/* FROG */
 
-	LoadASkeleton(SKELETON_TYPE_FROG, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FROG);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_FROG, 0,				// set sphere map on geometry texture
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
 				/* LOAD THE FOLIAGE MODELS */
 
-	LoadFoliage(setupInfo);
+	LoadFoliage();
 
 
 }
@@ -748,7 +748,7 @@ static void LoadLevelArt_Balsa(OGLSetupOutputType *setupInfo)
 
 /********************* LOAD LEVEL ART: TUNNEL **********************/
 
-void LoadLevelArt_Tunnel(OGLSetupOutputType *setupInfo)
+void LoadLevelArt_Tunnel(void)
 {
 FSSpec	spec, bg3dSpec;
 
@@ -763,27 +763,27 @@ FSSpec	spec, bg3dSpec;
 	if (gLevelNum == LEVEL_NUM_PLUMBING)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level4_Plumbing.sprites", &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
+		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
 	}
 	else
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level7_Gutter.sprites", &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
+		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
 	}
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 			/* LOAD PLAYER SKELETON */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_TUNNEL, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_SKIP_TUNNEL);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SKIP_TUNNEL, 0,				// set sphere map on geometry texture
 									1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
@@ -806,7 +806,7 @@ FSSpec	spec, bg3dSpec;
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level4_Plumbing.bg3d", &bg3dSpec);
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Plumbing.tun", &spec);
 
-		LoadTunnel(&spec, &bg3dSpec, setupInfo);
+		LoadTunnel(&spec, &bg3dSpec);
 
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, PLUMBING_ObjType_Nail,
 										-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
@@ -818,7 +818,7 @@ FSSpec	spec, bg3dSpec;
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level7_Gutter.bg3d", &bg3dSpec);
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Gutter.tun", &spec);
-		LoadTunnel(&spec, &bg3dSpec, setupInfo);
+		LoadTunnel(&spec, &bg3dSpec);
 
 //		SetSphereMapInfoOnMaterialObject(gTunnelTextureObj,	MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
 

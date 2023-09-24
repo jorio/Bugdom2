@@ -14,14 +14,14 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawWater(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawWater(ObjNode *theNode);
 static void MakeWaterGeometry(void);
 
-static void DrawRainEffect(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawRainEffect(ObjNode *theNode);
 static void MoveRainEffect(ObjNode *theNode);
 
 static void InitRipples(void);
-static void DrawRipples(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawRipples(ObjNode *theNode);
 static void MoveRippleEvent(ObjNode *theNode);
 
 
@@ -412,7 +412,7 @@ double					x,y,z;
 
 /********************* DRAW WATER ***********************/
 
-static void DrawWater(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawWater(ObjNode *theNode)
 {
 long	f,i;
 float	fps = gFramesPerSecondFrac;
@@ -441,7 +441,7 @@ float	ud1, uv1, ud2, uv2;
 			else
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			MO_DrawGeometry_VertexArray(&gWaterTriMeshData[f], setupInfo);
+			MO_DrawGeometry_VertexArray(&gWaterTriMeshData[f]);
 			gNumWaterDrawn++;
 		}
 
@@ -811,11 +811,11 @@ Boolean	makeNewDrops = false;
 
 				/* CALC CENTER POINT WHERE CAN ADD DROPS */
 
-			centerX = gGameViewInfoPtr->cameraPlacement.pointOfInterest.x - gGameViewInfoPtr->cameraPlacement.cameraLocation.x;
-			centerZ = gGameViewInfoPtr->cameraPlacement.pointOfInterest.z - gGameViewInfoPtr->cameraPlacement.cameraLocation.z;
+			centerX = gGameView->cameraPlacement.pointOfInterest.x - gGameView->cameraPlacement.cameraLocation.x;
+			centerZ = gGameView->cameraPlacement.pointOfInterest.z - gGameView->cameraPlacement.cameraLocation.z;
 			FastNormalizeVector2D(centerX, centerZ, &v, false);
-			centerX = gGameViewInfoPtr->cameraPlacement.cameraLocation.x + v.x * 1000.0f;
-			centerZ = gGameViewInfoPtr->cameraPlacement.cameraLocation.z + v.y * 1000.0f;
+			centerX = gGameView->cameraPlacement.cameraLocation.x + v.x * 1000.0f;
+			centerZ = gGameView->cameraPlacement.cameraLocation.z + v.y * 1000.0f;
 
 
 			for (j = 0; j < 4; j++)									// n drops per pass
@@ -880,7 +880,7 @@ Boolean	makeNewDrops = false;
 
 /************************* DRAW RAIN EFFECT ***************************/
 
-static void DrawRainEffect(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawRainEffect(ObjNode *theNode)
 {
 int			i;
 float		x,y,size;
@@ -911,7 +911,7 @@ OGLMatrix4x4	m;
 		OGLMatrix4x4_SetScale(&m, size, size, size);
 		glMultMatrixf((GLfloat *)&m);
 
-		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_WaterSpat], setupInfo);
+		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_WaterSpat]);
 
 		glPopMatrix();
 
@@ -936,7 +936,7 @@ OGLMatrix4x4	m;
 		x = gRainScreenDrops[i].coord.x;
 		y = gRainScreenDrops[i].coord.y;
 
-		DrawInfobarSprite2(x, y, size, SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_RainDrop, setupInfo);
+		DrawInfobarSprite2(x, y, size, SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_RainDrop);
 	}
 
 	gGlobalTransparency = 1.0f;
@@ -1052,7 +1052,7 @@ float	fps = gFramesPerSecondFrac;
 
 /******************** DRAW RIPPLES ***************************/
 
-static void DrawRipples(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawRipples(ObjNode *theNode)
 {
 int			i;
 float		s,x,y,z;
@@ -1061,7 +1061,7 @@ float		s,x,y,z;
 
 		/* ACTIVATE MATERIAL */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_WaterRipple].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_WaterRipple].materialObject);
 
 
 		/* DRAW EACH RIPPLE */

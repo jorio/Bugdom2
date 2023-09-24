@@ -99,7 +99,7 @@ ObjNode	*newObj;
 				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;						// draw after terrain for better performance since terrain blocks much of the pixels
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
-				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
+				gNewObjectDefinition.scale 	= gGameView->yon * .995f / 100.0f;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 				newObj->CustomDrawFunction = DrawCyclorama;
@@ -123,7 +123,7 @@ ObjNode	*newObj;
 				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;						// draw after terrain for better performance since terrain blocks much of the pixels
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
-				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
+				gNewObjectDefinition.scale 	= gGameView->yon * .995f / 100.0f;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 				newObj->CustomDrawFunction = DrawCyclorama;
@@ -141,7 +141,7 @@ regular:
 				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
-				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
+				gNewObjectDefinition.scale 	= gGameView->yon * .995f / 100.0f;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 				newObj->CustomDrawFunction = DrawCyclorama;
@@ -151,9 +151,9 @@ regular:
 
 /********************** DRAW CYCLORAMA *************************/
 
-void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+void DrawCyclorama(ObjNode *theNode)
 {
-OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
+OGLPoint3D cameraCoord = gGameView->cameraPlacement.cameraLocation;
 
 		/* UPDATE CYCLORAMA COORD INFO */
 
@@ -166,7 +166,7 @@ OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
 
 			/* DRAW THE OBJECT */
 
-	MO_DrawObject(theNode->BaseGroup, setupInfo);
+	MO_DrawObject(theNode->BaseGroup);
 }
 
 

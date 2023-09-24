@@ -16,11 +16,11 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo);
-static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
+static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType);
+static void ReadDataFromPlayfieldFile(FSSpec *specPtr);
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 
-static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum, OGLSetupOutputType *setupInfo);
+static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum);
 
 
 /****************************/
@@ -134,7 +134,7 @@ void SetDefaultDirectory(void)
 // OUTPUT:	Ptr to skeleton data
 //
 
-SkeletonDefType *LoadSkeletonFile(short skeletonType, OGLSetupOutputType *setupInfo)
+SkeletonDefType *LoadSkeletonFile(short skeletonType)
 {
 QDErr		iErr;
 short		fRefNum;
@@ -200,7 +200,7 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 
 			/* READ SKELETON RESOURCES */
 
-	ReadDataFromSkeletonFile(skeleton,&fsSpec,skeletonType,setupInfo);
+	ReadDataFromSkeletonFile(skeleton, &fsSpec, skeletonType);
 	PrimeBoneData(skeleton);
 
 			/* CLOSE REZ FILE */
@@ -216,7 +216,7 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 // Current rez file is set to the file.
 //
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo)
+static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType)
 {
 Handle				hand;
 int					i,k,j;
@@ -270,7 +270,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	{
 		iErr = ResolveAlias(fsSpec, alias, &target, &wasChanged);	// try to resolve alias
 		if (!iErr)
-			LoadBonesReferenceModel(&target,skeleton, skeletonType, setupInfo);
+			LoadBonesReferenceModel(&target,skeleton, skeletonType);
 		else
 			DoFatalAlert("ReadDataFromSkeletonFile: Cannot find Skeleton's BG3D file!");
 		ReleaseResource((Handle)alias);
@@ -657,14 +657,14 @@ PixMapHandle 				hPixMap;
 
 /******************* LOAD PLAYFIELD *******************/
 
-void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
+void LoadPlayfield(FSSpec *specPtr)
 {
 
 	gDisableHiccupTimer = true;
 
 			/* READ PLAYFIELD RESOURCES */
 
-	ReadDataFromPlayfieldFile(specPtr, setupInfo);
+	ReadDataFromPlayfieldFile(specPtr);
 
 
 				/* DO ADDITIONAL SETUP */
@@ -678,13 +678,13 @@ void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
 
 			/* CAST ITEM SHADOWS */
 
-	DoItemShadowCasting(setupInfo);
+	DoItemShadowCasting();
 }
 
 
 /********************** READ DATA FROM PLAYFIELD FILE ************************/
 
-static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
+static void ReadDataFromPlayfieldFile(FSSpec *specPtr)
 {
 Handle					hand;
 PlayfieldHeaderType		**header;
@@ -1149,7 +1149,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* INIT NEW MATERIAL DATA */
 
-		matData.setupInfo				= setupInfo;								// remember which draw context this material is assigned to
 		matData.flags 					= 	BG3D_MATERIALFLAG_CLAMP_U|
 											BG3D_MATERIALFLAG_CLAMP_V|
 											BG3D_MATERIALFLAG_TEXTURED;
@@ -1411,7 +1410,7 @@ bail:
 
 /************************* LOAD TUNNEL ***************************/
 
-void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec, OGLSetupOutputType *setupInfo)
+void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec)
 {
 OSErr		iErr;
 short		fRefNum;
@@ -1426,7 +1425,7 @@ short		fRefNum;
 
 			/* READ DATA FROM FILE */
 
-	ReadDataFromTunnelFile(inSpec, bg3dSpec, fRefNum, setupInfo);
+	ReadDataFromTunnelFile(inSpec, bg3dSpec, fRefNum);
 
 	FSClose(fRefNum);
 
@@ -1436,7 +1435,7 @@ short		fRefNum;
 
 /************** READ DATA FROM TUNNEL FILE *****************/
 
-static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum, OGLSetupOutputType *setupInfo)
+static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum)
 {
 TunnelFileHeaderType	header;
 OSErr					iErr;
@@ -1492,7 +1491,7 @@ MOVertexArrayData		data;
 
 	SetFPos(fRefNum, fsFromMark, aliasSize);
 
-	ImportBG3D(bg3dSpec, MODEL_GROUP_LEVELSPECIFIC, setupInfo);
+	ImportBG3D(bg3dSpec, MODEL_GROUP_LEVELSPECIFIC);
 
 
 
@@ -1519,7 +1518,7 @@ MOVertexArrayData		data;
 	buffer = AllocPtr(size);
 	FSRead(fRefNum, &size, buffer);
 
-	gTunnelTextureObj = MO_CreateTextureObjectFromBuffer(setupInfo, w, h, buffer);	// create material object from buffer
+	gTunnelTextureObj = MO_CreateTextureObjectFromBuffer(w, h, buffer);	// create material object from buffer
 
 
 		/* READ WATER TEXTURE */

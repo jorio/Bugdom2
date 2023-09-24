@@ -18,7 +18,7 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(OGLSetupOutputType *info);
+static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveIntroPlane(ObjNode *theNode);
 static void MoveBalsaSky(ObjNode *theNode);
@@ -113,7 +113,7 @@ ObjNode	*newObj, *prop, *band;
 	viewDef.lights.fillColor[0].g 	= .9;
 	viewDef.lights.fillColor[0].b 	= .8;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -124,10 +124,10 @@ ObjNode	*newObj, *prop, *band;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level9_Balsa.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 
 
@@ -151,7 +151,7 @@ ObjNode	*newObj, *prop, *band;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= MoveBalsaSky;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .85f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .85f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -231,7 +231,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -261,7 +261,7 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLevelIntroCallback);
+		OGL_DrawScene(DrawLevelIntroCallback);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -272,10 +272,10 @@ float	timer;
 
 /***************** DRAW LEVELINTRO CALLBACK *******************/
 
-static void DrawLevelIntroCallback(OGLSetupOutputType *info)
+static void DrawLevelIntroCallback(void)
 {
-	DrawObjects(info);
-	DrawShards(info);
+	DrawObjects();
+	DrawShards();
 }
 
 

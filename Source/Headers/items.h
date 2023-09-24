@@ -37,7 +37,7 @@ Boolean AddChlorineFloat(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddPoolRingFloat(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddDrainPipe(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddGlassBottle(TerrainItemEntryType *itemPtr, float  x, float z);
-void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+void DrawCyclorama(ObjNode *theNode);
 
 			/* ITEMS 2 */
 

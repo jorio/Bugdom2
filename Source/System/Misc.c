@@ -97,8 +97,8 @@ static Boolean	beenHere = false;
 		DisposeAllBG3DContainers();						// nuke all models
 		DisposeAllSpriteGroups();						// nuke all sprites
 
-		if (gGameViewInfoPtr)							// see if need to dispose this
-			OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+		if (gGameView)							// see if need to dispose this
+			OGL_DisposeWindowSetup(&gGameView);
 
 		ShutdownSound();								// cleanup sound stuff
 	}

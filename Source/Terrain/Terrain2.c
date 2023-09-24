@@ -598,7 +598,7 @@ static OGLPoint3D	p4 = {0,0,0};
 // by darkening the vertex colors of the terrain.
 //
 
-void DoItemShadowCasting(OGLSetupOutputType *setupInfo)
+void DoItemShadowCasting(void)
 {
 long				i;
 static OGLVector3D up = {0,1,0};
@@ -634,11 +634,11 @@ float				shadeFactor;
 
 			/* GET MAIN LIGHT VECTOR INFO */
 
-	lightVector.x = setupInfo->lightList.fillDirection[0].x;
-	lightVector.y = setupInfo->lightList.fillDirection[0].z;
+	lightVector.x = gGameView->lightList.fillDirection[0].x;
+	lightVector.y = gGameView->lightList.fillDirection[0].z;
 	OGLVector2D_Normalize(&lightVector, &lightVector);
 
-	dot = OGLVector3D_Dot(&up,&setupInfo->lightList.fillDirection[0]);
+	dot = OGLVector3D_Dot(&up, &gGameView->lightList.fillDirection[0]);
 	dot = 1.0f - dot;
 
 			/***********************/

@@ -18,9 +18,9 @@
 
 static void SetupScoreScreen(void);
 static void FreeScoreScreen(void);
-static void DrawHighScoresCallback(OGLSetupOutputType *info);
-static void DrawScoreVerbage(OGLSetupOutputType *info);
-static void DrawHighScoresAndCursor(OGLSetupOutputType *info);
+static void DrawHighScoresCallback(void);
+static void DrawScoreVerbage(void);
+static void DrawHighScoresAndCursor(void);
 static void SetHighScoresSpriteState(void);
 static void StartEnterName(void);
 static Boolean IsThisScoreInList(uint32_t score);
@@ -91,7 +91,7 @@ void NewScore(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawHighScoresCallback);
+		OGL_DrawScene(DrawHighScoresCallback);
 
 				/*****************************/
 				/* SEE IF USER ENTERING NAME */
@@ -216,7 +216,7 @@ ObjNode				*newObj;
 	viewDef.camera.from.z		= 800;
 	viewDef.camera.from.y		= -350;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -229,20 +229,20 @@ ObjNode				*newObj;
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:HighScores.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES);
 
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:highscores.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES);
 
 
 			/* CYC */
@@ -256,7 +256,7 @@ ObjNode				*newObj;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= MoveScoreCyc;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .99f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .99f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -278,17 +278,17 @@ static void FreeScoreScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
 
 /***************** DRAW HIGHSCORES CALLBACK *******************/
 
-static void DrawHighScoresCallback(OGLSetupOutputType *info)
+static void DrawHighScoresCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 
 			/* DRAW SPRITES */
@@ -298,9 +298,9 @@ static void DrawHighScoresCallback(OGLSetupOutputType *info)
 	SetHighScoresSpriteState();
 
 	if (gDrawScoreVerbage)
-		DrawScoreVerbage(info);
+		DrawScoreVerbage();
 	else
-		DrawHighScoresAndCursor(info);
+		DrawHighScoresAndCursor();
 
 
 	OGL_PopState();
@@ -331,7 +331,7 @@ static void SetHighScoresSpriteState(void)
 
 /********************* DRAW SCORE VERBAGE ****************************/
 
-static void DrawScoreVerbage(OGLSetupOutputType *info)
+static void DrawScoreVerbage(void)
 {
 Str32	s;
 int		texNum,n,i;
@@ -359,7 +359,7 @@ float	x;
 			/****************************/
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
+	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText);
 
 
 			/**************/
@@ -381,7 +381,7 @@ float	x;
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
 
-		DrawInfobarSprite2(x, 240, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_DIALOG, texNum, info);
+		DrawInfobarSprite2(x, 240, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_DIALOG, texNum);
 		x += MYSCORE_DIGIT_SPACING;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -396,7 +396,7 @@ float	x;
 
 /****************** DRAW HIGH SCORES AND CURSOR ***********************/
 
-static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
+static void DrawHighScoresAndCursor(void)
 {
 float	y,cursorY,cursorX;
 int		i,j,n;
@@ -417,7 +417,7 @@ Str32	s;
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
+	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText);
 
 
 	gGlobalTransparency = gFinalScoreAlpha;
@@ -448,7 +448,7 @@ Str32	s;
 
 				/* DRAW NAME */
 
-		DrawScoreText(gHighScores[i].name, 150,y,info);
+		DrawScoreText(gHighScores[i].name, 150, y);
 
 				/* DRAW SCORE */
 
@@ -463,7 +463,7 @@ Str32	s;
 
 			s[0] = SCORE_DIGITS;
 		}
-		DrawScoreText(s, 350, y, info);
+		DrawScoreText(s, 350, y);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
 	}
@@ -475,7 +475,7 @@ Str32	s;
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
 		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, DIALOG_SObjType_Cursor, info);
+		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, DIALOG_SObjType_Cursor);
 	}
 
 

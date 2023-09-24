@@ -18,7 +18,7 @@
 
 static void SetupTitleScreen(void);
 static void FreeTitleScreen(void);
-static void DrawTitleCallback(OGLSetupOutputType *info);
+static void DrawTitleCallback(void);
 static void DoBugdomEntrance(void);
 static void MoveTitleFlies(ObjNode *fly);
 static void DoSwatter(void);
@@ -148,11 +148,11 @@ ObjNode			*fly;
 	viewDef.lights.ambientColor.b = .15;
 	viewDef.lights.fillDirection[0] = fillDirection1;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 	gAutoFadeStatusBits = STATUS_BIT_AUTOFADE;
-	gAutoFadeStartDist	= gGameViewInfoPtr->yon * .80;
-	gAutoFadeEndDist	= gGameViewInfoPtr->yon * .95f;
+	gAutoFadeStartDist	= gGameView->yon * .80;
+	gAutoFadeEndDist	= gGameView->yon * .95f;
 	gAutoFadeRange_Frac	= 1.0f / (gAutoFadeEndDist - gAutoFadeStartDist);
 
 
@@ -170,46 +170,46 @@ ObjNode			*fly;
 			/* LOAD TERRAIN */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Terrain:Title.ter", &spec);
-	LoadPlayfield(&spec, gGameViewInfoPtr);
+	LoadPlayfield(&spec);
 
 
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:title.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_TITLE, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_TITLE);
 
-	LoadFoliage(gGameViewInfoPtr);
+	LoadFoliage();
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Title.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_TITLE, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_TITLE);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_TITLE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_SKIP_TITLE);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SKIP_TITLE, 0,				// set sphere map on geometry texture
 									1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
 
-	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_HOBOBAG, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_BUMBLEBEE);
+	LoadASkeleton(SKELETON_TYPE_HOBOBAG);
 
 
 
@@ -231,7 +231,7 @@ ObjNode			*fly;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 1;
-	gBack = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	gBack = MakeSpriteObject(&gNewObjectDefinition);
 
 	gBack->Scale.x = 640;
 	gBack->Scale.y = 640;
@@ -253,7 +253,7 @@ ObjNode			*fly;
 		gNewObjectDefinition.moveCall 	= MoveTitleFlies;
 		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 	    = 1;
-		fly = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+		fly = MakeSpriteObject(&gNewObjectDefinition);
 
 		fly->Scale.x = FLY_SCALE;
 		fly->Scale.y = fly->Scale.x;
@@ -355,7 +355,7 @@ static void FreeTitleScreen(void)
 	DisposeSoundBank(SOUND_BANK_TITLE);
 	DisposeTerrain();
 
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -
@@ -382,7 +382,7 @@ float	timer;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 1;
-	gText = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	gText = MakeSpriteObject(&gNewObjectDefinition);
 
 	gText->Scale.x = BUGDOM_TEXT_SCALE;
 	gText->Scale.y = BUGDOM_TEXT_SCALE;
@@ -424,7 +424,7 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawTitleCallback);
+		OGL_DrawScene(DrawTitleCallback);
 
 		timer -= fps;
 	}
@@ -453,7 +453,7 @@ Byte	swatMode = 0;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 1;
-	swatter = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	swatter = MakeSpriteObject(&gNewObjectDefinition);
 
 	swatter->ColorFilter.a = 0;
 	swatter->Scale.x =
@@ -514,7 +514,7 @@ Byte	swatMode = 0;
 						gNewObjectDefinition.moveCall 	= nil;
 						gNewObjectDefinition.rot 		= 0;
 						gNewObjectDefinition.scale 	    = 1;
-						g2 = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+						g2 = MakeSpriteObject(&gNewObjectDefinition);
 						g2->Scale.x =
 						g2->Scale.y = BUGDOM_TEXT_SCALE*.6;
 
@@ -553,7 +553,7 @@ Byte	swatMode = 0;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawTitleCallback);
+		OGL_DrawScene(DrawTitleCallback);
 
 		timer -= fps;
 	}
@@ -593,7 +593,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall = nil;
 	gNewObjectDefinition.rot 	= 0;
-	gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 	= gGameView->yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -656,7 +656,7 @@ ObjNode	*newObj;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawTitleCallback);
+		OGL_DrawScene(DrawTitleCallback);
 
 		timer -= fps;
 	}
@@ -820,7 +820,7 @@ OGLMatrix4x4	m,rm;
 
 		to = skip->Coord;
 		to.y += 70.0f;
-		OGL_UpdateCameraFromTo(gGameViewInfoPtr, &from, &to);
+		OGL_UpdateCameraFromTo(&from, &to);
 	}
 
 }
@@ -927,10 +927,10 @@ ObjNode *bag, *player;
 
 /***************** DRAW BONUS CALLBACK *******************/
 
-static void DrawTitleCallback(OGLSetupOutputType *info)
+static void DrawTitleCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 }
 

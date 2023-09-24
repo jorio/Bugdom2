@@ -18,7 +18,7 @@
 
 static void SetupBonusScreen(void);
 static void FreeBonusScreen(void);
-static void DrawBonusCallback(OGLSetupOutputType *info);
+static void DrawBonusCallback(void);
 static void DoSkipWalkOn(void);
 static void DoSkipThrowClovers(void);
 static Boolean TossClover(void);
@@ -27,9 +27,9 @@ static void DoMouseBonus(void);
 static void MoveBonusMouse(ObjNode *theNode);
 static void MoveBonusSkipDancing(ObjNode *theNode);
 static void MoveBonusFlower(ObjNode *theNode);
-static void DrawBonusScore(OGLSetupOutputType *info);
+static void DrawBonusScore(void);
 static void DoSaveSelect(void);
-static void DrawSave(OGLSetupOutputType *info);
+static void DrawSave(void);
 
 
 /****************************/
@@ -128,7 +128,7 @@ void DoBonusScreen(void)
 			CalcFramesPerSecond();
 			UpdateInput();
 			MoveObjects();
-			OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+			OGL_DrawScene(DrawBonusCallback);
 			timer -= gFramesPerSecondFrac;
 		}while(timer > 0.0f);
 	}
@@ -210,7 +210,7 @@ ObjNode	*newObj;
 	viewDef.lights.ambientColor.b = .15;
 	viewDef.lights.fillDirection[0] = fillDirection1;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -222,32 +222,32 @@ ObjNode	*newObj;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:bonus.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_BONUS, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_BONUS);
 
-	LoadFoliage(gGameViewInfoPtr);
+	LoadFoliage();
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_SKIP_EXPLORE);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SKIP_EXPLORE, 0,				// set sphere map on geometry texture
 									1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
 
 
-	LoadASkeleton(SKELETON_TYPE_MOUSE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_MOUSE);
 
 
 				/* LOAD AUDIO */
@@ -327,7 +327,7 @@ static void FreeBonusScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -
@@ -384,7 +384,7 @@ static void DoSkipWalkOn(void)
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 	}
 
 
@@ -434,7 +434,7 @@ Boolean	done = false;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 	}
 }
 
@@ -611,7 +611,7 @@ int		i;
 			CalcFramesPerSecond();
 			UpdateInput();
 			MoveObjects();
-			OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+			OGL_DrawScene(DrawBonusCallback);
 		}
 	}
 
@@ -624,7 +624,7 @@ int		i;
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 	}
 
 
@@ -693,7 +693,7 @@ static void DoSaveSelect(void)
 				/* MOVE & DRAW */
 
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 
 				/* FADE IN ICONS */
 
@@ -716,10 +716,10 @@ static void DoSaveSelect(void)
 
 /***************** DRAW BONUS CALLBACK *******************/
 
-static void DrawBonusCallback(OGLSetupOutputType *info)
+static void DrawBonusCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 
 			/* DRAW SPRITES */
@@ -727,8 +727,8 @@ static void DrawBonusCallback(OGLSetupOutputType *info)
 	OGL_PushState();
 	SetInfobarSpriteState();
 
-	DrawBonusScore(info);
-	DrawSave(info);
+	DrawBonusScore();
+	DrawSave();
 
 	OGL_PopState();
 }
@@ -738,7 +738,7 @@ static void DrawBonusCallback(OGLSetupOutputType *info)
 
 #define	SCORE_SPACING	30.0f
 
-static void DrawBonusScore(OGLSetupOutputType *info)
+static void DrawBonusScore(void)
 {
 Str255	s;
 int		n,i,texNum;
@@ -760,7 +760,7 @@ float	x;
 
 			/* DRAW "SCORE" */
 
-	DrawInfobarSprite2_Centered(640/2, 50, 200, SPRITE_GROUP_BONUS, BONUS_SObjType_Score, info);
+	DrawInfobarSprite2_Centered(640/2, 50, 200, SPRITE_GROUP_BONUS, BONUS_SObjType_Score);
 
 			/* DRAW SCORE */
 
@@ -773,7 +773,7 @@ float	x;
 	{
 		texNum = BONUS_SObjType_0 + s[i] - '0';		// convert char to sprite
 		if (texNum != -1)
-			DrawInfobarSprite2_Centered(x, 115, SCORE_SPACING * 1.6f, SPRITE_GROUP_BONUS, texNum, info);
+			DrawInfobarSprite2_Centered(x, 115, SCORE_SPACING * 1.6f, SPRITE_GROUP_BONUS, texNum);
 		x += SCORE_SPACING;
 	}
 
@@ -786,7 +786,7 @@ bail:
 
 /************************ DRAW SAVE *********************************/
 
-static void DrawSave(OGLSetupOutputType *info)
+static void DrawSave(void)
 {
 float	s;
 
@@ -799,13 +799,13 @@ float	s;
 
 	if (gSaveGame)
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon, info);
-		DrawInfobarSprite2_Centered(320+75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon, info);
+		DrawInfobarSprite2_Centered(320-75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon);
+		DrawInfobarSprite2_Centered(320+75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon);
 	}
 	else
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon, info);
-		DrawInfobarSprite2_Centered(320+75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon, info);
+		DrawInfobarSprite2_Centered(320-75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon);
+		DrawInfobarSprite2_Centered(320+75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon);
 	}
 
 	gGlobalTransparency = 1.0f;

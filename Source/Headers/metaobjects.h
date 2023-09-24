@@ -2,8 +2,7 @@
 // metaobjects.h
 //
 
-#ifndef __METAOBJECTS_H_
-#define __METAOBJECTS_H_
+#pragma once
 
 #include "ogl_support.h"
 
@@ -80,16 +79,14 @@ typedef struct
 
 typedef struct
 {
-	OGLSetupOutputType *setupInfo;					// materials are draw context relative, so remember which context we're using now
-
-	uint32_t			flags;
+	uint32_t		flags;
 	OGLColorRGBA	diffuseColor;					// rgba diffuse color
-	uint16_t			multiTextureMode;				// sphere map, etc.
-	uint16_t			multiTextureCombine;			// blend, replace, etc.
-	uint16_t			envMapNum;						// texture # in env map list to use
+	uint16_t		multiTextureMode;				// sphere map, etc.
+	uint16_t		multiTextureCombine;			// blend, replace, etc.
+	uint16_t		envMapNum;						// texture # in env map list to use
 
-	uint32_t			numMipmaps;						// # texture mipmaps to use
-	uint32_t			width,height;					// dimensions of texture
+	uint32_t		numMipmaps;						// # texture mipmaps to use
+	uint32_t		width,height;					// dimensions of texture
 	GLint			pixelSrcFormat;					// OGL format (GL_RGBA, etc.) for src pixels
 	GLint			pixelDstFormat;					// OGL format (GL_RGBA, etc.) for VRAM
 	void			*texturePixels[MO_MAX_MIPMAPS]; // ptr to texture pixels for each mipmap
@@ -227,29 +224,26 @@ typedef struct
 //-----------------------------
 
 void MO_InitHandler(void);
-MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, uint32_t subType, void *data);
+MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, intptr_t subType, void *data);
 MetaObjectPtr MO_GetNewReference(MetaObjectPtr mo);
 void MO_AppendToGroup(MOGroupObject *group, MetaObjectPtr newObject);
 void MO_AttachToGroupStart(MOGroupObject *group, MetaObjectPtr newObject);
-void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data, const OGLSetupOutputType *setupInfo);
-void MO_DrawGroup(const MOGroupObject *object, const OGLSetupOutputType *setupInfo);
-void MO_DrawObject(const MetaObjectPtr object, const OGLSetupOutputType *setupInfo);
-void MO_DrawMaterial(MOMaterialObject *matObj, const OGLSetupOutputType *setupInfo);
-void MO_DrawMatrix(const MOMatrixObject *matObj, const OGLSetupOutputType *setupInfo);
-void MO_DrawPicture(const MOPictureObject *picObj, const OGLSetupOutputType *setupInfo);
+void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data);
+void MO_DrawGroup(const MOGroupObject *object);
+void MO_DrawObject(const MetaObjectPtr object);
+void MO_DrawMaterial(MOMaterialObject *matObj);
+void MO_DrawMatrix(const MOMatrixObject *matObj);
+void MO_DrawPicture(const MOPictureObject *picObj);
 void MO_DisposeObjectReference(MetaObjectPtr obj);
 void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *outData);
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox, OGLMatrix4x4 *m);
-MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, OGLSetupOutputType *setupInfo, int destPixelFormat);
-void MO_SetPictureObjectCoordsToMouse(OGLSetupOutputType *info, MOPictureObject *obj);
+MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, int destPixelFormat);
+void MO_SetPictureObjectCoordsToMouse(MOPictureObject *obj);
 
-void MO_DrawSprite(const MOSpriteObject *spriteObj, const OGLSetupOutputType *setupInfo);
+void MO_DrawSprite(const MOSpriteObject *spriteObj);
 void MO_VertexArray_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Object_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Geometry_OffserUVs(short group, short type, short geometryNum, float du, float dv);
-MOMaterialObject *MO_LoadTextureObjectFromFile(OGLSetupOutputType *setupInfo, FSSpec *spec, Boolean useAlpha);
-MOMaterialObject *MO_CreateTextureObjectFromBuffer(OGLSetupOutputType *setupInfo, int width, int height, Ptr buffer);
-
-
-#endif
+MOMaterialObject *MO_LoadTextureObjectFromFile(FSSpec *spec, Boolean useAlpha);
+MOMaterialObject *MO_CreateTextureObjectFromBuffer(int width, int height, Ptr buffer);

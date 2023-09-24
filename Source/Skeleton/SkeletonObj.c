@@ -54,7 +54,7 @@ short	i;
 
 /******************** LOAD A SKELETON ****************************/
 
-void LoadASkeleton(Byte num, OGLSetupOutputType *setupInfo)
+void LoadASkeleton(Byte num)
 {
 short	i,numDecomp;
 
@@ -62,7 +62,7 @@ short	i,numDecomp;
 		DoFatalAlert("LoadASkeleton: MAX_SKELETON_TYPES exceeded!");
 
 	if (gLoadedSkeletonsList[num] == nil)					// check if already loaded
-		gLoadedSkeletonsList[num] = LoadSkeletonFile(num, setupInfo);
+		gLoadedSkeletonsList[num] = LoadSkeletonFile(num);
 
 
 		/* MAKE LOCAL COPY OF DECOMPOSED TRIMESH */
@@ -346,7 +346,7 @@ void FreeSkeletonBaseData(SkeletonObjDataType *data)
 
 /*************************** DRAW SKELETON ******************************/
 
-void DrawSkeleton(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+void DrawSkeleton(ObjNode *theNode)
 {
 short		i,numTriMeshes;
 short			skelType;
@@ -369,7 +369,7 @@ MOMaterialObject	*overrideTexture, *oldTexture = nil;
 			}
 		}
 
-		MO_DrawGeometry_VertexArray(&gLocalTriMeshesOfSkelType[skelType][i], setupInfo);
+		MO_DrawGeometry_VertexArray(&gLocalTriMeshesOfSkelType[skelType][i]);
 
 		if (overrideTexture && oldTexture)											// see if need to set texture back to normal
 			gLocalTriMeshesOfSkelType[skelType][i].materials[0] = oldTexture;

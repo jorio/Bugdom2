@@ -17,7 +17,7 @@
 /****************************/
 
 static void ExplodePlayer(void);
-static void DrawWingLayers(ObjNode *eventObj, const OGLSetupOutputType *setupInfo);
+static void DrawWingLayers(ObjNode *eventObj);
 static void MoveShieldSphere(ObjNode *theNode);
 
 
@@ -650,7 +650,7 @@ void EndGliding(ObjNode *theNode)
 
 /************************* DRAW WING LAYERS **********************************/
 
-static void DrawWingLayers(ObjNode *eventObj, const OGLSetupOutputType *setupInfo)
+static void DrawWingLayers(ObjNode *eventObj)
 {
 #pragma unused (eventObj)
 int		i;
@@ -663,7 +663,7 @@ int		i;
 		glPushMatrix();
 		glMultMatrixf((GLfloat *)&gPlayerInfo.wingLayerMatrix[i][0]);
 		gGlobalTransparency = gPlayerInfo.wingLayerAlpha[i][0];
-		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_RightWing], setupInfo);
+		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_RightWing]);
 		glPopMatrix();
 
 			/* DRAW RIGHT WING */
@@ -671,7 +671,7 @@ int		i;
 		glPushMatrix();
 		glMultMatrixf((GLfloat *)&gPlayerInfo.wingLayerMatrix[i][1]);
 		gGlobalTransparency = gPlayerInfo.wingLayerAlpha[i][1];
-		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_LeftWing], setupInfo);
+		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_LeftWing]);
 		glPopMatrix();
 
 
@@ -742,8 +742,8 @@ float	fps = gFramesPerSecondFrac;
 	playerAim.x = -sin(playerRotY);
 	playerAim.y = -cos(playerRotY);
 
-	cameraAim.x = gGameViewInfoPtr->cameraPlacement.pointOfInterest.x - gGameViewInfoPtr->cameraPlacement.cameraLocation.x;
-	cameraAim.y = gGameViewInfoPtr->cameraPlacement.pointOfInterest.z - gGameViewInfoPtr->cameraPlacement.cameraLocation.z;
+	cameraAim.x = gGameView->cameraPlacement.pointOfInterest.x - gGameView->cameraPlacement.cameraLocation.x;
+	cameraAim.y = gGameView->cameraPlacement.pointOfInterest.z - gGameView->cameraPlacement.cameraLocation.z;
 	FastNormalizeVector2D(cameraAim.x, cameraAim.y, &cameraAim, true);
 
 	dot = fabs(OGLVector2D_Dot(&playerAim, &cameraAim));

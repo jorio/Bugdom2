@@ -18,7 +18,7 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(OGLSetupOutputType *info);
+static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveLevelIntroSprinklerHead(ObjNode *base);
 static void MoveMud(ObjNode *theNode);
@@ -120,7 +120,7 @@ int		i;
 	viewDef.lights.fillColor[0].g 	= .9;
 	viewDef.lights.fillColor[0].b 	= .9;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -130,17 +130,17 @@ int		i;
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level1_Garden.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, GARDEN_ObjType_SprinklerBase,
 									0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
@@ -185,7 +185,7 @@ int		i;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -271,7 +271,7 @@ static void FreeLevelIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -297,7 +297,7 @@ float	timer;
 
 				/* MOVE CAMERA */
 
-		gGameViewInfoPtr->cameraPlacement.cameraLocation.z -= 30.0f * fps;
+		gGameView->cameraPlacement.cameraLocation.z -= 30.0f * fps;
 
 
 
@@ -310,7 +310,7 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawLevelIntroCallback);
+		OGL_DrawScene(DrawLevelIntroCallback);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -321,9 +321,9 @@ float	timer;
 
 /***************** DRAW LEVELINTRO CALLBACK *******************/
 
-static void DrawLevelIntroCallback(OGLSetupOutputType *info)
+static void DrawLevelIntroCallback(void)
 {
-	DrawObjects(info);
+	DrawObjects();
 
 }
 

@@ -16,21 +16,21 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot, const OGLSetupOutputType *setupInfo);
-static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawHealth(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawFlight(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawLives(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawKey(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawMap(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawTickAndFleaCount(const OGLSetupOutputType *setupInfo);
-//static void Infobar_DrawRacingInfo(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawMice(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawClovers(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawAntHills(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawRedClovers(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawFish(const OGLSetupOutputType *setupInfo);
-static void Infobar_DrawFood(const OGLSetupOutputType *setupInfo);
+static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot);
+static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum);
+static void Infobar_DrawHealth(void);
+static void Infobar_DrawFlight(void);
+static void Infobar_DrawLives(void);
+static void Infobar_DrawKey(void);
+static void Infobar_DrawMap(void);
+static void Infobar_DrawTickAndFleaCount(void);
+//static void Infobar_DrawRacingInfo(void);
+static void Infobar_DrawMice(void);
+static void Infobar_DrawClovers(void);
+static void Infobar_DrawAntHills(void);
+static void Infobar_DrawRedClovers(void);
+static void Infobar_DrawFish(void);
+static void Infobar_DrawFood(void);
 
 
 /****************************/
@@ -106,15 +106,11 @@ Byte			gFoodTypes[FOOD_TO_GET];
 // Called at beginning of level
 //
 
-void InitInfobar(OGLSetupOutputType *setupInfo)
+void InitInfobar(void)
 {
-
-#pragma unused(setupInfo)
-
 	gShowRedClovers = false;
 	gFishAlpha = gFoodAlpha = 1.0f;
 	gShowFish = gShowFood = true;
-
 }
 
 
@@ -149,7 +145,7 @@ void SetInfobarSpriteState(void)
 
 /********************** DRAW INFOBAR ****************************/
 
-void DrawInfobar(OGLSetupOutputType *setupInfo)
+void DrawInfobar(void)
 {
 	if (gHideInfobar)
 		return;
@@ -160,7 +156,7 @@ void DrawInfobar(OGLSetupOutputType *setupInfo)
 
 	OGL_PushState();
 
-	if (setupInfo->useFog)
+	if (gGameView->useFog)
 		glDisable(GL_FOG);
 
 	SetInfobarSpriteState();
@@ -174,19 +170,19 @@ void DrawInfobar(OGLSetupOutputType *setupInfo)
 
 			/* DRAW CORNER LEAVES */
 
-	DrawInfobarSprite(0, -7, 230, INFOBAR_SObjType_LeftCorner, setupInfo);
-	DrawInfobarSprite(CLOVERS_X-26, -7, CLOVERS_SCALE * 2, INFOBAR_SObjType_RightCorner, setupInfo);
+	DrawInfobarSprite(0, -7, 230, INFOBAR_SObjType_LeftCorner);
+	DrawInfobarSprite(CLOVERS_X-26, -7, CLOVERS_SCALE * 2, INFOBAR_SObjType_RightCorner);
 
 
 
 		/* DRAW STUFF */
 
-	Infobar_DrawFlight(setupInfo);
-	Infobar_DrawHealth(setupInfo);
-	Infobar_DrawLives(setupInfo);
-	Infobar_DrawKey(setupInfo);
-	Infobar_DrawMap(setupInfo);
-	Infobar_DrawClovers(setupInfo);
+	Infobar_DrawFlight();
+	Infobar_DrawHealth();
+	Infobar_DrawLives();
+	Infobar_DrawKey();
+	Infobar_DrawMap();
+	Infobar_DrawClovers();
 
 	switch(gLevelNum)
 	{
@@ -194,30 +190,30 @@ void DrawInfobar(OGLSetupOutputType *setupInfo)
 		case	LEVEL_NUM_SIDEWALK:
 		case	LEVEL_NUM_GARBAGE:
 		case	LEVEL_NUM_PLAYROOM:
-				Infobar_DrawMice(setupInfo);
+				Infobar_DrawMice();
 				break;
 
 		case	LEVEL_NUM_FIDO:
-				Infobar_DrawTickAndFleaCount(setupInfo);
+				Infobar_DrawTickAndFleaCount();
 				break;
 
 		case	LEVEL_NUM_CLOSET:
-				Infobar_DrawMice(setupInfo);
-				Infobar_DrawRedClovers(setupInfo);
+				Infobar_DrawMice();
+				Infobar_DrawRedClovers();
 				break;
 
 		case	LEVEL_NUM_BALSA:
-				Infobar_DrawAntHills(setupInfo);
+				Infobar_DrawAntHills();
 				break;
 
 		case	LEVEL_NUM_PARK:
-				Infobar_DrawFish(setupInfo);
-				Infobar_DrawFood(setupInfo);
-				Infobar_DrawMice(setupInfo);
+				Infobar_DrawFish();
+				Infobar_DrawFood();
+				Infobar_DrawMice();
 				break;
 	}
 
-	DrawDialogMessage(setupInfo);
+	DrawDialogMessage();
 
 
 			/***********/
@@ -226,7 +222,7 @@ void DrawInfobar(OGLSetupOutputType *setupInfo)
 
 	OGL_PopState();
 	gGlobalMaterialFlags = 0;
-	if (setupInfo->useFog)
+	if (gGameView->useFog)
 		glEnable(GL_FOG);
 }
 
@@ -235,7 +231,7 @@ void DrawInfobar(OGLSetupOutputType *setupInfo)
 
 /******************** DRAW INFOBAR SPRITE **********************/
 
-void DrawInfobarSprite(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
+void DrawInfobarSprite(float x, float y, float size, short texNum)
 {
 MOMaterialObject	*mo;
 float				aspect;
@@ -243,7 +239,7 @@ float				aspect;
 		/* ACTIVATE THE MATERIAL */
 
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
+	MO_DrawMaterial(mo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
@@ -262,7 +258,7 @@ float				aspect;
 // Coords are for center of sprite, not upper left
 //
 
-static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
+static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum)
 {
 MOMaterialObject	*mo;
 float				aspect;
@@ -270,7 +266,7 @@ float				aspect;
 		/* ACTIVATE THE MATERIAL */
 
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
+	MO_DrawMaterial(mo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
@@ -293,7 +289,7 @@ float				aspect;
 // This version lets user pass in the sprite group
 //
 
-void DrawInfobarSprite2(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo)
+void DrawInfobarSprite2(float x, float y, float size, short group, short texNum)
 {
 MOMaterialObject	*mo;
 float				aspect;
@@ -301,7 +297,7 @@ float				aspect;
 		/* ACTIVATE THE MATERIAL */
 
 	mo = gSpriteGroupList[group][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
+	MO_DrawMaterial(mo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
@@ -320,7 +316,7 @@ float				aspect;
 // This version lets user pass in the sprite group
 //
 
-void DrawInfobarSprite2_Centered(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo)
+void DrawInfobarSprite2_Centered(float x, float y, float size, short group, short texNum)
 {
 MOMaterialObject	*mo;
 float				aspect;
@@ -328,7 +324,7 @@ float				aspect;
 		/* ACTIVATE THE MATERIAL */
 
 	mo = gSpriteGroupList[group][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
+	MO_DrawMaterial(mo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
@@ -349,7 +345,7 @@ float				aspect;
 
 /******************** DRAW INFOBAR SPRITE: ROTATED **********************/
 
-static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot, const OGLSetupOutputType *setupInfo)
+static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot)
 {
 MOMaterialObject	*mo;
 float				aspect, xoff, yoff;
@@ -359,7 +355,7 @@ OGLMatrix3x3		m;
 		/* ACTIVATE THE MATERIAL */
 
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
+	MO_DrawMaterial(mo);
 
 				/* SET COORDS */
 
@@ -394,14 +390,14 @@ OGLMatrix3x3		m;
 
 /********************** DRAW LIVES *************************/
 
-static void Infobar_DrawLives(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawLives(void)
 {
 float	x = LIVES_X;
 int		i, n = gPlayerInfo.lives-1;
 
 	for (i = 0; i < n; i++)
 	{
-		DrawInfobarSprite(x, LIVES_Y, LIVES_SCALE, INFOBAR_SObjType_Life, setupInfo);
+		DrawInfobarSprite(x, LIVES_Y, LIVES_SCALE, INFOBAR_SObjType_Life);
 		x += LIVES_SCALE * .8f;
 	}
 }
@@ -409,13 +405,13 @@ int		i, n = gPlayerInfo.lives-1;
 
 /********************** DRAW CLOVERS *************************/
 
-static void Infobar_DrawClovers(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawClovers(void)
 {
 	if (gPlayerInfo.numBlueClovers)
-		DrawInfobarSprite(CLOVERS_X, CLOVERS_Y, CLOVERS_SCALE, INFOBAR_SObjType_BlueClover1-1 + gPlayerInfo.numBlueClovers, setupInfo);
+		DrawInfobarSprite(CLOVERS_X, CLOVERS_Y, CLOVERS_SCALE, INFOBAR_SObjType_BlueClover1-1 + gPlayerInfo.numBlueClovers);
 
 	if (gPlayerInfo.numGoldClovers)
-		DrawInfobarSprite(CLOVERS_X - 24, CLOVERS_Y + (CLOVERS_SCALE * .64), CLOVERS_SCALE, INFOBAR_SObjType_GoldClover1-1 + gPlayerInfo.numGoldClovers, setupInfo);
+		DrawInfobarSprite(CLOVERS_X - 24, CLOVERS_Y + (CLOVERS_SCALE * .64), CLOVERS_SCALE, INFOBAR_SObjType_GoldClover1-1 + gPlayerInfo.numGoldClovers);
 }
 
 
@@ -423,7 +419,7 @@ static void Infobar_DrawClovers(const OGLSetupOutputType *setupInfo)
 
 /********************** DRAW HEALTH *************************/
 
-static void Infobar_DrawHealth(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawHealth(void)
 {
 int			i, n;
 float		x, a, f;
@@ -455,7 +451,7 @@ static float wiggle = 0;
 
 			/* DRAW LEAF */
 
-//	DrawInfobarSprite(HEALTH_X-25, HEALTH_Y-23, 90, INFOBAR_SObjType_HealthLeaf, setupInfo);
+//	DrawInfobarSprite(HEALTH_X-25, HEALTH_Y-23, 90, INFOBAR_SObjType_HealthLeaf);
 
 
 			/*************/
@@ -474,7 +470,7 @@ static float wiggle = 0;
 		if (i > n)								// fade the non-active ones
 			gGlobalTransparency = .2;
 
-		DrawInfobarSprite_Centered(p[i].x, p[i].y, HEALTH_SCALE, INFOBAR_SObjType_Health, setupInfo);
+		DrawInfobarSprite_Centered(p[i].x, p[i].y, HEALTH_SCALE, INFOBAR_SObjType_Health);
 
 	}
 
@@ -487,7 +483,7 @@ static float wiggle = 0;
 
 /********************** DRAW FLIGHT *************************/
 
-static void Infobar_DrawFlight(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawFlight(void)
 {
 int		n,i;
 float	x, a, f;
@@ -535,7 +531,7 @@ static float wiggle = 0;
 		if (i > n)								// fade the non-active ones
 			gGlobalTransparency = .2;
 
-		DrawInfobarSprite_Centered(p[i].x, p[i].y, FLIGHT_SCALE, INFOBAR_SObjType_Flight, setupInfo);
+		DrawInfobarSprite_Centered(p[i].x, p[i].y, FLIGHT_SCALE, INFOBAR_SObjType_Flight);
 	}
 
 
@@ -546,7 +542,7 @@ static float wiggle = 0;
 
 /********************** DRAW KEY *************************/
 
-static void Infobar_DrawKey(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawKey(void)
 {
 int		i;
 static float wobble = 0;
@@ -560,7 +556,7 @@ float	scale;
 	{
 		if (gPlayerInfo.hasKey[i])
 		{
-			DrawInfobarSprite2_Centered(COLORKEY_X,COLORKEY_Y, scale, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon + i, setupInfo);
+			DrawInfobarSprite2_Centered(COLORKEY_X,COLORKEY_Y, scale, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon + i);
 			return;
 		}
 	}
@@ -570,7 +566,7 @@ float	scale;
 
 /********************** DRAW MAP *************************/
 
-static void Infobar_DrawMap(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawMap(void)
 {
 float	x,y;
 
@@ -581,7 +577,7 @@ float	x,y;
 	{
 		case	LEVEL_NUM_GNOMEGARDEN:
 				gGlobalTransparency = .90f;
-				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_Map, setupInfo);
+				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_Map);
 
 				x = (gPlayerInfo.coord.x / (float)gTerrainUnitWidth) * (MAP_SCALE/2) + 38.0f;
 				y = (gPlayerInfo.coord.z / (float)gTerrainUnitDepth) * (MAP_SCALE/2);
@@ -589,14 +585,14 @@ float	x,y;
 				x += MAP_X;
 				y += MAP_Y;
 
-				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y, setupInfo);
+				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y);
 				break;
 
 
 		case	LEVEL_NUM_PLAYROOM:
 				gGlobalTransparency = .90f;
 
-				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PLAYROOM_SObjType_Map, setupInfo);
+				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PLAYROOM_SObjType_Map);
 
 				x = (gPlayerInfo.coord.x / (float)gTerrainUnitWidth) * (MAP_SCALE * .655f) + 24.0f;
 				y = (gPlayerInfo.coord.z / (float)gTerrainUnitDepth) * (MAP_SCALE * .43f) + 5.0f;
@@ -604,12 +600,12 @@ float	x,y;
 				x += MAP_X;
 				y += MAP_Y;
 
-				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y, setupInfo);
+				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y);
 				break;
 
 		case	LEVEL_NUM_CLOSET:
 
-				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_Map, setupInfo);
+				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_Map);
 
 				x = (gPlayerInfo.coord.x / (float)gTerrainUnitWidth) * (MAP_SCALE * .55f) + 34.0f;
 				y = (gPlayerInfo.coord.z / (float)gTerrainUnitDepth) * (MAP_SCALE * .44f) + 1.0f;
@@ -617,13 +613,13 @@ float	x,y;
 				x += MAP_X;
 				y += MAP_Y;
 
-				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y, setupInfo);
+				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y);
 				break;
 
 
 		case	LEVEL_NUM_PARK:
 
-				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_Map, setupInfo);
+				DrawInfobarSprite2(MAP_X, MAP_Y, MAP_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_Map);
 
 				x = (gPlayerInfo.coord.x / (float)gTerrainUnitWidth) * (MAP_SCALE * .65f) + 25.0f;
 				y = (gPlayerInfo.coord.z / (float)gTerrainUnitDepth) * (MAP_SCALE * .485f) + 1.0f;
@@ -631,7 +627,7 @@ float	x,y;
 				x += MAP_X;
 				y += MAP_Y;
 
-				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y, setupInfo);
+				DrawInfobarSprite_Rotated(x, y, MAP_SCALE/15, INFOBAR_SObjType_MapDot, -gPlayerInfo.objNode->Rot.y);
 				break;
 
 
@@ -642,7 +638,7 @@ float	x,y;
 
 /********************** DRAW TICK AND FLEA COUNT *************************/
 
-static void Infobar_DrawTickAndFleaCount(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawTickAndFleaCount(void)
 {
 float	x,y;
 int		i;
@@ -660,7 +656,7 @@ int		i;
 		else
 			gGlobalTransparency = 1.0f;
 
-		DrawInfobarSprite2(x, y, TICK_SCALE, SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Tick, setupInfo);
+		DrawInfobarSprite2(x, y, TICK_SCALE, SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Tick);
 
 		y += TICK_SCALE;
 
@@ -682,7 +678,7 @@ int		i;
 		else
 			gGlobalTransparency = 1.0f;
 
-		DrawInfobarSprite2(x, y, FLEA_SCALE, SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Flea, setupInfo);
+		DrawInfobarSprite2(x, y, FLEA_SCALE, SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Flea);
 
 		y += FLEA_SCALE;
 
@@ -696,7 +692,7 @@ int		i;
 
 /********************** DRAW MICE *************************/
 
-static void Infobar_DrawMice(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawMice(void)
 {
 float	x,y;
 int		i;
@@ -713,7 +709,7 @@ int		i;
 		else
 			gGlobalTransparency = 1.0f;
 
-		DrawInfobarSprite2(x, y, MOUSE_SCALE, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_Mouse, setupInfo);
+		DrawInfobarSprite2(x, y, MOUSE_SCALE, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_Mouse);
 
 		if (i == 9)									// see if next col
 		{
@@ -731,7 +727,7 @@ int		i;
 
 /********************** DRAW ANT HILLS *************************/
 
-static void Infobar_DrawAntHills(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawAntHills(void)
 {
 float	x, y;
 int		i;
@@ -749,7 +745,7 @@ int		i;
 			gGlobalTransparency = 1.0f;
 
 
-		DrawInfobarSprite2(x, y, ANTHILL_SCALE, SPRITE_GROUP_LEVELSPECIFIC, BALSA_SObjType_AntHillIcon, setupInfo);
+		DrawInfobarSprite2(x, y, ANTHILL_SCALE, SPRITE_GROUP_LEVELSPECIFIC, BALSA_SObjType_AntHillIcon);
 
 		if (i == 7)									// see if go to next col
 		{
@@ -766,7 +762,7 @@ int		i;
 
 /********************** DRAW RED CLOVERS *************************/
 
-static void Infobar_DrawRedClovers(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawRedClovers(void)
 {
 float	x, y;
 int		i;
@@ -802,7 +798,7 @@ int		i;
 		else
 			gGlobalTransparency = 1.0f * gRedCloverAlpha;
 
-		DrawInfobarSprite2(x, y, REDCLOVER_SCALE, SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_RedClover, setupInfo);
+		DrawInfobarSprite2(x, y, REDCLOVER_SCALE, SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_RedClover);
 
 		y += REDCLOVER_SCALE;
 	}
@@ -813,7 +809,7 @@ int		i;
 
 /********************** DRAW FISH *************************/
 
-static void Infobar_DrawFish(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawFish(void)
 {
 float	y;
 int		i;
@@ -838,7 +834,7 @@ int		i;
 
 	for (i = 0; i < gNumCaughtFish; i++)
 	{
-		DrawInfobarSprite2(FISH_X, y, FISH_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_FishIcon, setupInfo);
+		DrawInfobarSprite2(FISH_X, y, FISH_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_FishIcon);
 		y += FISH_SCALE * .8f;
 	}
 
@@ -848,7 +844,7 @@ int		i;
 
 /********************** DRAW FOOD *************************/
 
-static void Infobar_DrawFood(const OGLSetupOutputType *setupInfo)
+static void Infobar_DrawFood(void)
 {
 float	y;
 int		i;
@@ -873,7 +869,7 @@ int		i;
 
 	for (i = 0; i < gNumFoodOnBasket; i++)
 	{
-		DrawInfobarSprite2(FOOD_X, y, FOOD_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_CheeseIcon + gFoodTypes[i], setupInfo);
+		DrawInfobarSprite2(FOOD_X, y, FOOD_SCALE, SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_CheeseIcon + gFoodTypes[i]);
 		y += FOOD_SCALE;
 	}
 

@@ -18,7 +18,7 @@
 
 static void SetupWinScreen(void);
 static void FreeWinScreen(void);
-static void DrawWinCallback(OGLSetupOutputType *info);
+static void DrawWinCallback(void);
 static void ProcessWin(void);
 static void MakeWinConfetti(ObjNode *player);
 static void MoveWinText(ObjNode *theNode);
@@ -136,7 +136,7 @@ ObjNode	*newObj;
 	viewDef.lights.fillColor[1].g 	= 1.0;
 	viewDef.lights.fillColor[1].b 	= .7;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef, &gGameView);
 
 
 				/************/
@@ -144,34 +144,34 @@ ObjNode	*newObj;
 				/************/
 
 	InitSparkles();
-	InitEffects(gGameViewInfoPtr);
+	InitEffects();
 
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:winscreen.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_WINSCREEN, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_WINSCREEN);
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:WinScreen.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_WIN, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_WIN);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_SKIP_TITLE, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_SKIP_TITLE);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SKIP_TITLE, 0,				// set sphere map on geometry texture
 									1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sheen);
 
-	LoadASkeleton(SKELETON_TYPE_HOBOBAG, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_HOBOBAG);
 
 
 			/*******************/
@@ -189,7 +189,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameViewInfoPtr->yon * .99f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView->yon * .99f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -254,7 +254,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.moveCall 	= MoveWinText;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 500;
-	newObj = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
+	newObj = MakeSpriteObject(&gNewObjectDefinition);
 
 	newObj->Timer = 7.0f;
 	newObj->ColorFilter.a = 0;
@@ -274,7 +274,7 @@ static void FreeWinScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
@@ -304,13 +304,13 @@ float	timer = 0.0f;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gHive->Coord, 0, .1f * gFramesPerSecondFrac, 0);
-		OGLPoint3D_Transform(&gGameViewInfoPtr->cameraPlacement.cameraLocation, &m, &p);
-		OGL_UpdateCameraFromTo(gGameViewInfoPtr, &p, nil);
+		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
+		OGL_UpdateCameraFromTo(&p, nil);
 
 
 				/* DRAW */
 
-		OGL_DrawScene(gGameViewInfoPtr, DrawWinCallback);
+		OGL_DrawScene(DrawWinCallback);
 
 
 		timer += fps;
@@ -328,10 +328,10 @@ float	timer = 0.0f;
 
 /***************** DRAW WIN CALLBACK *******************/
 
-static void DrawWinCallback(OGLSetupOutputType *info)
+static void DrawWinCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 }
 

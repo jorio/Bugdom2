@@ -104,7 +104,7 @@ typedef struct
 
 
 void InitBG3DManager(void);
-void ImportBG3D(FSSpec *spec, int groupNum, OGLSetupOutputType *setupInfo);
+void ImportBG3D(FSSpec *spec, int groupNum);
 void DisposeBG3DContainer(int groupNum);
 void DisposeAllBG3DContainers(void);
 void BG3D_SetContainerMaterialFlags(short group, short type, short geometryNum, uint32_t flags);

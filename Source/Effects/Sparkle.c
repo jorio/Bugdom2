@@ -99,7 +99,7 @@ void DeleteSparkle(short i)
 
 /*************************** DRAW SPARKLES ******************************/
 
-void DrawSparkles(OGLSetupOutputType *setupInfo)
+void DrawSparkles(void)
 {
 uint32_t	flags;
 int		i;
@@ -134,7 +134,7 @@ static OGLPoint3D		frame[4] =
 			/* DRAW EACH SPARKLE */
 			/*********************/
 
-	cameraLocation = &setupInfo->cameraPlacement.cameraLocation;		// point to camera coord
+	cameraLocation = &gGameView->cameraPlacement.cameraLocation;		// point to camera coord
 
 	for (i = 0; i < MAX_SPARKLES; i++)
 	{
@@ -212,7 +212,7 @@ static OGLPoint3D		frame[4] =
 
 			/* DRAW IT */
 
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gSparkles[i].textureNum].materialObject, setupInfo);	// submit material
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gSparkles[i].textureNum].materialObject);	// submit material
 
 		if (flags & SPARKLE_FLAG_FLICKER)								// set transparency
 		{

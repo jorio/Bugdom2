@@ -118,7 +118,7 @@ extern	OGLMatrix4x4			gWorldToViewMatrix;
 extern	OGLMatrix4x4			gWorldToWindowMatrix;
 extern	OGLPoint2D				gBestCheckpointCoord;
 extern	OGLPoint3D				gCoord;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
+extern	OGLSetupOutputType		*gGameView;
 extern	OGLVector3D				gDelta;
 extern	OGLVector3D				gRecentTerrainNormal;
 extern	OGLVector3D				gWorldSunDirection;

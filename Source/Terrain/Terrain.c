@@ -22,7 +22,7 @@ static uint16_t	BuildTerrainSuperTile(long	startCol, long startRow);
 static void ReleaseAllSuperTiles(void);
 static void DoSuperTileDeformation(SuperTileMemoryType *superTile);
 static void UpdateTerrainDeformationFunctions(void);
-static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawTerrain(ObjNode *theNode);
 
 
 /****************************/
@@ -697,25 +697,25 @@ OGLVector3D			*vertexNormals;
 
 			/* GET LIGHT DATA */
 
-		ambientR = gGameViewInfoPtr->lightList.ambientColor.r;			// get ambient color
-		ambientG = gGameViewInfoPtr->lightList.ambientColor.g;
-		ambientB = gGameViewInfoPtr->lightList.ambientColor.b;
+		ambientR = gGameView->lightList.ambientColor.r;			// get ambient color
+		ambientG = gGameView->lightList.ambientColor.g;
+		ambientB = gGameView->lightList.ambientColor.b;
 
-		fillR0 = gGameViewInfoPtr->lightList.fillColor[0].r;			// get fill color
-		fillG0 = gGameViewInfoPtr->lightList.fillColor[0].g;
-		fillB0 = gGameViewInfoPtr->lightList.fillColor[0].b;
-		fillDir0 = gGameViewInfoPtr->lightList.fillDirection[0];		// get fill direction
+		fillR0 = gGameView->lightList.fillColor[0].r;			// get fill color
+		fillG0 = gGameView->lightList.fillColor[0].g;
+		fillB0 = gGameView->lightList.fillColor[0].b;
+		fillDir0 = gGameView->lightList.fillDirection[0];		// get fill direction
 		fillDir0.x = -fillDir0.x;
 		fillDir0.y = -fillDir0.y;
 		fillDir0.z = -fillDir0.z;
 
-		numFillLights = gGameViewInfoPtr->lightList.numFillLights;
+		numFillLights = gGameView->lightList.numFillLights;
 		if (numFillLights > 1)
 		{
-			fillR1 = gGameViewInfoPtr->lightList.fillColor[1].r;
-			fillG1 = gGameViewInfoPtr->lightList.fillColor[1].g;
-			fillB1 = gGameViewInfoPtr->lightList.fillColor[1].b;
-			fillDir1 = gGameViewInfoPtr->lightList.fillDirection[1];
+			fillR1 = gGameView->lightList.fillColor[1].r;
+			fillG1 = gGameView->lightList.fillColor[1].g;
+			fillB1 = gGameView->lightList.fillColor[1].b;
+			fillDir1 = gGameView->lightList.fillDirection[1];
 			fillDir1.x = -fillDir1.x;
 			fillDir1.y = -fillDir1.y;
 			fillDir1.z = -fillDir1.z;
@@ -919,7 +919,7 @@ long	i;
 // This is the main call to update the screen.  It draws all ObjNode's and the terrain itself
 //
 
-static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawTerrain(ObjNode *theNode)
 {
 int				r,c;
 int				i,unique;
@@ -985,12 +985,12 @@ Boolean			superTileVisible;
 
 					/* SUBMIT THE TEXTURE */
 
-				MO_DrawMaterial(gSuperTileTextureObjects[unique], setupInfo);
+				MO_DrawMaterial(gSuperTileTextureObjects[unique]);
 
 
 					/* SUBMIT THE GEOMETRY */
 
-				MO_DrawGeometry_VertexArray(gSuperTileMemoryList[i].meshData, setupInfo);
+				MO_DrawGeometry_VertexArray(gSuperTileMemoryList[i].meshData);
 				gNumSuperTilesDrawn++;
 
 			}

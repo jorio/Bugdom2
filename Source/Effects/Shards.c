@@ -409,7 +409,7 @@ del:
 
 /************************* DRAW SHARDS ****************************/
 
-void DrawShards(const OGLSetupOutputType *setupInfo)
+void DrawShards(void)
 {
 long	i;
 
@@ -439,7 +439,7 @@ long	i;
 
 
 			if (gShards[i].material)
-				MO_DrawMaterial(gShards[i].material, setupInfo);
+				MO_DrawMaterial(gShards[i].material);
 
 					/* SET MATRIX */
 

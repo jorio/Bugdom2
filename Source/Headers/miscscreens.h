@@ -75,7 +75,7 @@ void DoLoseScreen(void);
 void NewScore(void);
 void LoadHighScores(void);
 void ClearHighScores(void);
-void DrawScoreText(unsigned char *s, float x, float y, OGLSetupOutputType *info);
+void DrawScoreText(unsigned char *s, float x, float y);
 
 void DoWinScreen(void);
 
