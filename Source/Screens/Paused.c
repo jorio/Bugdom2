@@ -39,59 +39,6 @@ static void DrawPaused(void);
 
 static short	gPausedMenuSelection;
 
-static const char *gPausedStrings[MAX_LANGUAGES][3] =
-{
-		/* ENGLISH */
-	{
-		"Resume Game",
-		"Retire Game",
-		"Quit Application",
-	},
-
-		/* FRENCH */
-	{
-		"Continuer",
-		"Abandonner",
-		"Quitter",
-	},
-
-		/* GERMAN */
-	{
-		"Spiel Fortsetzen",
-		"Spiel Abbrechen",
-		"Beenden",
-	},
-
-		/* SPANISH */
-	{
-		"Reanudar",
-		"Retirarse",
-		"Cerrar el Juego",
-	},
-
-		/* ITALIAN */
-	{
-		"Continua",
-		"Annulla",
-		"Esci dal Gioco",
-	},
-
-		/* SWEDISH */
-	{
-		"�teruppta Spelet",
-		"Dra dig ur Spelet",
-		"Avsluta",
-	},
-
-		/* DUTCH */
-	{
-		"Hervat Spel",
-		"Stop Spel",
-		"Stop Programma",
-	}
-
-};
-
 
 /********************** DO PAUSED **************************/
 
@@ -206,9 +153,11 @@ static float	dotAlpha = 1.0f;
 			dotY = y + 3.0f;
 		}
 
-		while (gPausedStrings[gGamePrefs.language][j][i] != 0x00)
+		const char* caption = Localize(STR_PAUSEOPTION1 + j);
+
+		while (caption[i] != 0x00)
 		{
-			char	c = gPausedStrings[gGamePrefs.language][j][i];	// get char
+			char	c = caption[i];									// get char
 			int		texNum = CharToSprite(c);						// convert to texture #
 			if (texNum != -1)
 				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);

@@ -1,7 +1,8 @@
 /****************************/
 /*    BUGDOM 2 - MAIN 		*/
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -128,6 +129,7 @@ long		createdDirID;
 
 	InitDefaultPrefs();
 	LoadPrefs(&gGamePrefs);
+	LoadLocalizedStrings(gGamePrefs.language);
 
 
 
@@ -155,41 +157,7 @@ long 		keyboardScript, languageCode;
 
 		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
 
-	IMPLEMENT_ME_SOFT();
-	gGamePrefs.language = LANGUAGE_ENGLISH;
-	gGamePrefs.language = LANGUAGE_FRENCH;
-#if 0
-	keyboardScript = GetScriptManagerVariable(smKeyScript);
-	languageCode = GetScriptVariable(keyboardScript, smScriptLang);
-
-	switch(languageCode)
-	{
-		case	langFrench:
-				gGamePrefs.language 			= LANGUAGE_FRENCH;
-				break;
-
-		case	langGerman:
-				gGamePrefs.language 			= LANGUAGE_GERMAN;
-				break;
-
-		case	langSpanish:
-				gGamePrefs.language 			= LANGUAGE_SPANISH;
-				break;
-
-		case	langItalian:
-				gGamePrefs.language 			= LANGUAGE_ITALIAN;
-				break;
-
-		case	langDutch:
-				gGamePrefs.language 			= LANGUAGE_DUTCH;
-				break;
-
-		default:
-				gGamePrefs.language 			= LANGUAGE_ENGLISH;
-	}
-#endif
-
-
+	gGamePrefs.language				= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.version				= CURRENT_PREFS_VERS;
 	gGamePrefs.difficulty			= 0;
 	gGamePrefs.showScreenModeDialog = true;
@@ -246,7 +214,7 @@ const short songs[] =
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
-		gLevelNum = LEVEL_NUM_PARK;
+//		gLevelNum = LEVEL_NUM_PARK;
 
 //			if (GetKeyState(KEY_F10))		// see if do Level cheat
 //				if (DoLevelCheatDialog())

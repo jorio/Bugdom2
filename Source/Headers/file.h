@@ -110,15 +110,5 @@ void LoadLevelArt_Tunnel(void);
 
 void LoadFoliage(void);
 
-
-
-
-
-
-
-
-
-
-
-
-
+Ptr LoadDataFile(const char* path, long* outLength);
+char* LoadTextFile(const char* spec, long* outLength);

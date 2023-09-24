@@ -51,6 +51,7 @@
 #include "lzss.h"
 #include "bones.h"
 #include "vaportrails.h"
+#include "localization.h"
 #include "dialog.h"
 
 extern	BG3DFileContainer		*gBG3DContainerList[];

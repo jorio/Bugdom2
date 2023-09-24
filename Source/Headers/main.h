@@ -28,20 +28,6 @@ enum
 	NUM_LEVELS
 };
 
-
-enum
-{
-	LANGUAGE_ENGLISH = 0,
-	LANGUAGE_FRENCH,
-	LANGUAGE_GERMAN,
-	LANGUAGE_SPANISH,
-	LANGUAGE_ITALIAN,
-	LANGUAGE_SWEDISH,
-	LANGUAGE_DUTCH,
-
-	MAX_LANGUAGES
-};
-
 //=================================================
 
 void GameMain(void);

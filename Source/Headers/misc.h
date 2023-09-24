@@ -39,6 +39,8 @@ void SwizzleUV(OGLTextureCoord *pt);
 void RGBtoHSV( float r, float g, float b, float *h, float *s, float *v );
 void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v );
 
+char* CSVIterator(char** csvCursor, bool* eolOut);
+
 #if _DEBUG
 #define IMPLEMENT_ME_SOFT() { static int _warnings = 0; if (!_warnings++) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "IMPLEMENT ME: %s:%d\n", __func__, __LINE__); }
 #else

@@ -1,7 +1,8 @@
 /****************************/
 /*      FILE ROUTINES       */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -26,10 +27,6 @@ static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short f
 /****************************/
 /*    CONSTANTS             */
 /****************************/
-
-#define	BASE_PATH_TILE		900					// tile # of 1st path tile
-
-#define	PICT_HEADER_SIZE	512
 
 #define	SKELETON_FILE_VERS_NUM	0x0110			// v1.1
 
@@ -1695,12 +1692,58 @@ MOVertexArrayData		data;
 }
 
 
+#pragma mark -
 
 
+/*********************** LOAD DATA FILE INTO MEMORY ***********************************/
+//
+// Use SafeDisposePtr when done.
+//
 
+Ptr LoadDataFile(const char* path, long* outLength)
+{
+	FSSpec spec;
+	OSErr err;
+	short refNum;
+	long fileLength = 0;
+	long readBytes = 0;
 
+	err = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &spec);
+	if (err != noErr)
+		return NULL;
 
+	err = FSpOpenDF(&spec, fsRdPerm, &refNum);
+	GAME_ASSERT_MESSAGE(!err, path);
 
+	// Get number of bytes until EOF
+	GetEOF(refNum, &fileLength);
 
+	// Prep data buffer
+	// Alloc 1 extra byte so LoadTextFile can return a null-terminated C string!
+	Ptr data = AllocPtrClear(fileLength + 1);
 
+	// Read file into data buffer
+	readBytes = fileLength;
+	err = FSRead(refNum, &readBytes, (Ptr) data);
+	GAME_ASSERT_MESSAGE(err == noErr, path);
+	FSClose(refNum);
 
+	GAME_ASSERT_MESSAGE(fileLength == readBytes, path);
+
+	if (outLength)
+	{
+		*outLength = fileLength;
+	}
+
+	return data;
+}
+
+/*********************** LOAD TEXT FILE INTO MEMORY ***********************************/
+//
+// Use SafeDisposePtr when done.
+//
+
+char* LoadTextFile(const char* spec, long* outLength)
+{
+	return LoadDataFile(spec, outLength);
+}
