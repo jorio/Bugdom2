@@ -334,15 +334,19 @@ OGLPoint3D			origin;
 void MoveShards(void)
 {
 float	ty,y,fps,x,z;
-long	i;
 
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;
 
+	GAME_ASSERT(gNumShards > 0);
+
 	fps = gFramesPerSecondFrac;
 
-	for (i=0; i < MAX_SHARDS; i++)
+	for (int i = 0; i < MAX_SHARDS; i++)
 	{
+		if (!gShards[i].isUsed)
+			continue;
+
 				/* ROTATE IT */
 
 		gShards[i].rot.x += gShards[i].rotDelta.x * fps;
@@ -411,52 +415,52 @@ del:
 
 void DrawShards(void)
 {
-long	i;
-
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;
+
+	GAME_ASSERT(gNumShards > 0);
 
 			/* SET STATE */
 
 	glDisable(GL_CULL_FACE);
 	OGL_DisableLighting();
 
-	for (i=0; i < MAX_SHARDS; i++)
+	for (int i = 0; i < MAX_SHARDS; i++)
 	{
-		if (gShards[i].isUsed)
-		{
-					/* SUBMIT MATERIAL */
+		if (!gShards[i].isUsed)
+			continue;
 
-			gGlobalColorFilter.r = gShards[i].colorFilter.r;
-			gGlobalColorFilter.g = gShards[i].colorFilter.g;
-			gGlobalColorFilter.b = gShards[i].colorFilter.b;
-			gGlobalTransparency = gShards[i].colorFilter.a;
+				/* SUBMIT MATERIAL */
 
-			if (gShards[i].glow)
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			else
-			    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gGlobalColorFilter.r = gShards[i].colorFilter.r;
+		gGlobalColorFilter.g = gShards[i].colorFilter.g;
+		gGlobalColorFilter.b = gShards[i].colorFilter.b;
+		gGlobalTransparency = gShards[i].colorFilter.a;
 
-
-			if (gShards[i].material)
-				MO_DrawMaterial(gShards[i].material);
-
-					/* SET MATRIX */
-
-			glPushMatrix();
-			glMultMatrixf((GLfloat *)&gShards[i].matrix);
+		if (gShards[i].glow)
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		else
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-					/* DRAW THE TRIANGLE */
+		if (gShards[i].material)
+			MO_DrawMaterial(gShards[i].material);
 
-			glBegin(GL_TRIANGLES);
-			glTexCoord2f(gShards[i].uvs[0].u, gShards[i].uvs[0].v);	glVertex3f(gShards[i].points[0].x, gShards[i].points[0].y, gShards[i].points[0].z);
-			glTexCoord2f(gShards[i].uvs[1].u, gShards[i].uvs[1].v);	glVertex3f(gShards[i].points[1].x, gShards[i].points[1].y, gShards[i].points[1].z);
-			glTexCoord2f(gShards[i].uvs[2].u, gShards[i].uvs[2].v);	glVertex3f(gShards[i].points[2].x, gShards[i].points[2].y, gShards[i].points[2].z);
-			glEnd();
+				/* SET MATRIX */
 
-			glPopMatrix();
-		}
+		glPushMatrix();
+		glMultMatrixf((GLfloat *)&gShards[i].matrix);
+
+
+				/* DRAW THE TRIANGLE */
+
+		glBegin(GL_TRIANGLES);
+		glTexCoord2f(gShards[i].uvs[0].u, gShards[i].uvs[0].v);	glVertex3f(gShards[i].points[0].x, gShards[i].points[0].y, gShards[i].points[0].z);
+		glTexCoord2f(gShards[i].uvs[1].u, gShards[i].uvs[1].v);	glVertex3f(gShards[i].points[1].x, gShards[i].points[1].y, gShards[i].points[1].z);
+		glTexCoord2f(gShards[i].uvs[2].u, gShards[i].uvs[2].v);	glVertex3f(gShards[i].points[2].x, gShards[i].points[2].y, gShards[i].points[2].z);
+		glEnd();
+
+		glPopMatrix();
 	}
 
 		/* CLEANUP */
