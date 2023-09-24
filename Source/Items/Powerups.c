@@ -225,7 +225,8 @@ static Boolean DoTrig_Butterfly(ObjNode *trigger, ObjNode *who, Byte sideBits)
 {
 ObjNode	*pow;
 
-#pragma unused (who, sideBits)
+	(void) who;
+	(void) sideBits;
 
 	MakeConfettiExplosion(trigger->Coord.x, trigger->Coord.y, trigger->Coord.z,
 							100, 1.0, PARTICLE_SObjType_YwllowDiasyConfetti, 100);
@@ -420,7 +421,8 @@ void MovePowerup(ObjNode *theNode)
 
 Boolean DoTrig_Powerup(ObjNode *pow, ObjNode *who, Byte sideBits)
 {
-#pragma unused (who, sideBits)
+	(void) who;
+	(void) sideBits;
 
 	switch(pow->POWKind)
 	{

@@ -372,7 +372,7 @@ static void UpdateComputerBugEyes(ObjNode *theNode)
 {
 short			i, j;
 float			r,aimX,aimZ, dist;
-const static OGLPoint3D	eyeOff[2] = {-12.0, 9.0, -9.0,
+static const OGLPoint3D	eyeOff[2] = {-12.0, 9.0, -9.0,
 									  12.0, 9.0, -9.0};
 OGLMatrix4x4	m;
 
@@ -462,7 +462,7 @@ OGLMatrix4x4	m;
 
 /************************ PRIME COMPUTERBUG ENEMY *************************/
 
-Boolean PrimeEnemy_ComputerBug(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_ComputerBug(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -612,7 +612,7 @@ OGLVector3D *pd;
 
 static Boolean DoTrig_ComputerBug(ObjNode *enemy, ObjNode *who, Byte sideBits)
 {
-#pragma unused (sideBits)
+	(void) sideBits;
 
 	ComputerBugTouchedPlayer(enemy, who);
 
@@ -660,7 +660,7 @@ OGLPoint3D	where;
 OGLVector3D	delta;
 float		scale = VIRUS_SCALE;
 
-#pragma unused (	enemy)
+	(void) enemy;
 
 	where.x = gCoord.x;
 	where.z = gCoord.z;
@@ -833,11 +833,11 @@ int		i;
 
 static Boolean DoTrig_Virus(ObjNode *virus, ObjNode *who, Byte sideBits)
 {
-int		i;
 OGLVector3D	delta;
 OGLPoint3D	where = virus->Coord;
 
-#pragma unused (sideBits, who)
+	(void) sideBits;
+	(void) who;
 
 	if (virus->StatusBits & STATUS_BIT_ONGROUND)				// only trigger when on ground
 	{
@@ -853,7 +853,7 @@ OGLPoint3D	where = virus->Coord;
 
 					/* MAKE MORE */
 
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			delta.x = RandomFloat2() * 300.0f;
 			delta.y = 500.0f + RandomFloat() * 400.0f;

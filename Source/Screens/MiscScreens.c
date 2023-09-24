@@ -31,10 +31,6 @@ static void DisplayPicture_Draw(void);
 
 MOPictureObject 	*gBackgoundPicture = nil;
 
-OGLSetupOutputType	*gScreenViewInfoPtr = nil;
-
-static Boolean		gLanguageChanged = false;
-
 
 /********************** DISPLAY PICTURE **************************/
 //
@@ -66,7 +62,7 @@ float	timeout = 40.0f;
 
 			/* CREATE BACKGROUND OBJECT */
 
-	gBackgoundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, (uint32_t)gGameView, spec);
+	gBackgoundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, spec);
 	if (!gBackgoundPicture)
 		DoFatalAlert("DisplayPicture: MO_CreateNewObjectOfType failed");
 

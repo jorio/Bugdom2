@@ -652,10 +652,9 @@ void EndGliding(ObjNode *theNode)
 
 static void DrawWingLayers(ObjNode *eventObj)
 {
-#pragma unused (eventObj)
-int		i;
+	(void) eventObj;
 
-	for (i = NUM_WING_BLUR_LAYERS-1; i >= 0; i--)
+	for (int i = NUM_WING_BLUR_LAYERS-1; i >= 0; i--)
 	{
 
 			/* DRAW RIGHT WING */

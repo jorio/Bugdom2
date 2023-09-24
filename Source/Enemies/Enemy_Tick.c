@@ -89,8 +89,8 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-short	gTotalTicks = 0;
-short	gNumKilledTicks = 0;
+int	gTotalTicks = 0;
+int	gNumKilledTicks = 0;
 
 #define	SpitNow				Flag[0]
 #define	LurchNow			Flag[0]
@@ -490,7 +490,7 @@ float fps = gFramesPerSecondFrac;
 
 static void  MoveTick_Spit(ObjNode *theNode)
 {
-float		fps,angle;
+float		fps;
 
 	fps = gFramesPerSecondFrac;
 
@@ -500,7 +500,7 @@ float		fps,angle;
 
 			/* MOVE TOWARD SPURT TARGET */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TICK_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TICK_TURN_SPEED, false);
 
 
 			/* MOVE */
@@ -576,8 +576,8 @@ static void UpdateTick(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-5,2.5,-35};
-const static OGLPoint3D	rightEye = {5,2.5,-35};
+static const OGLPoint3D	leftEye = {-5,2.5,-35};
+static const OGLPoint3D	rightEye = {5,2.5,-35};
 OGLMatrix4x4	m;
 
 	UpdateEnemy(theNode);
@@ -634,7 +634,7 @@ OGLMatrix4x4	m;
 
 /************************ PRIME TICK ENEMY *************************/
 
-Boolean PrimeEnemy_Tick(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Tick(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;

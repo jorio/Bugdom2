@@ -49,7 +49,7 @@ enum
 
 typedef struct
 {
-	unsigned char	name[MAX_NAME_LENGTH+1];
+	char			name[MAX_NAME_LENGTH+1];
 	uint32_t		score;
 }HighScoreType;
 
@@ -75,7 +75,7 @@ void DoLoseScreen(void);
 void NewScore(void);
 void LoadHighScores(void);
 void ClearHighScores(void);
-void DrawScoreText(unsigned char *s, float x, float y);
+void DrawScoreText(const char* cstr, float x, float y);
 
 void DoWinScreen(void);
 

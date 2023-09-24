@@ -14,7 +14,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static Boolean NilPrime(long splineNum, SplineItemType *itemPtr);
+static Boolean NilPrime(int splineNum, SplineItemType *itemPtr);
 
 
 /****************************/
@@ -30,9 +30,9 @@ static Boolean NilPrime(long splineNum, SplineItemType *itemPtr);
 /**********************/
 
 SplineDefType	**gSplineList = nil;
-long			gNumSplines = 0;
+int				gNumSplines = 0;
 
-static long		gNumSplineObjects = 0;
+static int		gNumSplineObjects = 0;
 static ObjNode	*gSplineObjectList[MAX_SPLINE_OBJECTS];
 
 
@@ -42,7 +42,7 @@ static ObjNode	*gSplineObjectList[MAX_SPLINE_OBJECTS];
 
 #define	MAX_SPLINE_ITEM_NUM		68				// for error checking!
 
-Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType *) =
+Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(int, SplineItemType *) =
 {
 		NilPrime,							// My Start Coords
 		NilPrime,
@@ -125,7 +125,7 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType 
 
 void PrimeSplines(void)
 {
-long			s,i,type;
+long			type;
 SplineItemType 	*itemPtr;
 SplineDefType	*spline;
 Boolean			flag;
@@ -134,17 +134,16 @@ SplinePointType	*points;
 
 			/* ADJUST SPLINE TO GAME COORDINATES */
 
-	for (s = 0; s < gNumSplines; s++)
+	for (int s = 0; s < gNumSplines; s++)
 	{
 		spline = &(*gSplineList)[s];							// point to this spline
 		points = (*spline->pointList);							// point to points list
 
-		for (i = 0; i < spline->numPoints; i++)
+		for (int i = 0; i < spline->numPoints; i++)
 		{
 			points[i].x *= gMapToUnitValue;
 			points[i].z *= gMapToUnitValue;
 		}
-
 	}
 
 
@@ -152,19 +151,18 @@ SplinePointType	*points;
 
 	gNumSplineObjects = 0;										// no items in spline object node list yet
 
-	for (s = 0; s < gNumSplines; s++)
+	for (int s = 0; s < gNumSplines; s++)
 	{
 		spline = &(*gSplineList)[s];							// point to this spline
 
 				/* SCAN ALL ITEMS ON THIS SPLINE */
 
 		HLockHi((Handle)spline->itemList);						// make sure this is permanently locked down
-		for (i = 0; i < spline->numItems; i++)
+		for (int i = 0; i < spline->numItems; i++)
 		{
 			itemPtr = &(*spline->itemList)[i];					// point to this item
 			type = itemPtr->type;								// get item type
-			if (type > MAX_SPLINE_ITEM_NUM)
-				DoFatalAlert("PrimeSplines: type > MAX_SPLINE_ITEM_NUM");
+			GAME_ASSERT(type <= MAX_SPLINE_ITEM_NUM);
 
 			flag = gSplineItemPrimeRoutines[type](s,itemPtr); 	// call item's Prime routine
 			if (flag)
@@ -179,10 +177,10 @@ SplinePointType	*points;
 // nothing prime
 //
 
-static Boolean NilPrime(long splineNum, SplineItemType *itemPtr)
+static Boolean NilPrime(int splineNum, SplineItemType *itemPtr)
 {
-#pragma unused (splineNum, itemPtr)
-
+	(void) splineNum;
+	(void) itemPtr;
 	return(false);
 }
 

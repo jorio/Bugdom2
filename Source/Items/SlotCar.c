@@ -82,7 +82,7 @@ void InitSlotCarRacing(void)
 
 /************************ PRIME SLOT CAR *************************/
 
-Boolean PrimeSlotCar(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeSlotCar(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*car, *frontWheels, *rearWheels;
 float			x,z,placement = 0;
@@ -338,7 +338,7 @@ Boolean isInRange;
 
 static Boolean DoTrig_SlotCar(ObjNode *car, ObjNode *who, Byte sideBits)
 {
-#pragma unused (who)
+	(void) who;
 
 	if (sideBits & SIDE_BITS_BOTTOM)												// see if on top of car
 	{
@@ -371,7 +371,7 @@ float		x1,z1,x2,z2,oldSplinePlacement;
 OGLVector2D	trackAim, buttAim, curve;
 int			splineNum = car->SplineNum;
 float		angle;
-int			carNum = car->CarNum;
+long		carNum = car->CarNum;
 float		speed,r,dot;
 OGLVector2D	pinAim;
 
@@ -834,7 +834,7 @@ static void PlayerExitsSlotCar(ObjNode *car)
 ObjNode	*player = gPlayerInfo.objNode;
 float	r;
 
-#pragma unused (car)
+	(void) car;
 
 	if (player->Skeleton->AnimNum != PLAYER_ANIM_DRIVESLOTCAR)		// make sure Skip is still on car
 		return;

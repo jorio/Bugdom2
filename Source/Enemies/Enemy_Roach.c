@@ -393,7 +393,7 @@ float		r,fps,aim,dist;
 
 static void  MoveRoach_WalkEmpty(ObjNode *theNode)
 {
-float		r,fps,aim;
+float		r,fps;
 ObjNode		*spear;
 
 	theNode->Skeleton->AnimSpeed = WALK_ANIM_SPEED;
@@ -410,8 +410,7 @@ ObjNode		*spear;
 
 			/* MOVE TOWARD SPEAR */
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, spear->Coord.x, spear->Coord.z,
-								ROACH_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, spear->Coord.x, spear->Coord.z, ROACH_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * ROACH_WALK_SPEED;
@@ -614,8 +613,8 @@ static void UpdateRoach(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-10,1,-40};
-const static OGLPoint3D	rightEye = {10,1,-40};
+static const OGLPoint3D	leftEye = {-10,1,-40};
+static const OGLPoint3D	rightEye = {10,1,-40};
 OGLMatrix4x4	m;
 
 
@@ -670,7 +669,7 @@ OGLMatrix4x4	m;
 
 /************************ PRIME ROACH ENEMY *************************/
 
-Boolean PrimeEnemy_Roach(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Roach(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -908,7 +907,7 @@ float					scale;
 static void RoachThrowSpear(ObjNode *enemy)
 {
 ObjNode		 			*spear;
-const static OGLPoint3D zero = {0,0,0};
+static const OGLPoint3D zero = {0,0,0};
 float					rot, dist;
 OGLMatrix4x4			m;
 

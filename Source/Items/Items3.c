@@ -208,7 +208,6 @@ static void DoSodaSpray(ObjNode *theNode)
 float				fps = gFramesPerSecondFrac;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
-int					particleGroup,magicNum,i;
 OGLVector3D			d;
 OGLPoint3D			p;
 float				x,y,z,dist;
@@ -240,8 +239,8 @@ float				x,y,z,dist;
 	{
 		theNode->ParticleTimer += .05f;
 
-		particleGroup 	= theNode->ParticleGroup;
-		magicNum 		= theNode->ParticleMagicNum;
+		long particleGroup 	= theNode->ParticleGroup;
+		long magicNum 		= theNode->ParticleMagicNum;
 
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
@@ -270,7 +269,7 @@ float				x,y,z,dist;
 			y = p.y;
 			z = p.z;
 
-			for (i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				p.x = x + RandomFloat2() * 20.0f;
 				p.y = y + RandomFloat2() * 40.0f;

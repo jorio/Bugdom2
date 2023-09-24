@@ -181,7 +181,6 @@ typedef	struct
 {
 	Boolean					clearBackBuffer;
 	OGLColorRGBA			clearColor;
-	Rect					clip;			// left = amount to clip off left, etc.
 }OGLViewDefType;
 
 
@@ -232,7 +231,6 @@ typedef struct
 {
 	Boolean					isActive;
 	SDL_GLContext			drawContext;
-	Rect					clip;				// not pane size, but clip:  left = amount to clip off left
 	OGLLightDefType			lightList;
 	OGLCameraPlacement		cameraPlacement;
 	float					fov,hither,yon;

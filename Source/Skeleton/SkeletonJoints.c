@@ -125,7 +125,9 @@ OGLMatrix4x4	matrix;
 void FindCoordOnJointAtFlagEvent(ObjNode *theNode, long jointNum, const OGLPoint3D *inPoint, OGLPoint3D *outPoint)
 {
 OGLMatrix4x4	matrix;
-short			time,oldTime,animNum;
+short			time = 0;
+short			oldTime;
+short			animNum;
 SkeletonObjDataType	*skeleton;
 Byte			i,numEvents;
 
@@ -169,10 +171,11 @@ Byte			i,numEvents;
 
 void FindJointMatrixAtFlagEvent(ObjNode *theNode, long jointNum, Byte flagNum, OGLMatrix4x4 *m)
 {
-short			time,oldTime;
+short			time = 0;
+short			oldTime;
 SkeletonObjDataType	*skeleton;
 SkeletonDefType	*skelDef;
-Byte			i,numEvents;
+Byte			numEvents;
 
 			/* GET THE TIME OF THE 1ST FLAG EVENT */
 
@@ -180,7 +183,7 @@ Byte			i,numEvents;
 	skelDef = skeleton->skeletonDefinition;
 	numEvents = skelDef->NumAnimEvents[skeleton->AnimNum];
 
-	for (i = 0; i < numEvents; i++)
+	for (int i = 0; i < numEvents; i++)
 	{
 		if (skelDef->AnimEventsList[skeleton->AnimNum][i].type == ANIMEVENT_TYPE_SETFLAG)		// is setflag?
 		{

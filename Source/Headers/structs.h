@@ -65,11 +65,12 @@ typedef struct
 
 typedef struct
 {
-	short			numNubs;			// # nubs in spline
+	int				numNubs;			// # nubs in spline
+	int				numPoints;			// # points in spline
+	int				numItems;			// # items on the spline
+
 	SplinePointType	**nubList;			// handle to nub list
-	long			numPoints;			// # points in spline
 	SplinePointType	**pointList;		// handle to calculated spline points
-	short			numItems;			// # items on the spline
 	SplineItemType	**itemList;			// handle to spline items
 
 	Rect			bBox;				// bounding box of spline area
@@ -173,16 +174,13 @@ typedef struct
 
 	BoneDefinitionType	*Bones;							// data which describes bone heirarachy
 
-	long				numDecomposedTriMeshes;			// # trimeshes in skeleton
+	int					numDecomposedTriMeshes;			// # trimeshes in skeleton
+	int					numDecomposedPoints;			// # shared points in skeleton
+	int					numDecomposedNormals;			// # shared normal vectors
+
 	MOVertexArrayData	decomposedTriMeshes[MAX_DECOMPOSED_TRIMESHES];	// array of triMeshData
-
-	long				numDecomposedPoints;			// # shared points in skeleton
 	DecomposedPointType	*decomposedPointList;			// array of shared points
-
-	short				numDecomposedNormals ;			// # shared normal vectors
 	OGLVector3D			*decomposedNormalsList;			// array of shared normals
-
-
 }SkeletonDefType;
 
 
@@ -312,7 +310,7 @@ struct ObjNode
 			/* SPECS */
 
 	signed char		Flag[6];
-	long			Special[6];
+	int				Special[6];
 	float			SpecialF[6];
 	struct ObjNode*	SpecialObjPtr[2];
 	float			Timer;				// misc use timer
@@ -352,8 +350,8 @@ struct ObjNode
 			/* PARTICLE EFFECTS */
 
 	short				EffectChannel;					// effect sound channel index (-1 = none)
-	short				ParticleGroup;
-	uint32_t				ParticleMagicNum;
+	int					ParticleGroup;
+	int					ParticleMagicNum;
 	float				ParticleTimer;
 
 	short				VaporTrails[MAX_JOINTS];		// indecies into vapor trail list
@@ -378,7 +376,7 @@ typedef struct
 {
 	Byte			genre,group,type,animNum;
 	OGLPoint3D		coord;
-	unsigned long	flags;
+	uint32_t		flags;
 	short			slot;
 	void			(*moveCall)(ObjNode *);
 	float			rot,scale;

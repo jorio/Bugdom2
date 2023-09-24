@@ -95,7 +95,6 @@ static void DrawPaused(void)
 {
 float	x,y,leftX;
 float	dotX,dotY;
-int		i,j;
 static float	dotAlpha = 1.0f;
 
 			/* DRAW THE BACKGROUND */
@@ -144,10 +143,9 @@ static float	dotAlpha = 1.0f;
 	leftX = x + 25.0f;
 	y += 13;
 
-	for (j = 0; j < 3; j++)											// 3 lines of text
+	for (int j = 0; j < 3; j++)											// 3 lines of text
 	{
 		x = leftX;
-		i = 0;
 
 		if (j == gPausedMenuSelection)								// remember where to put dot
 		{
@@ -165,7 +163,6 @@ static float	dotAlpha = 1.0f;
 				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
 
 			x += GetCharSpacing(c, LETTER_SPACING);
-			i++;
 		}
 		y += LETTER_SPACING_Y;
 	}

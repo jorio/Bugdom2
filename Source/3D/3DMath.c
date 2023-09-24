@@ -17,10 +17,6 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void OGLMatrix4x4_Multiply_Altivec(const OGLMatrix4x4	*mA, const OGLMatrix4x4 *mB, OGLMatrix4x4	*result);
-static void OGLMatrix4x4_Multiply_Float(const OGLMatrix4x4	*mA, const OGLMatrix4x4 *mB, OGLMatrix4x4	*result);
-
-
 #define Math_Min(x,y)             ((x) <= (y) ? (x) : (y))
 #define Math_Max(x,y)             ((x) >= (y) ? (x) : (y))
 
@@ -113,7 +109,7 @@ float		dot,angle;
 
 float	CalcYAngleFromPointToPoint(float oldRot, float fromX, float fromZ, float toX, float toZ)
 {
-const static OGLVector2D	zax = {0,-1};
+static const OGLVector2D	zax = {0,-1};
 OGLVector2D					aim;
 float		dot,angle,cross;
 
@@ -1572,22 +1568,7 @@ OGLMatrix4x4		negTransM, rotM;
 
 /****************** OGL MATRIX 4X4 MULTIPLY ********************/
 
-void OGLMatrix4x4_Multiply(const OGLMatrix4x4	*mA, const OGLMatrix4x4 *mB, OGLMatrix4x4	*result)
-{
-#if defined(__VEC__)
-
-	if (gAltivec)
-		OGLMatrix4x4_Multiply_Altivec(mA, mB, result);
-	else
-#endif
-		OGLMatrix4x4_Multiply_Float(mA,mB, result);
-}
-
-
-
-/****************** OGL MATRIX 4X4 MULTIPLY FLOAT ********************/
-
-static void OGLMatrix4x4_Multiply_Float(const OGLMatrix4x4	*mA, const OGLMatrix4x4 *mB, OGLMatrix4x4	*result)
+void OGLMatrix4x4_Multiply(const OGLMatrix4x4 *mA, const OGLMatrix4x4 *mB, OGLMatrix4x4 *result)
 {
 	float	b00, b01, b02, b03;
 	float	b10, b11, b12, b13;

@@ -38,10 +38,10 @@ enum
 
 struct MetaObjectHeader
 {
-	uint32_t		cookie;						// this value should always == MO_COOKIE
+	uint32_t	cookie;						// this value should always == MO_COOKIE
 	long		refCount;					// # times this is referenced
-	uint32_t		type;						// object type
-	uint32_t		subType;					// object sub-type
+	uint32_t	type;						// object type
+	intptr_t	subType;					// object sub-type
 	void		*data;						// pointer to meta object's specific data
 
 	struct MetaObjectHeader *parentGroup;			// illegal reference to parent group, or nil if no parent

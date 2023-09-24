@@ -19,10 +19,6 @@
 
 static void MoveFadeEvent(ObjNode *theNode);
 
-static void CreateDisplayModeList(void);
-static void CalcVRAMAfterBuffers(void);
-static void GetDisplayVRAM(void);
-
 
 /****************************/
 /*    CONSTANTS             */
@@ -470,37 +466,6 @@ void Exit2D(void)
 }
 
 
-/********************** WAIT **********************/
-
-void Wait(uint32_t ticks)
-{
-uint32_t	start;
-
-	start = TickCount();
-
-	while (TickCount()-start < ticks)
-		MyFlushEvents();
-
-}
-
-
-#pragma mark -
-
-/*********************** CALC VRAM AFTER BUFFERS ***********************/
-//
-// CALC HOW MUCH VRAM REMAINS AFTER OUR BUFFERS
-//
-
-static void CalcVRAMAfterBuffers(void)
-{
-int	bufferSpace;
-
-	bufferSpace = gGameWindowWidth * gGameWindowHeight * 2 * 2;		// calc main pixel/z buffers @ 16-bit
-	bufferSpace *= 2;	// 32-bit
-
-	gVRAMAfterBuffers = gDisplayVRAM - bufferSpace;
-}
-
 
 #pragma mark -
 
@@ -532,8 +497,3 @@ void ShowRealCursor(void)
 	}
 #endif
 }
-
-
-
-
-

@@ -338,7 +338,8 @@ float	fps = gFramesPerSecondFrac;
 
 void IgniteKindling(ObjNode *theNode)
 {
-#pragma unused (theNode)
+	(void) theNode;
+
 	gBurnKindling = true;
 	gNumFreedBees = 0;
 }
@@ -348,9 +349,8 @@ void IgniteKindling(ObjNode *theNode)
 
 static void MoveKindling2(ObjNode *theNode)
 {
-int		i;
 float	fps = gFramesPerSecondFrac;
-int		particleGroup,magicNum;
+long	particleGroup,magicNum;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
 OGLVector3D			d;
@@ -403,7 +403,7 @@ float	x,y,z;
 
 		if (particleGroup != -1)
 		{
-			for (i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 40.0f;
 				p.y = y + 80.0f + RandomFloat() * 50.0f;
@@ -461,7 +461,7 @@ float	x,y,z;
 
 		if (particleGroup != -1)
 		{
-			for (i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 30.0f;
 				p.y = y - RandomFloat() * 50.0f;

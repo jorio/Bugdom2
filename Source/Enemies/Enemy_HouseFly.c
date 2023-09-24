@@ -510,7 +510,7 @@ static void StartChaseSpurt(ObjNode *enemy, float distToPlayer)
 
 /************************ PRIME HOUSEFLY ENEMY *************************/
 
-Boolean PrimeEnemy_HouseFly(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_HouseFly(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -619,7 +619,7 @@ float	r = player->Rot.y;
 
 static Boolean HurtHouseFly(ObjNode *enemy, float damage)
 {
-#pragma unused (damage)
+	(void) damage;
 
 			/* SEE IF REMOVE FROM SPLINE */
 

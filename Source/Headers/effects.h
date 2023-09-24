@@ -21,10 +21,10 @@
 
 typedef struct
 {
-	uint32_t			magicNum;
+	long			magicNum;
 	Byte			isUsed[MAX_PARTICLES];
 	Byte			type;
-	uint32_t			flags;
+	uint32_t		flags;
 	Byte			particleTextureNum;
 	float			gravity;
 	float			magnetism;
@@ -53,9 +53,9 @@ typedef struct
 
 typedef struct
 {
-	uint32_t			magicNum;
+	uint32_t		magicNum;
 	Byte			isUsed[MAX_CONFETTIS];
-	uint32_t			flags;
+	uint32_t		flags;
 	Byte			confettiTextureNum;
 	float			gravity;
 	float			baseScale;
@@ -100,7 +100,7 @@ enum
 
 typedef struct
 {
-	uint32_t 	magicNum;
+	long	magicNum;
 	Byte 	type;
 	uint32_t  flags;
 	float 	gravity;
@@ -163,7 +163,7 @@ void InitParticleSystem(void);
 void DeleteAllParticleGroups(void);
 short NewParticleGroup(NewParticleGroupDefType *def);
 Boolean AddParticleToGroup(NewParticleDefType *def);
-Boolean VerifyParticleGroupMagicNum(short group, uint32_t magicNum);
+Boolean VerifyParticleGroupMagicNum(short group, long magicNum);
 Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags);
 void DisposeParticleSystem(void);
 

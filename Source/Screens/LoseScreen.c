@@ -82,8 +82,8 @@ static void SetupLoseScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
-const static OGLVector3D	fillDirection2 = { .3, .8, 1.0 };
+static const OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
+static const OGLVector3D	fillDirection2 = { .3, .8, 1.0 };
 ObjNode	*newObj, *bee, *bag;
 int			i;
 

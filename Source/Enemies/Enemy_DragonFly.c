@@ -317,18 +317,15 @@ float		r,fps,y;
 
 static void  MoveDragonfly_GotHit(ObjNode *theNode)
 {
-float		r,fps,aim;
+float		r,fps;
 
 	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE TOWARD PLAYER */
 
-	if (gPlayerIsDead)								// don't aim at player if player is dead
-		aim = PI;
-	else
-		aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, DRAGONFLY_TURN_SPEED, false);
-
+	if (!gPlayerIsDead)								// don't aim at player if player is dead
+		TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, DRAGONFLY_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * DRAGONFLY_WALK_SPEED;
@@ -462,7 +459,7 @@ float	v;
 
 /************************ PRIME DRAGONFLY ENEMY *************************/
 
-Boolean PrimeEnemy_Dragonfly(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Dragonfly(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;

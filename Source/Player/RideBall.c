@@ -100,7 +100,8 @@ static void MoveRideBall(ObjNode *ball)
 float	fps = gFramesPerSecondFrac;
 OGLMatrix3x3		m;
 static OGLPoint2D origin = {0,0};
-float	force,rot;
+float	force = 0;
+float	rot = 0;
 float	waterY;
 ObjNode	*player = gPlayerInfo.objNode;
 
@@ -125,7 +126,10 @@ ObjNode	*player = gPlayerInfo.objNode;
 	if (gPlayerInfo.ridingBall == ball)
 	{
 		if (gLevelNum != LEVEL_NUM_SIDEWALK)							// can only ride on sidewalk level
+		{
+			rot = RandomFloat2() * PI;									// pick some angle
 			goto jump_off;
+		}
 
 				/* CALC ACCEL VECTOR */
 

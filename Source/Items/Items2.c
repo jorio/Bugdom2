@@ -187,7 +187,7 @@ OGLVector2D	v1,v2;
 
 /************************ PRIME BUMBLE BEE *************************/
 
-Boolean PrimeBumbleBee(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeBumbleBee(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode		*bee,*bag;
 float		x,z,placement;
@@ -953,7 +953,8 @@ static Boolean DoTrig_SiliconDoor(ObjNode *door, ObjNode *who, Byte sideBits)
 {
 ObjNode	*held;
 
-#pragma unused (who, sideBits)
+	(void) who;
+	(void) sideBits;
 
 			/* SEE WHICH SILICON PART WE HAVE & SET FLAGS */
 

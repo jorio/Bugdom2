@@ -214,9 +214,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 
 static void  MoveAnt_Stand_Food(ObjNode *theNode)
 {
-float	angleToTarget;
 ObjNode	*food;
-float	dist;
 
 			/* VERIFY FOOD */
 
@@ -230,8 +228,7 @@ bad_food:
 		MorphToSkeletonAnim(theNode->Skeleton, ANT_ANIM_STAND_NO_FOOD, 6);
 	}
 
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
-	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);		// calc dist to player
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
 
 
 				/**********************/
@@ -250,12 +247,11 @@ bad_food:
 
 static void  MoveAnt_Stand(ObjNode *theNode)
 {
-float	angleToTarget;
 float	dist;
 
 				/* TURN TOWARDS ME */
 
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);		// calc dist to player
 
 
@@ -308,13 +304,13 @@ static void  MoveAnt_GetUp(ObjNode *theNode)
 
 static void  MoveAnt_WalkFood(ObjNode *theNode)
 {
-float		r,fps,aim,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * ANT_WALK_SPEED;
@@ -350,14 +346,14 @@ float		r,fps,aim,dist;
 
 static void  MoveAnt_WalkEmpty(ObjNode *theNode)
 {
-float		r,fps,aim,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE TOWARD PLAYER */
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * ANT_WALK_SPEED;
@@ -396,7 +392,7 @@ float		r,fps,aim,dist;
 
 static void  MoveAnt_Attack(ObjNode *theNode)
 {
-float		r,fps,aim;
+float		r,fps;
 const OGLPoint3D	off = {0,20, -30};
 OGLPoint3D	pt;
 
@@ -405,7 +401,7 @@ OGLPoint3D	pt;
 
 			/* MOVE TOWARD PLAYER */
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ANT_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * (ANT_WALK_SPEED/2);
@@ -545,7 +541,7 @@ static void UpdateAnt(ObjNode *theNode)
 
 /************************ PRIME ANT ENEMY *************************/
 
-Boolean PrimeEnemy_Ant(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Ant(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;

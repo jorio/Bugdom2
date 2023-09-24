@@ -522,7 +522,7 @@ OGLMatrix4x4	m,m2;
 
 /************************ PRIME OTTO ENEMY *************************/
 
-Boolean PrimeEnemy_Otto(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Otto(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -910,7 +910,7 @@ float			fps = gFramesPerSecondFrac;
 	i = theNode->Sparkles[OTTO_SPARKLE_CHEST];								// get sparkle index
 	if (i != -1)
 	{
-		const static OGLPoint3D	p = {0,0,0};
+		static const OGLPoint3D	p = {0,0,0};
 
 				/* GET MATRIX FOR JOINT */
 

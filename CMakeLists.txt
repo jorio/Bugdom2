@@ -55,6 +55,7 @@ set(POMME_NO_VIDEO true)
 set(POMME_NO_INPUT true)
 set(POMME_NO_GRAPHICS true)
 set(POMME_NO_QD3D true)
+set(POMME_NO_MP3 true)
 
 #------------------------------------------------------------------------------
 # DEPENDENCIES
@@ -146,25 +147,9 @@ if(NOT MSVC)
 		-Werror=return-type
 		-Wno-multichar
 		-Wno-unknown-pragmas
-		-Wno-unused-function
-		-Wstrict-aliasing=2
-		#----------------------------------------
-		-Wno-unused-parameter
+		#-Wno-unused-function
 		-Wno-missing-braces
-		-Wno-unused-but-set-variable
-		-Wno-implicit-function-declaration
-		-Wno-unused-variable
-		-Wno-old-style-declaration
-		-Wno-pointer-to-int-cast
-		-Wno-incompatible-pointer-types
-		-Wno-pointer-sign
-		-Wno-shadow
-		-Wno-int-conversion
-		-Wno-sequence-point
-		-Wno-switch-outside-range
-		-Wno-absolute-value
-		-Wno-char-subscripts
-		-Wno-missing-field-initializers
+		-Wstrict-aliasing=2
 	)
 
 	# Sanitizers in debug mode (Linux only)

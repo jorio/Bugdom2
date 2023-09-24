@@ -24,7 +24,7 @@ static void MothCarryPlayer(ObjNode *theNode);
 static void UpdateMoth(ObjNode *theNode);
 static void FindMothTarget(ObjNode *moth);
 static Boolean PlayerHasMothBall(void);
-static float FindClosestPointOnMothPath(float x, float z, int pathNum);
+static float FindClosestPointOnMothPath(float x, float z, long pathNum);
 
 
 /****************************/
@@ -432,7 +432,6 @@ float		fps = gFramesPerSecondFrac;
 static void MothCarryPlayer(ObjNode *theNode)
 {
 float		fps = gFramesPerSecondFrac;
-float		r,y;
 float		targetX, targetZ, dist;
 OGLVector2D	v;
 
@@ -465,13 +464,13 @@ OGLVector2D	v;
 
 			/* AIM  */
 
-	r = theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z, gCoord.x, gCoord.z);
+	theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z, gCoord.x, gCoord.z);
 
 
 
 			/* CHECK Y */
 
-	y = GetTerrainY(gCoord.x, gCoord.z);			// get ground y here
+	float y = GetTerrainY(gCoord.x, gCoord.z);		// get ground y here
 	if (gCoord.y < (y + CARRY_HEIGHT))				// see if below hover height
 	{
 		gDelta.y += 700.0f * fps;
@@ -485,7 +484,6 @@ OGLVector2D	v;
 	}
 
 	gCoord.y += gDelta.y * fps;						// move on y
-
 }
 
 
@@ -494,8 +492,8 @@ OGLVector2D	v;
 
 static void UpdateMoth(ObjNode *theNode)
 {
-const static OGLPoint3D	leftEye = {-8, -1, -23};
-const static OGLPoint3D	rightEye = {8, -1, -23};
+static const OGLPoint3D	leftEye = {-8, -1, -23};
+static const OGLPoint3D	rightEye = {8, -1, -23};
 float	r, aimX, aimZ;
 OGLMatrix4x4	m;
 int		i;
@@ -586,7 +584,7 @@ static void FindMothTarget(ObjNode *moth)
 // The moth paths are simply the shared paths that moths will travel on when carrying Skip
 //
 
-Boolean PrimeMothPath(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeMothPath(int splineNum, SplineItemType *itemPtr)
 {
 int	pathNum = itemPtr->parm[0];
 
@@ -601,7 +599,7 @@ int	pathNum = itemPtr->parm[0];
 
 /******************** FIND CLOSEST POINT ON MOTH PATH ***********************/
 
-static float FindClosestPointOnMothPath(float x, float z, int pathNum)
+static float FindClosestPointOnMothPath(float x, float z, long pathNum)
 {
 int				splineNum;
 SplineDefType	*splinePtr;

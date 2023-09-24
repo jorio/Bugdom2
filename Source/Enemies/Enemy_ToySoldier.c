@@ -286,14 +286,14 @@ doco:
 
 static void  MoveToySoldier_Walk(ObjNode *theNode)
 {
-float		r,fps,aim,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE TOWARD PLAYER */
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOYSOLDIER_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOYSOLDIER_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * TOYSOLDIER_WALK_SPEED;
@@ -505,7 +505,7 @@ static void UpdateToySoldier(ObjNode *theNode)
 
 /************************ PRIME TOYSOLDIER ENEMY *************************/
 
-Boolean PrimeEnemy_ToySoldier(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_ToySoldier(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;

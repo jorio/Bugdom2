@@ -163,6 +163,7 @@ const short songs[] =
 	{
 		gLevelNum = 0;
 //		gLevelNum = LEVEL_NUM_PARK;
+		gLevelNum = LEVEL_NUM_PLAYROOM;
 
 //			if (GetKeyState(KEY_F10))		// see if do Level cheat
 //				if (DoLevelCheatDialog())
@@ -1047,7 +1048,8 @@ unsigned long	someLong;
 	DoTitleScreen();
 #endif
 
-
+	gScore = 1337;
+	NewScore();
 
 
 		/* MAIN LOOP */

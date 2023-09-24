@@ -32,6 +32,7 @@
 void SetMacLinearMouse(int linear)
 {
 	// no-op on non-Apple systems
+	(void) linear;
 }
 
 #else

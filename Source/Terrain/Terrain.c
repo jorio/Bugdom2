@@ -15,10 +15,10 @@
 /*  PROTOTYPES             */
 /****************************/
 
-static short GetFreeSuperTileMemory(void);
+static int GetFreeSuperTileMemory(void);
 static inline void ReleaseSuperTileObject(short superTileNum);
 static void CalcNewItemDeleteWindow(void);
-static uint16_t	BuildTerrainSuperTile(long	startCol, long startRow);
+static int BuildTerrainSuperTile(int startCol, int startRow);
 static void ReleaseAllSuperTiles(void);
 static void DoSuperTileDeformation(SuperTileMemoryType *superTile);
 static void UpdateTerrainDeformationFunctions(void);
@@ -40,7 +40,7 @@ float			gTerrainSuperTileUnitSize, gTerrainSuperTileUnitSizeFrac;
 float			gMapToUnitValue;
 int				gSuperTileActiveRange = 4;
 
-short			gNumSuperTilesDrawn;
+int				gNumSuperTilesDrawn = 0;
 static	Byte	gHiccupTimer;
 
 Boolean			gDisableHiccupTimer = false;
@@ -50,10 +50,10 @@ SuperTileStatus	**gSuperTileStatusGrid = nil;				// supertile status grid
 
 
 
-long			gTerrainTileWidth,gTerrainTileDepth;			// width & depth of terrain in tiles
-long			gTerrainUnitWidth,gTerrainUnitDepth;			// width & depth of terrain in world units (see gTerrainPolygonSize)
+int				gTerrainTileWidth,gTerrainTileDepth;			// width & depth of terrain in tiles
+int				gTerrainUnitWidth,gTerrainUnitDepth;			// width & depth of terrain in world units (see gTerrainPolygonSize)
 
-long			gNumUniqueSuperTiles;
+int				gNumUniqueSuperTiles;
 int16_t		 	**gSuperTileTextureGrid = nil;			// 2d array
 
 float			**gVertexShading = nil;					// vertex shading grid
@@ -62,11 +62,11 @@ MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 
 //uint16_t			**gAttributeGrid = nil;
 
-long			gNumSuperTilesDeep,gNumSuperTilesWide;	  		// dimensions of terrain in terms of supertiles
-static long		gCurrentSuperTileRow,gCurrentSuperTileCol;
-static long		gPreviousSuperTileCol,gPreviousSuperTileRow;
+int				gNumSuperTilesDeep,gNumSuperTilesWide;	  		// dimensions of terrain in terms of supertiles
+static int		gCurrentSuperTileRow,gCurrentSuperTileCol;
+static int		gPreviousSuperTileCol,gPreviousSuperTileRow;
 
-short			gNumFreeSupertiles = 0;
+int				gNumFreeSupertiles = 0;
 SuperTileMemoryType	gSuperTileMemoryList[MAX_SUPERTILES];
 
 
@@ -168,8 +168,8 @@ void SetTerrainScale(float polygonSize)
 
 void InitCurrentScrollSettings(void)
 {
-long	x,y;
-long	dummy1,dummy2;
+int	x,y;
+int	dummy1,dummy2;
 ObjNode	*obj;
 
 	x = gPlayerInfo.coord.x-(gSuperTileActiveRange*gTerrainSuperTileUnitSize);
@@ -353,45 +353,20 @@ int	u,v,i,j;
 
 	gNumFreeSupertiles = MAX_SUPERTILES;
 
-			/* ALLOC BASE TRIMESH DATA FOR ALL SUPERTILES */
+	gSuperTileMeshData	= AllocPtr(sizeof(MOVertexArrayData) * MAX_SUPERTILES);
+	gSuperTileCoords	= AllocPtr(sizeof(OGLPoint3D) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
+	gSuperTileNormals	= AllocPtr(sizeof(OGLVector3D) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
+	gSuperTileUVs		= AllocPtr(sizeof(OGLTextureCoord) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
+	gSuperTileColors	= AllocPtr(sizeof(OGLColorRGBA_Byte) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
+	gSuperTileTriangles	= AllocPtr(sizeof(MOTriangleIndecies) * NUM_TRIS_IN_SUPERTILE * MAX_SUPERTILES);
 
-	gSuperTileMeshData = AllocPtr(sizeof(MOVertexArrayData) * MAX_SUPERTILES);
-	if (gSuperTileMeshData == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileMeshData");
+	GAME_ASSERT(gSuperTileMeshData);
+	GAME_ASSERT(gSuperTileCoords);
+	GAME_ASSERT(gSuperTileNormals);
+	GAME_ASSERT(gSuperTileUVs);
+	GAME_ASSERT(gSuperTileColors);
+	GAME_ASSERT(gSuperTileTriangles);
 
-
-			/* ALLOC POINTS FOR ALL SUPERTILES */
-
-	gSuperTileCoords = AllocPtr(sizeof(OGLPoint3D) * (NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES));
-	if (gSuperTileCoords == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileCoords");
-
-
-			/* ALLOC VERTEX NORMALS FOR ALL SUPERTILES */
-
-	gSuperTileNormals = AllocPtr(sizeof(OGLVector3D) * (NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES));
-	if (gSuperTileNormals == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileNormals");
-
-
-			/* ALLOC UVS FOR ALL SUPERTILES */
-
-	gSuperTileUVs = AllocPtr(sizeof(OGLTextureCoord) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
-	if (gSuperTileUVs == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileUVs");
-
-			/* ALLOC VERTEX COLORS FOR ALL SUPERTILES */
-
-	gSuperTileColors = AllocPtr(sizeof(OGLColorRGBA_Byte) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
-	if (gSuperTileColors == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileColors");
-
-
-			/* ALLOC TRIANGLE ARRAYS ALL SUPERTILES */
-
-	gSuperTileTriangles = AllocPtr(sizeof(MOTriangleIndecies) * NUM_TRIS_IN_SUPERTILE * MAX_SUPERTILES);
-	if (gSuperTileTriangles == nil)
-		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileTriangles");
 
 
 			/****************************************/
@@ -498,7 +473,7 @@ void DisposeSuperTileMemoryList(void)
 // OUTPUT: index into gSuperTileMemoryList
 //
 
-static short GetFreeSuperTileMemory(void)
+static int GetFreeSuperTileMemory(void)
 {
 int	i;
 
@@ -531,17 +506,17 @@ int	i;
 // OUTPUT: index to supertile
 //
 
-static uint16_t	BuildTerrainSuperTile(long	startCol, long startRow)
+static int BuildTerrainSuperTile(int startCol, int startRow)
 {
-long	 			row,col,row2,col2,numPoints,i;
-uint16_t				superTileNum;
+int					row,col,row2,col2,numPoints,i;
+uint16_t			superTileNum;
 float				height,miny,maxy;
 MOVertexArrayData	*meshData;
 SuperTileMemoryType	*superTilePtr;
 OGLColorRGBA_Byte	*vertexColorList;
 MOTriangleIndecies	*triangleList;
 OGLPoint3D			*vertexPointList;
-OGLTextureCoord		*uvs;
+//OGLTextureCoord		*uvs;
 OGLVector3D			*vertexNormals;
 
 	superTileNum = GetFreeSuperTileMemory();						// get memory block for the data
@@ -570,7 +545,7 @@ OGLVector3D			*vertexNormals;
 	vertexPointList 		= meshData->points;									// get ptr to points list
 	vertexColorList 		= meshData->colorsByte;								// get ptr to vertex color
 	vertexNormals			= meshData->normals;								// get ptr to vertex normals
-	uvs						= meshData->uvs[0];									// get ptr to uvs
+//	uvs						= meshData->uvs[0];									// get ptr to uvs
 
 	miny = 10000000;													// init bbox counters
 	maxy = -miny;
@@ -808,7 +783,7 @@ OGLVector3D			*vertexNormals;
 
 /******************** CALCULATE SUPERTILE VERTEX NORMALS **********************/
 
-void CalculateSupertileVertexNormals(MOVertexArrayData	*meshData, long	startRow, long startCol)
+void CalculateSupertileVertexNormals(MOVertexArrayData *meshData, int startRow, int startCol)
 {
 OGLPoint3D			*vertexPointList;
 OGLVector3D			*vertexNormals;
@@ -818,7 +793,7 @@ OGLVector3D			faceNormal[NUM_TRIS_IN_SUPERTILE];
 OGLVector3D			*n1,*n2;
 float				avX,avY,avZ;
 OGLVector3D			nA,nB;
-long				ro,co;
+int					ro,co;
 
 	vertexPointList 		= meshData->points;									// get ptr to points list
 	vertexNormals			= meshData->normals;								// get ptr to vertex normals
@@ -859,8 +834,8 @@ long				ro,co;
 			{
 				for (co = -1; co <= 0; co++)
 				{
-					long	cc = col + co;
-					long	rr = row + ro;
+					int		cc = col + co;
+					int		rr = row + ro;
 
 					if ((cc >= 0) && (cc < SUPERTILE_SIZE) && (rr >= 0) && (rr < SUPERTILE_SIZE)) // see if this vertex is in supertile bounds
 					{
@@ -904,9 +879,7 @@ static inline void ReleaseSuperTileObject(short superTileNum)
 
 static void ReleaseAllSuperTiles(void)
 {
-long	i;
-
-	for (i = 0; i < MAX_SUPERTILES; i++)
+	for (int i = 0; i < MAX_SUPERTILES; i++)
 		ReleaseSuperTileObject(i);
 
 	gNumFreeSupertiles = MAX_SUPERTILES;
@@ -924,7 +897,8 @@ static void DrawTerrain(ObjNode *theNode)
 int				r,c;
 int				i,unique;
 Boolean			superTileVisible;
-#pragma unused(theNode)
+
+	(void) theNode;
 
 				/**************/
 				/* DRAW STUFF */
@@ -1452,9 +1426,9 @@ float			minX,maxX,minZ,maxZ;
 // OUTPUT: row/col in tile coords and supertile coords
 //
 
-void GetSuperTileInfo(long x, long z, long *superCol, long *superRow, long *tileCol, long *tileRow)
+void GetSuperTileInfo(int x, int z, int *superCol, int *superRow, int *tileCol, int *tileRow)
 {
-long	row,col;
+int	row,col;
 
 	if ((x < 0) || (z < 0))									// see if out of bounds
 		return;

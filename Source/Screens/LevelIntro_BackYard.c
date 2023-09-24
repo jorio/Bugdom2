@@ -61,7 +61,7 @@ static void SetupLevelIntroScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
+static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
 ObjNode	*newObj;
 int		i,x,z;
 

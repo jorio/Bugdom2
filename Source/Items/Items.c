@@ -488,7 +488,8 @@ static Boolean DoTrig_Door(ObjNode *door, ObjNode *who, Byte sideBits)
 {
 int	keyNum = door->Kind;							// get door color
 
-#pragma unused (who, sideBits)
+	(void) who;
+	(void) sideBits;
 
 	if (gPlayerInfo.hasKey[keyNum])					// see if player has this key
 	{
@@ -918,7 +919,9 @@ ObjNode	*newObj;
 
 static Boolean DoTrig_DogHouse(ObjNode *house, ObjNode *who, Byte sideBits)
 {
-#pragma unused (house, who, sideBits)
+	(void) house;
+	(void) who;
+	(void) sideBits;
 
 	if (sideBits & SIDE_BITS_FRONT)
 		StartLevelCompletion(0);
@@ -1296,7 +1299,7 @@ static void MoveGlassBottle(ObjNode *theNode)
 
 static Boolean HurtGlassBottle(ObjNode *bottle, float damage)
 {
-#pragma unused (damage)
+	(void) damage;
 
 			/* SEE IF BLOW IT UP */
 

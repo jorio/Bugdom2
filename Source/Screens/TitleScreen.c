@@ -111,7 +111,7 @@ static void SetupTitleScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
+static const OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
 int				i;
 ObjNode			*fly;
 

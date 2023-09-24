@@ -404,7 +404,7 @@ static Boolean DoTrig_Chipmunk(ObjNode *chipmunk, ObjNode *who, Byte sideBits)
 {
 ObjNode	*acorn;
 
-#pragma unused (sideBits)
+	(void) sideBits;
 
 	if (chipmunk->Kind == CHIPMUNK_KIND_RACE)			// make sure we don't do anything with this chipmunk (fixed for 1.0.3 update)
 		return(true);

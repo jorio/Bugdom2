@@ -408,7 +408,6 @@ short	i;
 void StopAChannel(short *channelNum)
 {
 SndCommand 	mySndCmd;
-OSErr 		myErr;
 short		c = *channelNum;
 
 	if ((c < 0) || (c >= gMaxChannels))		// make sure its a legal #
@@ -417,12 +416,12 @@ short		c = *channelNum;
 	mySndCmd.cmd = flushCmd;
 	mySndCmd.param1 = 0;
 	mySndCmd.param2 = 0;
-	myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
+	SndDoImmediate(gSndChannel[c], &mySndCmd);
 
 	mySndCmd.cmd = quietCmd;
 	mySndCmd.param1 = 0;
 	mySndCmd.param2 = 0;
-	myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
+	SndDoImmediate(gSndChannel[c], &mySndCmd);
 
 	*channelNum = -1;
 
@@ -990,7 +989,7 @@ static UInt32          loopStart, loopEnd;
 
     		/* SEE IF THIS IS A LOOPING EFFECT */
 
-	IMPLEMENT_ME_SOFT();
+	IMPLEMENT_ME_SOFT(); (void) loopStart; (void) loopEnd;
 #if 0
     sndPtr = (SoundHeaderPtr)(((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum]);
     loopStart = sndPtr->loopStart;

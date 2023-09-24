@@ -71,8 +71,8 @@ struct SuperTileMemoryType
 	Byte				hiccupTimer;							// # frames to skip for use
 	Byte				mode;									// free, used, etc.
 	float				x,z,y;									// world coords
-	long				left,back;								// integer coords of back/left corner
-	long				tileRow,tileCol;						// tile row/col of the start of this supertile
+	int					left,back;								// integer coords of back/left corner
+	int					tileRow,tileCol;						// tile row/col of the start of this supertile
 	MOMaterialObject	*texture;								// refs to materials
 	MOVertexArrayData	*meshData;								// mesh's data for the supertile
 	OGLBoundingBox		bBox;									// bounding box
@@ -111,7 +111,7 @@ enum
 
 typedef	struct
 {
-	uint16_t		supertileIndex;
+	uint16_t	supertileIndex;
 	uint8_t		statusFlags;
 	Boolean		playerHereFlag;
 }SuperTileStatus;
@@ -167,27 +167,26 @@ void SetTerrainScale(float polygonSize);
 
 void CreateSuperTileMemoryList(void);
 void DisposeSuperTileMemoryList(void);
-extern 	void DisposeTerrain(void);
-extern	void GetSuperTileInfo(long x, long z, long *superCol, long *superRow, long *tileCol, long *tileRow);
-extern	void InitTerrainManager(void);
+void DisposeTerrain(void);
+void GetSuperTileInfo(int x, int z, int *superCol, int *superRow, int *tileCol, int *tileRow);
+void InitTerrainManager(void);
 float	GetTerrainY(float x, float z);
 float	GetMinTerrainY(float x, float z, short group, short type, float scale);
 void InitCurrentScrollSettings(void);
 
-extern 	void BuildTerrainItemList(void);
-void AddTerrainItemsOnSuperTile(long row, long col);
-extern 	Boolean TrackTerrainItem(ObjNode *theNode);
+void BuildTerrainItemList(void);
+void AddTerrainItemsOnSuperTile(int row, int col);
+Boolean TrackTerrainItem(ObjNode *theNode);
 Boolean TrackTerrainItem_FromInit(ObjNode *theNode);
 Boolean SeeIfCoordsOutOfRange(float x, float z);
-extern 	void FindPlayerStartCoordItems(void);
+void FindPlayerStartCoordItems(void);
 void InitSuperTileGrid(void);
 void RotateOnTerrain(ObjNode *theNode, float yOffset, OGLVector3D *surfaceNormal);
-void RotateOnTerrain_WideArea(ObjNode *theNode, float yOffset, float radius);
 void DoPlayerTerrainUpdate(float x, float y);
-void CalcTileNormals(long row, long col, OGLVector3D *n1, OGLVector3D *n2);
-void CalcTileNormals_NotNormalized(long row, long col, OGLVector3D *n1, OGLVector3D *n2);
+void CalcTileNormals(int row, int col, OGLVector3D *n1, OGLVector3D *n2);
+void CalcTileNormals_NotNormalized(int row, int col, OGLVector3D *n1, OGLVector3D *n2);
 void CalculateSplitModeMatrix(void);
-void CalculateSupertileVertexNormals(MOVertexArrayData	*meshData, long	startRow, long startCol);
+void CalculateSupertileVertexNormals(MOVertexArrayData *meshData, int startRow, int startCol);
 
 short NewSuperTileDeformation(DeformationType *data);
 void DeleteTerrainDeformation(short	i);

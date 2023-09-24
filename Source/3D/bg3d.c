@@ -85,10 +85,10 @@ int	i;
 void ImportBG3D(FSSpec *spec, int groupNum)
 {
 short				refNum;
-int					i;
 MetaObjectHeader	*header;
 MOGroupObject		*group;
 MOGroupData			*data;
+OSErr				err;
 
 			/* INIT SOME VARIABLES */
 
@@ -102,8 +102,8 @@ MOGroupData			*data;
 		/* OPEN THE FILE & READ */
 		/************************/
 
-	if (FSpOpenDF(spec, fsRdPerm, &refNum) != noErr)
-		DoFatalAlert("ImportBG3D: FSpOpenDF failed");
+	err = FSpOpenDF(spec, fsRdPerm, &refNum);
+	GAME_ASSERT(!err);
 
 	ReadBG3DHeader(refNum);
 	ParseBG3DFile(refNum);
@@ -130,11 +130,8 @@ MOGroupData			*data;
 	gBG3DContainerList[groupNum] = gBG3D_CurrentContainer;			// save container into list
 
 	header = gBG3D_CurrentContainer->root;							// point to root object in container
-	if (header == nil)
-		DoFatalAlert("ImportBG3D: header == nil");
-
-	if (header->type != MO_TYPE_GROUP)								// root should be a group
-		DoFatalAlert("ImportBG3D: root isnt a group!");
+	GAME_ASSERT(header);
+	GAME_ASSERT(header->type == MO_TYPE_GROUP);						// root should be a group
 
 
 			/* PARSE GROUP */
@@ -145,7 +142,7 @@ MOGroupData			*data;
 	group = gBG3D_CurrentContainer->root;
 	data = &group->objectData;
 
-	for (i = 0; i < data->numObjectsInGroup; i++)
+	for (int i = 0; i < data->numObjectsInGroup; i++)
 	{
 		OGLBoundingBox	*bbox = &gObjectGroupBBoxList[groupNum][i];		// point to bbox destination
 
@@ -163,22 +160,17 @@ static void ReadBG3DHeader(short refNum)
 {
 BG3DHeaderType	headerData;
 long			count;
+OSErr			err;
 
 
 	count = sizeof(BG3DHeaderType);
 
-	if (FSRead(refNum, &count, &headerData) != noErr)
-		DoFatalAlert("ReadBG3DHeader: FSRead failed");
+	err = FSRead(refNum, &count, (Ptr) &headerData);
+	GAME_ASSERT(!err);
 
 			/* VERIFY FILE */
 
-	if ((headerData.headerString[0] != 'B') ||
-		(headerData.headerString[1] != 'G') ||
-		(headerData.headerString[2] != '3') ||
-		(headerData.headerString[3] != 'D'))
-	{
-		DoFatalAlert("ReadBG3DHeader: BG3D file has invalid header.");
-	}
+	GAME_ASSERT_MESSAGE(0 == SDL_memcmp("BG3D", headerData.headerString, 4), "BG3D file has invalid header");
 }
 
 
@@ -188,6 +180,7 @@ static void ParseBG3DFile(short refNum)
 {
 uint32_t		tag;
 long			count;
+OSErr			err;
 Boolean			done = false;
 MetaObjectPtr 	newObj;
 
@@ -196,8 +189,8 @@ MetaObjectPtr 	newObj;
 			/* READ A TAG */
 
 		count = sizeof(tag);
-		if (FSRead(refNum, &count, &tag) != noErr)
-			DoFatalAlert("ParseBG3DFile: FSRead failed");
+		err = FSRead(refNum, &count, (Ptr) &tag);
+		GAME_ASSERT(!err);
 
 		tag = SwizzleULong(&tag);
 
@@ -277,15 +270,16 @@ MetaObjectPtr 	newObj;
 
 static void ReadMaterialFlags(short refNum)
 {
-long				count,i;
+long				count;
+OSErr				err;
 MOMaterialData		data;
 uint32_t			flags;
 
 			/* READ FLAGS */
 
 	count = sizeof(flags);
-	if (FSRead(refNum, &count, &flags) != noErr)
-		DoFatalAlert("ReadMaterialFlags: FSRead failed");
+	err = FSRead(refNum, &count, (Ptr) &flags);
+	GAME_ASSERT(!err);
 
 	flags = SwizzleULong(&flags);
 
@@ -310,7 +304,7 @@ uint32_t			flags;
 	/* ADD THIS MATERIAL TO THE FILE CONTAINER */
 
 
-	i = gBG3D_CurrentContainer->numMaterials++;									// get index into file container's material list
+	int i = gBG3D_CurrentContainer->numMaterials++;								// get index into file container's material list
 
 	gBG3D_CurrentContainer->materials[i] = gBG3D_CurrentMaterialObj;			// stores the 1 reference here.
 }
@@ -321,18 +315,18 @@ uint32_t			flags;
 static void ReadMaterialDiffuseColor(short refNum)
 {
 long			count;
+OSErr			err;
 GLfloat			color[4];
 MOMaterialData	*data;
 
-	if (gBG3D_CurrentMaterialObj == nil)
-		DoFatalAlert("ReadMaterialDiffuseColor: gBG3D_CurrentMaterialObj == nil");
+	GAME_ASSERT(gBG3D_CurrentMaterialObj);
 
 
 			/* READ COLOR VALUE */
 
 	count = sizeof(GLfloat) * 4;
-	if (FSRead(refNum, &count, color) != noErr)
-		DoFatalAlert("ReadMaterialDiffuseColor: FSRead failed");
+	err = FSRead(refNum, &count, (Ptr) color);
+	GAME_ASSERT(!err);
 
 	color[0] = SwizzleFloat(&color[0]);
 	color[1] = SwizzleFloat(&color[1]);
@@ -366,8 +360,7 @@ MOMaterialData	*data;
 
 			/* GET PTR TO CURRENT MATERIAL */
 
-	if (gBG3D_CurrentMaterialObj == nil)
-		DoFatalAlert("ReadMaterialTextureMap: gBG3D_CurrentMaterialObj == nil");
+	GAME_ASSERT(gBG3D_CurrentMaterialObj);
 
 	data = &gBG3D_CurrentMaterialObj->objectData; 	// get ptr to material data
 
@@ -377,7 +370,7 @@ MOMaterialData	*data;
 			/***********************/
 
 	count = sizeof(BG3DTextureHeader);
-	FSRead(refNum, &count, &textureHeader);		// read header
+	FSRead(refNum, &count, (Ptr) &textureHeader);		// read header
 
 	textureHeader.width			= SwizzleULong(&textureHeader.width);
 	textureHeader.height		= SwizzleULong(&textureHeader.height);
@@ -388,6 +381,8 @@ MOMaterialData	*data;
 
 			/* COPY BASIC INFO */
 
+	GAME_ASSERT(data->numMipmaps <= MO_MAX_MIPMAPS);		// see if overflow
+
 	if (data->numMipmaps == 0)					// see if this is the first texture
 	{
 		data->width 			= textureHeader.width;
@@ -395,9 +390,6 @@ MOMaterialData	*data;
 		data->pixelSrcFormat 	= textureHeader.srcPixelFormat;		// internal format
 		data->pixelDstFormat 	= textureHeader.dstPixelFormat;		// vram format
 	}
-	else
-	if (data->numMipmaps >= MO_MAX_MIPMAPS)		// see if overflow
-		DoFatalAlert("ReadMaterialTextureMap: mipmap overflow!");
 
 
 		/***************************/
@@ -407,8 +399,7 @@ MOMaterialData	*data;
 	count = textureHeader.bufferSize;			// get size of buffer to load
 
 	texturePixels = AllocPtr(count);			// alloc memory for buffer
-	if (texturePixels == nil)
-		DoFatalAlert("ReadMaterialTextureMap: AllocPtr failed");
+	GAME_ASSERT(texturePixels);
 
 	FSRead(refNum, &count, texturePixels);		// read pixel data
 
@@ -444,16 +435,14 @@ MOGroupObject	*newGroup;
 			/* CREATE NEW GROUP OBJECT */
 
 	newGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
-	if (newGroup == nil)
-		DoFatalAlert("ReadGroup: MO_CreateNewObjectOfType failed");
+	GAME_ASSERT(newGroup);
 
 
 		/*************************/
 		/* PUSH ONTO GROUP STACK */
 		/*************************/
 
-	if (gBG3D_GroupStackIndex >= (BG3D_GROUP_STACK_SIZE-1))
-		DoFatalAlert("ReadGroup: gBG3D_GroupStackIndex overflow!");
+	GAME_ASSERT(gBG3D_GroupStackIndex < (BG3D_GROUP_STACK_SIZE-1));
 
 		/* SEE IF THIS IS FIRST GROUP */
 
@@ -484,8 +473,7 @@ static void EndGroup(void)
 {
 	gBG3D_GroupStackIndex--;
 
-	if (gBG3D_GroupStackIndex < 0)									// must be something on group stack
-		DoFatalAlert("EndGroup: stack is empty!");
+	GAME_ASSERT(gBG3D_GroupStackIndex >= 0);					// stack mustn't be empty
 
 	gBG3D_CurrentGroup = gBG3D_GroupStack[gBG3D_GroupStackIndex]; // get previous group off of stack
 }
@@ -503,10 +491,10 @@ MetaObjectPtr		newObj;
 			/* READ GEOMETRY HEADER */
 
 	count = sizeof(BG3DGeometryHeader);
-	FSRead(refNum, &count, &geoHeader);		// read header
+	FSRead(refNum, &count, (Ptr) &geoHeader);		// read header
 
 	geoHeader.type = SwizzleULong(&geoHeader.type);
-	geoHeader.numMaterials = SwizzleLong(&geoHeader.numMaterials);
+	geoHeader.numMaterials = SwizzleULong(&geoHeader.numMaterials);
 	geoHeader.layerMaterialNum[0] = SwizzleULong(&geoHeader.layerMaterialNum[0]);
 	geoHeader.layerMaterialNum[1] = SwizzleULong(&geoHeader.layerMaterialNum[1]);
 	geoHeader.flags = SwizzleULong(&geoHeader.flags);
@@ -518,17 +506,9 @@ MetaObjectPtr		newObj;
 		/* CREATE NEW GEOMETRY OBJECT */
 		/******************************/
 
-	switch(geoHeader.type)
-	{
-				/* VERTEX ELEMENTS */
+	GAME_ASSERT(geoHeader.type == BG3D_GEOMETRYTYPE_VERTEXELEMENTS);
 
-		case	BG3D_GEOMETRYTYPE_VERTEXELEMENTS:
-				newObj = ReadVertexElementsGeometry(&geoHeader);
-				break;
-
-		default:
-				DoFatalAlert("ReadNewGeometry: unknown geo type");
-	}
+	newObj = ReadVertexElementsGeometry(&geoHeader);
 
 	return(newObj);
 }
@@ -542,7 +522,6 @@ MetaObjectPtr		newObj;
 static MetaObjectPtr ReadVertexElementsGeometry(BG3DGeometryHeader *header)
 {
 MOVertexArrayData vertexArrayData;
-int		i;
 
 			/* SETUP DATA */
 
@@ -552,7 +531,7 @@ int		i;
 	vertexArrayData.points 			= nil;							// these arrays havnt been read in yet
 	vertexArrayData.normals 		= nil;
 
-	for (i = 0; i < MAX_MATERIAL_LAYERS; i++)
+	for (int i = 0; i < MAX_MATERIAL_LAYERS; i++)
 		vertexArrayData.uvs[i]	 		= nil;
 
 	vertexArrayData.colorsByte 		= nil;
@@ -573,7 +552,7 @@ int		i;
 	// These start as illegal references.  The ref count is incremented during the Object Creation function.
 	//
 
-	for (i = 0; i < vertexArrayData.numMaterials; i++)
+	for (int i = 0; i < vertexArrayData.numMaterials; i++)
 	{
 		int	materialNum = header->layerMaterialNum[i];
 
@@ -593,25 +572,23 @@ int		i;
 
 static void ReadVertexArray(short refNum)
 {
-long				count, i;
+long				count;
 int					numPoints;
 MOVertexArrayData	*data;
 OGLPoint3D			*pointList;
 
 	data = &gBG3D_CurrentGeometryObj->objectData;					// point to geometry data
-	if (data->points)												// see if points already assigned
-		DoFatalAlert("ReadVertexArray: points already assigned!");
+	GAME_ASSERT(!data->points);										// points mustn't be assigned yet
 
 	numPoints = data->numPoints;									// get # points to expect to read
 
 	count = sizeof(OGLPoint3D) * numPoints;							// calc size of data to read
 	pointList = AllocPtr(count);									// alloc buffer to hold points
-	if (pointList == nil)
-		DoFatalAlert("ReadVertexArray: AllocPtr failed!");
+	GAME_ASSERT(pointList);
 
-	FSRead(refNum, &count, pointList);								// read the data
+	FSRead(refNum, &count, (Ptr) pointList);						// read the data
 
-	for (i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)						// swizzle
 	{
 		pointList[i].x = SwizzleFloat(&pointList[i].x);
 		pointList[i].y = SwizzleFloat(&pointList[i].y);
@@ -627,7 +604,7 @@ OGLPoint3D			*pointList;
 
 static void ReadNormalArray(short refNum)
 {
-long				count, i;
+long				count;
 int					numPoints;
 MOVertexArrayData	*data;
 OGLVector3D			*normalList;
@@ -637,18 +614,16 @@ OGLVector3D			*normalList;
 
 	count = sizeof(OGLVector3D) * numPoints;						// calc size of data to read
 	normalList = AllocPtr(count);									// alloc buffer to hold normals
-	if (normalList == nil)
-		DoFatalAlert("ReadNormalArray: AllocPtr failed!");
+	GAME_ASSERT(normalList);
 
-	FSRead(refNum, &count, normalList);								// read the data
+	FSRead(refNum, &count, (Ptr) normalList);						// read the data
 
-	for (i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)						// swizzle
 	{
 		normalList[i].x = SwizzleFloat(&normalList[i].x);
 		normalList[i].y = SwizzleFloat(&normalList[i].y);
 		normalList[i].z = SwizzleFloat(&normalList[i].z);
 	}
-
 
 	data->normals = normalList;										// assign normal array to geometry header
 }
@@ -658,7 +633,7 @@ OGLVector3D			*normalList;
 
 static void ReadUVArray(short refNum)
 {
-long				count, i;
+long				count;
 int					numPoints;
 MOVertexArrayData	*data;
 OGLTextureCoord		*uvList;
@@ -668,17 +643,15 @@ OGLTextureCoord		*uvList;
 
 	count = sizeof(OGLTextureCoord) * numPoints;					// calc size of data to read
 	uvList = AllocPtr(count);										// alloc buffer to hold uv's
-	if (uvList == nil)
-		DoFatalAlert("ReadUVArray: AllocPtr failed!");
+	GAME_ASSERT(uvList);
 
-	FSRead(refNum, &count, uvList);									// read the data
+	FSRead(refNum, &count, (Ptr) uvList);							// read the data
 
-	for (i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)						// swizzle
 	{
 		uvList[i].u = SwizzleFloat(&uvList[i].u);
 		uvList[i].v = SwizzleFloat(&uvList[i].v);
 	}
-
 
 	data->uvs[0] = uvList;												// assign uv array to geometry header
 }
@@ -699,10 +672,9 @@ OGLColorRGBA		*colorsF;
 
 	count = sizeof(OGLColorRGBA_Byte) * numPoints;					// calc size of data to read
 	colorList = AllocPtr(count);									// alloc buffer to hold data
-	if (colorList == nil)
-		DoFatalAlert("ReadVertexColorArray: AllocPtr failed!");
+	GAME_ASSERT(colorList);
 
-	FSRead(refNum, &count, colorList);								// read the data
+	FSRead(refNum, &count, (Ptr) colorList);						// read the data
 
 	data->colorsByte = colorList;									// assign color array to geometry header
 
@@ -713,8 +685,7 @@ OGLColorRGBA		*colorsF;
 		//
 
 	colorsF = AllocPtr(sizeof(OGLColorRGBA) * numPoints);
-	if (colorsF == nil)
-		DoFatalAlert("ReadVertexColorArray: AllocPtr failed!");
+	GAME_ASSERT(colorsF);
 
 	data->colorsFloat = colorsF;									// assign color array to geometry header
 
@@ -733,7 +704,7 @@ OGLColorRGBA		*colorsF;
 
 static void ReadTriangleArray(short refNum)
 {
-long				count, i;
+long				count;
 int					numTriangles;
 MOVertexArrayData	*data;
 MOTriangleIndecies	*triList;
@@ -743,19 +714,16 @@ MOTriangleIndecies	*triList;
 
 	count = sizeof(MOTriangleIndecies) * numTriangles;				// calc size of data to read
 	triList = AllocPtr(count);										// alloc buffer to hold data
-	if (triList == nil)
-		DoFatalAlert("ReadTriangleArray: AllocPtr failed!");
+	GAME_ASSERT(triList);
 
-	FSRead(refNum, &count, triList);								// read the data
+	FSRead(refNum, &count, (Ptr) triList);							// read the data
 
-	for (i = 0; i < numTriangles; i++)							//	swizzle
+	for (int i = 0; i < numTriangles; i++)							//	swizzle
 	{
 		triList[i].vertexIndices[0] = SwizzleULong(&triList[i].vertexIndices[0]);
 		triList[i].vertexIndices[1] = SwizzleULong(&triList[i].vertexIndices[1]);
 		triList[i].vertexIndices[2] = SwizzleULong(&triList[i].vertexIndices[2]);
 	}
-
-
 
 	data->triangles = triList;										// assign triangle array to geometry header
 }
@@ -772,7 +740,7 @@ MOVertexArrayData	*data;
 
 	count = sizeof(OGLBoundingBox);									// calc size of data to read
 
-	FSRead(refNum, &count, &data->bBox);							// read the bbox data directly into geometry header
+	FSRead(refNum, &count, (Ptr) &data->bBox);						// read the bbox data directly into geometry header
 
 	data->bBox.min.x = SwizzleFloat(&data->bBox.min.x);
 	data->bBox.min.y = SwizzleFloat(&data->bBox.min.y);
@@ -801,8 +769,7 @@ static void InitBG3DContainer(void)
 MOGroupObject	*rootGroup;
 
 	gBG3D_CurrentContainer = AllocPtr(sizeof(BG3DFileContainer));
-	if (gBG3D_CurrentContainer == nil)
-		DoFatalAlert("InitBG3DContainer: AllocPtr failed!");
+	GAME_ASSERT(gBG3D_CurrentContainer);
 
 	gBG3D_CurrentContainer->numMaterials =	0;			// no materials yet
 
@@ -810,12 +777,10 @@ MOGroupObject	*rootGroup;
 			/* CREATE NEW GROUP OBJECT */
 
 	rootGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
-	if (rootGroup == nil)
-		DoFatalAlert("InitBG3DContainer: MO_CreateNewObjectOfType failed");
+	GAME_ASSERT(rootGroup);
 
 	gBG3D_CurrentContainer->root 	= rootGroup;		// root is an empty group
 	gBG3D_CurrentGroup 				= rootGroup;
-
 }
 
 
@@ -981,7 +946,6 @@ void BG3D_SetContainerMaterialFlags(short group, short type, short geometryNum, 
 MOVertexArrayObject	*mo;
 MOVertexArrayData	*va;
 MOMaterialObject	*mat;
-int					n,i;
 
 	mo = gBG3DGroupList[group][type];			// point to this model
 
@@ -994,24 +958,20 @@ int					n,i;
 	{
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
 
-		if (geometryNum >= groupObj->objectData.numObjectsInGroup)							// make sure # is valid
-			DoFatalAlert("BG3D_SetContainerMaterialFlags: geometryNum out of range");
+		GAME_ASSERT(geometryNum < groupObj->objectData.numObjectsInGroup);				// make sure # is valid
 
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
 
 		if (geometryNum == -1)																// if -1 then assign to all textures for this model
 		{
-			for (i = 0; i < groupObj->objectData.numObjectsInGroup; i++)
+			for (int i = 0; i < groupObj->objectData.numObjectsInGroup; i++)
 			{
 				mo = (MOVertexArrayObject *)groupObj->objectData.groupContents[i];
 
-				if ((mo->objectHeader.type != MO_TYPE_GEOMETRY) || (mo->objectHeader.subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-					DoFatalAlert("BG3D_SetContainerMaterialFlags:  object isnt a vertex array");
+				GAME_ASSERT(mo->objectHeader.type == MO_TYPE_GEOMETRY && mo->objectHeader.subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
 
 				va = &mo->objectData;								// point to vertex array data
-				n = va->numMaterials;
-				if (n <= 0)											// make sure there are materials
-					DoFatalAlert("BG3D_SetContainerMaterialFlags:  no materials!");
+				GAME_ASSERT(va->numMaterials > 0);					// make sure there are materials
 
 				mat = va->materials[0];						// get pointer to material
 				mat->objectData.flags |= flags;						// set flags
@@ -1029,9 +989,7 @@ int					n,i;
 	{
 setit:
 		va = &mo->objectData;								// point to vertex array data
-		n = va->numMaterials;
-		if (n <= 0)											// make sure there are materials
-			DoFatalAlert("BG3D_SetContainerMaterialFlags:  no materials!");
+		GAME_ASSERT(va->numMaterials > 0);					// make sure there are materials
 
 		mat = va->materials[0];								// get pointer to material
 		mat->objectData.flags |= flags;						// set flags
@@ -1060,8 +1018,7 @@ MOVertexArrayObject	*mo;
 	{
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
 
-		if (geometryNum >= groupObj->objectData.numObjectsInGroup)					// make sure # is valid
-			DoFatalAlert("BG3D_SphereMapGeomteryMaterial: geometryNum out of range");
+		GAME_ASSERT(geometryNum < groupObj->objectData.numObjectsInGroup);			// make sure # is valid
 
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
 
@@ -1097,8 +1054,7 @@ MOVertexArrayData	*va;
 MOMaterialObject	*mat;
 
 
-	if ((mo->objectHeader.type != MO_TYPE_GEOMETRY) || (mo->objectHeader.subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-		DoFatalAlert("SetSphereMapInfo:  object isnt a vertex array");
+	GAME_ASSERT(mo->objectHeader.type == MO_TYPE_GEOMETRY && mo->objectHeader.subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
 
 	va = &mo->objectData;														// point to vertex array data
 
@@ -1130,10 +1086,7 @@ MOMaterialObject	*mat;
 
 void SetSphereMapInfoOnMaterialObject(MOMaterialObject *mat, uint16_t combineMode, uint16_t envMapNum)
 {
-
-
-	if (mat->objectHeader.type != MO_TYPE_MATERIAL)
-		DoFatalAlert("SetSphereMapInfoOnMaterialObject:  object isnt a material");
+	GAME_ASSERT(mat->objectHeader.type == MO_TYPE_MATERIAL);
 
 	mat->objectData.flags |= BG3D_MATERIALFLAG_MULTITEXTURE;					// set flags for multi-texture
 
@@ -1141,8 +1094,3 @@ void SetSphereMapInfoOnMaterialObject(MOMaterialObject *mat, uint16_t combineMod
 	mat->objectData.multiTextureCombine	= combineMode;							// set combining mode
 	mat->objectData.envMapNum			= envMapNum;							// set sphere map texture # to use
 }
-
-
-
-
-

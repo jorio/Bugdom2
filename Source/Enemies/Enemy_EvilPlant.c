@@ -272,14 +272,14 @@ static void  MoveEvilPlant_Grow(ObjNode *theNode)
 
 static void  MoveEvilPlant_Walk(ObjNode *theNode)
 {
-float		r,fps,angle,dist;
+float		r,fps,dist;
 
 
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, EVILPLANT_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, EVILPLANT_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * EVILPLANT_WALK_SPEED;
@@ -465,8 +465,8 @@ static void UpdateEvilPlant(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-9,0,-25};
-const static OGLPoint3D	rightEye = {9,0,-25};
+static const OGLPoint3D	leftEye = {-9,0,-25};
+static const OGLPoint3D	rightEye = {9,0,-25};
 OGLMatrix4x4	m;
 
 	CreateCollisionBoxFromBoundingBox(theNode, 1,1);				// call this continuously for evil plant since scale changes

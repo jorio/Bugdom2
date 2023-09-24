@@ -219,13 +219,13 @@ float	fps = gFramesPerSecondFrac;
 
 static void  MoveGnome_Walk(ObjNode *theNode)
 {
-float		r,fps,angle,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GNOME_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GNOME_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * GNOME_WALK_SPEED;
@@ -411,7 +411,7 @@ float	fps = gFramesPerSecondFrac;
 
 /************************ PRIME GNOME ENEMY *************************/
 
-Boolean PrimeEnemy_Gnome(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Gnome(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -509,7 +509,7 @@ static void UpdateGnome(ObjNode *theNode)
 
 static void GnomeGotKickedCallback(ObjNode *player, ObjNode *enemy)
 {
-#pragma unused (player)
+	(void) player;
 
 			/* SEE IF REMOVE FROM SPLINE */
 

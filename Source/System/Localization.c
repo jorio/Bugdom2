@@ -108,7 +108,7 @@ int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const
 		goto fail;
 	}
 
-	memcpy(buf, localizedString, bytesBeforePlaceholder);
+	SDL_memcpy(buf, localizedString, bytesBeforePlaceholder);
 	buf += bytesBeforePlaceholder;
 	bufSize -= bytesBeforePlaceholder;
 

@@ -61,13 +61,13 @@ void MoveEnemySkipChunk(ObjNode *chunk);
 
 		/* GNOME */
 
-Boolean PrimeEnemy_Gnome(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Gnome(int splineNum, SplineItemType *itemPtr);
 Boolean AddEnemy_Gnome(TerrainItemEntryType *itemPtr, float x, float z);
 
 
 		/* HOUSEFLY */
 
-Boolean PrimeEnemy_HouseFly(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_HouseFly(int splineNum, SplineItemType *itemPtr);
 Boolean AddEnemy_HouseFly(TerrainItemEntryType *itemPtr, float x, float z);
 
 
@@ -86,13 +86,13 @@ void MovePlayer_EatenBySnake(ObjNode *theNode);
 		/* FLEA */
 
 Boolean AddEnemy_Flea(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Flea(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Flea(int splineNum, SplineItemType *itemPtr);
 void CountFleas(void);
 
 		/* TICK */
 
 Boolean AddEnemy_Tick(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Tick(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Tick(int splineNum, SplineItemType *itemPtr);
 void CountTicks(void);
 
 
@@ -114,19 +114,19 @@ enum
 
 
 Boolean AddEnemy_ToySoldier(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_ToySoldier(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_ToySoldier(int splineNum, SplineItemType *itemPtr);
 
 
 		/* OTTO */
 
 Boolean AddEnemy_Otto(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Otto(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Otto(int splineNum, SplineItemType *itemPtr);
 
 
 		/* DRAGONFLY */
 
 Boolean AddEnemy_Dragonfly(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Dragonfly(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Dragonfly(int splineNum, SplineItemType *itemPtr);
 void SpawnKillerDragonfly(void);
 
 
@@ -157,26 +157,26 @@ Boolean AddEnemy_Frog2(TerrainItemEntryType *itemPtr, float x, float z);
 		/* MOTH */
 
 Boolean AddEnemy_Moth(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeMothPath(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeMothPath(int splineNum, SplineItemType *itemPtr);
 
 
 		/* COMPUTER BUG */
 
 Boolean AddEnemy_ComputerBug(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_ComputerBug(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_ComputerBug(int splineNum, SplineItemType *itemPtr);
 void ComputerBugTouchedPlayer(ObjNode *enemy, ObjNode *player);
 
 
 		/* ROACH */
 
 Boolean AddEnemy_Roach(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Roach(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Roach(int splineNum, SplineItemType *itemPtr);
 
 
 		/* ANT */
 
 Boolean AddEnemy_Ant(TerrainItemEntryType *itemPtr, float x, float z);
-Boolean PrimeEnemy_Ant(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeEnemy_Ant(int splineNum, SplineItemType *itemPtr);
 
 
 		/* POND FISH */

@@ -233,7 +233,7 @@ const 	OGLPoint2D	offsets[3] =
 
 /************************ PRIME HANGER *************************/
 
-Boolean PrimeHanger(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeHanger(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj, *trig;
 float			x,z,splineIndex,x2,z2,y;
@@ -357,19 +357,17 @@ Boolean isInRange;
 
 static Boolean DoTrig_Hanger(ObjNode *theNode, ObjNode *who, Byte sideBits)
 {
-#pragma unused (who, sideBits)
-
-ObjNode	*hanger;
+	(void) who;
+	(void) sideBits;
 
 	gShowRedClovers = true;					// make sure we're showing this
 
 	gGatheredRedClovers++;					// inc count
 
-	hanger = theNode->ChainHead;			// get parent
+	ObjNode	* hanger = theNode->ChainHead;	// get parent
 	hanger->ChainNode = nil;				// detach
 
 	StartPowerupVanish(theNode);
-
 
 	return(false);
 }
@@ -542,7 +540,8 @@ ObjNode	*newObj;
 
 static Boolean DoTrig_PicnicBasket(ObjNode *basket, ObjNode *who, Byte sideBits)
 {
-#pragma unused (basket, sideBits)
+	(void) basket;
+	(void) sideBits;
 
 	if (gNumFoodOnBasket >= FOOD_TO_GET)			// we only need n
 		return(true);

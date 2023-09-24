@@ -684,8 +684,6 @@ ObjNode	*newObj;
 void BlowUpAntHill(ObjNode *theNode)
 {
 float	x,z;
-int		i;
-ObjNode	*newObj;
 
 	PlayEffect3D(EFFECT_HILLBOOM, &theNode->Coord);
 
@@ -701,7 +699,7 @@ ObjNode	*newObj;
 
 			/* MAKE SMOKING AREAS */
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		x = theNode->Coord.x + RandomFloat2() * 250.0f;
 		z = theNode->Coord.z + RandomFloat2() * 250.0f;
@@ -722,7 +720,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.moveCall 	= MoveShockwave;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= .5;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
 			/* SEE IF THAT'S ALL */
@@ -765,9 +763,8 @@ static void MoveShockwave(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 
-	theNode->Scale.x =
-	theNode->Scale.y =
-	theNode->Scale.z = theNode->Scale.x += fps * 800.0f;
+	float s = theNode->Scale.x + fps * 800.0f;
+	theNode->Scale = (OGLVector3D) {s,s,s};
 
 	theNode->ColorFilter.a -= fps * 1.5f;
 	if (theNode->ColorFilter.a <= 0.0f)
@@ -822,9 +819,9 @@ ObjNode	*newObj;
 
 void BurnPlane(ObjNode *theNode)
 {
-int		i;
 float	fps = gFramesPerSecondFrac;
-int		particleGroup,magicNum;
+long	particleGroup;
+long	magicNum;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
 OGLVector3D			d;
@@ -868,7 +865,7 @@ float				x,y,z;
 
 		if (particleGroup != -1)
 		{
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				p.x = x + RandomFloat2() * 50.0f;
 				p.y = y + RandomFloat() * 50.0f;
@@ -927,7 +924,7 @@ float				x,y,z;
 
 		if (particleGroup != -1)
 		{
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				p.x = x + RandomFloat2() * 30.0f;
 				p.y = y + RandomFloat() * 50.0f;

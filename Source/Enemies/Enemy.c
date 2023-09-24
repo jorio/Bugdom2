@@ -28,7 +28,7 @@
 /*    VARIABLES      */
 /*********************/
 
-signed char	gNumEnemyOfKind[NUM_ENEMY_KINDS];
+int			gNumEnemyOfKind[NUM_ENEMY_KINDS];
 int			gNumEnemies;
 int			gMaxEnemies;
 

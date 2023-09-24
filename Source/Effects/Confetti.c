@@ -276,126 +276,125 @@ got_it:
 
 static void MoveConfettiGroups(ObjNode *theNode)
 {
-uint32_t		flags;
-long		i,n,p;
+uint32_t	flags;
 float		fps = gFramesPerSecondFrac;
-float		y,baseScale,oneOverBaseScaleSquared,gravity;
+float		y,gravity;
 float		decayRate,fadeRate;
 OGLPoint3D	*coord;
 OGLVector3D	*delta;
 
-#pragma unused(theNode)
+	(void) theNode;
 
-	for (i = 0; i < MAX_CONFETTI_GROUPS; i++)
+	for (int i = 0; i < MAX_CONFETTI_GROUPS; i++)
 	{
-		if (gConfettiGroups[i])
+		if (!gConfettiGroups[i])
+			continue;
+
+//		baseScale 	= gConfettiGroups[i]->baseScale;					// get base scale
+//		oneOverBaseScaleSquared = 1.0f/(baseScale*baseScale);
+		gravity 	= gConfettiGroups[i]->gravity;						// get gravity
+		decayRate 	= gConfettiGroups[i]->decayRate;					// get decay rate
+		fadeRate 	= gConfettiGroups[i]->fadeRate;						// get fade rate
+		flags 		= gConfettiGroups[i]->flags;
+
+
+		int n = 0;														// init counter
+		for (int p = 0; p < MAX_CONFETTIS; p++)
 		{
-			baseScale 	= gConfettiGroups[i]->baseScale;					// get base scale
-			oneOverBaseScaleSquared = 1.0f/(baseScale*baseScale);
-			gravity 	= gConfettiGroups[i]->gravity;						// get gravity
-			decayRate 	= gConfettiGroups[i]->decayRate;					// get decay rate
-			fadeRate 	= gConfettiGroups[i]->fadeRate;						// get fade rate
-			flags 		= gConfettiGroups[i]->flags;
+			if (!gConfettiGroups[i]->isUsed[p])							// make sure this confetti is used
+				continue;
+
+			n++;														// inc counter
+			delta = &gConfettiGroups[i]->delta[p];						// get ptr to deltas
+			coord = &gConfettiGroups[i]->coord[p];						// get ptr to coords
+
+						/* ADD GRAVITY */
+
+			delta->y -= gravity * fps;									// add gravity
 
 
-			n = 0;															// init counter
-			for (p = 0; p < MAX_CONFETTIS; p++)
+					/* DO ROTATION & MOTION */
+
+			gConfettiGroups[i]->rot[p].x += gConfettiGroups[i]->deltaRot[p].x * fps;
+			gConfettiGroups[i]->rot[p].y += gConfettiGroups[i]->deltaRot[p].y * fps;
+			gConfettiGroups[i]->rot[p].z += gConfettiGroups[i]->deltaRot[p].z * fps;
+
+			coord->x += delta->x * fps;									// move it
+			coord->y += delta->y * fps;
+			coord->z += delta->z * fps;
+
+
+			/*****************/
+			/* SEE IF BOUNCE */
+			/*****************/
+
+			if (!(flags & PARTICLE_FLAGS_DONTCHECKGROUND))
 			{
-				if (!gConfettiGroups[i]->isUsed[p])							// make sure this confetti is used
-					continue;
+				y = GetTerrainY(coord->x, coord->z);						// get terrain coord at confetti x/z
+				if (y == ILLEGAL_TERRAIN_Y)									// bounce for Win screen
+					y = 0.0f;
+				y += 10.0f;
 
-				n++;														// inc counter
-				delta = &gConfettiGroups[i]->delta[p];						// get ptr to deltas
-				coord = &gConfettiGroups[i]->coord[p];						// get ptr to coords
-
-							/* ADD GRAVITY */
-
-				delta->y -= gravity * fps;									// add gravity
-
-
-						/* DO ROTATION & MOTION */
-
-				gConfettiGroups[i]->rot[p].x += gConfettiGroups[i]->deltaRot[p].x * fps;
-				gConfettiGroups[i]->rot[p].y += gConfettiGroups[i]->deltaRot[p].y * fps;
-				gConfettiGroups[i]->rot[p].z += gConfettiGroups[i]->deltaRot[p].z * fps;
-
-				coord->x += delta->x * fps;									// move it
-				coord->y += delta->y * fps;
-				coord->z += delta->z * fps;
-
-
-				/*****************/
-				/* SEE IF BOUNCE */
-				/*****************/
-
-				if (!(flags & PARTICLE_FLAGS_DONTCHECKGROUND))
+				if (flags & PARTICLE_FLAGS_BOUNCE)
 				{
-					y = GetTerrainY(coord->x, coord->z);						// get terrain coord at confetti x/z
-					if (y == ILLEGAL_TERRAIN_Y)									// bounce for Win screen
-						y = 0.0f;
-					y += 10.0f;
-
-					if (flags & PARTICLE_FLAGS_BOUNCE)
+					if (delta->y < 0.0f)									// if moving down, see if hit floor
 					{
-						if (delta->y < 0.0f)									// if moving down, see if hit floor
+						if (coord->y < y)
 						{
-							if (coord->y < y)
+							coord->y = y;
+							delta->y *= -.4f;
+
+							delta->x += gRecentTerrainNormal.x * 300.0f;	// reflect off of surface
+							delta->z += gRecentTerrainNormal.z * 300.0f;
+
+							if (flags & PARTICLE_FLAGS_DISPERSEIFBOUNCE)	// see if disperse on impact
 							{
-								coord->y = y;
-								delta->y *= -.4f;
-
-								delta->x += gRecentTerrainNormal.x * 300.0f;	// reflect off of surface
-								delta->z += gRecentTerrainNormal.z * 300.0f;
-
-								if (flags & PARTICLE_FLAGS_DISPERSEIFBOUNCE)	// see if disperse on impact
-								{
-									delta->y *= .4f;
-									delta->x *= 5.0f;
-									delta->z *= 5.0f;
-								}
+								delta->y *= .4f;
+								delta->x *= 5.0f;
+								delta->z *= 5.0f;
 							}
 						}
 					}
+				}
 
-					/***************/
-					/* SEE IF GONE */
-					/***************/
+				/***************/
+				/* SEE IF GONE */
+				/***************/
 
-					else
+				else
+				{
+					if (coord->y < y)									// if hit floor then nuke confetti
 					{
-						if (coord->y < y)									// if hit floor then nuke confetti
-						{
-							gConfettiGroups[i]->isUsed[p] = false;
-						}
+						gConfettiGroups[i]->isUsed[p] = false;
 					}
 				}
-
-
-					/* DO SCALE */
-
-				gConfettiGroups[i]->scale[p] -= decayRate * fps;			// shrink it
-				if (gConfettiGroups[i]->scale[p] <= 0.0f)					// see if gone
-					gConfettiGroups[i]->isUsed[p] = false;
-
-					/* DO FADE */
-
-				gConfettiGroups[i]->fadeDelay[p] -= fps;
-				if (gConfettiGroups[i]->fadeDelay[p] <= 0.0f)
-				{
-					gConfettiGroups[i]->alpha[p] -= fadeRate * fps;				// fade it
-					if (gConfettiGroups[i]->alpha[p] <= 0.0f)					// see if gone
-						gConfettiGroups[i]->isUsed[p] = false;
-				}
-
-
 			}
 
-				/* SEE IF GROUP WAS EMPTY, THEN DELETE */
 
-			if (n == 0)
+				/* DO SCALE */
+
+			gConfettiGroups[i]->scale[p] -= decayRate * fps;			// shrink it
+			if (gConfettiGroups[i]->scale[p] <= 0.0f)					// see if gone
+				gConfettiGroups[i]->isUsed[p] = false;
+
+				/* DO FADE */
+
+			gConfettiGroups[i]->fadeDelay[p] -= fps;
+			if (gConfettiGroups[i]->fadeDelay[p] <= 0.0f)
 			{
-				DeleteConfettiGroup(i);
+				gConfettiGroups[i]->alpha[p] -= fadeRate * fps;				// fade it
+				if (gConfettiGroups[i]->alpha[p] <= 0.0f)					// see if gone
+					gConfettiGroups[i]->isUsed[p] = false;
 			}
+
+
+		}
+
+			/* SEE IF GROUP WAS EMPTY, THEN DELETE */
+
+		if (n == 0)
+		{
+			DeleteConfettiGroup(i);
 		}
 	}
 }
@@ -406,13 +405,12 @@ OGLVector3D	*delta;
 static void DrawConfettiGroup(ObjNode *theNode)
 {
 float				scale,baseScale;
-long				g,p,n,i;
 OGLColorRGBA_Byte	*vertexColors;
 MOVertexArrayData	*geoData;
 OGLPoint3D		v[4];
 OGLBoundingBox	bbox;
 
-#pragma unused(theNode)
+	(void) theNode;
 
 	v[0].z = 												// init z's to 0
 	v[1].z =
@@ -425,116 +423,116 @@ OGLBoundingBox	bbox;
 
 	SetColor4f(1,1,1,1);										// full white & alpha to start with
 
-	for (g = 0; g < MAX_CONFETTI_GROUPS; g++)
+	for (int g = 0; g < MAX_CONFETTI_GROUPS; g++)
 	{
 		float	minX,minY,minZ,maxX,maxY,maxZ;
-		int		temp;
 
-		if (gConfettiGroups[g])
+		if (!gConfettiGroups[g])
+			continue;
+
+		geoData 		= &gConfettiGroups[g]->geometryObj->objectData;			// get pointer to geometry object data
+		vertexColors 	= geoData->colorsByte;									// get pointer to vertex color array
+		baseScale 		= gConfettiGroups[g]->baseScale;						// get base scale
+
+				/********************************/
+				/* ADD ALL CONFETTIS TO TRIMESH */
+				/********************************/
+
+		minX = minY = minZ = 100000000;									// init bbox
+		maxX = maxY = maxZ = -minX;
+
+		int n = 0;
+		for (int p = 0; p < MAX_CONFETTIS; p++)
 		{
-			geoData 		= &gConfettiGroups[g]->geometryObj->objectData;			// get pointer to geometry object data
-			vertexColors 	= geoData->colorsByte;									// get pointer to vertex color array
-			baseScale 		= gConfettiGroups[g]->baseScale;						// get base scale
+			OGLMatrix4x4	m;
 
-					/********************************/
-					/* ADD ALL CONFETTIS TO TRIMESH */
-					/********************************/
-
-			minX = minY = minZ = 100000000;									// init bbox
-			maxX = maxY = maxZ = -minX;
-
-			for (p = n = 0; p < MAX_CONFETTIS; p++)
-			{
-				OGLMatrix4x4	m;
-
-				if (!gConfettiGroups[g]->isUsed[p])							// make sure this confetti is used
-					continue;
-
-							/* SET VERTEX COORDS */
-
-				scale = gConfettiGroups[g]->scale[p] * baseScale;
-
-				v[0].x = -scale;
-				v[0].y = scale;
-
-				v[1].x = -scale;
-				v[1].y = -scale;
-
-				v[2].x = scale;
-				v[2].y = -scale;
-
-				v[3].x = scale;
-				v[3].y = scale;
-
-
-					/* TRANSFORM THIS CONFETTI'S VERTICES & ADD TO TRIMESH */
-
-				OGLMatrix4x4_SetRotate_XYZ(&m, gConfettiGroups[g]->rot[p].x, gConfettiGroups[g]->rot[p].y, gConfettiGroups[g]->rot[p].z);
-				m.value[M03] = gConfettiGroups[g]->coord[p].x;								// set translate
-				m.value[M13] = gConfettiGroups[g]->coord[p].y;
-				m.value[M23] = gConfettiGroups[g]->coord[p].z;
-				OGLPoint3D_TransformArray(&v[0], &m, &geoData->points[n*4], 4);				// transform
-
-
-							/* UPDATE BBOX */
-
-				for (i = 0; i < 4; i++)
-				{
-					int j = n*4+i;
-
-					if (geoData->points[j].x < minX)
-						minX = geoData->points[j].x;
-					if (geoData->points[j].x > maxX)
-						maxX = geoData->points[j].x;
-					if (geoData->points[j].y < minY)
-						minY = geoData->points[j].y;
-					if (geoData->points[j].y > maxY)
-						maxY = geoData->points[j].y;
-					if (geoData->points[j].z < minZ)
-						minZ = geoData->points[j].z;
-					if (geoData->points[j].z > maxZ)
-						maxZ = geoData->points[j].z;
-				}
-
-					/* UPDATE COLOR/TRANSPARENCY */
-
-				temp = n*4;
-				for (i = temp; i < (temp+4); i++)
-				{
-					vertexColors[i].r =
-					vertexColors[i].g =
-					vertexColors[i].b = 0xff;
-					vertexColors[i].a = gConfettiGroups[g]->alpha[p] * 255.0f;		// set transparency alpha
-				}
-
-				n++;											// inc confetti count
-			}
-
-			if (n == 0)											// if no confettis, then skip
+			if (!gConfettiGroups[g]->isUsed[p])							// make sure this confetti is used
 				continue;
 
-				/* UPDATE FINAL VALUES */
+						/* SET VERTEX COORDS */
 
-			geoData->numTriangles = n*2;
-			geoData->numPoints = n*4;
+			scale = gConfettiGroups[g]->scale[p] * baseScale;
 
-			if (geoData->numPoints < 20)						// if small then just skip cull test
-				goto drawme;
+			v[0].x = -scale;
+			v[0].y = scale;
 
-			bbox.min.x = minX;									// build bbox for culling test
-			bbox.min.y = minY;
-			bbox.min.z = minZ;
-			bbox.max.x = maxX;
-			bbox.max.y = maxY;
-			bbox.max.z = maxZ;
+			v[1].x = -scale;
+			v[1].y = -scale;
 
-			if (OGL_IsBBoxVisible(&bbox, nil))						// do cull test on it
+			v[2].x = scale;
+			v[2].y = -scale;
+
+			v[3].x = scale;
+			v[3].y = scale;
+
+
+				/* TRANSFORM THIS CONFETTI'S VERTICES & ADD TO TRIMESH */
+
+			OGLMatrix4x4_SetRotate_XYZ(&m, gConfettiGroups[g]->rot[p].x, gConfettiGroups[g]->rot[p].y, gConfettiGroups[g]->rot[p].z);
+			m.value[M03] = gConfettiGroups[g]->coord[p].x;								// set translate
+			m.value[M13] = gConfettiGroups[g]->coord[p].y;
+			m.value[M23] = gConfettiGroups[g]->coord[p].z;
+			OGLPoint3D_TransformArray(&v[0], &m, &geoData->points[n*4], 4);				// transform
+
+
+						/* UPDATE BBOX */
+
+			for (int i = 0; i < 4; i++)
 			{
-drawme:
-					/* DRAW IT */
+				int j = n*4+i;
 
-				MO_DrawObject(gConfettiGroups[g]->geometryObj);						// draw geometry
+				if (geoData->points[j].x < minX)
+					minX = geoData->points[j].x;
+				if (geoData->points[j].x > maxX)
+					maxX = geoData->points[j].x;
+				if (geoData->points[j].y < minY)
+					minY = geoData->points[j].y;
+				if (geoData->points[j].y > maxY)
+					maxY = geoData->points[j].y;
+				if (geoData->points[j].z < minZ)
+					minZ = geoData->points[j].z;
+				if (geoData->points[j].z > maxZ)
+					maxZ = geoData->points[j].z;
 			}
+
+				/* UPDATE COLOR/TRANSPARENCY */
+
+			int temp = n*4;
+			for (int i = temp; i < (temp+4); i++)
+			{
+				vertexColors[i].r =
+				vertexColors[i].g =
+				vertexColors[i].b = 0xff;
+				vertexColors[i].a = gConfettiGroups[g]->alpha[p] * 255.0f;		// set transparency alpha
+			}
+
+			n++;											// inc confetti count
+		}
+
+		if (n == 0)											// if no confettis, then skip
+			continue;
+
+			/* UPDATE FINAL VALUES */
+
+		geoData->numTriangles = n*2;
+		geoData->numPoints = n*4;
+
+		if (geoData->numPoints < 20)						// if small then just skip cull test
+			goto drawme;
+
+		bbox.min.x = minX;									// build bbox for culling test
+		bbox.min.y = minY;
+		bbox.min.z = minZ;
+		bbox.max.x = maxX;
+		bbox.max.y = maxY;
+		bbox.max.z = maxZ;
+
+		if (OGL_IsBBoxVisible(&bbox, nil))						// do cull test on it
+		{
+drawme:
+				/* DRAW IT */
+
+			MO_DrawObject(gConfettiGroups[g]->geometryObj);						// draw geometry
 		}
 	}
 

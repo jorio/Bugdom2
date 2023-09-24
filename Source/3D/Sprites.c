@@ -96,7 +96,6 @@ int 		i,n;
 void LoadSpriteFile(FSSpec *spec, int groupNum)
 {
 short			refNum;
-int				i,w,h;
 long			count;
 MOMaterialData	matData;
 
@@ -109,7 +108,7 @@ MOMaterialData	matData;
 		/* READ # SPRITES IN THIS FILE */
 
 	count = sizeof(gNumSpritesInGroupList[groupNum]);
-	FSRead(refNum, &count, &gNumSpritesInGroupList[groupNum]);
+	FSRead(refNum, &count, (Ptr) &gNumSpritesInGroupList[groupNum]);
 
 	gNumSpritesInGroupList[groupNum] = SwizzleLong(&gNumSpritesInGroupList[groupNum]);
 
@@ -125,44 +124,45 @@ MOMaterialData	matData;
 			/* READ EACH SPRITE */
 			/********************/
 
-	for (i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
+	for (int i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
 	{
+		SpriteType* sprite = &gSpriteGroupList[groupNum][i];
 		int32_t	bufferSize;
 		uint8_t *buffer;
 
 			/* READ WIDTH/HEIGHT, ASPECT RATIO */
 
-		count = sizeof(gSpriteGroupList[groupNum][i].width);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].width);
-		gSpriteGroupList[groupNum][i].width = SwizzleLong(&gSpriteGroupList[groupNum][i].width);
+		count = sizeof(sprite->width);
+		FSRead(refNum, &count, (Ptr) &sprite->width);
+		sprite->width = SwizzleLong(&sprite->width);
 
-		count = sizeof(gSpriteGroupList[groupNum][i].height);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].height);
-		gSpriteGroupList[groupNum][i].height = SwizzleLong(&gSpriteGroupList[groupNum][i].height);
+		count = sizeof(sprite->height);
+		FSRead(refNum, &count, (Ptr) &sprite->height);
+		sprite->height = SwizzleLong(&sprite->height);
 
-		count = sizeof(gSpriteGroupList[groupNum][i].aspectRatio);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].aspectRatio);
-		gSpriteGroupList[groupNum][i].aspectRatio = SwizzleFloat(&gSpriteGroupList[groupNum][i].aspectRatio);
+		count = sizeof(sprite->aspectRatio);
+		FSRead(refNum, &count, (Ptr) &sprite->aspectRatio);
+		sprite->aspectRatio = SwizzleFloat(&sprite->aspectRatio);
 
 
 			/* READ SRC FORMAT */
 
 		count = sizeof(GLint);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].srcFormat);
-		gSpriteGroupList[groupNum][i].srcFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].srcFormat);
+		FSRead(refNum, &count, (Ptr) &sprite->srcFormat);
+		sprite->srcFormat = SwizzleLong(&sprite->srcFormat);
 
 
 			/* READ DEST FORMAT */
 
 		count = sizeof(GLint);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].destFormat);
-		gSpriteGroupList[groupNum][i].destFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].destFormat);
+		FSRead(refNum, &count, (Ptr) &sprite->destFormat);
+		sprite->destFormat = SwizzleLong(&sprite->destFormat);
 
 
 			/* READ BUFFER SIZE */
 
 		count = sizeof(bufferSize);
-		FSRead(refNum, &count, &bufferSize);
+		FSRead(refNum, &count, (Ptr) &bufferSize);
 		bufferSize = SwizzleLong(&bufferSize);
 
 		buffer = AllocPtr(bufferSize);							// alloc memory for buffer
@@ -173,9 +173,9 @@ MOMaterialData	matData;
 			/* READ THE SPRITE PIXEL BUFFER */
 
 		count = bufferSize;
-		FSRead(refNum, &count, buffer);
+		FSRead(refNum, &count, (Ptr) buffer);
 
-		if (gSpriteGroupList[groupNum][i].srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
+		if (sprite->srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 		{
 			int		q;
 			uint16_t *pix = (uint16_t *)buffer;
@@ -199,11 +199,11 @@ MOMaterialData	matData;
 		matData.diffuseColor.a	= 1;
 
 		matData.numMipmaps		= 1;
-		w = matData.width		= gSpriteGroupList[groupNum][i].width;
-		h = matData.height		= gSpriteGroupList[groupNum][i].height;
+		matData.width			= sprite->width;
+		matData.height			= sprite->height;
 
-		matData.pixelSrcFormat	= gSpriteGroupList[groupNum][i].srcFormat;
-		matData.pixelDstFormat	= gSpriteGroupList[groupNum][i].destFormat;
+		matData.pixelSrcFormat	= sprite->srcFormat;
+		matData.pixelDstFormat	= sprite->destFormat;
 
 		matData.texturePixels[0]= nil;											// we're going to preload
 
@@ -240,14 +240,13 @@ MOMaterialData	matData;
 													 matData.pixelDstFormat, GL_UNSIGNED_BYTE);
 		}
 
-		gSpriteGroupList[groupNum][i].materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
+		sprite->materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 
-		if (gSpriteGroupList[groupNum][i].materialObject == nil)
+		if (sprite->materialObject == nil)
 			DoFatalAlert("LoadSpriteFile: MO_CreateNewObjectOfType failed");
 
 
 		SafeDisposePtr((Ptr)buffer);														// free the buffer
-
 	}
 
 
@@ -255,8 +254,6 @@ MOMaterialData	matData;
 		/* CLOSE FILE */
 
 	FSClose(refNum);
-
-
 }
 
 

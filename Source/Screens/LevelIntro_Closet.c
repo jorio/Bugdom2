@@ -62,8 +62,7 @@ static void SetupLevelIntroScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.8, -.6, -1.0 };
-ObjNode	*newObj;
+static const OGLVector3D	fillDirection1 = { -.8, -.6, -1.0 };
 
 			/**************/
 			/* SETUP VIEW */
@@ -132,10 +131,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 40.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-
-
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 }
 
 

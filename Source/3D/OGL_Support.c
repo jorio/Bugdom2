@@ -130,10 +130,12 @@ static OGLVector3D			fillDirection2 = { -1, -.3, -.3 };
 	OGLVector3D_Normalize(&fillDirection2, &fillDirection2);
 
 	viewDef->view.clearColor 		= clearColor;
+#if 0
 	viewDef->view.clip.left 	= 0;
 	viewDef->view.clip.right 	= 0;
 	viewDef->view.clip.top 		= 0;
 	viewDef->view.clip.bottom 	= 0;
+#endif
 	viewDef->view.clearBackBuffer = true;
 
 	viewDef->camera.from			= cameraFrom;
@@ -188,7 +190,7 @@ OGLSetupOutputType	*outputPtr;
 				/* PASS BACK INFO */
 
 	outputPtr->drawContext 		= gAGLContext;
-	outputPtr->clip 			= setupDefPtr->view.clip;
+//	outputPtr->clip 			= setupDefPtr->view.clip;
 	outputPtr->hither 			= setupDefPtr->camera.hither;			// remember hither/yon
 	outputPtr->yon 				= setupDefPtr->camera.yon;
 	outputPtr->useFog 			= setupDefPtr->styles.useFog;
@@ -431,7 +433,7 @@ static char			*s;
 
 			/* SEE IF SUPPORT 1024x1024 TEXTURES */
 
-	GLuint maxTexSize = 0;
+	GLint maxTexSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 	if (maxTexSize < 1024)
 		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
@@ -569,8 +571,6 @@ GLfloat	ambient[4];
 
 void OGL_DrawScene(void (*drawRoutine)(void))
 {
-int	x,y,w,h;
-
 	GAME_ASSERT(gGameView);								// make sure it's legit
 	GAME_ASSERT(gGameView->isActive);
 	// aglSetCurrentContext(gGameView->drawContext);		// make context active
@@ -629,9 +629,12 @@ int	x,y,w,h;
 
 				/* SET VIEWPORT */
 
-	OGL_GetCurrentViewport(&x, &y, &w, &h);
-	glViewport(x,y, w, h);
-	gCurrentAspectRatio = (float)w/(float)h;
+	{
+		int x, y, w, h;
+		OGL_GetCurrentViewport(&x, &y, &w, &h);
+		glViewport(x, y, w, h);
+		gCurrentAspectRatio = (float) w / (float) h;
+	}
 
 
 			/*************************/
@@ -821,6 +824,7 @@ do_anaglyph:
 
 void OGL_GetCurrentViewport(int *x, int *y, int *w, int *h)
 {
+#if 0
 	int t = gGameView->clip.top;
 	int b = gGameView->clip.bottom;
 	int l = gGameView->clip.left;
@@ -830,6 +834,13 @@ void OGL_GetCurrentViewport(int *x, int *y, int *w, int *h)
 	*y = t;
 	*w = gGameWindowWidth-l-r;
 	*h = gGameWindowHeight-t-b;
+#else
+	// no pane clipping in Bugdom 2
+	*x = 0;
+	*y = 0;
+	*w = gGameWindowWidth;
+	*h = gGameWindowHeight;
+#endif
 }
 
 
@@ -1591,12 +1602,9 @@ void OGL_DrawString(const char* s, GLint x, GLint y)
 
 void OGL_DrawFloat(float f, GLint x, GLint y)
 {
-
-Str255	s;
-
-	FloatToString(f,s);
+	char s[16];
+	SDL_snprintf(s, sizeof(s), "%f", f);
 	OGL_DrawString(s,x,y);
-
 }
 
 
@@ -1605,10 +1613,7 @@ Str255	s;
 
 void OGL_DrawInt(int f, GLint x, GLint y)
 {
-
-Str255	s;
-
-	NumToString(f,s);
+	char s[16];
+	SDL_snprintf(s, sizeof(s), "%d", f);
 	OGL_DrawString(s,x,y);
-
 }

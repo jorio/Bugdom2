@@ -27,7 +27,7 @@ static Boolean NilAdd(TerrainItemEntryType *itemPtr,float x, float z);
 /*     VARIABLES      */
 /**********************/
 
-short	  				gNumTerrainItems;
+int						gNumTerrainItems;
 TerrainItemEntryType 	**gMasterItemList = nil;
 
 float					**gMapYCoords = nil;			// 2D array of map vertex y coords
@@ -235,16 +235,11 @@ int						total;
 
 void FindPlayerStartCoordItems(void)
 {
-long					i;
-TerrainItemEntryType	*itemPtr;
-Boolean                 flags = false;
-
-
-	itemPtr = *gMasterItemList; 												// get pointer to data inside the LOCKED handle
+	const TerrainItemEntryType* itemPtr = *gMasterItemList;					// get pointer to data inside the LOCKED handle
 
 				/* SCAN FOR "START COORD" ITEM */
 
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
 		if (itemPtr[i].type == MAP_ITEM_MYSTARTCOORD)						// see if it's a MyStartCoord item
 		{
@@ -256,11 +251,7 @@ Boolean                 flags = false;
 			gPlayerInfo.coord.z = gPlayerInfo.startZ = itemPtr[i].y;
 			gPlayerInfo.startRotY = (float)itemPtr[i].parm[0] * (PI2/8.0f);	// calc starting rotation aim
 
-			break;
-
-//			if (flags)                      								// if we already got a coord for this player then err
-  //              DoFatalAlert("FindPlayerStartCoordItems:  duplicate start item for player #n");
-	        flags = true;
+			return;
 		}
 	}
 }
@@ -272,10 +263,10 @@ Boolean                 flags = false;
 // This scans all of the items on this supertile and attempts to add them.
 //
 
-void AddTerrainItemsOnSuperTile(long row, long col)
+void AddTerrainItemsOnSuperTile(int row, int col)
 {
 TerrainItemEntryType *itemPtr;
-long			type,numItems,startIndex,i;
+int				type,numItems,startIndex;
 Boolean			flag;
 
 
@@ -291,7 +282,7 @@ Boolean			flag;
 			/* SCAN ALL ITEMS UNDER HERE */
 			/*****************************/
 
-	for (i = 0; i < numItems; i++)
+	for (int i = 0; i < numItems; i++)
 	{
 		float	x,z;
 
@@ -323,9 +314,11 @@ Boolean			flag;
 // nothing add
 //
 
-static Boolean NilAdd(TerrainItemEntryType *itemPtr,float x, float z)
+static Boolean NilAdd(TerrainItemEntryType *itemPtr, float x, float z)
 {
-#pragma unused (itemPtr, x, z)
+	(void) itemPtr;
+	(void) x;
+	(void) z;
 	return(false);
 }
 
@@ -442,43 +435,6 @@ OGLMatrix4x4	*m,m2;
 
 
 
-/*************************** ROTATE ON TERRAIN: WIDE AREA ***************************/
-//
-// Same as above except it averages normals around the center.
-//
-
-void RotateOnTerrain_WideArea(ObjNode *theNode, float yOffset, float radius)
-{
-OGLVector3D		up;
-float			r,x,z,x2,z2;
-
-
-			/* GET CENTER Y COORD & TERRAIN NORMAL */
-
-	x = theNode->Coord.x;
-	z = theNode->Coord.z;
-	GetTerrainY(x, z);
-	up = gRecentTerrainNormal;
-
-			/* AVERAGE IN THE RADIAL NORMALS */
-
-	for (r = 0; r < PI2; r += (PI/8))
-	{
-		x2 = x + sin(r) * radius;
-		z2 = z + cos(r) * radius;
-
-		GetTerrainY(x, z);
-		up.x += gRecentTerrainNormal.x;
-		up.y += gRecentTerrainNormal.y;
-		up.z += gRecentTerrainNormal.z;
-	}
-	OGLVector3D_Normalize(&up, &up);
-
-
-	RotateOnTerrain(theNode, yOffset, &up);
-}
-
-
 #pragma mark ======= TERRAIN PRE-CONSTRUCTION =========
 
 
@@ -489,7 +445,7 @@ float			r,x,z,x2,z2;
 // Given a row, col coord, calculate the face normals for the 2 triangles.
 //
 
-void CalcTileNormals(long row, long col, OGLVector3D *n1, OGLVector3D *n2)
+void CalcTileNormals(int row, int col, OGLVector3D *n1, OGLVector3D *n2)
 {
 static OGLPoint3D	p1 = {0,0,0};
 static OGLPoint3D	p2 = {0,0,0};
@@ -542,7 +498,7 @@ static OGLPoint3D	p4 = {0,0,0};
 // Given a row, col coord, calculate the face normals for the 2 triangles.
 //
 
-void CalcTileNormals_NotNormalized(long row, long col, OGLVector3D *n1, OGLVector3D *n2)
+void CalcTileNormals_NotNormalized(int row, int col, OGLVector3D *n1, OGLVector3D *n2)
 {
 static OGLPoint3D	p1 = {0,0,0};
 static OGLPoint3D	p2 = {0,0,0};
@@ -600,13 +556,12 @@ static OGLPoint3D	p4 = {0,0,0};
 
 void DoItemShadowCasting(void)
 {
-long				i;
 static OGLVector3D up = {0,1,0};
 float				height,dot,length;
 OGLVector2D			lightVector;
 OGLPoint2D			from,to;
 float				x,z,t;
-long				row,col;
+int					row,col;
 Byte				**shadowFlags;
 float				shadeFactor;
 
@@ -645,7 +600,7 @@ float				shadeFactor;
 			/* SCAN THRU ITEM LIST */
 			/***********************/
 
-	for (i = 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
 			/* SEE WHICH THINGS WE SUPPORT & GET PARMS */
 

@@ -86,15 +86,13 @@ void InitObjectManager(void)
 ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef)
 {
 ObjNode	*newNodePtr;
-long	slot,i;
-unsigned long flags = newObjDef->flags;
+long	slot;
+uint32_t flags = newObjDef->flags;
 
 				/* ALLOCATE NEW NODE(CLEARED TO 0'S) */
 
 	newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
-	if (newNodePtr == nil)
-		DoFatalAlert("MakeNewObject: Alloc Ptr failed!");
-
+	GAME_ASSERT(newNodePtr);
 
 
 
@@ -116,7 +114,7 @@ unsigned long flags = newObjDef->flags;
 	newNodePtr->Coord = newNodePtr->InitCoord = newNodePtr->OldCoord = newObjDef->coord;		// save coords
 	newNodePtr->StatusBits = flags;
 
-	for (i = 0; i < MAX_NODE_SPARKLES; i++)								// no sparkles
+	for (int i = 0; i < MAX_NODE_SPARKLES; i++)								// no sparkles
 		newNodePtr->Sparkles[i] = -1;
 
 
@@ -154,7 +152,7 @@ unsigned long flags = newObjDef->flags;
 
 		/* NO VAPOR TRAILS YET */
 
-	for (i = 0; i < MAX_JOINTS; i++)
+	for (int i = 0; i < MAX_JOINTS; i++)
 		newNodePtr->VaporTrails[i] = -1;
 
 

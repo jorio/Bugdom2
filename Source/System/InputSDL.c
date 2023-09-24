@@ -114,11 +114,11 @@ void InvalidateAllInputs(void)
 {
 	_Static_assert(1 == sizeof(KeyState), "sizeof(KeyState) has changed -- Rewrite this function without memset()!");
 
-	memset(gNeedStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
-	memset(gKeyboardStates, KEYSTATE_IGNOREHELD, SDL_NUM_SCANCODES);
-	memset(gMouseButtonStates, KEYSTATE_IGNOREHELD, NUM_SUPPORTED_MOUSE_BUTTONS);
+	SDL_memset(gNeedStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
+	SDL_memset(gKeyboardStates, KEYSTATE_IGNOREHELD, SDL_NUM_SCANCODES);
+	SDL_memset(gMouseButtonStates, KEYSTATE_IGNOREHELD, NUM_SUPPORTED_MOUSE_BUTTONS);
 
-	memset(gController.needStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
+	SDL_memset(gController.needStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
 }
 
 static void UpdateRawKeyboardStates(void)
@@ -310,7 +310,7 @@ void DoSDLMaintenance(void)
 				break;
 
 			case SDL_TEXTINPUT:
-				memcpy(gTextInput, event.text.text, sizeof(gTextInput));
+				SDL_memcpy(gTextInput, event.text.text, sizeof(gTextInput));
 				_Static_assert(sizeof(gTextInput) == sizeof(event.text.text), "size mismatch: gTextInput/event.text.text");
 				break;
 
@@ -693,7 +693,7 @@ void ResetDefaultKeyboardBindings(void)
 {
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.bindings[i].key, kDefaultInputBindings[i].key, sizeof(gGamePrefs.bindings[i].key));
+		SDL_memcpy(gGamePrefs.bindings[i].key, kDefaultInputBindings[i].key, sizeof(gGamePrefs.bindings[i].key));
 	}
 }
 
@@ -701,7 +701,7 @@ void ResetDefaultGamepadBindings(void)
 {
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.bindings[i].pad, kDefaultInputBindings[i].pad, sizeof(gGamePrefs.bindings[i].pad));
+		SDL_memcpy(gGamePrefs.bindings[i].pad, kDefaultInputBindings[i].pad, sizeof(gGamePrefs.bindings[i].pad));
 	}
 
 	gGamePrefs.rumbleIntensity = 100;

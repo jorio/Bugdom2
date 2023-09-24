@@ -80,7 +80,7 @@ static void SetupLevelIntroScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
+static const OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
 ObjNode	*newObj, *base, *head;
 int		i;
 

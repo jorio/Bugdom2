@@ -114,8 +114,8 @@ static void SetupMainMenuScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.7, .9, -1.0 };
-const static OGLVector3D	fillDirection2 = { .3, .8, 1.0 };
+static const OGLVector3D	fillDirection1 = { -.7, .9, -1.0 };
+static const OGLVector3D	fillDirection2 = { .3, .8, 1.0 };
 ObjNode	*newObj;
 int		i;
 
@@ -779,7 +779,6 @@ ObjNode	*pane;
 static void DrawHighScores(void)
 {
 float	y;
-int		i,j,n;
 Str32	s;
 
 			/* SET STATE */
@@ -801,7 +800,7 @@ Str32	s;
 			/*****************/
 
 	y = 120;
-	for (i = 0; i < NUM_SCORES; i++)
+	for (int i = 0; i < NUM_SCORES; i++)
 	{
 				/* DRAW NAME */
 
@@ -809,17 +808,7 @@ Str32	s;
 
 				/* DRAW SCORE */
 
-		NumToString(gHighScores[i].score, s);	// convert score to a text string
-		if (s[0] < SCORE_DIGITS)				// pad 0's
-		{
-			n = SCORE_DIGITS-s[0];
-			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-
-			for (j = 0; j < n; j++)				// pad with 0's
-				s[1+j] = '0';
-
-			s[0] = SCORE_DIGITS;
-		}
+		SDL_snprintf(s, sizeof(s), "%09d", gHighScores[i].score);
 		DrawScoreText(s, 350, y);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
@@ -840,19 +829,18 @@ Str32	s;
 
 /***************** DRAW SCORE TEXT ***********************/
 
-void DrawScoreText(unsigned char *s, float x, float y)
+void DrawScoreText(const char* s, float x, float y)
 {
-int	n,i,texNum;
-
-	n = s[0];										// get str len
-
-	for (i = 1; i <= n; i++)
+	for (; *s; s++)
 	{
-		texNum = CharToSprite(s[i]);				// get texture #
+		char c = *s;
+
+		int texNum = CharToSprite(c);				// get texture #
+
 		if (texNum != -1)
 			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, texNum);
 
-		x += GetCharSpacing(s[i], SCORE_TEXT_SPACING);
+		x += GetCharSpacing(c, SCORE_TEXT_SPACING);
 	}
 }
 

@@ -99,57 +99,41 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
-			IMPLEMENT_ME();
-#if 0
-			EventRecord 	theEvent;
-
-			GetNextEvent(keyDownMask|autoKeyMask, &theEvent);							// poll event queue
-			if ((theEvent.what == keyDown) || (theEvent.what == autoKeyMask))			// see if key pressed
+			if (IsKeyDown(SDL_SCANCODE_RETURN) || IsKeyDown(SDL_SCANCODE_KP_ENTER))
 			{
-				char	theChar = theEvent.message & charCodeMask;						// extract key
-				int		i;
-
-				switch(theChar)
-				{
-					case	CHAR_RETURN:
-					case	CHAR_ENTER:
-							gExitHighScores = true;
-							break;
-
-					case	CHAR_LEFT:
-							if (gCursorIndex > 0)
-								gCursorIndex--;
-							break;
-
-					case	CHAR_RIGHT:
-							if (gCursorIndex < (MAX_NAME_LENGTH-1))
-								gCursorIndex++;
-							else
-								gCursorIndex = MAX_NAME_LENGTH-1;
-							break;
-
-					case	CHAR_DELETE:
-							if (gCursorIndex > 0)
-							{
-								gCursorIndex--;
-								for (i = gCursorIndex+1; i < MAX_NAME_LENGTH; i++)
-									gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
-								gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
-							}
-							break;
-
-					default:
-							if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
-							{
-								if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
-									theChar = 'A' + (theChar-'a');
-								gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
-								gCursorIndex++;
-							}
-				}
-
+				gExitHighScores = true;
 			}
-#endif
+			else if (IsKeyDown(SDL_SCANCODE_LEFT))
+			{
+				if (gCursorIndex > 0)
+					gCursorIndex--;
+			}
+			else if (IsKeyDown(SDL_SCANCODE_RIGHT))
+			{
+				if (gCursorIndex < (MAX_NAME_LENGTH-1)
+					&& gHighScores[gNewScoreSlot].name[gCursorIndex])
+				{
+					gCursorIndex++;
+				}
+			}
+			else if (IsKeyDown(SDL_SCANCODE_BACKSPACE))
+			{
+				if (gCursorIndex > 0)
+				{
+					gCursorIndex--;
+					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+						gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
+					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = '\0';
+				}
+			}
+			else if (gTextInput[0] && gCursorIndex < MAX_NAME_LENGTH)			// dont add anything more if maxxed out now
+			{
+				char theChar = gTextInput[0];
+				if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
+					theChar = 'A' + (theChar-'a');
+				gHighScores[gNewScoreSlot].name[gCursorIndex] = theChar;
+				gCursorIndex++;
+			}
 		}
 	}
 
@@ -334,7 +318,7 @@ static void SetHighScoresSpriteState(void)
 static void DrawScoreVerbage(void)
 {
 Str32	s;
-int		texNum,n,i;
+int		texNum;
 float	x;
 
 				/* SEE IF DONE */
@@ -366,8 +350,7 @@ float	x;
 			/* DRAW SCORE */
 			/**************/
 
-	NumToString(gScore, s);
-	n = s[0];										// get str len
+	int n = SDL_snprintf(s, sizeof(s), "%d", gScore);
 
 	x = 320.0f - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
 
@@ -377,7 +360,7 @@ float	x;
 	gGlobalColorFilter.b = 0;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (i = 1; i <= n; i++)
+	for (int i = 0; i < n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
 
@@ -399,8 +382,7 @@ float	x;
 static void DrawHighScoresAndCursor(void)
 {
 float	y,cursorY,cursorX;
-int		i,j,n;
-Str32	s;
+char	s[33];
 
 	gFinalScoreAlpha += gFramesPerSecondFrac;						// fade in
 	if (gFinalScoreAlpha > .99f)
@@ -433,17 +415,18 @@ Str32	s;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
 	y = 120;
-	for (i = 0; i < NUM_SCORES; i++)
+	for (int i = 0; i < NUM_SCORES; i++)
 	{
 		if (i == gNewScoreSlot)								// see if cursor will go on this line
 		{
 			cursorY = y;
 			cursorX = 150.0f;
 
-			n = gHighScores[i].name[0];						// get str len
-			for (j = 1; j <= gCursorIndex; j++)
+			for (int j = 0; j < gCursorIndex && gHighScores[i].name[j]; j++)
+			{
+				if (gHighScores[i].name[j])
 				cursorX += GetCharSpacing(gHighScores[i].name[j], SCORE_TEXT_SPACING);	// calc cursor position
-
+			}
 		}
 
 				/* DRAW NAME */
@@ -452,17 +435,7 @@ Str32	s;
 
 				/* DRAW SCORE */
 
-		NumToString(gHighScores[i].score, s);	// convert score to a text string
-		if (s[0] < SCORE_DIGITS)				// pad 0's
-		{
-			n = SCORE_DIGITS-s[0];
-			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-
-			for (j = 0; j < n; j++)				// pad with 0's
-				s[1+j] = '0';
-
-			s[0] = SCORE_DIGITS;
-		}
+		SDL_snprintf(s, sizeof(s), "%09d", gHighScores[i].score);
 		DrawScoreText(s, 350, y);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
@@ -525,19 +498,23 @@ long				count;
 	if (iErr == fnfErr)
 		ClearHighScores();
 	else
+		GAME_ASSERT(!iErr);
+
+	count = sizeof(HighScoreType) * NUM_SCORES;
+	iErr = FSRead(refNum, &count, (Ptr) gHighScores);					// read data from file
+	FSClose(refNum);
+
 	if (iErr)
-		DoFatalAlert("LoadHighScores: Error opening High Scores file!");
-	else
 	{
-		count = sizeof(HighScoreType) * NUM_SCORES;
-		iErr = FSRead(refNum, &count,  &gHighScores[0]);								// read data from file
-		if (iErr)
-		{
-			FSClose(refNum);
-			FSpDelete(&file);												// file is corrupt, so delete
-			return;
-		}
-		FSClose(refNum);
+		FSpDelete(&file);												// file is corrupt, so delete
+		return;
+	}
+
+				/* SAFETY */
+
+	for (int i = 0; i < NUM_SCORES; i++)
+	{
+		gHighScores[i].name[MAX_NAME_LENGTH] = '\0';
 	}
 }
 
@@ -576,7 +553,7 @@ err:
 				/* WRITE DATA */
 
 	count = sizeof(HighScoreType) * NUM_SCORES;
-	FSWrite(refNum, &count, &gHighScores[0]);
+	FSWrite(refNum, &count, (Ptr) gHighScores);
 	FSClose(refNum);
 
 }
@@ -586,19 +563,7 @@ err:
 
 void ClearHighScores(void)
 {
-short				i,j;
-char				blank[MAX_NAME_LENGTH] = "               ";
-
-
-			/* INIT SCORES */
-
-	for (i=0; i < NUM_SCORES; i++)
-	{
-		gHighScores[i].name[0] = MAX_NAME_LENGTH;
-		for (j=0; j < MAX_NAME_LENGTH; j++)
-			gHighScores[i].name[j+1] = blank[j];
-		gHighScores[i].score = 0;
-	}
+	SDL_memset(gHighScores, 0, sizeof(gHighScores));
 
 	SaveHighScores();
 }
@@ -629,9 +594,7 @@ got_slot:
 	for (i = NUM_SCORES-1; i > slot; i--)						// make hole
 		gHighScores[i] = gHighScores[i-1];
 	gHighScores[slot].score = newScore;							// set score in structure
-	gHighScores[slot].name[0] = MAX_NAME_LENGTH;				// clear name
-	for (i = 1; i <= MAX_NAME_LENGTH; i++)
-		gHighScores[slot].name[i] = ' ';						// clear to all spaces
+	SDL_zeroa(gHighScores[slot].name);							// clear name
 	return(slot);
 }
 

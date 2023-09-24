@@ -105,8 +105,8 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-short	gTotalFleas = 0;
-short	gNumKilledFleas = 0;
+int	gTotalFleas = 0;
+int	gNumKilledFleas = 0;
 
 #define	ButtTimer			SpecialF[2]
 
@@ -373,7 +373,7 @@ float	dist;
 
 static void  MoveFlea_Walk(ObjNode *theNode)
 {
-float		r,fps,aim,dist;
+float		r,fps,dist;
 ObjNode		*cap;
 
 	fps = gFramesPerSecondFrac;
@@ -397,8 +397,7 @@ ObjNode		*cap;
 
 						/* MOVE TOWARD CAP */
 
-				aim = TurnObjectTowardTarget(theNode, &gCoord, cap->Coord.x, cap->Coord.z,
-											FLEA_TURN_SPEED, false);
+				TurnObjectTowardTarget(theNode, &gCoord, cap->Coord.x, cap->Coord.z, FLEA_TURN_SPEED, false);
 
 				r = theNode->Rot.y;
 				gDelta.x = -sin(r) * FLEA_WALK_SPEED;
@@ -432,7 +431,7 @@ ObjNode		*cap;
 				if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))	// dont chase thru things
 					goto stand;
 
-				aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLEA_TURN_SPEED, false);
+				TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLEA_TURN_SPEED, false);
 
 				r = theNode->Rot.y;
 				gDelta.x = -sin(r) * FLEA_WALK_SPEED;
@@ -469,7 +468,7 @@ stand:
 
 static void  MoveFlea_Hop(ObjNode *theNode)
 {
-float		r,fps,aim,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
@@ -477,7 +476,7 @@ float		r,fps,aim,dist;
 
 	ApplyFrictionToDeltas(1200.0,&gDelta);
 
-	aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLEA_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLEA_TURN_SPEED, false);
 	r = theNode->Rot.y;
 
 	if (theNode->HopNow)
@@ -694,8 +693,8 @@ static void UpdateFleaEyes(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-10,1,-40};
-const static OGLPoint3D	rightEye = {10,1,-40};
+static const OGLPoint3D	leftEye = {-10,1,-40};
+static const OGLPoint3D	rightEye = {10,1,-40};
 OGLMatrix4x4	m;
 
 
@@ -746,7 +745,7 @@ OGLMatrix4x4	m;
 
 /************************ PRIME FLEA ENEMY *************************/
 
-Boolean PrimeEnemy_Flea(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeEnemy_Flea(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj;
 float			x,z,placement;
@@ -1001,7 +1000,7 @@ float					scale;
 static void FleaThrowCap(ObjNode *enemy)
 {
 ObjNode		 			*cap;
-const static OGLPoint3D zero = {0,0,0};
+static const OGLPoint3D zero = {0,0,0};
 float					rot;
 
 	enemy->HasCap = false;							// dont have it anymore

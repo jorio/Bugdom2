@@ -62,7 +62,7 @@ short  		i, j, k, r;
 unsigned short  flags;
 Ptr			srcOriginalPtr;
 unsigned char *sourcePtr,c;
-long		decompSize = (long)destPtr;
+Ptr			destStartPtr = destPtr;
 
 	textsize = 0;						/* text size counter */
 	codesize = 0;						/* code size counter */
@@ -73,8 +73,8 @@ long		decompSize = (long)destPtr;
 	InitLZSSMemory();										// init internal stuff
 
 	srcOriginalPtr = (Ptr)AllocPtr(sourceSize+1);
-	if (srcOriginalPtr == nil)
-		DoFatalAlert("Couldnt allocate memory for ZS pack buffer!");
+	GAME_ASSERT(srcOriginalPtr);
+
 	sourcePtr = (unsigned char *)srcOriginalPtr;
 
 				/* READ LZSS DATA */
@@ -130,7 +130,7 @@ long		decompSize = (long)destPtr;
 		}
 	}
 
-	decompSize = (int)destPtr - decompSize;		// calc size of decompressed data
+	ptrdiff_t decompSize = destPtr - destStartPtr;		// calc size of decompressed data
 
 
 			/* CLEANUP */
@@ -144,7 +144,7 @@ long		decompSize = (long)destPtr;
 	SafeDisposePtr((Ptr)dad);
 	dad = nil;
 
-	return(decompSize);
+	return (long) decompSize;
 }
 
 /********************* INIT LZSS MEMORY **********************/

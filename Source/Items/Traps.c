@@ -852,7 +852,7 @@ float	r,y;
 
 static Boolean DoTrig_MouseTrap(ObjNode *trap, ObjNode *who, Byte sideBits)
 {
-#pragma unused (who)
+	(void) who;
 
 	if (!(sideBits & SIDE_BITS_BOTTOM))					// only trigger if land on top
 		return(true);
@@ -874,7 +874,7 @@ static Boolean DoTrig_MouseTrap(ObjNode *trap, ObjNode *who, Byte sideBits)
 
 static void MouseTrapGotKickedCallback(ObjNode *player, ObjNode *trap)
 {
-#pragma unused (player)
+	(void) player;
 
 	SetOffMouseTrap(trap);
 }
@@ -1236,7 +1236,7 @@ static Boolean DoTrig_Trampoline(ObjNode *theNode, ObjNode *who, Byte sideBits)
 
 /************************ PRIME VACUUME *************************/
 
-Boolean PrimeVacuume(long splineNum, SplineItemType *itemPtr)
+Boolean PrimeVacuume(int splineNum, SplineItemType *itemPtr)
 {
 ObjNode			*newObj, *light;
 float			x,z,placement;

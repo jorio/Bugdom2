@@ -345,12 +345,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		// We need to restore these manually.
 
 	hand = GetResource('RelP', 1000);
-	if (hand == nil)
-		DoFatalAlert("Error reading RelP resource!");
+	GAME_ASSERT(hand);
 	HLock(hand);
 	pointPtr = (OGLPoint3D *)*hand;
 
-	i = GetHandleSize(hand) / sizeof(OGLPoint3D);
+	i = (int) (GetHandleSize(hand) / (Size) sizeof(OGLPoint3D));
 	if (i != skeleton->numDecomposedPoints)
 		DoFatalAlert("# of points in Reference Model has changed!");
 	else
@@ -548,7 +547,7 @@ long				count;
 				/* WRITE DATA */
 
 	count = sizeof(PrefsType);
-	FSWrite(refNum, &count, &gGamePrefs);
+	FSWrite(refNum, &count, (Ptr) &gGamePrefs);
 	FSClose(refNum);
 }
 
@@ -570,6 +569,9 @@ long				count;
 
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth)
 {
+	(void) myFSSpec;
+	(void) theGWorld;
+	(void) depth;
 	IMPLEMENT_ME();
 	return unimpErr;
 #if 0
@@ -668,9 +670,8 @@ static void ReadDataFromPlayfieldFile(FSSpec *specPtr)
 {
 Handle					hand;
 PlayfieldHeaderType		**header;
-long					row,col,j,i,size;
+long					row,col,size;
 float					yScale;
-float					*src;
 short					fRefNum;
 OSErr					iErr;
 Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
@@ -736,16 +737,16 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	Alloc_2d_array(short, gSuperTileTextureGrid, gNumSuperTilesDeep, gNumSuperTilesWide);
 
 	hand = GetResource('STgd',1000);												// load grid from rez
-	if (hand == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: Error reading supertile rez resource!");
-	else																			// copy rez into 2D array
+	GAME_ASSERT(hand);
+
+	// copy rez into 2D array
 	{
-		short *src = (short *)*hand;
+		int16_t *srcShort = (int16_t *)*hand;
 
 		for (row = 0; row < gNumSuperTilesDeep; row++)
 			for (col = 0; col < gNumSuperTilesWide; col++)
 			{
-				gSuperTileTextureGrid[row][col] = SwizzleShort(src++);
+				gSuperTileTextureGrid[row][col] = SwizzleShort(srcShort++);
 			}
 		ReleaseResource(hand);
 	}
@@ -764,11 +765,9 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	Alloc_2d_array(float, gMapYCoordsOriginal, gTerrainTileDepth+1, gTerrainTileWidth+1);	// and the copy of it
 
 	hand = GetResource('YCrd',1000);
-	if (hand == nil)
-		DoAlert("ReadDataFromPlayfieldFile: Error reading height data resource!");
-	else
+	GAME_ASSERT(hand);
 	{
-		src = (float *)*hand;
+		float* src = (float *)*hand;
 		for (row = 0; row <= gTerrainTileDepth; row++)
 			for (col = 0; col <= gTerrainTileWidth; col++)
 				gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
@@ -782,9 +781,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				/* READ ITEM LIST */
 
 	hand = GetResource('Itms',1000);
-	if (hand == nil)
-		DoAlert("ReadDataFromPlayfieldFile: Error reading itemlist resource!");
-	else
+	GAME_ASSERT(hand);
+
 	{
 		TerrainItemEntryType   *rezItems;
 
@@ -795,7 +793,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* CONVERT COORDINATES */
 
-		for (i = 0; i < gNumTerrainItems; i++)
+		for (int i = 0; i < gNumTerrainItems; i++)
 		{
 			(*gMasterItemList)[i].x = SwizzleULong(&rezItems[i].x) * gMapToUnitValue;								// convert coordinates
 			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * gMapToUnitValue;
@@ -822,7 +820,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{
 		File_SplineDefType	*splinePtr = (File_SplineDefType *)*hand;
 
-		gSplineList = NewHandleClear(sizeof(SplineDefType) * gNumSplines);				// allocate memory for spline data
+		gSplineList = (SplineDefType**) NewHandleClear(sizeof(SplineDefType) * gNumSplines);		// allocate memory for spline data
 
 		for (int i = 0; i < gNumSplines; i++)
 		{
@@ -847,56 +845,48 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ SPLINE POINT LIST */
 
-	for (i = 0; i < gNumSplines; i++)
+	for (int i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
 		hand = GetResource('SpPt',1000+i);
-		if (hand)
+		GAME_ASSERT(hand);
+
+		SplinePointType	*ptList = (SplinePointType *)*hand;
+
+		DetachResource(hand);
+		HLockHi(hand);
+		(*gSplineList)[i].pointList = (SplinePointType **)hand;
+
+		for (int j = 0; j < spline->numPoints; j++)			// swizzle
 		{
-			SplinePointType	*ptList = (SplinePointType *)*hand;
-
-			DetachResource(hand);
-			HLockHi(hand);
-			(*gSplineList)[i].pointList = (SplinePointType **)hand;
-
-			for (j = 0; j < spline->numPoints; j++)			// swizzle
-			{
-				(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
-				(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
-			}
-
+			(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
+			(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline points rez");
 	}
 
 
 			/* READ SPLINE ITEM LIST */
 
-	for (i = 0; i < gNumSplines; i++)
+	for (int i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
 		hand = GetResource('SpIt',1000+i);
-		if (hand)
+		GAME_ASSERT(hand);
+
+		SplineItemType	*itemList = (SplineItemType *)*hand;
+
+		DetachResource(hand);
+		HLockHi(hand);
+		(*gSplineList)[i].itemList = (SplineItemType **)hand;
+
+		for (int j = 0; j < spline->numItems; j++)			// swizzle
 		{
-			SplineItemType	*itemList = (SplineItemType *)*hand;
-
-			DetachResource(hand);
-			HLockHi(hand);
-			(*gSplineList)[i].itemList = (SplineItemType **)hand;
-
-			for (j = 0; j < spline->numItems; j++)			// swizzle
-			{
-				(*spline->itemList)[j].placement = SwizzleFloat(&itemList[j].placement);
-				(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
-				(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
-			}
-
+			(*spline->itemList)[j].placement = SwizzleFloat(&itemList[j].placement);
+			(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
+			(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline items rez");
 	}
 
 			/****************************/
@@ -916,7 +906,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
 
-		for (i = 0; i < gNumFences; i++)								// copy data from rez to new list
+		for (int i = 0; i < gNumFences; i++)							// copy data from rez to new list
 		{
 			gFenceList[i].type 		= SwizzleUShort(&inData[i].type);
 			gFenceList[i].numNubs 	= SwizzleShort(&inData[i].numNubs);
@@ -934,30 +924,24 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ FENCE NUB LIST */
 
-	for (i = 0; i < gNumFences; i++)
+	for (int i = 0; i < gNumFences; i++)
 	{
 		hand = GetResource('FnNb',1000+i);					// get rez
+		GAME_ASSERT(hand);
 		HLock(hand);
-		if (hand)
+
+		FencePointType *fileFencePoints = (FencePointType *)*hand;
+
+		gFenceList[i].nubList = (OGLPoint3D *)AllocPtrClear(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
+		GAME_ASSERT(gFenceList[i].nubList);
+
+		for (int j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
 		{
-   			FencePointType *fileFencePoints = (FencePointType *)*hand;
-
-			gFenceList[i].nubList = (OGLPoint3D *)AllocPtrClear(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
-			if (gFenceList[i].nubList == nil)
-				DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
-
-
-
-			for (j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
-			{
-				gFenceList[i].nubList[j].x = SwizzleLong(&fileFencePoints[j].x);
-				gFenceList[i].nubList[j].z = SwizzleLong(&fileFencePoints[j].z);
-				gFenceList[i].nubList[j].y = 0;
-			}
-			ReleaseResource(hand);
+			gFenceList[i].nubList[j].x = SwizzleLong(&fileFencePoints[j].x);
+			gFenceList[i].nubList[j].z = SwizzleLong(&fileFencePoints[j].z);
+			gFenceList[i].nubList[j].y = 0;
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get fence nub rez");
+		ReleaseResource(hand);
 	}
 
 
@@ -975,7 +959,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		gWaterListHandle = (WaterDefType **)hand;
 		gWaterList = *gWaterListHandle;
 
-		for (i = 0; i < gNumWaterPatches; i++)						// swizzle
+		for (int i = 0; i < gNumWaterPatches; i++)						// swizzle
 		{
 			gWaterList[i].type = SwizzleUShort(&gWaterList[i].type);
 			gWaterList[i].flags = SwizzleULong(&gWaterList[i].flags);
@@ -990,14 +974,12 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gWaterList[i].bBox.left = SwizzleShort(&gWaterList[i].bBox.left);
 			gWaterList[i].bBox.right = SwizzleShort(&gWaterList[i].bBox.right);
 
-			for (j = 0; j < gWaterList[i].numNubs; j++)
+			for (int j = 0; j < gWaterList[i].numNubs; j++)
 			{
 				gWaterList[i].nubList[j].x = SwizzleFloat(&gWaterList[i].nubList[j].x);
 				gWaterList[i].nubList[j].y = SwizzleFloat(&gWaterList[i].nubList[j].y);
 			}
 		}
-
-
 	}
 	else
 	{
@@ -1014,8 +996,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	if (gNumLineMarkers > 0)
 	{
-		if (gNumLineMarkers > MAX_LINEMARKERS)
-			DoFatalAlert("ReadDataFromPlayfieldFile: gNumLineMarkers > MAX_LINEMARKERS");
+		GAME_ASSERT(gNumLineMarkers <= MAX_LINEMARKERS);
 
 				/* READ CHECKPOINT LIST */
 
@@ -1028,7 +1009,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 						/* CONVERT COORDINATES */
 
-			for (i = 0; i < gNumLineMarkers; i++)
+			for (int i = 0; i < gNumLineMarkers; i++)
 			{
 				LineMarkerDefType	*lm = &gLineMarkerList[i];
 
@@ -1065,49 +1046,41 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	size = SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 2;						// calc size of supertile 16-bit texture
 	tempBuffer16 = AllocPtr(size);
-	if (tempBuffer16 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
-
 	tempBuffer24 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 3);		// alloc for 24bit pixels
-	if (tempBuffer24 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
-
 	tempBuffer32 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 4);		// alloc for 32bit pixels
-	if (tempBuffer32 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
+	GAME_ASSERT(tempBuffer16);
+	GAME_ASSERT(tempBuffer24);
+	GAME_ASSERT(tempBuffer32);
 
 
 
 				/* OPEN THE DATA FORK */
 
 	iErr = FSpOpenDF(specPtr, fsRdPerm, &fRefNum);
-	if (iErr)
-		DoFatalAlert("ReadDataFromPlayfieldFile: FSpOpenDF failed!");
+	GAME_ASSERT(!iErr);
 
 
 
-	for (i = 0; i < gNumUniqueSuperTiles; i++)
+	for (int i = 0; i < gNumUniqueSuperTiles; i++)
 	{
 		static long	sizeoflong = 4;
-		int32_t	compressedSize,decompressedSize;
+		int32_t	compressedSize;
 		int32_t	width,height;
 		MOMaterialData	matData;
 
 
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
 
-		iErr = FSRead(fRefNum, &sizeoflong, &compressedSize);
-		if (iErr)
-			DoFatalAlert("ReadDataFromPlayfieldFile: FSRead failed!");
+		iErr = FSRead(fRefNum, &sizeoflong, (Ptr) &compressedSize);
+		GAME_ASSERT(!iErr);
 
 		compressedSize = SwizzleLong(&compressedSize);
 
 
 				/* READ & DECOMPRESS IT */
 
-		decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
-		if (decompressedSize != size)
-      			DoFatalAlert("ReadDataFromPlayfieldFile: LZSS_Decode size is wrong!");
+		long decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
+		GAME_ASSERT(decompressedSize == size);
 
 		width = SUPERTILE_TEXMAP_SIZE;
 		height = SUPERTILE_TEXMAP_SIZE;
@@ -1169,18 +1142,14 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 {
-int		x,y;
 uint16_t	pixel,*bottom;
-uint16_t	*dest;
 
 
 	bottom = textureBuffer + ((height - 1) * width);
 
-	for (y = 0; y < height / 2; y++)
+	for (int y = 0; y < height / 2; y++)
 	{
-		dest = bottom;
-
-		for (x = 0; x < width; x++)
+		for (int x = 0; x < width; x++)
 		{
 			pixel = textureBuffer[x];						// get 16bit pixel from top
 #if __BIG_ENDIAN__
@@ -1426,16 +1395,15 @@ int32_t					aliasSize;
 int						i, j;
 MOVertexArrayData		data;
 
-#pragma unused (tunnelSpec)
+	(void) tunnelSpec;
 
 			/***************/
 			/* READ HEADER */
 			/***************/
 
 	size = sizeof(header);
-	iErr = FSRead(fRefNum, &size, &header);
-	if (iErr)
-		DoFatalAlert("ReadDataFromTunnelFile: error reading!");
+	iErr = FSRead(fRefNum, &size, (Ptr) &header);
+	GAME_ASSERT(!iErr);
 	GAME_ASSERT(size == sizeof(header));
 
 	header.numNubs			= SwizzleLong(&header.numNubs);
@@ -1448,8 +1416,7 @@ MOVertexArrayData		data;
 	gNumTunnelSplinePoints		= SwizzleLong(&header.numSplinePoints);
 	gNumTunnelSections			= SwizzleLong(&header.numSections);
 
-	if (gNumTunnelSections > MAX_TUNNEL_SECTIONS)
-		DoFatalAlert("ReadDataFromTunnelFile: gNumTunnelSections > MAX_TUNNEL_SECTIONS");
+	GAME_ASSERT(gNumTunnelSections <= MAX_TUNNEL_SECTIONS);
 
 
 			/****************************/
@@ -1459,7 +1426,7 @@ MOVertexArrayData		data;
 			/* READ THE SIZE OF THE ALIAS DATA */
 
 	size = sizeof(aliasSize);
-	FSRead(fRefNum, &size, &aliasSize);
+	FSRead(fRefNum, &size, (Ptr) &aliasSize);
 	aliasSize = SwizzleLong(&aliasSize);
 
 
@@ -1489,9 +1456,9 @@ MOVertexArrayData		data;
 		/* READ TUNNEL TEXTURE */
 
 	size = sizeof(int32_t);												// read this texture's dimensions
-	FSRead(fRefNum, &size, &w);
+	FSRead(fRefNum, &size, (Ptr) &w);
 	w = SwizzleLong(&w);
-	FSRead(fRefNum, &size, &h);
+	FSRead(fRefNum, &size, (Ptr) &h);
 	h = SwizzleLong(&h);
 
 	size = w * h * 4;													// read the pixel buffer
@@ -1504,9 +1471,9 @@ MOVertexArrayData		data;
 		/* READ WATER TEXTURE */
 
 	size = sizeof(int32_t);												// read this texture's dimensions
-	FSRead(fRefNum, &size, &w);
+	FSRead(fRefNum, &size, (Ptr) &w);
 	w = SwizzleLong(&w);
-	FSRead(fRefNum, &size, &h);
+	FSRead(fRefNum, &size, (Ptr) &h);
 	h = SwizzleLong(&h);
 
 	size = w * h * 4;													// read the pixel buffer
@@ -1524,7 +1491,7 @@ MOVertexArrayData		data;
 
 		size = sizeof(TunnelItemDefType) * gNumTunnelItems;
 		gTunnelItemList = AllocPtr(size);								// alloc a new list
-		FSRead(fRefNum, &size, gTunnelItemList);						// read data into it
+		FSRead(fRefNum, &size, (Ptr) gTunnelItemList);					// read data into it
 
 		for (i = 0; i < gNumTunnelItems; i++)
 		{
@@ -1539,7 +1506,6 @@ MOVertexArrayData		data;
 			gTunnelItemList[i].parms[1]	=	SwizzleULong(&gTunnelItemList[i].parms[1]);
 			gTunnelItemList[i].parms[2]	=	SwizzleULong(&gTunnelItemList[i].parms[2]);
 		}
-
 	}
 
 
@@ -1549,7 +1515,7 @@ MOVertexArrayData		data;
 
 	size = sizeof(TunnelSplinePointType) * gNumTunnelSplinePoints;
 	gTunnelSplinePoints = AllocPtr(size);								// alloc a new list
-	FSRead(fRefNum, &size, gTunnelSplinePoints);						// read data into it
+	FSRead(fRefNum, &size, (Ptr) gTunnelSplinePoints);					// read data into it
 
 	for (i = 0; i < gNumTunnelSplinePoints; i++)
 	{
@@ -1572,38 +1538,38 @@ MOVertexArrayData		data;
 				/* READ TUNNEL GEOMETRY FOR THIS SECTION */
 
 		size = sizeof(OGLBoundingBox);							// read bbox
-		iErr = FSRead(fRefNum, &size, &data.bBox);
+		iErr = FSRead(fRefNum, &size, (Ptr) &data.bBox);
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
 		size = sizeof(int32_t);									// read # vertices
-		iErr |= FSRead(fRefNum, &size, &data.numPoints);
+		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numPoints);
 		data.numPoints = SwizzleLong(&data.numPoints);
 		size = sizeof(int32_t);									// read # triangles
-		iErr |= FSRead(fRefNum, &size, &data.numTriangles);
+		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numTriangles);
 		data.numTriangles = SwizzleLong(&data.numTriangles);
 
 		size = sizeof(OGLPoint3D) * data.numPoints;
 		data.points = AllocPtr(size);							// alloc coord list
-		iErr |= FSRead(fRefNum, &size, data.points);			// read points coords
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.points);		// read points coords
 		for (i = 0; i < data.numPoints; i++)
 			SwizzlePoint3D(&data.points[i]);
 
 		size = sizeof(OGLVector3D) * data.numPoints;
 		data.normals = AllocPtr(size);							// alloc normals list
-		iErr |= FSRead(fRefNum, &size, data.normals);			// read normals
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.normals);		// read normals
 		for (i = 0; i < data.numPoints; i++)
 			SwizzleVector3D(&data.normals[i]);
 
 		size = sizeof(OGLTextureCoord) * data.numPoints;
 		data.uvs[0] = AllocPtr(size);							// alloc uvs list
-		iErr |= FSRead(fRefNum, &size, data.uvs[0]);			// read uvs
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.uvs[0]);		// read uvs
 		for (i = 0; i < data.numPoints; i++)
 			SwizzleUV(&data.uvs[0][i]);
 
 		size = sizeof(MOTriangleIndecies) * data.numTriangles;
 		data.triangles = AllocPtr(size);						// alloc triangle list
-		iErr |= FSRead(fRefNum, &size, data.triangles);			// read triangles
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.triangles);	// read triangles
 		for (i = 0; i < data.numTriangles; i++)
 		{
 			data.triangles[i].vertexIndices[0] = SwizzleULong(&data.triangles[i].vertexIndices[0]);
@@ -1624,21 +1590,21 @@ MOVertexArrayData		data;
 				/* READ WATER GEOMETRY FOR THIS SECTION */
 
 		size = sizeof(OGLBoundingBox);							// read bbox
-		iErr = FSRead(fRefNum, &size, &data.bBox);
+		iErr = FSRead(fRefNum, &size, (Ptr) &data.bBox);
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
 		size = sizeof(int32_t);									// read # vertices
-		iErr |= FSRead(fRefNum, &size, &data.numPoints);
+		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numPoints);
 		data.numPoints = SwizzleLong(&data.numPoints);
 
 		size = sizeof(int32_t);									// read # triangles
-		iErr |= FSRead(fRefNum, &size, &data.numTriangles);
+		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numTriangles);
 		data.numTriangles = SwizzleLong(&data.numTriangles);
 
 		size = sizeof(OGLPoint3D) * data.numPoints;
 		data.points = AllocPtr(size);							// alloc coord list
-		iErr |= FSRead(fRefNum, &size, data.points);			// read points coords
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.points);			// read points coords
 		for (i = 0; i < data.numPoints; i++)
 			SwizzlePoint3D(&data.points[i]);
 
@@ -1646,13 +1612,13 @@ MOVertexArrayData		data;
 
 		size = sizeof(OGLTextureCoord) * data.numPoints;
 		data.uvs[0] = AllocPtr(size);							// alloc uvs list
-		iErr |= FSRead(fRefNum, &size, data.uvs[0]);			// read uvs
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.uvs[0]);		// read uvs
 		for (i = 0; i < data.numPoints; i++)
 			SwizzleUV(&data.uvs[0][i]);
 
 		size = sizeof(MOTriangleIndecies) * data.numTriangles;
 		data.triangles = AllocPtr(size);						// alloc triangle list
-		iErr |= FSRead(fRefNum, &size, data.triangles);			// read triangles
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.triangles);	// read triangles
 		for (i = 0; i < data.numTriangles; i++)
 		{
 			data.triangles[i].vertexIndices[0] = SwizzleULong(&data.triangles[i].vertexIndices[0]);
@@ -1660,18 +1626,14 @@ MOVertexArrayData		data;
 			data.triangles[i].vertexIndices[2] = SwizzleULong(&data.triangles[i].vertexIndices[2]);
 		}
 
-		if (iErr)
-			DoFatalAlert("ReadDataFromTunnelFile: FSRead failed!");
+		GAME_ASSERT(!iErr);
 
 		data.numMaterials = -1;
 		data.materials[0] = nil;
 
 
 		gTunnelSectionWaterObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &data);	// make metaobject
-
 	}
-
-
 }
 
 

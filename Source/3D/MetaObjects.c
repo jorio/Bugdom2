@@ -21,9 +21,9 @@ extern PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
 /*    PROTOTYPES            */
 /****************************/
 
-static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType);
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, intptr_t subType);
 static void SetMetaObjectToGroup(MOGroupObject *groupObj);
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data);
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, intptr_t subType, void *data);
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
@@ -87,7 +87,7 @@ MetaObjectPtr	mo;
 
 			/* ALLOCATE EMPTY OBJECT */
 
-	mo = AllocateEmptyMetaObject(type,subType);
+	mo = AllocateEmptyMetaObject(type, subType);
 	if (mo == nil)
 		return(nil);
 
@@ -136,10 +136,10 @@ MetaObjectPtr	mo;
 // allocates an empty meta object and connects it to the linked list
 //
 
-static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType)
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, intptr_t subType)
 {
 MetaObjectHeader	*mo;
-int					size;
+int					size = 0;
 
 			/* DETERMINE SIZE OF DATA TO ALLOC */
 
@@ -150,15 +150,8 @@ int					size;
 				break;
 
 		case	MO_TYPE_GEOMETRY:
-				switch(subType)
-				{
-					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-							size = sizeof(MOVertexArrayObject);
-							break;
-
-					default:
-							DoFatalAlert("AllocateEmptyMetaObject: object subtype not recognized");
-				}
+				GAME_ASSERT(subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+				size = sizeof(MOVertexArrayObject);
 				break;
 
 		case	MO_TYPE_MATERIAL:
@@ -185,8 +178,7 @@ int					size;
 			/* ALLOC MEMORY FOR META OBJECT */
 
 	mo = AllocPtr(size);
-	if (mo == nil)
-		DoFatalAlert("AllocateEmptyMetaObject: AllocPtr failed!");
+	GAME_ASSERT(mo);
 
 
 			/* INIT STRUCTURE */
@@ -208,8 +200,7 @@ int					size;
 
 	if (gFirstMetaObject == nil)
 	{
-		if (gLastMetaObject)
-			DoFatalAlert("AllocateEmptyMetaObject: gFirstMetaObject & gLastMetaObject should be nil");
+		GAME_ASSERT(!gLastMetaObject);	// gFirstMetaObject & gLastMetaObject should be nil
 
 		mo->prevNode = nil;
 		gFirstMetaObject = gLastMetaObject = mo;
@@ -248,18 +239,10 @@ static void SetMetaObjectToGroup(MOGroupObject *groupObj)
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
 
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data)
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, intptr_t subType, void *data)
 {
-	switch(subType)
-	{
-		case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-				SetMetaObjectToVertexArrayGeometry(mo, data);
-				break;
-
-		default:
-				DoFatalAlert("SetMetaObjectToGeometry: unknown subType");
-
-	}
+	GAME_ASSERT(subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+	SetMetaObjectToVertexArrayGeometry(mo, data);
 }
 
 
@@ -273,8 +256,6 @@ static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *da
 
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data)
 {
-int	i;
-
 			/* INIT THE DATA */
 
 	geoObj->objectData = *data;									// copy from input data
@@ -282,12 +263,11 @@ int	i;
 
 		/* INCREASE MATERIAL REFERENCE COUNTS */
 
-	for (i = 0; i < data->numMaterials; i++)
+	for (int i = 0; i < data->numMaterials; i++)
 	{
 		if (data->materials[i] != nil)				// make sure this material ref is valid
 			MO_GetNewReference(data->materials[i]);
 	}
-
 }
 
 
@@ -344,6 +324,9 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 
 static void SetMetaObjectToPicture(MOPictureObject *pictObj, FSSpec *inData, int destPixelFormat)
 {
+	(void) pictObj;
+	(void) inData;
+	(void) destPixelFormat;
 	IMPLEMENT_ME_SOFT();
 #if 0
 GWorldPtr	gworld;
@@ -649,6 +632,7 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 
 void MO_SetPictureObjectCoordsToMouse(MOPictureObject *obj)
 {
+	(void) obj;
 	IMPLEMENT_ME();
 #if 0
 MOPictureData	*picData = &obj->objectData;				//  point to pic obj's data
@@ -1980,6 +1964,8 @@ float				x,y,z;
 
 MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, int destPixelFormat)
 {
+	(void) spec;
+	(void) destPixelFormat;
 	IMPLEMENT_ME_SOFT();
 	return NULL;
 #if 0
@@ -2280,6 +2266,8 @@ MOVertexArrayObject	*vObj;
 
 MOMaterialObject *MO_LoadTextureObjectFromFile(FSSpec *spec, Boolean useAlpha)
 {
+	(void) spec;
+	(void) useAlpha;
 	IMPLEMENT_ME_SOFT();
 	return NULL;
 #if 0

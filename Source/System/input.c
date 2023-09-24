@@ -29,7 +29,7 @@
 static	long					gMouseDeltaX = 0;
 static	long					gMouseDeltaY = 0;
 
-static	float					gReadMouseDeltasTimer = 0;
+//static	float					gReadMouseDeltasTimer = 0;
 
 Boolean		gMouseButtonState = false, gMouseNewButtonState = false;
 
@@ -114,10 +114,9 @@ float	mouseDX, mouseDY;
 // Call this only once per frame.
 //
 
+#if 0
 static void UpdateMouseDeltas(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
 EventRecord   theEvent;
 
 				/* UPDATE DELTAS */
@@ -147,11 +146,8 @@ EventRecord   theEvent;
 	{
 		gMouseButtonState = gMouseNewButtonState = false;
 	}
-#endif
 }
 
-
-#if 0
 /**************** MY MOUSE EVENT HANDLER *************************/
 //
 // Every time WaitNextEvent() is called this callback will be invoked.

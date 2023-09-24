@@ -42,7 +42,7 @@ void DrawCyclorama(ObjNode *theNode);
 			/* ITEMS 2 */
 
 Boolean AddLetterBlock(TerrainItemEntryType *itemPtr, float  x, float z);
-Boolean PrimeBumbleBee(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeBumbleBee(int splineNum, SplineItemType *itemPtr);
 Boolean AddLegoWall(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddFlashLight(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddCrayon(TerrainItemEntryType *itemPtr, float  x, float z);
@@ -95,7 +95,7 @@ Boolean AddMouseTrap(TerrainItemEntryType *itemPtr, float  x, float z);
 void CountMice(void);
 void SeeIfLiftMousetrapLever(ObjNode *player);
 Boolean AddTrampoline(TerrainItemEntryType *itemPtr, float  x, float z);
-Boolean PrimeVacuume(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeVacuume(int splineNum, SplineItemType *itemPtr);
 
 
 
@@ -145,7 +145,7 @@ void CountSquishBerries(void);
 void AlignShellOnSnail(ObjNode *snail, ObjNode *shell);
 
 Boolean AddPuzzle(TerrainItemEntryType *itemPtr, float  x, float z);
-Boolean PrimeHanger(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeHanger(int splineNum, SplineItemType *itemPtr);
 Boolean AddFishingLure(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddPicnicBasket(TerrainItemEntryType *itemPtr, float  x, float z);
 
@@ -237,7 +237,7 @@ enum
 	SLOTCAR_RACEMODE_OVER
 };
 
-Boolean PrimeSlotCar(long splineNum, SplineItemType *itemPtr);
+Boolean PrimeSlotCar(int splineNum, SplineItemType *itemPtr);
 void InitSlotCarRacing(void);
 void UpdateSlotCarRacing(void);
 Boolean AddFinishLine(TerrainItemEntryType *itemPtr, float  x, float z);
@@ -253,12 +253,3 @@ Boolean AddFinishLine(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddBeeHive(TerrainItemEntryType *itemPtr, float  x, float z);
 Boolean AddKindling(TerrainItemEntryType *itemPtr, float  x, float z);
 void IgniteKindling(ObjNode *theNode);
-
-
-
-
-
-
-
-
-

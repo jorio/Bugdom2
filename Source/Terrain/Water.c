@@ -79,8 +79,8 @@ typedef struct
 /*     VARIABLES      */
 /**********************/
 
-long			gNumWaterPatches = 0;
-short			gNumWaterDrawn;
+int				gNumWaterPatches = 0;
+int				gNumWaterDrawn;
 WaterDefType	**gWaterListHandle = nil;
 WaterDefType	*gWaterList;
 
@@ -414,11 +414,10 @@ double					x,y,z;
 
 static void DrawWater(ObjNode *theNode)
 {
-long	f,i;
 float	fps = gFramesPerSecondFrac;
 float	ud1, uv1, ud2, uv2;
 
-#pragma unused(theNode)
+	(void) theNode;
 
 			/*******************/
 			/* DRAW EACH WATER */
@@ -426,7 +425,7 @@ float	ud1, uv1, ud2, uv2;
 
 	gNumWaterDrawn = 0;
 
-	for (f = 0; f < gNumWaterPatches; f++)
+	for (int f = 0; f < gNumWaterPatches; f++)
 	{
 		short	waterType = gWaterList[f].type;
 
@@ -459,7 +458,7 @@ float	ud1, uv1, ud2, uv2;
 		ud2 = gWaterScrollUVDeltas[waterType][1].u * fps;
 		uv2 = gWaterScrollUVDeltas[waterType][1].v * fps;
 
-		for (i = 0; i <= gWaterList[f].numNubs; i++)
+		for (int i = 0; i <= gWaterList[f].numNubs; i++)
 		{
 			gWaterUVs[f][i].u 	+= ud1;
 			gWaterUVs[f][i].v 	+= uv1;
@@ -467,7 +466,6 @@ float	ud1, uv1, ud2, uv2;
 			gWaterUVs2[f][i].u 	-= ud2;
 			gWaterUVs2[f][i].v 	-= uv2;
 		}
-
 	}
 
 	gGlobalTransparency = 1.0;
@@ -479,15 +477,14 @@ float	ud1, uv1, ud2, uv2;
 
 void RaiseWater(void)
 {
-long		f,i,n;
 float		y;
 float		fps = gFramesPerSecondFrac;
 
-	for (f = 0; f < gNumWaterPatches; f++)
+	for (int f = 0; f < gNumWaterPatches; f++)
 	{
-		n = gWaterTriMeshData[f].numPoints;			// get # points in geometry
+		int n = gWaterTriMeshData[f].numPoints;		// get # points in geometry
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			y = gWaterTriMeshData[f].points[i].y;	// get y
 			y += fps * 3.0f;
@@ -516,22 +513,18 @@ float		fps = gFramesPerSecondFrac;
 
 void ResetRisingWater(void)
 {
-long		f,i,n;
-float		y;
-
-	for (f = 0; f < gNumWaterPatches; f++)
+	for (int f = 0; f < gNumWaterPatches; f++)
 	{
-		y = gWaterInitY[f];							// get init Y
-		n = gWaterTriMeshData[f].numPoints;			// get # points in geometry
+		float y = gWaterInitY[f];					// get init Y
+		int n = gWaterTriMeshData[f].numPoints;		// get # points in geometry
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			gWaterTriMeshData[f].points[i].y = y;	// reset Y
 		}
 
 		gWaterBBox[f].max.y = y;					// update bbox
 	}
-
 }
 
 
@@ -882,11 +875,10 @@ Boolean	makeNewDrops = false;
 
 static void DrawRainEffect(ObjNode *theNode)
 {
-int			i;
 float		x,y,size;
 OGLMatrix4x4	m;
 
-#pragma unused (theNode)
+	(void) theNode;
 
 	if (gRainMode == RAIN_MODE_OFF)
 		return;
@@ -897,7 +889,7 @@ OGLMatrix4x4	m;
 			/* DRAW GROUND DROPS */
 			/*********************/
 
-	for (i = 0; i < MAX_GROUND_DROPS; i++)
+	for (int i = 0; i < MAX_GROUND_DROPS; i++)
 	{
 		if (!gRainGroundDrops[i].isUsed)
 			continue;
@@ -927,7 +919,7 @@ OGLMatrix4x4	m;
 
 	gGlobalTransparency = gRainRampFactor * .99f;
 
-	for (i = 0; i < MAX_SCREEN_DROPS; i++)
+	for (int i = 0; i < MAX_SCREEN_DROPS; i++)
 	{
 		if (!gRainScreenDrops[i].isUsed)
 			continue;
@@ -953,14 +945,11 @@ OGLMatrix4x4	m;
 
 static void InitRipples(void)
 {
-int	i;
-
 	gNumRipples = 0;
 	gRippleEventObj = nil;
 
-	for (i = 0; i < MAX_RIPPLES; i++)
-			gRippleList[i].isUsed = false;
-
+	for (int i = 0; i < MAX_RIPPLES; i++)
+		gRippleList[i].isUsed = false;
 }
 
 
@@ -1057,7 +1046,7 @@ static void DrawRipples(ObjNode *theNode)
 int			i;
 float		s,x,y,z;
 
-#pragma unused (theNode)
+	(void) theNode;
 
 		/* ACTIVATE MATERIAL */
 

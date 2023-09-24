@@ -84,8 +84,8 @@ static void SetupWinScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -.1, -.1, 1.0 };
-const static OGLVector3D	fillDirection2 = {0, -.4, -1.0 };
+static const OGLVector3D	fillDirection1 = { -.1, -.1, 1.0 };
+static const OGLVector3D	fillDirection2 = {0, -.4, -1.0 };
 ObjNode	*newObj;
 
 			/* SET ANAGLYPH INFO */

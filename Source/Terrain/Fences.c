@@ -57,8 +57,8 @@ enum
 /*     VARIABLES      */
 /**********************/
 
-long			gNumFences = 0;
-short			gNumFencesDrawn;
+int				gNumFences = 0;
+int				gNumFencesDrawn = 0;
 FenceDefType	*gFenceList = nil;
 
 
@@ -151,9 +151,6 @@ static OGLPoint3D				gFencePoints[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 static OGLTextureCoord			gFenceUVs[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 static OGLColorRGBA_Byte		gFenceColors[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 
-static short	gSeaweedFrame;
-static float	gSeaweedFrameTimer;
-
 
 /********************** DISPOSE FENCES *********************/
 
@@ -198,9 +195,6 @@ FenceDefType			*fence;
 OGLPoint3D				*nubs;
 ObjNode					*obj;
 float					sink;
-
-	gSeaweedFrame = 0;
-	gSeaweedFrameTimer = 0;
 
 
 	if (gNumFences > MAX_FENCES)
@@ -301,15 +295,15 @@ float					sink;
 
 static void MakeFenceGeometry(void)
 {
-int						f, group, sprite;
-uint16_t					type;
+int						group, sprite;
+int						numNubs;
+uint16_t				type;
 float					u,height,aspectRatio,textureUOff;
-long					i,numNubs,j;
 FenceDefType			*fence;
 OGLPoint3D				*nubs;
 float					minX,minY,minZ,maxX,maxY,maxZ;
 
-	for (f = 0; f < gNumFences; f++)
+	for (int f = 0; f < gNumFences; f++)
 	{
 				/******************/
 				/* GET FENCE INFO */
@@ -343,13 +337,13 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		gFenceTriMeshData[f].normals					= nil;
 		gFenceTriMeshData[f].colorsByte					= &gFenceColors[f][0];
 		gFenceTriMeshData[f].colorsFloat				= nil;
-		gFenceTriMeshData[f].numPoints = numNubs * 2;					// 2 vertices per nub
-		gFenceTriMeshData[f].numTriangles = (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
+		gFenceTriMeshData[f].numPoints					= numNubs * 2;				// 2 vertices per nub
+		gFenceTriMeshData[f].numTriangles				= (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
 
 
 				/* BUILD TRIANGLE INFO */
 
-		for (i = j = 0; i < MAX_NUBS_IN_FENCE; i++, j+=2)
+		for (int i = 0, j = 0; i < MAX_NUBS_IN_FENCE; i++, j+=2)
 		{
 			gFenceTriangles[f][j].vertexIndices[0] = 1 + j;
 			gFenceTriangles[f][j].vertexIndices[1] = 0 + j;
@@ -363,7 +357,7 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 
 				/* INIT VERTEX COLORS */
 
-		for (i = 0; i < (MAX_NUBS_IN_FENCE*2); i++)
+		for (int i = 0; i < (MAX_NUBS_IN_FENCE*2); i++)
 			gFenceColors[f][i].r = gFenceColors[f][i].g = gFenceColors[f][i].b = 0xff;
 
 
@@ -375,7 +369,7 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		minX = minY = minZ = -maxX;
 
 		u = 0;
-		for (i = j = 0; i < numNubs; i++, j+=2)
+		for (int i = 0, j = 0; i < numNubs; i++, j+=2)
 		{
 			float		x,y,z,y2;
 
@@ -439,21 +433,10 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 
 static void DrawFences(ObjNode *theNode)
 {
-long			f,type;
+long			type;
 float			cameraX, cameraZ;
 
-#pragma unused (theNode)
-
-			/* UPDATE SEAWEED ANIMATION */
-
-	gSeaweedFrameTimer += gFramesPerSecondFrac;
-	if (gSeaweedFrameTimer > .09f)
-	{
-		gSeaweedFrameTimer -= .09f;
-
-		if (++gSeaweedFrame > 5)
-			gSeaweedFrame = 0;
-	}
+	(void) theNode;
 
 
 			/* GET CAMERA COORDS */
@@ -473,7 +456,7 @@ float			cameraX, cameraZ;
 
 	gNumFencesDrawn = 0;
 
-	for (f = 0; f < gNumFences; f++)
+	for (int f = 0; f < gNumFences; f++)
 	{
 		type = gFenceList[f].type;							// get type
 
@@ -508,11 +491,10 @@ float			cameraX, cameraZ;
 
 static void DrawFenceNormals(short f)
 {
-int				i,numNubs;
+int				numNubs;
 OGLPoint3D		*nubs;
 OGLVector2D		*normals;
 float			x,y,z,nx,nz;
-#pragma unused ()
 
 	OGL_PushState();
 	glDisable(GL_TEXTURE_2D);
@@ -523,7 +505,7 @@ float			x,y,z,nx,nz;
 	nubs  		= gFenceList[f].nubList;						// get ptr to nub list
 	normals 	= gFenceList[f].sectionNormals;					// get ptr to normals
 
-	for (i = 0; i < numNubs; i++)
+	for (int i = 0; i < numNubs; i++)
 	{
 		glBegin(GL_LINES);
 

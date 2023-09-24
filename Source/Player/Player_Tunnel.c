@@ -1412,8 +1412,7 @@ static void PlayerGotHitInTunnel(ObjNode *player)
 
 void KillPlayerInTunnel(ObjNode *skip)
 {
-#pragma unused (skip)
-
+	(void) skip;
 }
 
 

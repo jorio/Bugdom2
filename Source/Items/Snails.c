@@ -551,7 +551,7 @@ static Boolean DoTrig_Snail(ObjNode *snail, ObjNode *who, Byte sideBits)
 {
 ObjNode	*shell = gPlayerInfo.heldObject;
 
-#pragma unused (sideBits)
+	(void) sideBits;
 
 			/* SEE IF PLAYER HAS THE SHELL */
 

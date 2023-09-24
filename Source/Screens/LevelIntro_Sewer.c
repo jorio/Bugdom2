@@ -72,7 +72,7 @@ static void SetupLevelIntroScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-const static OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
+static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
 ObjNode	*newObj, *pipe, *grate;
 
 			/**************/
@@ -400,9 +400,7 @@ float	r,s;
 
 static void MakeSewerGas(ObjNode *pipe)
 {
-int					i;
 float				fps = gFramesPerSecondFrac;
-int					particleGroup,magicNum;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
 OGLVector3D			d;
@@ -418,8 +416,8 @@ float				x,y,z;
 	{
 		pipe->ParticleTimer += 0.06f;
 
-		particleGroup 	= pipe->ParticleGroup;
-		magicNum 		= pipe->ParticleMagicNum;
+		long particleGroup 	= pipe->ParticleGroup;
+		long magicNum 		= pipe->ParticleMagicNum;
 
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
@@ -441,7 +439,7 @@ float				x,y,z;
 
 		if (particleGroup != -1)
 		{
-			for (i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 40.0f;
 				p.y = y + RandomFloat() * 50.0f;
@@ -467,20 +465,4 @@ float				x,y,z;
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

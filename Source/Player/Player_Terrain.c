@@ -328,10 +328,8 @@ update:
 
 static float CalcWalkAnimSpeed(ObjNode *theNode)
 {
-float	speed = CalcQuickDistance(0,0,gDelta.x, gDelta.z) * .007f;
-#pragma unused (theNode)
-
-	return(speed);
+	(void) theNode;
+	return CalcQuickDistance(0,0,gDelta.x, gDelta.z) * .007f;
 }
 
 
@@ -794,13 +792,11 @@ update:
 
 static void MovePlayer_Drown(ObjNode *theNode)
 {
-float	oldTimer;
-
-#pragma unused (theNode)
+	(void) theNode;
 
 			/* SEE IF RESET PLAYER NOW */
 
-	oldTimer = gDeathTimer;
+	float oldTimer = gDeathTimer;
 	gDeathTimer -= gFramesPerSecondFrac;
 	if (gDeathTimer <= 0.0f)
 	{
@@ -981,7 +977,7 @@ float		vacX, vacZ, dist, r;
 static void TurnPlayerTowardKickable(ObjNode *player)
 {
 ObjNode *thisNode,*nearest;
-float	ex,ey,ez,dist,bestDist;
+float	ex,ez,dist,bestDist;
 
 	bestDist = 10000000;
 	nearest = nil;
@@ -996,7 +992,6 @@ float	ex,ey,ez,dist,bestDist;
 		if (thisNode->CType & CTYPE_KICKABLE)
 		{
 			ex = thisNode->Coord.x;								// get obj coords
-			ey = thisNode->Coord.y;
 			ez = thisNode->Coord.z;
 
 			dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
@@ -1026,7 +1021,7 @@ float	ex,ey,ez,dist,bestDist;
 static void TurnPlayerTowardPickup(ObjNode *player)
 {
 ObjNode *thisNode,*nearest;
-float	ex,ey,ez,dist,bestDist;
+float	ex,ez,dist,bestDist;
 
 	bestDist = 10000000;
 	nearest = nil;
@@ -1041,7 +1036,6 @@ float	ex,ey,ez,dist,bestDist;
 		if (thisNode->CType & CTYPE_PICKUP)
 		{
 			ex = thisNode->Coord.x;								// get obj coords
-			ey = thisNode->Coord.y;
 			ez = thisNode->Coord.z;
 
 			dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
@@ -1073,10 +1067,9 @@ static Boolean TryToGrabAPickup(ObjNode *player)
 {
 ObjNode *thisNode,*nearest;
 float	dist,bestDist;
-OGLVector2D	aim;
 
-	aim.x = -sin(player->Rot.y);								// calc player aim vector
-	aim.y = -cos(player->Rot.y);
+//	aim.x = -sin(player->Rot.y);								// calc player aim vector
+//	aim.y = -cos(player->Rot.y);
 
 	bestDist = 10000000;
 	nearest = nil;
@@ -1301,7 +1294,6 @@ const float fps = gFramesPerSecondFrac;
 static Boolean DoPlayerMovementAndCollision(ObjNode *theNode, Boolean useBBoxForTerrain)
 {
 float				fps = gFramesPerSecondFrac,oldFPS,oldFPSFrac,terrainY;
-OGLPoint3D			oldCoord;
 OGLMatrix3x3		m;
 static OGLPoint2D origin = {0,0};
 int					numPasses,pass;
@@ -1401,7 +1393,7 @@ Boolean				killed = false;
 	{
 		float	dx,dy,dz;
 
-		oldCoord = gCoord;								// remember starting coord
+//		oldCoord = gCoord;								// remember starting coord
 
 
 				/* GET DELTA */
@@ -1464,7 +1456,6 @@ Boolean				killed = false;
 static Boolean DoPlayerMovementAndCollision_Ramming(ObjNode *theNode, Boolean useBBoxForTerrain)
 {
 float				fps = gFramesPerSecondFrac,oldFPS,oldFPSFrac,terrainY;
-OGLPoint3D			oldCoord;
 int					numPasses,pass;
 Boolean				killed = false;
 float				rot;
@@ -1507,7 +1498,7 @@ float				rot;
 	{
 		float	dx,dy,dz;
 
-		oldCoord = gCoord;								// remember starting coord
+//		oldCoord = gCoord;								// remember starting coord
 
 
 				/* GET DELTA */
@@ -1641,9 +1632,7 @@ float	x,z,fps;
 
 static Boolean DoSkipCollisionDetect(ObjNode *theNode, Boolean useBBoxForTerrain)
 {
-short		i;
 ObjNode		*hitObj;
-uint8_t		sides;
 float		distToFloor, terrainY;
 float		bottomOff;
 Boolean		killed = false;
@@ -1660,11 +1649,11 @@ Boolean		killed = false;
 	else
 		theNode->BottomOff = gPlayerBottomOff;
 
-	sides = HandleCollisions(theNode, PLAYER_COLLISION_CTYPE, -.3);
+	HandleCollisions(theNode, PLAYER_COLLISION_CTYPE, -.3);
 
 			/* SCAN FOR INTERESTING STUFF */
 
-	for (i=0; i < gNumCollisions; i++)
+	for (int i = 0; i < gNumCollisions; i++)
 	{
 		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
 		{

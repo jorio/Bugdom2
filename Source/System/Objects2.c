@@ -432,7 +432,6 @@ ObjNode *shadowNode,*thisNodePtr;
 float	x,bottom,z;
 float	dist,scaleX,scaleZ;
 Boolean	onBlocker = false;
-int		kind;
 
 	if (theNode == nil)
 		return;
@@ -441,7 +440,7 @@ int		kind;
 	if (shadowNode == nil)
 		return;
 
-	kind = shadowNode->Kind;
+//	kind = shadowNode->Kind;
 
 	shadowNode->ColorFilter.a = theNode->ColorFilter.a * .9f;		// match fade and decay a little to adjust it how we want it
 

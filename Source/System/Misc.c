@@ -134,7 +134,7 @@ static Boolean	beenHere = false;
 //		without the 0xffff at the end.
 //
 
-unsigned long MyRandomLong(void)
+uint32_t MyRandomLong(void)
 {
   return gSeed2 ^= (((gSeed1 ^= (gSeed2>>5)*1568397607UL)>>7)+
                    (gSeed0 = (gSeed0+1)*3141592621UL))*2435386481UL;
@@ -206,7 +206,7 @@ float	f;
 
 void SetMyRandomSeed(unsigned long seed)
 {
-	gSeed0 = seed;
+	gSeed0 = (uint32_t) seed;
 	gSeed1 = 0;
 	gSeed2 = 0;
 
@@ -220,111 +220,6 @@ void InitMyRandomSeed(void)
 	gSeed1 = 0;
 	gSeed2 = 0;
 }
-
-
-#pragma mark -
-
-
-/******************* FLOAT TO STRING *******************/
-
-void FloatToString(float num, Str255 string)
-{
-Str255	sf;
-long	i,f;
-
-	i = num;						// get integer part
-
-
-	f = (fabs(num)-fabs((float)i)) * 10000;		// reduce num to fraction only & move decimal --> 5 places
-
-	if ((i==0) && (num < 0))		// special case if (-), but integer is 0
-	{
-		string[0] = 2;
-		string[1] = '-';
-		string[2] = '0';
-	}
-	else
-		NumToString(i,string);		// make integer into string
-
-	NumToString(f,sf);				// make fraction into string
-
-	string[++string[0]] = '.';		// add "." into string
-
-	if (f >= 1)
-	{
-		if (f < 1000)
-			string[++string[0]] = '0';	// add 1000's zero
-		if (f < 100)
-			string[++string[0]] = '0';	// add 100's zero
-		if (f < 10)
-			string[++string[0]] = '0';	// add 10's zero
-	}
-
-	for (i = 0; i < sf[0]; i++)
-	{
-		string[++string[0]] = sf[i+1];	// copy fraction into string
-	}
-}
-
-/*********************** STRING TO FLOAT *************************/
-
-float StringToFloat(Str255 textStr)
-{
-short	i;
-short	length;
-Byte	mode = 0;
-long	integer = 0;
-long	mantissa = 0,mantissaSize = 0;
-float	f;
-float	tens[8] = {1,10,100,1000,10000,100000,1000000,10000000};
-char	c;
-float	sign = 1;												// assume positive
-
-	length = textStr[0];										// get string length
-
-	if (length== 0)												// quick check for empty
-		return(0);
-
-
-			/* SCAN THE NUMBER */
-
-	for (i = 1; i <= length; i++)
-	{
-		c  = textStr[i];										// get this char
-
-		if (c == '-')											// see if negative
-		{
-			sign = -1;
-			continue;
-		}
-		else
-		if (c == '.')											// see if hit the decimal
-		{
-			mode = 1;
-			continue;
-		}
-		else
-		if ((c < '0') || (c > '9'))								// skip all but #'s
-			continue;
-
-
-		if (mode == 0)
-			integer = (integer * 10) + (c - '0');
-		else
-		{
-			mantissa = (mantissa * 10) + (c - '0');
-			mantissaSize++;
-		}
-	}
-
-			/* BUILT A FLOAT FROM IT */
-
-	f = (float)integer + ((float)mantissa/tens[mantissaSize]);
-	f *= sign;
-
-	return(f);
-}
-
 
 
 
@@ -496,7 +391,7 @@ wait:
 		fps = DEFAULT_FPS;
 #endif
 
-	// SDL_Log("FPS: %f\n", fps);
+//	SDL_Log("FPS: %f\n", fps);
 
 	gFramesPerSecond = fps;
 	gFramesPerSecondFrac = 1.0f / fps;

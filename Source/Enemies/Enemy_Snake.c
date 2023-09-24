@@ -295,7 +295,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 ObjNode	*head;
 Boolean	runAway;
 
-#pragma unused (theNode)
+	(void) theNode;
 
 
 	runAway = gPlayerInfo.ridingBall || (!gEnableSnakes) || (gPlayerInfo.snake != -1);						// see if snakes should run away now
@@ -430,7 +430,7 @@ const OGLVector3D from = {0,1,0};
 MOTriangleIndecies	*triPtr;
 Boolean			runAway = gPlayerInfo.ridingBall || (!gEnableSnakes);						// see if snakes are running away
 
-#pragma unused (theNode)
+	(void) theNode;
 
 	gGlobalTransparency = 1.0f;
 

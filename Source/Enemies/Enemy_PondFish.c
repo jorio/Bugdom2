@@ -182,7 +182,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 
 static void  MovePondFish_Swimming(ObjNode *theNode)
 {
-float	dist,r,aim,swimY;
+float	dist,aim,swimY;
 float	fps = gFramesPerSecondFrac;
 float	waterY;
 
@@ -239,12 +239,13 @@ float	waterY;
 				/***********/
 
 		case	PONDFISH_MODE_CHASEPLAYER:
+		{
 				aim = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, PONDFISH_TURN_SPEED, false);
 
 
 						/* MOVE FORWARD */
 
-				r = theNode->Rot.y;
+				float r = theNode->Rot.y;
 				gDelta.x = -sin(r) * PONDFISH_CHASESPEED;
 				gDelta.z = -cos(r) * PONDFISH_CHASESPEED;
 				gCoord.x += gDelta.x * fps;
@@ -294,7 +295,7 @@ attack:
 
 				FindTargetLure(theNode);
 				break;
-
+		}
 
 				/************/
 				/* GET LURE */
