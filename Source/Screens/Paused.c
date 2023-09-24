@@ -1,7 +1,8 @@
 /****************************/
 /*   	PAUSED.C			*/
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -10,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "utf8.h"
 
 
 /****************************/
@@ -155,9 +157,9 @@ static float	dotAlpha = 1.0f;
 
 		const char* caption = Localize(STR_PAUSEOPTION1 + j);
 
-		while (caption[i] != 0x00)
+		while (*caption)
 		{
-			char	c = caption[i];									// get char
+			uint32_t c = ReadNextCodepointFromUTF8(&caption);		// get char
 			int		texNum = CharToSprite(c);						// convert to texture #
 			if (texNum != -1)
 				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);

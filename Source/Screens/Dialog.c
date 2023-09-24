@@ -1,7 +1,8 @@
 /****************************/
 /*   	DIALOG.C		    */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -10,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "utf8.h"
 
 
 /****************************/
@@ -310,7 +312,6 @@ int		effect;
 
 void DrawDialogMessage(void)
 {
-int		i;
 float	x,y,leftX;
 
 			/* UPDATE ANY CURRENT VOICE */
@@ -321,7 +322,7 @@ float	x,y,leftX;
 			Update3DSoundChannel(gDialogSoundEffect, &gDialogSoundChannel, &gDialogSoundWhere);
 	}
 
-	for (i = 0; i < MAX_DIALOG_MESSAGES; i++)					// update delay timers while we're here
+	for (int i = 0; i < MAX_DIALOG_MESSAGES; i++)				// update delay timers while we're here
 	{
 		if (gMessageReplayVoiceDelay[i] > 0.0f)
 		{
@@ -427,12 +428,14 @@ float	x,y,leftX;
 
 			/* DRAW EACH CHAR */
 
-	i = 0;
-	while (gCurrentDialogString[i] != 0x00)
+	const char* cursor = gCurrentDialogString;
+	while (*cursor)
 	{
+		uint32_t c = ReadNextCodepointFromUTF8(&cursor);
+
 			/* NEXT LINE */
 
-		if (gCurrentDialogString[i] == '\n')					// look for line feed
+		if (c == '\n')					// look for line feed
 		{
 			y += LETTER_SIZE * 1.3f;
 			x = leftX;
@@ -441,14 +444,12 @@ float	x,y,leftX;
 			/* DRAW LETTER */
 		else
 		{
-			char	c = gCurrentDialogString[i];
 			int	texNum = CharToSprite(c);
 			if (texNum != -1)
 				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
 
 			x += GetCharSpacing(c, LETTER_SPACING);
 		}
-		i++;
 	}
 
 	gGlobalColorFilter.r = 1.0f;
@@ -457,7 +458,6 @@ float	x,y,leftX;
 
 	gGlobalTransparency = 1.0f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 }
 
 
@@ -468,183 +468,69 @@ float	x,y,leftX;
 
 /***************** CHAR TO SPRITE **********************/
 
-int CharToSprite(char c)
+int CharToSprite(uint32_t c)
 {
-
 	if ((c >= 'a') && (c <= 'z'))
 	{
 		return(DIALOG_SObjType_a + (c - 'a'));
 	}
-	else
+
 	if ((c >= 'A') && (c <= 'Z'))
 	{
 		return(DIALOG_SObjType_A + (c - 'A'));
 	}
-	else
+
 	if ((c >= '0') && (c <= '9'))
 	{
 		return(DIALOG_SObjType_0 + (c - '0'));
 	}
-	else
+
+	switch(c)
 	{
-		short	s;
-		switch(c)
-		{
-			case	'.':
-					s = DIALOG_SObjType_Period;
-					break;
-
-			case	',':
-					s = DIALOG_SObjType_Comma;
-					break;
-
-			case	'-':
-					s = DIALOG_SObjType_Dash;
-					break;
-
-			case	'?':
-					s = DIALOG_SObjType_QuestionMark;
-					break;
-
-			case	'!':
-					s = DIALOG_SObjType_ExclamationMark;
-					break;
-
-			case	'Á':
-					s = DIALOG_SObjType_ExclamationMark2;
-					break;
-
-			case	'†':
-					s = DIALOG_SObjType_UU;
-					break;
-
-			case	'Ÿ':
-					s = DIALOG_SObjType_uu;
-					break;
-
-			case	'œ':
-					s = DIALOG_SObjType_ua;
-					break;
-
-			case	'…':
-					s = DIALOG_SObjType_OO;
-					break;
-
-			case	'š':
-					s = DIALOG_SObjType_oo;
-					break;
-
-			case	'€':
-					s = DIALOG_SObjType_AA;
-					break;
-
-			case	'':
-					s = DIALOG_SObjType_AO;
-					break;
-
-			case	'‰':
-					s = DIALOG_SObjType_av;
-					break;
-
-			case	'Š':
-					s = DIALOG_SObjType_au;
-					break;
-
-			case	'‡':
-					s = DIALOG_SObjType_aa;
-					break;
-
-			case	'„':
-					s = DIALOG_SObjType_NN;
-					break;
-
-			case	'–':
-					s = DIALOG_SObjType_nn;
-					break;
-
-			case	'ƒ':
-					s = DIALOG_SObjType_EE;
-					break;
-
-			case	'Ž':
-					s = DIALOG_SObjType_ee;
-					break;
-
-			case	'':
-					s = DIALOG_SObjType_ee;
-					break;
-
-			case	'':
-					s = DIALOG_SObjType_ev;
-					break;
-
-			case	'é':
-					s = DIALOG_SObjType_EE;
-					break;
-
-			case	'æ':
-					s = DIALOG_SObjType_E;
-					break;
-
-			case	'Ë':
-					s = DIALOG_SObjType_Ax;
-					break;
-
-			case	'ˆ':
-					s = DIALOG_SObjType_ax;
-					break;
-
-			case	'Œ':
-					s = DIALOG_SObjType_ao;
-					break;
-
-
-			case	'ï':
-					s = DIALOG_SObjType_Ox;
-					break;
-
-			case	'î':
-					s = DIALOG_SObjType_Oa;
-					break;
-
-			case	'—':
-					s = DIALOG_SObjType_oa;
-					break;
-
-			case	'§':
-					s = DIALOG_SObjType_beta;
-					break;
-
-			case	'’':
-					s = DIALOG_SObjType_ia;
-					break;
-
-			case	'‚':
-					s = DIALOG_SObjType_C;
-					break;
-
-			case	'':
-					s = DIALOG_SObjType_c;
-					break;
-
-			case	CHAR_APOSTROPHE:
-					s = DIALOG_SObjType_Apostrophe;
-					break;
-
-
-			default:
-					s = -1;
-
-		}
-	return(s);
+		case '.': return DIALOG_SObjType_Period;
+		case ',': return DIALOG_SObjType_Comma;
+		case '-': return DIALOG_SObjType_Dash;
+		case '?': return DIALOG_SObjType_QuestionMark;
+		case '!': return DIALOG_SObjType_ExclamationMark;
+		case 161: return DIALOG_SObjType_ExclamationMark2;
+		case 192: return DIALOG_SObjType_Ax;
+		case 196: return DIALOG_SObjType_AA;
+		case 197: return DIALOG_SObjType_AO;
+		case 199: return DIALOG_SObjType_C;
+		case 200: return DIALOG_SObjType_EE;
+		case 201: return DIALOG_SObjType_EE;
+		case 202: return DIALOG_SObjType_E;
+		case 209: return DIALOG_SObjType_NN;
+		case 211: return DIALOG_SObjType_Oa;
+		case 212: return DIALOG_SObjType_Ox;
+		case 214: return DIALOG_SObjType_OO;
+		case 220: return DIALOG_SObjType_UU;
+		case 223: return DIALOG_SObjType_beta;
+		case 224: return DIALOG_SObjType_ax;
+		case 225: return DIALOG_SObjType_aa;
+		case 226: return DIALOG_SObjType_av;
+		case 228: return DIALOG_SObjType_au;
+		case 229: return DIALOG_SObjType_ao;
+		case 231: return DIALOG_SObjType_c;
+		case 232: return DIALOG_SObjType_ee;
+		case 233: return DIALOG_SObjType_ee;
+		case 234: return DIALOG_SObjType_ev;
+		case 237: return DIALOG_SObjType_ia;
+		case 241: return DIALOG_SObjType_nn;
+		case 243: return DIALOG_SObjType_oa;
+		case 246: return DIALOG_SObjType_oo;
+		case 250: return DIALOG_SObjType_ua;
+		case 252: return DIALOG_SObjType_uu;
+		case '\'': return DIALOG_SObjType_Apostrophe;
+		case ' ': return -1;
+		default: return DIALOG_SObjType_Cursor;
 	}
-
 }
 
 
 /******************** GET CHAR SPACING *************************/
 
-float GetCharSpacing(char c, float spacingScale)
+float GetCharSpacing(uint32_t c, float spacingScale)
 {
 float	s;
 
@@ -652,7 +538,7 @@ float	s;
 	{
 		case	'j':
 		case	'9':
-		case	'Š':
+		case	228:	// auml
 				s = .6;
 				break;
 
@@ -665,12 +551,12 @@ float	s;
 
 		case	'I':
 		case	'i':
-		case	'’':
+		case	237:	// iacute
 		case	'l':
 		case	'.':
 		case	',':
 		case	'!':
-		case	'Á':
+		case	161:	// iexcl
 				s = .4;
 				break;
 
@@ -679,31 +565,32 @@ float	s;
 				break;
 
 		case	'a':
-		case	'‡':
-		case	'ˆ':
-		case	'‰':
-		case	'Œ':
+		case	224:
+		case	225:
+		case	226:
+		case	229:
 		case	'b':
 		case	'c':
-		case	'':
+		case	231:	// ccedil
 		case	'd':
 		case	'e':
-		case	'Ž':
-		case	'':
+		case	232:
+		case	233:
+		case	234:
 		case	'g':
 		case	'h':
 		case	'k':
 		case	'n':
-		case	'–':
+		case	241:
 		case	'o':
-		case	'š':
-		case	'—':
+		case	243:
+		case	246:
 		case	'p':
 		case	'q':
 		case	's':
 		case	'u':
-		case	'Ÿ':
-		case	'œ':
+		case	250:
+		case	252:
 		case	'v':
 		case	'x':
 		case	'y':
@@ -729,11 +616,11 @@ float	s;
 		case	'P':
 		case	'B':
 		case	'C':
-		case	'‚':
+		case	199:	// CCedil
 		case	'V':
 		case	'F':
 		case	'H':
-		case	'§':
+		case	223:	// eszett
 				s = .8f;
 				break;
 

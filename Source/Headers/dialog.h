@@ -13,5 +13,5 @@ void DoDialogMessage(int messNum, int priority, float duration, OGLPoint3D *from
 void DrawDialogMessage(void);
 
 
-int CharToSprite(char c);
-float GetCharSpacing(char c, float spacingScale);
+int CharToSprite(uint32_t c);
+float GetCharSpacing(uint32_t c, float spacingScale);
