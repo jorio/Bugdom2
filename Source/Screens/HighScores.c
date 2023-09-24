@@ -551,6 +551,8 @@ OSErr				iErr;
 short				refNum;
 long				count;
 
+	CheckPrefsFolder(true);
+
 				/* CREATE BLANK FILE */
 
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gHighScoresFileName, &file);

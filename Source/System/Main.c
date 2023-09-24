@@ -33,9 +33,6 @@ static void UpdateParkFog(void);
 #define	NORMAL_GRAVITY	4500.0f
 
 
-#define kDefaultNibFileName "main"
-
-
 /****************************/
 /*    VARIABLES             */
 /****************************/
@@ -88,63 +85,26 @@ uint32_t				gScore,gLoadedScore;
 
 /****************** TOOLBOX INIT  *****************/
 
-void ToolBoxInit(void)
+OSErr CheckPrefsFolder(bool createIt)
 {
 OSErr		iErr;
 long		createdDirID;
 
-
-	MyFlushEvents();
-
-
-			/* CHECK PREFERENCES FOLDER */
-
 	iErr = FindFolder(kOnSystemDisk,kPreferencesFolderType,kDontCreateFolder,			// locate the folder
 					&gPrefsFolderVRefNum,&gPrefsFolderDirID);
+
 	if (iErr != noErr)
+	{
 		DoAlert("Warning: Cannot locate the Preferences folder.");
+		return iErr;
+	}
 
-	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"Bugdom2",&createdDirID);		// make folder in there
+	if (createIt)
+	{
+		iErr = DirCreate(gPrefsFolderVRefNum, gPrefsFolderDirID, PROJECT_NAME, &createdDirID);		// make folder in there
+	}
 
-
-
-			/* MAKE FSSPEC FOR DATA FOLDER */
-
-	SetDefaultDirectory();							// be sure to get the default directory
-
-//	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
-//	if (iErr)
-//		DoFatalAlert("The game's Data folder appears to be missing.  Please reinstall the game.");
-
-
-		/* FIRST VERIFY SYSTEM BEFORE GOING TOO FAR */
-
- 	InitInput();
-
-
-
-			/********************/
-			/* INIT PREFERENCES */
-			/********************/
-
-	InitDefaultPrefs();
-	LoadPrefs(&gGamePrefs);
-	LoadLocalizedStrings(gGamePrefs.language);
-
-
-
-			/* BOOT OGL */
-
-	OGL_Boot();
-
-
-			/*********************************/
-			/* DO BOOT CHECK FOR SCREEN MODE */
-			/*********************************/
-
-	DoScreenModeDialog();
-
-	MyFlushEvents();
+	return iErr;
 }
 
 
@@ -380,16 +340,16 @@ static void PlayArea_Terrain(void)
 		if (IsKeyActive(SDL_SCANCODE_LGUI) || IsKeyActive(SDL_SCANCODE_RGUI))
 #endif
 		{
-			if (IsKeyDown(SDL_SCANCODE_F10))			// win level cheat
+			if (IsKeyDown(SDL_SCANCODE_F10))            // win level cheat
 				break;
+		}
 
-			if (IsKeyDown(SDL_SCANCODE_HELP) || IsKeyDown(SDL_SCANCODE_INSERT))		// get health & stuff
-			{
-				gPlayerInfo.health = 1.0;
-				gPlayerInfo.glidePower = 1.0;
-				if (gPlayerInfo.lives < 3)
-					gPlayerInfo.lives = 3;
-			}
+		if (IsCheatKeyComboDown())						// get health & stuff
+		{
+			gPlayerInfo.health = 1.0;
+			gPlayerInfo.glidePower = 1.0;
+			if (gPlayerInfo.lives < 3)
+				gPlayerInfo.lives = 3;
 		}
 
 				/* SEE IF LEVEL IS COMPLETED */
@@ -1063,29 +1023,21 @@ unsigned long	someLong;
 				/* BOOT STUFF */
 				/**************/
 
-	ToolBoxInit();
-
-
-
-
-			/* INIT SOME OF MY STUFF */
-
+	LoadLocalizedStrings(gGamePrefs.language);
+	InitInput();
+	OGL_Boot();
 	InitSpriteManager();
 	InitBG3DManager();
 	InitWindowStuff();
 	InitTerrainManager();
 	InitSkeletonManager();
 	InitSoundTools();
-
-
-			/* INIT MORE MY STUFF */
-
 	InitObjectManager();
 
 	GetDateTime ((unsigned long *)(&someLong));		// init random seed
 	SetMyRandomSeed(someLong);
-	HideRealCursor();
 
+	HideRealCursor();
 
 	IMPLEMENT_ME_SOFT();
 #if 0

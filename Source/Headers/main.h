@@ -30,8 +30,8 @@ enum
 
 //=================================================
 
+OSErr CheckPrefsFolder(bool createIt);
 void GameMain(void);
-void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
 void DrawArea(void);

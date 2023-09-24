@@ -47,6 +47,8 @@ typedef struct
 		/* PREFERENCES */
 
 #define	CURRENT_PREFS_VERS	0xA0E2
+#define PREFS_FILE_NAME		"Preferences4"
+#define PREFS_FILE_PATH		(":" PROJECT_NAME ":" PREFS_FILE_NAME)
 
 typedef struct
 {
@@ -72,12 +74,11 @@ typedef struct
 
 SkeletonDefType *LoadSkeletonFile(short skeletonType);
 extern	void	OpenGameFile(Str255 filename,short *fRefNumPtr, Str255 errString);
-extern	OSErr LoadPrefs(PrefsType *prefBlock);
+extern	OSErr LoadPrefs(void);
 void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr);
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
-void SetDefaultDirectory(void);
 
 Boolean SaveGame(void);
 Boolean LoadSavedGame(void);

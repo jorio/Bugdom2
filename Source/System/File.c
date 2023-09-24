@@ -32,6 +32,8 @@ static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short f
 
 #define	SAVE_GAME_VERSION	0x0100		// 1.0
 
+
+
 		/* SAVE GAME */
 
 typedef struct
@@ -106,18 +108,6 @@ typedef struct
 
 
 float	g3DTileSize, g3DMinY, g3DMaxY;
-
-
-
-/****************** SET DEFAULT DIRECTORY ********************/
-//
-// This function needs to be called for OS X because OS X doesnt automatically
-// set the default directory to the application directory.
-//
-
-void SetDefaultDirectory(void)
-{
-}
 
 
 
@@ -470,50 +460,56 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 // Load in standard preferences
 //
 
-OSErr LoadPrefs(PrefsType *prefBlock)
+OSErr LoadPrefs(void)
 {
-OSErr		iErr;
-short		refNum;
+OSErr		iErr = noErr;
+short		refNum = 0;
 FSSpec		file;
 long		count;
+
+	iErr = CheckPrefsFolder(false);
+	if (iErr)
+		goto err;
 
 				/*************/
 				/* READ FILE */
 				/*************/
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences4", &file);
+	iErr = FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, PREFS_FILE_PATH, &file);
+	if (iErr)
+		goto err;
+
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
-		return(iErr);
+		goto err;
 
 	count = sizeof(PrefsType);
-	iErr = FSRead(refNum, &count,  (Ptr)prefBlock);		// read data from file
-	if (iErr)
-	{
-		FSClose(refNum);
-		return(iErr);
-	}
-
+	iErr = FSRead(refNum, &count, (Ptr) &gGamePrefs);		// read data from file
 	FSClose(refNum);
+	if (iErr)
+		goto err;
 
 			/****************/
 			/* VERIFY PREFS */
 			/****************/
 
+	if ((size_t) count < sizeof(PrefsType))
+		goto err;
+
 	if (gGamePrefs.version != CURRENT_PREFS_VERS)
 		goto err;
 
+			/* OVERWRITE NON-CONFIGURABLE BINDINGS */
 
-		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
-
-	IMPLEMENT_ME_SOFT();
-
+	SDL_memcpy(&gGamePrefs.bindings[NUM_REMAPPABLE_NEEDS],
+				&kDefaultInputBindings[NUM_REMAPPABLE_NEEDS],
+				sizeof(gGamePrefs.bindings[0]) * (NUM_CONTROL_NEEDS - NUM_REMAPPABLE_NEEDS));
 
 	return(noErr);
 
 err:
 	InitDefaultPrefs();
-	return(noErr);
+	return iErr;
 }
 
 
@@ -527,16 +523,14 @@ OSErr				iErr;
 short				refNum;
 long				count;
 
-		/* GET THE CURRENT CONTROL SETTINGS */
 
-	IMPLEMENT_ME_SOFT();
-#if 0
-	BuildHIDControlSettings(&gGamePrefs.controlSettings);
-#endif
+	iErr = CheckPrefsFolder(true);
+	if (iErr)
+		return;
 
 				/* CREATE BLANK FILE */
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":Bugdom2:Preferences4", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, PREFS_FILE_PATH, &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, kGameID, 'Pref', smSystemScript);					// create blank file
 	if (iErr)
@@ -556,8 +550,6 @@ long				count;
 	count = sizeof(PrefsType);
 	FSWrite(refNum, &count, &gGamePrefs);
 	FSClose(refNum);
-
-
 }
 
 #pragma mark -

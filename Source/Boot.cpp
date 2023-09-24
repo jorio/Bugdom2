@@ -108,8 +108,7 @@ static void Boot(int argc, char** argv)
 	Pomme::Init();
 
 	// Load game prefs before starting
-	InitDefaultPrefs();
-	// LoadPrefs();
+	LoadPrefs();
 
 retryVideo:
 	// Initialize SDL video subsystem
