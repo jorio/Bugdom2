@@ -605,7 +605,7 @@ float	scale;
 	{
 		if (gPlayerInfo.hasKey[i])
 		{
-			DrawInfobarSprite2_Centered(COLORKEY_X,COLORKEY_Y, scale, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon + i);
+			DrawInfobarSprite2_Centered(COLORKEY_X,COLORKEY_Y, scale, SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon + i);
 			return;
 		}
 	}

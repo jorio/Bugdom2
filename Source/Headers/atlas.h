@@ -88,18 +88,10 @@ void TextMesh_DrawExtents(ObjNode* textNode);
 
 void Atlas_ImmediateDraw(int groupNum, const char* text, uint32_t flags);
 
-void Atlas_DrawString2(
-	int groupNum,
-	const char* text,
-	float x,
-	float y,
-	float scaleX,
-	float scaleY,
-	float rot,
-	uint32_t flags);
+void Atlas_DrawString(int groupNum, const char* text, float x, float y, float scaleX, float scaleY, uint32_t flags);
 
 #define GameFont_DrawString(text, x, y, scale, flags) \
-	Atlas_DrawString2(ATLAS_GROUP_FONT1, text, x, y, scale, scale, 0, flags)
+	Atlas_DrawString(ATLAS_GROUP_FONT1, text, x, y, scale, scale, flags)
 
 void LoadSpriteAtlas(int groupNum, const char* atlasName, int flags);
 void DisposeSpriteAtlas(int groupNum);

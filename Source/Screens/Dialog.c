@@ -11,7 +11,6 @@
 /****************************/
 
 #include "game.h"
-#include "utf8.h"
 
 
 /****************************/
@@ -48,22 +47,22 @@ enum
 static const int gMessageIcon[MAX_DIALOG_MESSAGES][2] =					// Sprite Group, Sprite #
 {
 	[DIALOG_MESSAGE_NEEDSNAILSHELL]				= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_SnailShellIcon },
-	[DIALOG_MESSAGE_GOTSNAILSHELL]				= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_GOTSNAILSHELL]				= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_FINDSCARECROWHEAD]			= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_ScarecrowHeadIcon },
 	[DIALOG_MESSAGE_PUTSCARECROWHEAD]			= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_ScarecrowHeadIcon },
-	[DIALOG_MESSAGE_ATTACHEDSCARECROWHEAD]		= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_GreenKeyIcon },
+	[DIALOG_MESSAGE_ATTACHEDSCARECROWHEAD]		= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_GreenKeyIcon },
 	[DIALOG_MESSAGE_FINDMARBLE]					= { SPRITE_GROUP_LEVELSPECIFIC, PLAYROOM_SObjType_MarbleIcon },
 	[DIALOG_MESSAGE_BOWLMARBLE]					= { SPRITE_GROUP_LEVELSPECIFIC, PLAYROOM_SObjType_MarbleIcon },
-	[DIALOG_MESSAGE_DONEBOWLING]				= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_BlueKeyIcon },
-	[DIALOG_MESSAGE_CHIPMUNK_MAP4ACORN]			= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_AcornIcon },
-	[DIALOG_MESSAGE_CHIPMUNK_CHECKPOINT4ACORN]	= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_AcornIcon },
+	[DIALOG_MESSAGE_DONEBOWLING]				= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_BlueKeyIcon },
+	[DIALOG_MESSAGE_CHIPMUNK_MAP4ACORN]			= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_AcornIcon },
+	[DIALOG_MESSAGE_CHIPMUNK_CHECKPOINT4ACORN]	= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_AcornIcon },
 	[DIALOG_MESSAGE_CHIPMUNK_MOUSETRAP]			= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_Mouse },
 	[DIALOG_MESSAGE_CHIPMUNK_THANKS]			= { -1,-1 },
 	[DIALOG_MESSAGE_CHIPMUNK_CHECKPOINT]		= { -1,-1 },
-	[DIALOG_MESSAGE_POOLWATER]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_POOLWATER]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_SMASHBERRIES]				= { SPRITE_GROUP_LEVELSPECIFIC, SIDEWALK_SObjType_SquishBerry },
 	[DIALOG_MESSAGE_SQUISHMORE]					= { SPRITE_GROUP_LEVELSPECIFIC, SIDEWALK_SObjType_SquishBerry },
-	[DIALOG_MESSAGE_SQUISHDONE]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_GreenKeyIcon },
+	[DIALOG_MESSAGE_SQUISHDONE]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_GreenKeyIcon },
 	[DIALOG_MESSAGE_DOGHOUSE]					= { -1,-1 },
 	[DIALOG_MESSAGE_GOTFLEAS]					= { SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Tick },
 	[DIALOG_MESSAGE_GOTTICKS]					= { SPRITE_GROUP_LEVELSPECIFIC, FIDO_SObjType_Flea },
@@ -73,31 +72,31 @@ static const int gMessageIcon[MAX_DIALOG_MESSAGES][2] =					// Sprite Group, Spr
 	[DIALOG_MESSAGE_SLOTCAR]					= { -1,-1 },
 	[DIALOG_MESSAGE_RESCUEMICE]					= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_Mouse },
 	[DIALOG_MESSAGE_RESCUEMICE2]				= { SPRITE_GROUP_LEVELSPECIFIC, GARDEN_SObjType_Mouse },
-	[DIALOG_MESSAGE_MICESAVED]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_MICESAVED]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_SLOTCARPLAYERWON]			= { -1,-1 },
 	[DIALOG_MESSAGE_SLOTCARTRYAGAIN]			= { -1,-1 },
 	[DIALOG_MESSAGE_DOPUZZLE]					= { -1,-1 },
 	[DIALOG_MESSAGE_DONEPUZZLE]					= { -1,-1 },
 	[DIALOG_MESSAGE_BOMBHILLS]					= { SPRITE_GROUP_LEVELSPECIFIC, BALSA_SObjType_AntHillIcon },
 	[DIALOG_MESSAGE_BOMBHILLS2]					= { SPRITE_GROUP_LEVELSPECIFIC, BALSA_SObjType_AntHillIcon },
-	[DIALOG_MESSAGE_HILLSDONE]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_BeeIcon },
+	[DIALOG_MESSAGE_HILLSDONE]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_BeeIcon },
 	[DIALOG_MESSAGE_MOTHBALL]					= { SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_MothBallIcon },
 	[DIALOG_MESSAGE_SILICONDOOR]				= { SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_ChipIcon },
 	[DIALOG_MESSAGE_GETREDCLOVERS]				= { SPRITE_GROUP_LEVELSPECIFIC, CLOSET_SObjType_RedClover },
-	[DIALOG_MESSAGE_GOTREDCLOVERS]				= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_GOTREDCLOVERS]				= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_GOFISHING]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_BobberIcon },
 	[DIALOG_MESSAGE_MOREFISH]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_BobberIcon },
-	[DIALOG_MESSAGE_THANKSFISH]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_THANKSFISH]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_GETFOOD]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_CheeseIcon },
 	[DIALOG_MESSAGE_MOREFOOD]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_CheeseIcon },
-	[DIALOG_MESSAGE_THANKSFOOD]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_BlueKeyIcon },
+	[DIALOG_MESSAGE_THANKSFOOD]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_BlueKeyIcon },
 	[DIALOG_MESSAGE_GETKINDLING]				= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_KindlingIcon },
 	[DIALOG_MESSAGE_MOREKINDLING]				= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_KindlingIcon },
 	[DIALOG_MESSAGE_LIGHTFIRE]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_FireIcon },
 	[DIALOG_MESSAGE_ENTERHIVE]					= { SPRITE_GROUP_LEVELSPECIFIC, PARK_SObjType_HiveIcon },
-	[DIALOG_MESSAGE_BOTTLEKEY]					= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_GreenKeyIcon },
+	[DIALOG_MESSAGE_BOTTLEKEY]					= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_GreenKeyIcon },
 	[DIALOG_MESSAGE_MICEDROWN]					= { SPRITE_GROUP_LEVELSPECIFIC, GARBAGE_SObjType_Mouse },
-	[DIALOG_MESSAGE_THANKSNODROWN]				= { SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_RedKeyIcon },
+	[DIALOG_MESSAGE_THANKSNODROWN]				= { SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_RedKeyIcon },
 	[DIALOG_MESSAGE_GLIDER]						= { SPRITE_GROUP_LEVELSPECIFIC, GARBAGE_SObjType_PropIcon },
 	[DIALOG_MESSAGE_SODACAN]					= { SPRITE_GROUP_LEVELSPECIFIC, GARBAGE_SObjType_CanIcon },
 };
@@ -188,7 +187,6 @@ static	OGLPoint3D	gNextMessageWhere;
 
 void InitDialogManager(void)
 {
-FSSpec	spec;
 int		i;
 
 	gNumLinesInCurrentDialog = 0;
@@ -202,10 +200,6 @@ int		i;
 
 	for (i = 0; i < MAX_DIALOG_MESSAGES; i++)
 		gMessageReplayVoiceDelay[i] = 0;
-
-			/* LOAD THE SPRITES FOR THE DIALOGS */
-
-//	LoadSpriteGroupFromSeries(SPRITE_GROUP_DIALOG, DIALOG_SObjType_COUNT, "Dialog");
 }
 
 
@@ -311,7 +305,7 @@ int		effect;
 
 void DrawDialogMessage(void)
 {
-float	x,y,leftX;
+float	x,y;
 
 			/* UPDATE ANY CURRENT VOICE */
 
@@ -390,7 +384,7 @@ float	x,y,leftX;
 
 	x = (640-DIALOG_FRAME_WIDTH)/2 + 5.0f;
 	y = 410.0f;
-	DrawInfobarSprite2(x, y, DIALOG_FRAME_WIDTH, SPRITE_GROUP_DIALOG, DIALOG_SObjTypes_Frame);
+	DrawInfobarSprite2(x, y, DIALOG_FRAME_WIDTH, SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_DialogFrame);
 
 
 			/* DRAW ICON */
@@ -412,54 +406,10 @@ float	x,y,leftX;
 	gGlobalColorFilter.g = 1.0f;
 	gGlobalColorFilter.b = .8f;
 
-	leftX = x += 80.0f;
-
-	if ((gGameFrameNum / 60) % 2 == 0)
-		goto oldRendering;
-
+	x += 80;
 	y += 29;
 	GameFont_DrawString(gCurrentDialogString, x, y, .24f, kTextMeshAlignLeft | kTextMeshAlignMiddle);
-	goto done;
 
-oldRendering:
-			/* SET VERTICAL CENTERING */
-
-	y += 10;
-
-	if (gNumLinesInCurrentDialog == 1)						// center based on # of lines of text
-		y += LETTER_SIZE * 1.3f;
-	else
-	if (gNumLinesInCurrentDialog == 2)
-		y += LETTER_SIZE * 1.3f * .5f;
-
-
-			/* DRAW EACH CHAR */
-
-	const char* cursor = gCurrentDialogString;
-	while (*cursor)
-	{
-		uint32_t c = ReadNextCodepointFromUTF8(&cursor);
-
-			/* NEXT LINE */
-
-		if (c == '\n')					// look for line feed
-		{
-			y += LETTER_SIZE * 1.3f;
-			x = leftX;
-		}
-
-			/* DRAW LETTER */
-		else
-		{
-			int	texNum = CharToSprite(c);
-			if (texNum != -1)
-				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
-
-			x += GetCharSpacing(c, LETTER_SPACING);
-		}
-	}
-
-done:
 	gGlobalColorFilter.r = 1.0f;
 	gGlobalColorFilter.g = 1.0f;
 	gGlobalColorFilter.b = 1.0f;
@@ -467,189 +417,3 @@ done:
 	gGlobalTransparency = 1.0f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
-
-
-
-#pragma mark -
-
-
-/***************** CHAR TO SPRITE **********************/
-
-int CharToSprite(uint32_t c)
-{
-	if ((c >= 'a') && (c <= 'z'))
-	{
-		return(DIALOG_SObjType_a + (c - 'a'));
-	}
-
-	if ((c >= 'A') && (c <= 'Z'))
-	{
-		return(DIALOG_SObjType_A + (c - 'A'));
-	}
-
-	if ((c >= '0') && (c <= '9'))
-	{
-		return(DIALOG_SObjType_0 + (c - '0'));
-	}
-
-	switch(c)
-	{
-		case '.': return DIALOG_SObjType_Period;
-		case ',': return DIALOG_SObjType_Comma;
-		case '-': return DIALOG_SObjType_Dash;
-		case '?': return DIALOG_SObjType_QuestionMark;
-		case '!': return DIALOG_SObjType_ExclamationMark;
-		case 161: return DIALOG_SObjType_ExclamationMark2;
-		case 192: return DIALOG_SObjType_Ax;
-		case 196: return DIALOG_SObjType_AA;
-		case 197: return DIALOG_SObjType_AO;
-		case 199: return DIALOG_SObjType_C;
-		case 200: return DIALOG_SObjType_EE;
-		case 201: return DIALOG_SObjType_EE;
-		case 202: return DIALOG_SObjType_E;
-		case 209: return DIALOG_SObjType_NN;
-		case 211: return DIALOG_SObjType_Oa;
-		case 212: return DIALOG_SObjType_Ox;
-		case 214: return DIALOG_SObjType_OO;
-		case 220: return DIALOG_SObjType_UU;
-		case 223: return DIALOG_SObjType_beta;
-		case 224: return DIALOG_SObjType_ax;
-		case 225: return DIALOG_SObjType_aa;
-		case 226: return DIALOG_SObjType_av;
-		case 228: return DIALOG_SObjType_au;
-		case 229: return DIALOG_SObjType_ao;
-		case 231: return DIALOG_SObjType_c;
-		case 232: return DIALOG_SObjType_ee;
-		case 233: return DIALOG_SObjType_ee;
-		case 234: return DIALOG_SObjType_ev;
-		case 237: return DIALOG_SObjType_ia;
-		case 241: return DIALOG_SObjType_nn;
-		case 243: return DIALOG_SObjType_oa;
-		case 246: return DIALOG_SObjType_oo;
-		case 250: return DIALOG_SObjType_ua;
-		case 252: return DIALOG_SObjType_uu;
-		case '\'': return DIALOG_SObjType_Apostrophe;
-		case ' ': return -1;
-		default: return DIALOG_SObjType_Cursor;
-	}
-}
-
-
-/******************** GET CHAR SPACING *************************/
-
-float GetCharSpacing(uint32_t c, float spacingScale)
-{
-float	s;
-
-	switch(c)
-	{
-		case	'j':
-		case	'9':
-		case	228:	// auml
-				s = .6;
-				break;
-
-		case	' ':
-		case	'f':
-		case	't':
-		case	'r':
-				s = .5f;
-				break;
-
-		case	'I':
-		case	'i':
-		case	237:	// iacute
-		case	'l':
-		case	'.':
-		case	',':
-		case	'!':
-		case	161:	// iexcl
-				s = .4;
-				break;
-
-		case	CHAR_APOSTROPHE:
-				s = .3;
-				break;
-
-		case	'a':
-		case	224:
-		case	225:
-		case	226:
-		case	229:
-		case	'b':
-		case	'c':
-		case	231:	// ccedil
-		case	'd':
-		case	'e':
-		case	232:
-		case	233:
-		case	234:
-		case	'g':
-		case	'h':
-		case	'k':
-		case	'n':
-		case	241:
-		case	'o':
-		case	243:
-		case	246:
-		case	'p':
-		case	'q':
-		case	's':
-		case	'u':
-		case	250:
-		case	252:
-		case	'v':
-		case	'x':
-		case	'y':
-		case	'z':
-		case	'J':
-		case	'S':
-		case	'T':
-		case	'Y':
-		case	'0':
-		case	'1':
-		case	'2':
-		case	'3':
-		case	'4':
-		case	'5':
-		case	'6':
-		case	'7':
-		case	'8':
-		case	'L':
-				s = .7f;
-				break;
-
-		case	'N':
-		case	'P':
-		case	'B':
-		case	'C':
-		case	199:	// CCedil
-		case	'V':
-		case	'F':
-		case	'H':
-		case	223:	// eszett
-				s = .8f;
-				break;
-
-
-		case	'M':
-		case	'm':
-				s = 1.0f;
-				break;
-
-		default:
-				s = .9f;
-	}
-
-
-
-
-
-	return(spacingScale * s);
-
-
-}
-
-
-

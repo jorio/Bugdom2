@@ -41,6 +41,7 @@ enum
 {
 	HIGHSCORES_SObjType_EnterNameText,
 	HIGHSCORES_SObjType_ScoreText,
+	HIGHSCORES_SObjType_Cursor,
 	HIGHSCORES_SObjType_COUNT,
 };
 
@@ -288,10 +289,6 @@ static void DrawHighScoresCallback(void)
 
 static void DrawScoreVerbage(void)
 {
-Str32	s;
-int		texNum;
-float	x;
-
 				/* SEE IF DONE */
 
 	gFinalScoreTimer -= gFramesPerSecondFrac;
@@ -321,10 +318,8 @@ float	x;
 			/* DRAW SCORE */
 			/**************/
 
-	int n = SDL_snprintf(s, sizeof(s), "%d", gScore);
-
-	x = 320.0f - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
-
+	char s[32];
+	SDL_snprintf(s, sizeof(s), "%d", gScore);
 
 	gGlobalColorFilter.r = 1;
 	gGlobalColorFilter.g = 1;
@@ -332,17 +327,7 @@ float	x;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	GameFont_DrawString(s, 320, 240, .8f, kTextMeshAlignCenter | kTextMeshAlignTop);
-#if 0
-	for (int i = 0; i < n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-
-		DrawInfobarSprite2(x, 240, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_DIALOG, texNum);
-		x += MYSCORE_DIGIT_SPACING;
-	}
-#endif
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
 	gGlobalTransparency = 1.0f;
 	gGlobalColorFilter.r = 1;
@@ -423,7 +408,7 @@ char	s[33];
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
 		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, DIALOG_SObjType_Cursor);
+		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_Cursor);
 	}
 
 

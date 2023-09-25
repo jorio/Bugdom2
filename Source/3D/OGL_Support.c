@@ -11,7 +11,6 @@
 /****************************/
 
 #include "game.h"
-#include "utf8.h"
 #include "tga.h"
 
 
@@ -1556,45 +1555,6 @@ static void OGL_FreeFont(void)
 
 void OGL_DrawString(const char* s, float x, float y)
 {
-
-#if 0
-	float leftX = x;
-
-	OGL_PushState();
-
-	SetInfobarSpriteState();
-
-	gGlobalColorFilter = (OGLColorRGB) {1,1,.3f};
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-	glEnable(GL_BLEND);
-
-	float LETTER_SIZE = 9;
-	const char* cursor = s;
-	while (*cursor)
-	{
-		uint32_t c = ReadNextCodepointFromUTF8(&cursor);
-
-		if (c == '\n')					// look for line feed
-		{
-			y += LETTER_SIZE * 1.3f;
-			x = leftX;
-		}
-		else
-		{
-			int	texNum = CharToSprite(c);
-			if (texNum != -1)
-				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
-
-			x += GetCharSpacing(c, LETTER_SIZE);
-		}
-	}
-
-	gGlobalTransparency = 1;
-	gGlobalColorFilter = (OGLColorRGB) {1,1,1};
-	OGL_PopState();
-#endif
-
 	OGL_PushState();
 	SetInfobarSpriteState();
 	GameFont_DrawString(s, x, y, .25f, kTextMeshAlignLeft);
@@ -1609,8 +1569,6 @@ void OGL_DrawFloat(float f, float x, float y)
 	SDL_snprintf(s, sizeof(s), "%f", f);
 	OGL_DrawString(s,x,y);
 }
-
-
 
 /**************** OGL_DRAW INT ********************/
 

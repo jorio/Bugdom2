@@ -8,9 +8,8 @@ enum
 	SPRITE_GROUP_SPHEREMAPS 		=	0,
 	SPRITE_GROUP_GLOBAL				=	1,
 	SPRITE_GROUP_PARTICLES			=	2,
-	SPRITE_GROUP_DIALOG				=	3,
-	SPRITE_GROUP_INFOBAR			=	4,
-	SPRITE_GROUP_LEVELSPECIFIC		=	5,
+	SPRITE_GROUP_INFOBAR			=	3,
+	SPRITE_GROUP_LEVELSPECIFIC		=	4,
 	MAX_SPRITE_GROUPS
 };
 
@@ -102,124 +101,10 @@ enum
 	PARTICLE_SObjType_COUNT,
 };
 
-/******************* DIALOG SOBJTYPES *************************/
-
-enum
-{
-	DIALOG_SObjTypes_Frame,
-	DIALOG_SObjTypes_AcornIcon,
-	DIALOG_SObjTypes_RedKeyIcon,
-	DIALOG_SObjTypes_GreenKeyIcon,
-	DIALOG_SObjTypes_BlueKeyIcon,
-	DIALOG_SObjTypes_BeeIcon,
-
-	DIALOG_SObjType_Comma,
-	DIALOG_SObjType_Dash,
-	DIALOG_SObjType_Period,
-	DIALOG_SObjType_QuestionMark,
-	DIALOG_SObjType_ExclamationMark,
-	DIALOG_SObjType_ExclamationMark2,
-	DIALOG_SObjType_Apostrophe,
-
-	DIALOG_SObjType_UU,
-	DIALOG_SObjType_uu,
-	DIALOG_SObjType_ua,
-	DIALOG_SObjType_OO,
-	DIALOG_SObjType_oo,
-	DIALOG_SObjType_AA,
-	DIALOG_SObjType_AO,
-	DIALOG_SObjType_NN,
-	DIALOG_SObjType_nn,
-	DIALOG_SObjType_EE,
-	DIALOG_SObjType_ee,
-	DIALOG_SObjType_ev,
-	DIALOG_SObjType_Ax,
-	DIALOG_SObjType_ax,
-	DIALOG_SObjType_av,
-	DIALOG_SObjType_au,
-	DIALOG_SObjType_ao,
-	DIALOG_SObjType_aa,
-	DIALOG_SObjType_Ox,
-	DIALOG_SObjType_Oa,
-	DIALOG_SObjType_oa,
-	DIALOG_SObjType_beta,
-	DIALOG_SObjType_ia,
-
-	DIALOG_SObjType_0,
-	DIALOG_SObjType_1,
-	DIALOG_SObjType_2,
-	DIALOG_SObjType_3,
-	DIALOG_SObjType_4,
-	DIALOG_SObjType_5,
-	DIALOG_SObjType_6,
-	DIALOG_SObjType_7,
-	DIALOG_SObjType_8,
-	DIALOG_SObjType_9,
-
-	DIALOG_SObjType_a,
-	DIALOG_SObjType_b,
-	DIALOG_SObjType_c,
-	DIALOG_SObjType_d,
-	DIALOG_SObjType_e,
-	DIALOG_SObjType_f,
-	DIALOG_SObjType_g,
-	DIALOG_SObjType_h,
-	DIALOG_SObjType_i,
-	DIALOG_SObjType_j,
-	DIALOG_SObjType_k,
-	DIALOG_SObjType_l,
-	DIALOG_SObjType_m,
-	DIALOG_SObjType_n,
-	DIALOG_SObjType_o,
-	DIALOG_SObjType_p,
-	DIALOG_SObjType_q,
-	DIALOG_SObjType_r,
-	DIALOG_SObjType_s,
-	DIALOG_SObjType_t,
-	DIALOG_SObjType_u,
-	DIALOG_SObjType_v,
-	DIALOG_SObjType_w,
-	DIALOG_SObjType_x,
-	DIALOG_SObjType_y,
-	DIALOG_SObjType_z,
-
-	DIALOG_SObjType_A,
-	DIALOG_SObjType_B,
-	DIALOG_SObjType_C,
-	DIALOG_SObjType_D,
-	DIALOG_SObjType_E,
-	DIALOG_SObjType_F,
-	DIALOG_SObjType_G,
-	DIALOG_SObjType_H,
-	DIALOG_SObjType_I,
-	DIALOG_SObjType_J,
-	DIALOG_SObjType_K,
-	DIALOG_SObjType_L,
-	DIALOG_SObjType_M,
-	DIALOG_SObjType_N,
-	DIALOG_SObjType_O,
-	DIALOG_SObjType_P,
-	DIALOG_SObjType_Q,
-	DIALOG_SObjType_R,
-	DIALOG_SObjType_S,
-	DIALOG_SObjType_T,
-	DIALOG_SObjType_U,
-	DIALOG_SObjType_V,
-	DIALOG_SObjType_W,
-	DIALOG_SObjType_X,
-	DIALOG_SObjType_Y,
-	DIALOG_SObjType_Z,
-
-	DIALOG_SObjType_Cursor,
-
-	DIALOG_SObjType_COUNT,
-};
-
 /******************* INFOBAR SOBJTYPES *************************/
 
 enum
 {
-
 	INFOBAR_SObjType_LeftCorner,
 	INFOBAR_SObjType_RightCorner,
 
@@ -227,17 +112,6 @@ enum
 
 	INFOBAR_SObjType_Flight,
 	INFOBAR_SObjType_Life,
-
-	INFOBAR_SObjType_0,
-	INFOBAR_SObjType_1,
-	INFOBAR_SObjType_2,
-	INFOBAR_SObjType_3,
-	INFOBAR_SObjType_4,
-	INFOBAR_SObjType_5,
-	INFOBAR_SObjType_6,
-	INFOBAR_SObjType_7,
-	INFOBAR_SObjType_8,
-	INFOBAR_SObjType_9,
 
 	INFOBAR_SObjType_MapDot,
 
@@ -255,10 +129,15 @@ enum
 	INFOBAR_SObjType_GoldClover3,
 	INFOBAR_SObjType_GoldClover4,
 
+	INFOBAR_SObjTypes_DialogFrame,
+	INFOBAR_SObjTypes_AcornIcon,
+	INFOBAR_SObjTypes_RedKeyIcon,
+	INFOBAR_SObjTypes_GreenKeyIcon,
+	INFOBAR_SObjTypes_BlueKeyIcon,
+	INFOBAR_SObjTypes_BeeIcon,
+
 	INFOBAR_SObjType_COUNT,
 };
-
-
 
 
 /******************* GARDEN LEVEL *************************/

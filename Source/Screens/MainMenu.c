@@ -836,19 +836,6 @@ Str32	s;
 void DrawScoreText(const char* s, float x, float y)
 {
 	GameFont_DrawString(s, x, y, .32f, kTextMeshAlignLeft | kTextMeshAlignTop);
-#if 0
-	for (; *s; s++)
-	{
-		char c = *s;
-
-		int texNum = CharToSprite(c);				// get texture #
-
-		if (texNum != -1)
-			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_DIALOG, texNum);
-
-		x += GetCharSpacing(c, SCORE_TEXT_SPACING);
-	}
-#endif
 }
 
 

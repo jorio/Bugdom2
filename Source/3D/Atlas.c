@@ -894,15 +894,7 @@ void Atlas_ImmediateDraw(int groupNum, const char* text, uint32_t flags)
 
 }
 
-void Atlas_DrawString2(
-	int groupNum,
-	const char* text,
-	float x,
-	float y,
-	float scaleX,
-	float scaleY,
-	float rot,
-	uint32_t flags)
+void Atlas_DrawString(int groupNum, const char* text, float x, float y, float scaleX, float scaleY, uint32_t flags)
 {
 			/* SET STATE */
 
@@ -924,9 +916,6 @@ void Atlas_DrawString2(
 
 	glTranslatef(x,y,0);
 	glScalef(scaleX, scaleY, 1);					// Assume ortho projection
-
-//	if (rot != 0.0f)
-//		glRotatef(OGLMath_RadiansToDegrees(rot), 0, 0, 1);											// remember:  rotation is in degrees, not radians!
 
 	Atlas_ImmediateDraw(groupNum, text, flags);
 

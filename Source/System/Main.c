@@ -1038,7 +1038,6 @@ unsigned long	someLong;
 	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
 	LoadSpriteGroupFromSeries(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "SphereMap");
 	LoadSpriteGroupFromSeries(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "Global");
-	LoadSpriteGroupFromSeries(SPRITE_GROUP_DIALOG, DIALOG_SObjType_COUNT, "Dialog");
 	LoadSpriteAtlas(ATLAS_GROUP_FONT1, ":Sprites:Font:font", kAtlasLoadFont);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
