@@ -156,6 +156,8 @@ static float	dotAlpha = 1.0f;
 
 		const char* caption = Localize(STR_PAUSEOPTION1 + j);
 
+		GameFont_DrawString(caption, x, y, .3f, kTextMeshAlignLeft | kTextMeshAlignTop);
+#if 0
 		while (*caption)
 		{
 			uint32_t c = ReadNextCodepointFromUTF8(&caption);		// get char
@@ -165,6 +167,7 @@ static float	dotAlpha = 1.0f;
 
 			x += GetCharSpacing(c, LETTER_SPACING);
 		}
+#endif
 		y += LETTER_SPACING_Y;
 	}
 

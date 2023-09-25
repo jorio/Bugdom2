@@ -414,6 +414,14 @@ float	x,y,leftX;
 
 	leftX = x += 80.0f;
 
+	if ((gGameFrameNum / 60) % 2 == 0)
+		goto oldRendering;
+
+	y += 29;
+	GameFont_DrawString(gCurrentDialogString, x, y, .24f, kTextMeshAlignLeft | kTextMeshAlignMiddle);
+	goto done;
+
+oldRendering:
 			/* SET VERTICAL CENTERING */
 
 	y += 10;
@@ -451,6 +459,7 @@ float	x,y,leftX;
 		}
 	}
 
+done:
 	gGlobalColorFilter.r = 1.0f;
 	gGlobalColorFilter.g = 1.0f;
 	gGlobalColorFilter.b = 1.0f;

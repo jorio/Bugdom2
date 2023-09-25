@@ -831,10 +831,12 @@ Str32	s;
 }
 
 
-/***************** DRAW SCORE TEXT ***********************/
+/***************** DRAW SCORE TEXT (ASSUMES INFOBAR MODE) ***********************/
 
 void DrawScoreText(const char* s, float x, float y)
 {
+	GameFont_DrawString(s, x, y, .32f, kTextMeshAlignLeft | kTextMeshAlignTop);
+#if 0
 	for (; *s; s++)
 	{
 		char c = *s;
@@ -846,6 +848,7 @@ void DrawScoreText(const char* s, float x, float y)
 
 		x += GetCharSpacing(c, SCORE_TEXT_SPACING);
 	}
+#endif
 }
 
 

@@ -705,7 +705,7 @@ do_anaglyph:
 		y += 15;
 #endif
 
-		OGL_DrawString("# pointers:", 20,y);
+		OGL_DrawString("#pointers:", 20,y);
 		OGL_DrawInt(gNumPointers, 100,y);
 		y += 15;
 	}
@@ -1557,7 +1557,7 @@ static void OGL_FreeFont(void)
 void OGL_DrawString(const char* s, float x, float y)
 {
 
-
+#if 0
 	float leftX = x;
 
 	OGL_PushState();
@@ -1592,6 +1592,12 @@ void OGL_DrawString(const char* s, float x, float y)
 
 	gGlobalTransparency = 1;
 	gGlobalColorFilter = (OGLColorRGB) {1,1,1};
+	OGL_PopState();
+#endif
+
+	OGL_PushState();
+	SetInfobarSpriteState();
+	GameFont_DrawString(s, x, y, .25f, kTextMeshAlignLeft);
 	OGL_PopState();
 }
 

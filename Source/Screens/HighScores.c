@@ -331,6 +331,8 @@ float	x;
 	gGlobalColorFilter.b = 0;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	GameFont_DrawString(s, 320, 240, .8f, kTextMeshAlignCenter | kTextMeshAlignTop);
+#if 0
 	for (int i = 0; i < n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -338,6 +340,7 @@ float	x;
 		DrawInfobarSprite2(x, 240, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_DIALOG, texNum);
 		x += MYSCORE_DIGIT_SPACING;
 	}
+#endif
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
@@ -393,10 +396,11 @@ char	s[33];
 			cursorY = y;
 			cursorX = 150.0f;
 
+			// calc cursor position
 			for (int j = 0; j < gCursorIndex && gHighScores[i].name[j]; j++)
 			{
-				if (gHighScores[i].name[j])
-				cursorX += GetCharSpacing(gHighScores[i].name[j], SCORE_TEXT_SPACING);	// calc cursor position
+				const AtlasGlyph* g = GetAtlasSpriteInfo(ATLAS_GROUP_FONT1, gHighScores[i].name[j]);
+				cursorX += g->xadv * .32f;
 			}
 		}
 

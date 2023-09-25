@@ -55,6 +55,7 @@
 #include "vaportrails.h"
 #include "localization.h"
 #include "dialog.h"
+#include "atlas.h"
 
 extern	BG3DFileContainer		*gBG3DContainerList[];
 extern	Boolean					gAllowAudioKeys;
