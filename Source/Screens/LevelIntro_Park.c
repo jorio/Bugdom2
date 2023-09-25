@@ -42,8 +42,6 @@ static ObjNode *gText = nil;
 
 void DoLevelIntroScreen_Park(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -54,7 +52,7 @@ void DoLevelIntroScreen_Park(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

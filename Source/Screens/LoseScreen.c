@@ -58,8 +58,6 @@ enum
 void DoLoseScreen(void)
 {
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLoseScreen();
@@ -70,7 +68,7 @@ void DoLoseScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLoseCallback, NULL);
 	FreeLoseScreen();
 }
 

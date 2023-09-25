@@ -18,7 +18,6 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 
 
@@ -38,8 +37,6 @@ static void ProcessLevelIntro(void);
 
 void DoLevelIntroScreen_Closet(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -50,7 +47,7 @@ void DoLevelIntroScreen_Closet(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 
@@ -177,27 +174,10 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLevelIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
 			break;
 	}
 }
-
-
-/***************** DRAW LEVELINTRO CALLBACK *******************/
-
-static void DrawLevelIntroCallback(void)
-{
-	DrawObjects();
-}
-
-
-
-
-
-
-
-
-

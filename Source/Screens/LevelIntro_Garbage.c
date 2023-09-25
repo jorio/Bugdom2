@@ -38,8 +38,6 @@ static	ObjNode	 *gCan;
 
 void DoLevelIntroScreen_Garbage(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -50,7 +48,7 @@ void DoLevelIntroScreen_Garbage(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 

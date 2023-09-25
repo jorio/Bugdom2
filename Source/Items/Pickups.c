@@ -384,7 +384,7 @@ float	fps = gFramesPerSecondFrac;
 
 				/* SEE IF MAKE BOUNCE SOUND */
 
-		if (gGammaFadePercent >= 1.0f)
+		if (gGammaFadeFrac >= 1.0f)
 		{
 			if ((gDelta.y > 60.0f) && (theNode->OldCoord.y > gCoord.y))
 				PlayEffect_Parms3D(EFFECT_ACORNKICKED, &gCoord, NORMAL_CHANNEL_RATE * 2/3, .4f);

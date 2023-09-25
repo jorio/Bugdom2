@@ -37,8 +37,6 @@ static void MoveIntroBottle(ObjNode *theNode);
 
 void DoLevelIntroScreen_BackYard(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -49,7 +47,7 @@ void DoLevelIntroScreen_BackYard(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

@@ -18,7 +18,6 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveIntroDrain(ObjNode *pipe);
 static void MakeSewerGas(ObjNode *pipe);
@@ -48,8 +47,6 @@ enum
 
 void DoLevelIntroScreen_Sewer(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -60,7 +57,7 @@ void DoLevelIntroScreen_Sewer(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 
@@ -266,20 +263,12 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLevelIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
 			break;
 	}
-}
-
-
-/***************** DRAW LEVELINTRO CALLBACK *******************/
-
-static void DrawLevelIntroCallback(void)
-{
-	DrawObjects();
 }
 
 

@@ -91,8 +91,6 @@ static	float	gScoreFadeAlpha;
 void DoMainMenuScreen(void)
 {
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupMainMenuScreen();
@@ -103,7 +101,7 @@ void DoMainMenuScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawMainMenuCallback, NULL);
 	FreeMainMenuScreen();
 }
 
@@ -434,7 +432,6 @@ static void DoMenuControls(void)
 					{
 						gPlayNow = true;
 						gPlayingFromSavedGame = true;
-						GameScreenToBlack();
 					}
 					break;
 
@@ -875,25 +872,21 @@ void DrawScoreText(const char* s, float x, float y)
 
 ObjNode *MakeDarkenPane(void)
 {
-ObjNode *pane;
+	NewObjectDefinitionType def =
+	{
+		.genre		= CUSTOM_GENRE,
+		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG
+					| STATUS_BIT_NOTEXTUREWRAP| STATUS_BIT_DOUBLESIDED,
+		.slot		= SLOT_OF_DUMB+100,
+		.moveCall	= MoveDarkenPane,
+		.drawCall	= DrawDarkenPane,
+	};
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_DOUBLESIDED;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
-	gNewObjectDefinition.moveCall 	= MoveDarkenPane;
-	pane = MakeNewObject(&gNewObjectDefinition);
-
+	ObjNode* pane = MakeNewObject(&def);
 	pane->Mode = 0;							// make lighten
+	pane->ColorFilter = (OGLColorRGBA){0,0,0,0};
 
-	pane->CustomDrawFunction = DrawDarkenPane;
-
-	pane->ColorFilter.r = 0;
-	pane->ColorFilter.g = 0;
-	pane->ColorFilter.b = 0;
-	pane->ColorFilter.a = 0;
-
-	return(pane);
+	return pane;
 }
 
 

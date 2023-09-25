@@ -107,8 +107,6 @@ void DoBonusScreen(void)
 
 	gScore += POINTS_LEVEL;							// get level completion bonus
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupBonusScreen();
@@ -139,7 +137,7 @@ void DoBonusScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawBonusCallback, NULL);
 	FreeBonusScreen();
 }
 

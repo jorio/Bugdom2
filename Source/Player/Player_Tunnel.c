@@ -342,9 +342,6 @@ void PlayArea_Tunnel(void)
 
 		CalcFramesPerSecond();
 
-		if (gGameFrameNum == 0)						// if that was 1st frame, then create a fade event
-			MakeFadeEvent(true, 1);
-
 		gGameFrameNum++;
 
 				/* CHEATS */
@@ -389,11 +386,10 @@ void PlayArea_Tunnel(void)
 				if (oldTimer > 0.0f)						// if just now crossed zero then start fade
 					MakeFadeEvent(false, 1);
 				else
-				if (gGammaFadePercent <= 0.0f)				// once fully faded out reset player @ checkpoint
+				if (gGammaFadeFrac <= 0.0f)				// once fully faded out reset player @ checkpoint
 					ResetPlayerInTunnel();
 			}
 		}
-
 	}
 }
 

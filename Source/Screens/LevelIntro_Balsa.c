@@ -51,8 +51,6 @@ static ObjNode *gBanner;
 
 void DoLevelIntroScreen_Balsa(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -63,7 +61,7 @@ void DoLevelIntroScreen_Balsa(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

@@ -43,6 +43,7 @@
 #include "splineitems.h"
 #include "items.h"
 #include "window.h"
+#include "fade.h"
 #include "enemy.h"
 #include "water.h"
 #include "miscscreens.h"
@@ -165,7 +166,7 @@ extern	float					gDeathTimer;
 extern	float					gDragonflyY;
 extern	float					gFramesPerSecond;
 extern	float					gFramesPerSecondFrac;
-extern	float					gGammaFadePercent;
+extern	float					gGammaFadeFrac;
 extern	float					gGlobalTransparency;
 extern	float					gGravity;
 extern	float					gLevelCompletedCoolDownTimer;

@@ -2,9 +2,7 @@
 // structs.h
 //
 
-#ifndef STRUCTS_H
-#define STRUCTS_H
-
+#pragma once
 
 #include "globals.h"
 #include "ogl_support.h"
@@ -379,13 +377,6 @@ typedef struct
 	uint32_t		flags;
 	short			slot;
 	void			(*moveCall)(ObjNode *);
+	void			(*drawCall)(ObjNode *);
 	float			rot,scale;
 }NewObjectDefinitionType;
-
-
-
-#endif
-
-
-
-

@@ -38,8 +38,6 @@ static ObjNode	*gPinecone = nil;
 
 void DoLevelIntroScreen_Gutter(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -50,7 +48,7 @@ void DoLevelIntroScreen_Gutter(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

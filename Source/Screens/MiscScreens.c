@@ -104,12 +104,10 @@ float	timeout = 40.0f;
 
 			/* FADE OUT */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DisplayPicture_Draw, NULL);
 
 
 	OGL_DisposeWindowSetup(&gGameView);
-
-
 }
 
 
@@ -130,12 +128,9 @@ void DoLegalScreen(void)
 {
 FSSpec	spec;
 
-	GammaFadeOut();
-
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:Pangea", &spec);
 
 	DisplayPicture(&spec);
-
 }
 
 

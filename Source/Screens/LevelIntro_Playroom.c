@@ -39,8 +39,6 @@ static void MoveIntroSoldier(ObjNode *theNode);
 
 void DoLevelIntroScreen_Playroom(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -51,7 +49,7 @@ void DoLevelIntroScreen_Playroom(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

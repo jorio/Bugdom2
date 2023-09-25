@@ -649,7 +649,7 @@ void MovePlayer_EatenBySnake(ObjNode *player)
 			if (oldTimer > 0.0f)						// if just now crossed zero then start fade
 				MakeFadeEvent(false, 1);
 			else
-			if (gGammaFadePercent <= 0.0f)				// once fully faded out reset player @ checkpoint
+			if (gGammaFadeFrac <= 0.0f)				// once fully faded out reset player @ checkpoint
 				ResetPlayerAtBestCheckpoint();
 		}
 	}

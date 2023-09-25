@@ -60,8 +60,6 @@ static	ObjNode *gHive, *gBag;
 void DoWinScreen(void)
 {
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupWinScreen();
@@ -72,7 +70,7 @@ void DoWinScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawWinCallback, NULL);
 	FreeWinScreen();
 }
 

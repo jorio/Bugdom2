@@ -37,8 +37,6 @@ static void MoveDogBone(ObjNode *theNode);
 
 void DoLevelIntroScreen_Fido(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -49,7 +47,7 @@ void DoLevelIntroScreen_Fido(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
 	FreeLevelIntroScreen();
 }
 

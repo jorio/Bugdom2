@@ -161,15 +161,13 @@ const short songs[] =
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
-//		gLevelNum = LEVEL_NUM_PARK;
+		gLevelNum = LEVEL_NUM_PARK;
 //		gLevelNum = LEVEL_NUM_PLAYROOM;
 
 //			if (GetKeyState(KEY_F10))		// see if do Level cheat
 //				if (DoLevelCheatDialog())
 //					CleanQuit();
 	}
-
-	GammaFadeOut();
 
 	for (;gLevelNum < NUM_LEVELS; gLevelNum++)
 	{
@@ -198,9 +196,7 @@ const short songs[] =
 
 		gInGameNow = false;
 		MyFlushEvents();
-		GammaFadeOut();
 		CleanupLevel();
-		GameScreenToBlack();
 
 			/***************/
 			/* SEE IF LOST */
@@ -239,7 +235,7 @@ static void PlayArea(void)
 	CalcFramesPerSecond();
 	CalcFramesPerSecond();
 
-
+	MakeFadeEvent(true, 1);
 
 	/***********************************************/
 	/* PLAY BASED ON THE TYPE OF LEVEL WE'RE DOING */
@@ -252,6 +248,7 @@ static void PlayArea(void)
 		case	LEVEL_NUM_PLUMBING:
 		case	LEVEL_NUM_GUTTER:
 				PlayArea_Tunnel();
+				OGL_FadeOutScene(DrawTunnel, NULL);
 				break;
 
 
@@ -259,6 +256,7 @@ static void PlayArea(void)
 
 		default:
 				PlayArea_Terrain();
+				OGL_FadeOutScene(DrawArea, NULL);
 	}
 }
 
@@ -329,9 +327,6 @@ static void PlayArea_Terrain(void)
 
 		CalcFramesPerSecond();
 
-		if (gGameFrameNum == 0)						// if that was 1st frame, then create a fade event
-			MakeFadeEvent(true, 1);
-
 		gGameFrameNum++;
 		gGameLevelTimer += gFramesPerSecondFrac;
 
@@ -377,7 +372,7 @@ static void PlayArea_Terrain(void)
 				if (oldTimer > 0.0f)						// if just now crossed zero then start fade
 					MakeFadeEvent(false, 1);
 				else
-				if (gGammaFadePercent <= 0.0f)				// once fully faded out reset player @ checkpoint
+				if (gGammaFadeFrac <= 0.0f)				// once fully faded out reset player @ checkpoint
 					ResetPlayerAtBestCheckpoint();
 			}
 		}
@@ -520,7 +515,6 @@ static void InitArea(void)
 
 
 	HideRealCursor();								// do this again to be sure!
-	GammaFadeOut();
 }
 
 

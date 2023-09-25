@@ -8,8 +8,6 @@
 /* CONSTANTS   */
 /***************/
 
-#define gGammaFadeFrac gGammaFadePercent
-
 #define MOUSE_SMOOTHING 0
 
 #define kJoystickDeadZone				(33 * 32767 / 100)

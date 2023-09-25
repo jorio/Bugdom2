@@ -18,7 +18,6 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveLevelIntroSprinklerHead(ObjNode *base);
 static void MoveMud(ObjNode *theNode);
@@ -56,8 +55,6 @@ enum
 
 void DoLevelIntroScreen_FrontYard(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLevelIntroScreen();
@@ -68,7 +65,7 @@ void DoLevelIntroScreen_FrontYard(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 
@@ -321,7 +318,7 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLevelIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
@@ -329,14 +326,6 @@ float	timer;
 	}
 }
 
-
-/***************** DRAW LEVELINTRO CALLBACK *******************/
-
-static void DrawLevelIntroCallback(void)
-{
-	DrawObjects();
-
-}
 
 
 #pragma mark -

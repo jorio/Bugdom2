@@ -73,9 +73,6 @@ static ObjNode *gBack, *gText, *g2;
 
 void DoTitleScreen(void)
 {
-
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupTitleScreen();
@@ -99,7 +96,7 @@ void DoTitleScreen(void)
 			/* CLEANUP */
 
 bail:
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawTitleCallback, NULL);
 	FreeTitleScreen();
 }
 

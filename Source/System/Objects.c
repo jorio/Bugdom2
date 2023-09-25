@@ -104,6 +104,7 @@ uint32_t flags = newObjDef->flags;
 	newNodePtr->Type 		= newObjDef->type;
 	newNodePtr->Group 		= newObjDef->group;
 	newNodePtr->MoveCall 	= newObjDef->moveCall;
+	newNodePtr->CustomDrawFunction	= newObjDef->drawCall;
 
 	if (flags & STATUS_BIT_ONSPLINE)
 		newNodePtr->SplineMoveCall = newObjDef->moveCall;				// save spline move routine
@@ -185,26 +186,14 @@ Byte	group,type;
 	newObjDef->genre = DISPLAY_GROUP_GENRE;
 
 	newObj = MakeNewObject(newObjDef);
-	if (newObj == nil)
-		DoFatalAlert("MakeNewDisplayGroupObject: MakeNewObject failed!");
+	GAME_ASSERT(newObj);
 
 			/* MAKE BASE GROUP & ADD GEOMETRY TO IT */
 
 	CreateBaseGroup(newObj);											// create group object
 	group = newObjDef->group;											// get group #
 	type = newObjDef->type;												// get type #
-
-	if (type >= gNumObjectsInBG3DGroupList[group])							// see if illegal
-	{
-		Str255	s;
-
-		DoAlert("MakeNewDisplayGroupObject: type > gNumObjectsInGroupList[]!");
-
-		NumToString(group, s);
-		DoAlert(s);
-		NumToString(type,s);
-		DoFatalAlert(s);
-	}
+	GAME_ASSERT(type < gNumObjectsInBG3DGroupList[group]);				// see if illegal
 
 	AttachGeometryToDisplayGroupObject(newObj,gBG3DGroupList[group][type]);
 
