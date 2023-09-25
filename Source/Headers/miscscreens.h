@@ -58,6 +58,8 @@ typedef struct
 ObjNode *MakeDarkenPane(void);
 
 void DisplayPicture(FSSpec *spec);
+
+void KeepTerrainAlive(void);
 void DoPaused(void);
 
 Boolean DoFailedMenu(const Str31	headerString);

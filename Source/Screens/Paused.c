@@ -43,6 +43,14 @@ Boolean			gGamePaused = false;
 static short	gPausedMenuSelection;
 
 
+/***************** KEEP TERRAIN ALIVE WHILE PAUSED ******************/
+
+void KeepTerrainAlive(void)
+{
+	// need to call this to keep supertiles active
+	DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);
+}
+
 /********************** DO PAUSED **************************/
 
 void DoPaused(void)
@@ -71,7 +79,7 @@ void DoPaused(void)
 
 		CalcFramesPerSecond();
 		UpdateInput();
-		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);		// need to call this to keep supertiles active
+		KeepTerrainAlive();
 		OGL_DrawScene(DrawPaused);
 	}
 

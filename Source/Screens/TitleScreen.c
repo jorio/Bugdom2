@@ -96,7 +96,7 @@ void DoTitleScreen(void)
 			/* CLEANUP */
 
 bail:
-	OGL_FadeOutScene(DrawTitleCallback, NULL);
+	OGL_FadeOutScene(DrawTitleCallback, KeepTerrainAlive);
 	FreeTitleScreen();
 }
 

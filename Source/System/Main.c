@@ -161,7 +161,7 @@ const short songs[] =
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
-		gLevelNum = LEVEL_NUM_PARK;
+//		gLevelNum = LEVEL_NUM_PARK;
 //		gLevelNum = LEVEL_NUM_PLAYROOM;
 
 //			if (GetKeyState(KEY_F10))		// see if do Level cheat
@@ -248,7 +248,7 @@ static void PlayArea(void)
 		case	LEVEL_NUM_PLUMBING:
 		case	LEVEL_NUM_GUTTER:
 				PlayArea_Tunnel();
-				OGL_FadeOutScene(DrawTunnel, NULL);
+				OGL_FadeOutScene(DrawTunnel, KeepTerrainAlive);
 				break;
 
 
@@ -256,7 +256,7 @@ static void PlayArea(void)
 
 		default:
 				PlayArea_Terrain();
-				OGL_FadeOutScene(DrawArea, NULL);
+				OGL_FadeOutScene(DrawArea, KeepTerrainAlive);
 	}
 }
 
