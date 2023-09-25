@@ -236,6 +236,8 @@ static void PlayArea(void)
 	CalcFramesPerSecond();
 
 	MakeFadeEvent(true, 1);
+	
+	GrabMouse(true);
 
 	/***********************************************/
 	/* PLAY BASED ON THE TYPE OF LEVEL WE'RE DOING */

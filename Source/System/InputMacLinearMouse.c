@@ -7,7 +7,7 @@
 // entire system. Restore it when your game is done with the mouse, otherwise
 // linear mouse movement will stick around until a reboot.
 //
-// Tested on macOS 12.6.
+// Tested on macOS 13.6.
 // Needs CoreFoundation and IOKit.
 //
 // Interesting reading:
@@ -42,8 +42,9 @@ void SetMacLinearMouse(int linear)
 #include <IOKit/hidsystem/IOHIDParameter.h>
 #include <IOKit/hidsystem/event_status_driver.h>
 
-static const int32_t	kNoAcceleration			= -0x10000;
-static int32_t			gAccelerationBackup		= 0;
+// int64_t as of macOS 13.6
+static const int64_t	kNoAcceleration			= -0x10000;
+static int64_t			gAccelerationBackup		= 0;
 static bool				gAccelerationTainted	= false;
 
 static void KillMacMouseAcceleration(void)
@@ -81,12 +82,12 @@ static void KillMacMouseAcceleration(void)
 		ret = IOHIDSetParameter(handle, CFSTR(kIOHIDMouseAccelerationType), &kNoAcceleration, sizeof(kNoAcceleration));
 		if (ret != KERN_SUCCESS)
 		{
-			printf("%s: IOHIDSetParameter failed! Error %d. (Current accel = %d)\n", __func__, (int)ret, gAccelerationBackup);
+			printf("%s: IOHIDSetParameter failed! Error %d. (Current accel = %d)\n", __func__, (int)ret, (int)gAccelerationBackup);
 		}
 		else
 		{
 			gAccelerationTainted = true;
-			printf("%s: success. Was %d, now %d.\n", __func__, gAccelerationBackup, kNoAcceleration);
+			printf("%s: success. Was %d, now %d.\n", __func__, (int)gAccelerationBackup, (int)kNoAcceleration);
 		}
 	}
 
@@ -97,7 +98,7 @@ static void RestoreMacMouseAcceleration(void)
 {
 	if (!gAccelerationTainted)
 	{
-		printf("%s: Acceleration value not tainted (%d).\n", __func__, gAccelerationBackup);
+		printf("%s: Acceleration value not tainted (%d).\n", __func__, (int)gAccelerationBackup);
 		return;
 	}
 
@@ -119,7 +120,7 @@ static void RestoreMacMouseAcceleration(void)
 	else
 	{
 		gAccelerationTainted = false;
-		printf("%s: success. Restored %d.\n", __func__, gAccelerationBackup);
+		printf("%s: success. Restored %d.\n", __func__, (int)gAccelerationBackup);
 	}
 
 	NXCloseEventStatus(handle);

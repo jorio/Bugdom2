@@ -26,13 +26,6 @@
 /*     VARIABLES      */
 /**********************/
 
-static	long					gMouseDeltaX = 0;
-static	long					gMouseDeltaY = 0;
-
-//static	float					gReadMouseDeltasTimer = 0;
-
-Boolean		gMouseButtonState = false, gMouseNewButtonState = false;
-
 
 			/**************/
 			/* NEEDS LIST */
@@ -70,9 +63,11 @@ float	mouseDX, mouseDY;
 		//
 		// The mouse is only used for Player 1
 		//
+	
+	OGLVector2D mouseDelta = GetMouseDelta();
 
-	mouseDX = gMouseDeltaX * 0.015f;											// scale down deltas for our use
-	mouseDY = gMouseDeltaY * 0.015f;
+	mouseDX = mouseDelta.x * 0.015f;							// scale down deltas for our use
+	mouseDY = mouseDelta.y * 0.015f;
 
 	if (mouseDX > 1.0f)											// keep x values pinned
 		mouseDX = 1.0f;

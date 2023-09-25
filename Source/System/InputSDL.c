@@ -867,12 +867,13 @@ void BackupRestoreCursorCoord(Boolean backup)
 		SDL_WarpMouseInWindow(gSDLWindow, mx, my);
 	}
 }
+#endif
 
 void GrabMouse(Boolean capture)
 {
 	if (capture)
 	{
-		BackupRestoreCursorCoord(true);
+//		BackupRestoreCursorCoord(true);
 	}
 
 	SDL_SetWindowGrab(gSDLWindow, capture);
@@ -882,8 +883,6 @@ void GrabMouse(Boolean capture)
 
 	if (!capture)
 	{
-		BackupRestoreCursorCoord(false);
+//		BackupRestoreCursorCoord(false);
 	}
 }
-
-#endif

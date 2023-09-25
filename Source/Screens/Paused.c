@@ -59,6 +59,7 @@ void DoPaused(void)
 	gPausedMenuSelection = 0;
 
 	PauseAllChannels(true);
+	GrabMouse(false);
 
 
 				/*************/
@@ -84,6 +85,7 @@ void DoPaused(void)
 	}
 
 	PauseAllChannels(false);
+	GrabMouse(true);
 	gGamePaused = false;
 }
 

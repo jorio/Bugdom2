@@ -63,6 +63,7 @@ void GammaFadeIn(void)
 
 void Enter2D(void)
 {
+	GrabMouse(false);
 	IMPLEMENT_ME_SOFT();
 #if 0
 	ShowRealCursor();
