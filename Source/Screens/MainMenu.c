@@ -77,7 +77,7 @@ static 	ObjNode	*gMenuFlower, *gMenuLogo;
 
 static	int		gSelectedIcon = 0;
 
-static	Boolean	gPlayNow;
+static Boolean	gPlayNow = false;
 
 static	float	gInactivityTimer;
 

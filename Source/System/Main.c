@@ -40,11 +40,8 @@ static void UpdateParkFog(void);
 short	gPrefsFolderVRefNum;
 long	gPrefsFolderDirID;
 
-Boolean				gShareware = false;
-
 Boolean				gG4 = true;
 Boolean				gSlowCPU = false;
-Boolean				gAltivec = false;
 
 float				gGravity = NORMAL_GRAVITY;
 
@@ -62,6 +59,7 @@ OGLColorRGBA		gFillColor1 = { .6, .6, .6, 1};
 uint32_t				gGameFrameNum = 0;
 float				gGameLevelTimer = 0;
 
+Boolean				gInGameNow = false;
 Boolean				gPlayingFromSavedGame = false;
 Boolean				gGameOver = false;
 Boolean				gLevelCompleted = false;
@@ -122,6 +120,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
+	gGamePrefs.fullscreen			= true;
 
 	_Static_assert(sizeof(gGamePrefs.bindings) == sizeof(kDefaultInputBindings), "input binding size mismatch: prefs vs defaults");
 	SDL_memcpy(&gGamePrefs.bindings, &kDefaultInputBindings, sizeof(kDefaultInputBindings));
@@ -192,10 +191,12 @@ const short songs[] =
 	        /* PLAY IT */
 	        /***********/
 
+		gInGameNow = true;
 		PlayArea();
 
 			/* CLEANUP LEVEL */
 
+		gInGameNow = false;
 		MyFlushEvents();
 		GammaFadeOut();
 		CleanupLevel();

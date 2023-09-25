@@ -136,15 +136,8 @@ static void UpdateRawKeyboardStates(void)
 		UpdateKeyState(&gKeyboardStates[i], false);
 }
 
-static void ProcessSystemKeyChords(void)
+static void ProcessAltEnter(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
-	if ((gGamePaused || !gPlayNow) && IsCmdQDown())
-	{
-		CleanQuit();
-	}
-
 	if (IsKeyDown(SDL_SCANCODE_RETURN)
 		&& (IsKeyHeld(SDL_SCANCODE_LALT) || IsKeyHeld(SDL_SCANCODE_RALT)))
 	{
@@ -153,8 +146,25 @@ static void ProcessSystemKeyChords(void)
 
 		InvalidateAllInputs();
 	}
-#endif
 }
+
+#if __APPLE__
+static void ProcessCmdQ(void)
+{
+	if ((IsKeyHeld(SDL_SCANCODE_LGUI) || IsKeyHeld(SDL_SCANCODE_RGUI))
+		&& IsKeyDown(SDL_GetScancodeFromKey(SDLK_q)))
+	{
+		if (gInGameNow && !gGamePaused)
+		{
+			UpdateKeyState(&gNeedStates[kNeed_UIPause], true);
+		}
+		else
+		{
+			CleanQuit();
+		}
+	}
+}
+#endif
 
 static void UpdateMouseButtonStates(int mouseWheelDeltaX, int mouseWheelDeltaY)
 {
@@ -351,14 +361,18 @@ void DoSDLMaintenance(void)
 	UpdateRawKeyboardStates();
 
 	// On ALT+ENTER, toggle fullscreen, and ignore ENTER until keyup.
-	// Also, on macOS, process Cmd+Q.
-	ProcessSystemKeyChords();
+	ProcessAltEnter();
 
 	// Refresh the state of each mouse button
 	UpdateMouseButtonStates(mouseWheelDeltaX, mouseWheelDeltaY);
 
 	// Refresh the state of each input need
 	UpdateInputNeeds();
+
+#if __APPLE__
+	// Check for Cmd-Q (must be after UpdateInputNeeds because it may update kNeed_UIPause)
+	ProcessCmdQ();
+#endif
 
 	//-------------------------------------------------------------------------
 	// Multiplayer gamepad input
@@ -450,17 +464,6 @@ Boolean UserWantsOut(void)
 		|| IsNeedDown(kNeed_UIBack)
 		|| IsNeedDown(kNeed_UIPause)
 		|| IsClickDown(SDL_BUTTON_LEFT);
-}
-
-Boolean IsCmdQDown(void)
-{
-#if __APPLE__
-	return (IsKeyHeld(SDL_SCANCODE_LGUI) || IsKeyHeld(SDL_SCANCODE_RGUI))
-		&& IsKeyDown(SDL_GetScancodeFromKey(SDLK_q));
-#else
-	// On non-macOS systems, alt-f4 is handled by the system
-	return false;
-#endif
 }
 
 Boolean IsCheatKeyComboDown(void)

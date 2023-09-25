@@ -57,7 +57,6 @@
 
 extern	BG3DFileContainer		*gBG3DContainerList[];
 extern	Boolean					gAllowAudioKeys;
-extern	Boolean					gAltivec;
 extern	Boolean					gBurnKindling;
 extern	Boolean					gDisableAnimSounds;
 extern	Boolean					gDisableHiccupTimer;
@@ -66,10 +65,12 @@ extern	Boolean					gDrawLensFlare;
 extern	Boolean					gEnableSnakes;
 extern	Boolean					gFreezeCameraFromXZ;
 extern	Boolean					gFreezeCameraFromY;
+extern	Boolean					gGamePaused;
 extern	Boolean					gG4;
 extern	Boolean					gGameOver;
 extern	Boolean					gHeadOnScarecrow;
 extern	Boolean					gIgnoreBottleKeySnail;
+extern	Boolean					gInGameNow;
 extern	Boolean					gLevelCompleted;
 extern	Boolean					gMuteMusicFlag;
 extern	Boolean					gMyState_Lighting;

@@ -81,7 +81,6 @@ float GetNeedAnalogSteering(int negativeNeedID, int positiveNeedID);
 #define IsNeedUp(needID) (KEYSTATE_UP == GetNeedState((needID)))
 
 Boolean UserWantsOut(void);
-Boolean IsCmdQDown(void);
 Boolean IsCheatKeyComboDown(void);
 
 void DoSDLMaintenance(void);

@@ -19,3 +19,6 @@ void HideRealCursor(void);
 void ShowRealCursor(void);
 
 void MakeFadeEvent(Boolean fadeIn, float fadeSpeed);
+
+void GetDefaultWindowSize(int display, int* width, int* height);
+void SetFullscreenMode(bool enforceDisplayPref);

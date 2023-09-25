@@ -78,26 +78,6 @@ tryAgain:
 	return dataPath;
 }
 
-static void GetInitialWindowSize(int display, int& width, int& height)
-{
-	const float aspectRatio = 4.0f / 3.0f;
-	const float screenCoverage = 2.0f / 3.0f;
-
-	SDL_Rect displayBounds = { .x = 0, .y = 0, .w = 640, .h = 480 };
-	SDL_GetDisplayUsableBounds(display, &displayBounds);
-
-	if (displayBounds.w > displayBounds.h)
-	{
-		width	= displayBounds.h * screenCoverage * aspectRatio;
-		height	= displayBounds.h * screenCoverage;
-	}
-	else
-	{
-		width	= displayBounds.w * screenCoverage;
-		height	= displayBounds.w * screenCoverage / aspectRatio;
-	}
-}
-
 static void Boot(int argc, char** argv)
 {
 	const char* executablePath = argc > 0 ? argv[0] : NULL;
@@ -139,7 +119,7 @@ retryVideo:
 	// Determine initial window size
 	int initialWidth = 640;
 	int initialHeight = 480;
-	GetInitialWindowSize(display, initialWidth, initialHeight);
+	GetDefaultWindowSize(display, &initialWidth, &initialHeight);
 
 	gSDLWindow = SDL_CreateWindow(
 			PROJECT_FULL_NAME " " PROJECT_VERSION,
@@ -178,6 +158,9 @@ retryVideo:
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, PROJECT_FULL_NAME, "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
 		}
 	}
+
+	// Set fullscreen mode from prefs
+	SetFullscreenMode(true);
 }
 
 static void Shutdown()

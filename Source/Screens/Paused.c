@@ -39,6 +39,7 @@ static void DrawPaused(void);
 /*    VARIABLES      */
 /*********************/
 
+Boolean			gGamePaused = false;
 static short	gPausedMenuSelection;
 
 
@@ -46,6 +47,7 @@ static short	gPausedMenuSelection;
 
 void DoPaused(void)
 {
+	gGamePaused = true;
 	gPausedMenuSelection = 0;
 
 	PauseAllChannels(true);
@@ -74,6 +76,7 @@ void DoPaused(void)
 	}
 
 	PauseAllChannels(false);
+	gGamePaused = false;
 }
 
 
