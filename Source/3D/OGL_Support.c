@@ -575,7 +575,12 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 	GAME_ASSERT(gGameView->isActive);
 	// aglSetCurrentContext(gGameView->drawContext);		// make context active
 
+
+			/* REFRESH DIMENSIONS */
+
 	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+
+	g2DLogicalRect = Get2DLogicalRect(1);
 
 
 			/* INIT SOME STUFF */

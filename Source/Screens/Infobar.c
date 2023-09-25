@@ -1,7 +1,8 @@
 /****************************/
 /*   	INFOBAR.C		    */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -101,6 +102,9 @@ static float	gRedCloverAlpha, gFishAlpha, gFoodAlpha;
 Boolean			gShowRedClovers, gShowFish, gShowFood;
 Byte			gFoodTypes[FOOD_TO_GET];
 
+OGLRect			g2DLogicalRect = {0, 480, 0, 640};
+static float	g640x480Scaling = 1.0f;
+
 /********************* INIT INFOBAR ****************************/
 //
 // Called at beginning of level
@@ -122,6 +126,44 @@ void DisposeInfobar(void)
 }
 
 
+/****************** 640x480 LOGICAL RECT **********************/
+
+OGLRect Get2DLogicalRect(float zoom)
+{
+	float referenceW = 640;
+	float referenceH = 480;
+
+	g640x480Scaling = 1.0f / zoom;
+	referenceW *= g640x480Scaling;
+	referenceH *= g640x480Scaling;
+
+	float referenceAR = referenceW / referenceH;
+
+	float logicalW;
+	float logicalH;
+
+	float drawableAR = gGameWindowWidth / (float) gGameWindowHeight;
+	if (drawableAR >= referenceAR)
+	{
+		// wide
+		logicalW = referenceH * drawableAR;
+		logicalH = referenceH;
+	}
+	else
+	{
+		// tall
+		logicalW = referenceW;
+		logicalH = referenceW / drawableAR;
+	}
+
+	float left		= (referenceW - logicalW) * 0.5f;
+	float top		= (referenceH - logicalH) * 0.5f;
+	float right		= left + logicalW;
+	float bottom	= top + logicalH;
+
+	return (OGLRect) {.left=left, .top=top, .right=right, .bottom=bottom};
+}
+
 /***************** SET INFOBAR SPRITE STATE *******************/
 
 void SetInfobarSpriteState(void)
@@ -137,7 +179,14 @@ void SetInfobarSpriteState(void)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+
+	float left		= g2DLogicalRect.left;
+	float top		= g2DLogicalRect.top;
+	float right		= g2DLogicalRect.right;
+	float bottom	= g2DLogicalRect.bottom;
+
+	glOrtho(left, right, bottom, top, 0, 1);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }

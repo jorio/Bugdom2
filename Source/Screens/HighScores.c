@@ -21,7 +21,6 @@ static void FreeScoreScreen(void);
 static void DrawHighScoresCallback(void);
 static void DrawScoreVerbage(void);
 static void DrawHighScoresAndCursor(void);
-static void SetHighScoresSpriteState(void);
 static void StartEnterName(void);
 static Boolean IsThisScoreInList(uint32_t score);
 static short AddNewScore(uint32_t newScore);
@@ -279,7 +278,7 @@ static void DrawHighScoresCallback(void)
 
 	OGL_PushState();
 
-	SetHighScoresSpriteState();
+	SetInfobarSpriteState();
 
 	if (gDrawScoreVerbage)
 		DrawScoreVerbage();
@@ -292,26 +291,6 @@ static void DrawHighScoresCallback(void)
 	gGlobalTransparency = 1.0;
 }
 
-
-/********************* SET HIGHSCORES SPRITE STATE ***************/
-
-static void SetHighScoresSpriteState(void)
-{
-	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);								// no z-buffer
-
-	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
-
-
-			/* INIT MATRICES */
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
 
 /********************* DRAW SCORE VERBAGE ****************************/
 
