@@ -11,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "utf8.h"
 
 
 /****************************/
@@ -56,8 +57,6 @@ Byte					gAnaglyphPass;
 uint8_t					gAnaglyphGreyTable[255];
 
 SDL_GLContext			gAGLContext = NULL;
-
-static GLuint 			gFontList;
 
 
 OGLMatrix4x4	gViewToFrustumMatrix,gWorldToViewMatrix,gWorldToFrustumMatrix;
@@ -772,6 +771,8 @@ do_anaglyph:
 		OGL_DrawString("#sparkles:", 20,y);
 		OGL_DrawInt(gNumSparkles, 100,y);
 		y += 15;
+#endif
+
 
 		if (gPlayerInfo.objNode)
 		{
@@ -783,7 +784,7 @@ do_anaglyph:
 			y += 15;
 		}
 
-
+#if 0
 		OGL_DrawString("#H2O:", 20,y);
 		OGL_DrawInt(gNumWaterDrawn, 100,y);
 		y += 15;
@@ -791,17 +792,11 @@ do_anaglyph:
 		OGL_DrawString("#scratchI:", 20,y);
 		OGL_DrawInt(gScratch, 100,y);
 		y += 15;
-
-
-
-
-
-//		OGL_DrawString("# pointers:", 20,y);
-//		OGL_DrawInt(gNumPointers, 100,y);
-//		y += 15;
-
 #endif
 
+		OGL_DrawString("# pointers:", 20,y);
+		OGL_DrawInt(gNumPointers, 100,y);
+		y += 15;
 	}
 
 
@@ -1561,13 +1556,12 @@ void OGL_DisableLighting(void)
 
 static void OGL_InitFont(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
-	gFontList = glGenLists(256);
-
-    if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
-		DoFatalAlert("OGL_InitFont: aglUseFont failed");
-#endif
+	if (!gNumSpritesInGroupList[SPRITE_GROUP_DIALOG])
+	{
+		FSSpec spec;
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
+		LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
+	}
 }
 
 
@@ -1575,37 +1569,54 @@ static void OGL_InitFont(void)
 
 static void OGL_FreeFont(void)
 {
-	glDeleteLists(gFontList, 256);
 }
 
 /**************** OGL_DRAW STRING ********************/
 
-void OGL_DrawString(const char* s, GLint x, GLint y)
+void OGL_DrawString(const char* s, float x, float y)
 {
+
+
+	float leftX = x;
+
 	OGL_PushState();
 
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 640, 0, 480, -10.0, 10.0);
+	SetInfobarSpriteState();
 
-	glDisable(GL_LIGHTING);
+	gGlobalColorFilter = (OGLColorRGB) {1,1,.3f};
 
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(1,1,1);
-	glRasterPos2i(x, 480-y);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
+	glEnable(GL_BLEND);
 
-	glListBase(gFontList);
-	glCallLists(s[0], GL_UNSIGNED_BYTE, &s[1]);
+	float LETTER_SIZE = 9;
+	const char* cursor = s;
+	while (*cursor)
+	{
+		uint32_t c = ReadNextCodepointFromUTF8(&cursor);
 
+		if (c == '\n')					// look for line feed
+		{
+			y += LETTER_SIZE * 1.3f;
+			x = leftX;
+		}
+		else
+		{
+			int	texNum = CharToSprite(c);
+			if (texNum != -1)
+				DrawInfobarSprite2(x, y, LETTER_SIZE * 1.8f, SPRITE_GROUP_DIALOG, texNum);
+
+			x += GetCharSpacing(c, LETTER_SIZE);
+		}
+	}
+
+	gGlobalTransparency = 1;
+	gGlobalColorFilter = (OGLColorRGB) {1,1,1};
 	OGL_PopState();
-
 }
 
 /**************** OGL_DRAW FLOAT ********************/
 
-void OGL_DrawFloat(float f, GLint x, GLint y)
+void OGL_DrawFloat(float f, float x, float y)
 {
 	char s[16];
 	SDL_snprintf(s, sizeof(s), "%f", f);
@@ -1616,7 +1627,7 @@ void OGL_DrawFloat(float f, GLint x, GLint y)
 
 /**************** OGL_DRAW INT ********************/
 
-void OGL_DrawInt(int f, GLint x, GLint y)
+void OGL_DrawInt(int f, float x, float y)
 {
 	char s[16];
 	SDL_snprintf(s, sizeof(s), "%d", f);
