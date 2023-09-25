@@ -994,11 +994,7 @@ static void CleanupLevel(void)
 
 	DisposeAllBG3DContainers();
 
-
-
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-
-	OGL_DisposeWindowSetup(&gGameView);	// do this last!
 }
 
 

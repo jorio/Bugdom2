@@ -272,7 +272,6 @@ static void FreeWinScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 

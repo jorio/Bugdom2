@@ -325,7 +325,6 @@ static void FreeBonusScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -

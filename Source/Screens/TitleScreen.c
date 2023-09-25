@@ -361,8 +361,6 @@ static void FreeTitleScreen(void)
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_TITLE);
 	DisposeTerrain();
-
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -

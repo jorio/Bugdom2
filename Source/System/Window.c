@@ -169,7 +169,7 @@ void ShowRealCursor(void)
 void GetDefaultWindowSize(int display, int* width, int* height)
 {
 	const float aspectRatio = 4.0 / 3.0f;
-	const float screenCoverage = 2.0f / 3.0f;
+	const float screenCoverage = .75f;
 
 	SDL_Rect displayBounds = { .x = 0, .y = 0, .w = 640, .h = 480 };
 	SDL_GetDisplayUsableBounds(display, &displayBounds);

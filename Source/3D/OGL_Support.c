@@ -21,7 +21,7 @@
 PFNGLACTIVETEXTUREPROC gGlActiveTextureProc;
 PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
 
-static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr);
+static void OGL_InitDrawContext(OGLViewDefType *viewDefPtr);
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr);
 static void OGL_CreateLights(OGLLightDefType *lightDefPtr);
 static void OGL_InitFont(void);
@@ -93,18 +93,42 @@ Boolean		gMyState_Lighting;
 
 void OGL_Boot(void)
 {
-short	i;
-float	f;
+			/* GENERATE ANAGLYPH GREY CONVERSION TABLE */
 
-		/* GENERATE ANAGLYPH GREY CONVERSION TABLE */
-
-	f = 0;
-	for (i = 0; i < 255; i++)
+	float f = 0;
+	for (int i = 0; i < 255; i++)
 	{
 		gAnaglyphGreyTable[i] = sin(f) * 255.0f;
 		f += (PI/2.0) / 255.0f;
 	}
 
+	GAME_ASSERT_MESSAGE(!gAGLContext, "GL context already exists");
+	GAME_ASSERT_MESSAGE(gSDLWindow, "Window must be created before the DC!");
+	
+	
+			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
+	
+	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
+	
+	if (!gAGLContext)
+		DoFatalAlert(SDL_GetError());
+	
+
+			/* ACTIVATE CONTEXT */
+
+	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
+	
+	
+			/* SEE IF SUPPORT 1024x1024 TEXTURES */
+
+	GLint maxTexSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+	if (maxTexSize < 1024)
+		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
+	
+
+	OGL_CheckError();
 }
 
 
@@ -177,7 +201,7 @@ OGLSetupOutputType	*outputPtr;
 
 				/* SETUP */
 
-	OGL_CreateDrawContext(&setupDefPtr->view);
+	OGL_InitDrawContext(&setupDefPtr->view);
 	OGL_CheckError();
 
 	OGL_SetStyles(setupDefPtr);
@@ -247,44 +271,15 @@ OGLSetupOutputType	*data;
 }
 
 
+/**************** OGL: INIT DRAW CONTEXT *********************/
 
-
-/**************** OGL: CREATE DRAW CONTEXT *********************/
-
-static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
+void OGL_InitDrawContext(OGLViewDefType *viewDefPtr)
 {
-	GAME_ASSERT_MESSAGE(!gAGLContext, "GL context already exists");
-	GAME_ASSERT_MESSAGE(gSDLWindow, "Window must be created before the DC!");
-
-			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
-
-	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
-
-	if (!gAGLContext)
-		DoFatalAlert(SDL_GetError());
-
-	GAME_ASSERT(glGetError() == GL_NO_ERROR);
-
-
-			/* ACTIVATE CONTEXT */
-
-	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
-	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
-
 			/* ENABLE VSYNC */
 
 	SDL_GL_SetSwapInterval(gGamePrefs.vsync);
+
 #if 0
-
-AGLPixelFormat 	fmt;
-GLboolean      mkc, ok;
-GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib2[] 		= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_ALL_RENDERERS, AGL_NONE};
-GLint			maxTexSize;
-static char			*s;
-
 
 			/* FIX FOG FOR FOR B&W ANAGLYPH */
 			//
@@ -321,79 +316,6 @@ static char			*s;
 			viewDefPtr->clearColor.b = f;
 		}
 	}
-
-			/***********************/
-			/* CHOOSE PIXEL FORMAT */
-			/***********************/
-
-			/* PLAY IN WINDOW */
-
-	if (!gPlayFullScreen)
-	{
-		fmt = aglChoosePixelFormat(&gGDevice, 1, attribWindow);
-	}
-
-			/* FULL-SCREEN */
-	else
-	{
-		if (gGamePrefs.depth == 32)
-			fmt = aglChoosePixelFormat(&gGDevice, 1, attrib32bit);						// 32-bit display
-		else
-			fmt = aglChoosePixelFormat(&gGDevice, 1, attrib16bit);						// 16-bit display
-	}
-
-			/* BACKUP PLAN IF ERROR */
-
-	if ((fmt == NULL) || (aglGetError() != AGL_NO_ERROR))
-	{
-		fmt = aglChoosePixelFormat(&gGDevice, 1, attrib2);							// try being less stringent
-		if ((fmt == NULL) || (aglGetError() != AGL_NO_ERROR))
-		{
-			DoFatalAlert("aglChoosePixelFormat failed!  OpenGL could not initialize your video card for 3D.  Check that your video card meets the game's minimum system requirements.");
-		}
-	}
-
-
-			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
-
-	gAGLContext = aglCreateContext(fmt, nil);
-	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
-		DoFatalAlert("OGL_CreateDrawContext: aglCreateContext failed!");
-
-	if (gPlayFullScreen)
-	{
-		gAGLWin = nil;
-		aglEnable (gAGLContext, AGL_FS_CAPTURE_SINGLE);
-		aglSetFullScreen(gAGLContext, 0, 0, 0, 0);
-	}
-	else
-	{
-		gAGLWin = (AGLDrawable)gGameWindowGrafPtr;
-		ok = aglSetDrawable(gAGLContext, gAGLWin);
-		if ((!ok) || (aglGetError() != AGL_NO_ERROR))
-		{
-			if (aglGetError() == AGL_BAD_ALLOC)
-			{
-				gGamePrefs.showScreenModeDialog	= true;
-				SavePrefs();
-				DoFatalAlert("Not enough VRAM for the selected video mode.  Please try again and select a different mode.");
-			}
-			else
-				DoFatalAlert("OGL_CreateDrawContext: aglSetDrawable failed!");
-		}
-	}
-
-
-			/* ACTIVATE CONTEXT */
-
-	mkc = aglSetCurrentContext(gAGLContext);
-	if ((mkc == 0) || (aglGetError() != AGL_NO_ERROR))
-		return;
-
-
-			/* NO LONGER NEED PIXEL FORMAT */
-
-	aglDestroyPixelFormat(fmt);
 #endif
 
 
@@ -415,27 +337,9 @@ static char			*s;
 
 
 
-#if 0
- 		/***************************/
-		/* GET OPENGL CAPABILITIES */
- 		/***************************/
-
-	s = (char *)glGetString(GL_EXTENSIONS);					// get extensions list
-#endif
-
-
-
 			/* INIT DEBUG FONT */
 
 	OGL_InitFont();
-
-
-			/* SEE IF SUPPORT 1024x1024 TEXTURES */
-
-	GLint maxTexSize = 0;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
-	if (maxTexSize < 1024)
-		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
 
 
 				/* CLEAR BACK BUFFER ENTIRELY */
@@ -510,7 +414,6 @@ OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
 
 static void OGL_CreateLights(OGLLightDefType *lightDefPtr)
 {
-int		i;
 GLfloat	ambient[4];
 
 	OGL_EnableLighting();
@@ -531,7 +434,7 @@ GLfloat	ambient[4];
 			/* CREATE FILL LIGHTS */
 			/**********************/
 
-	for (i=0; i < lightDefPtr->numFillLights; i++)
+	for (int i = 0; i < lightDefPtr->numFillLights; i++)
 	{
 		static GLfloat lightamb[4] = { 0.0, 0.0, 0.0, 1.0 };
 		GLfloat lightVec[4];
@@ -561,7 +464,14 @@ GLfloat	ambient[4];
 
 		glEnable(GL_LIGHT0+i);								// enable the light
 	}
-
+	
+	
+			/* KILL ANY LIGHTS LEFT OVER FROM PREVIOUS SCENE */
+	
+	for (int i = lightDefPtr->numFillLights; i < MAX_FILL_LIGHTS; i++)
+	{
+		glDisable(GL_LIGHT0+i);
+	}
 }
 
 #pragma mark -
@@ -867,6 +777,8 @@ GLuint	textureName;
 
 	glGenTextures(1, &textureName);
 	OGL_CheckError();
+	
+	SDL_Log("Texture %d\n", textureName);
 
 	glBindTexture(GL_TEXTURE_2D, textureName);				// this is now the currently active texture
 	OGL_CheckError();

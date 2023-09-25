@@ -105,9 +105,6 @@ float	timeout = 40.0f;
 			/* FADE OUT */
 
 	OGL_FadeOutScene(DisplayPicture_Draw, NULL);
-
-
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 

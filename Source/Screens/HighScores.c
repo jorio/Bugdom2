@@ -52,7 +52,7 @@ enum
 /*    VARIABLES            */
 /***************************/
 
-static Str32	gHighScoresFileName = ":Bugdom2:HighScores";
+static Str32	gHighScoresFileName = ":" PROJECT_NAME ":HighScores4";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -261,7 +261,6 @@ static void FreeScoreScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 

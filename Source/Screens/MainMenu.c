@@ -342,7 +342,6 @@ static void FreeMainMenuScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_MAINMENU);
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 #pragma mark -

@@ -282,7 +282,6 @@ static void FreeLoseScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LOSE);
-	OGL_DisposeWindowSetup(&gGameView);
 }
 
 
