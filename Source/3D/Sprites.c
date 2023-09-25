@@ -1,7 +1,8 @@
 /****************************/
 /*   	SPRITES.C			*/
-/* (c)2000 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2003 Pangea Software  */
+/* (c)2022 Iliyas Jorio     */
 /****************************/
 
 
@@ -10,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "tga.h"
 
 
 /****************************/
@@ -21,15 +23,13 @@
 /*    CONSTANTS             */
 /****************************/
 
-#define	FONT_WIDTH	.51f
-
 
 /*********************/
 /*    VARIABLES      */
 /*********************/
 
 SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-int32_t		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];		// note:  this must be int32_t's since that's what we read from the sprite file!
+int gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
 
 
 
@@ -61,7 +61,7 @@ int	i;
 }
 
 
-/************************** DISPOSE BG3D *****************************/
+/************************** DISPOSE SPRITE GROUP *****************************/
 
 void DisposeSpriteGroup(int groupNum)
 {
@@ -87,181 +87,101 @@ int 		i,n;
 
 
 
-/********************** LOAD SPRITE FILE **************************/
-//
-// NOTE:  	All sprite files must be imported AFTER the draw context has been created,
-//			because all imported textures are named with OpenGL and loaded into OpenGL!
-//
+/********************** ALLOCATE SPRITE GROUP **************************/
 
-void LoadSpriteFile(FSSpec *spec, int groupNum)
+void AllocSpriteGroup(int groupNum, int capacity)
 {
-short			refNum;
-long			count;
-MOMaterialData	matData;
+	GAME_ASSERT_MESSAGE(!gSpriteGroupList[groupNum], "Sprite group already allocated");
+	GAME_ASSERT(gNumSpritesInGroupList[groupNum] == 0);
+
+	gNumSpritesInGroupList[groupNum] = capacity;
+
+	gSpriteGroupList[groupNum] = (SpriteType *)AllocPtrClear(sizeof(SpriteType) * capacity);
+	GAME_ASSERT(gSpriteGroupList[groupNum]);
+}
 
 
-		/* OPEN THE FILE */
+/************** LOAD SPRITETYPE FROM IMAGE FILE ********************/
 
-	if (FSpOpenDF(spec, fsRdPerm, &refNum) != noErr)
-		DoFatalAlert("LoadSpriteFile: FSpOpenDF failed");
+static SpriteType LoadSpriteFromTGA(const char* path)
+{
+		/* LOAD TEXTURE FROM IMAGE FILE */
 
-		/* READ # SPRITES IN THIS FILE */
+	int width = 0;
+	int height = 0;
+	int hasAlpha = 0;
+	GLuint textureName = OGL_TextureMap_LoadTGA(path, 0, &width, &height);//, &hasAlpha);
+	GAME_ASSERT(textureName);
 
-	count = sizeof(gNumSpritesInGroupList[groupNum]);
-	FSRead(refNum, &count, (Ptr) &gNumSpritesInGroupList[groupNum]);
+		/* SET UP MATERIAL */
 
-	gNumSpritesInGroupList[groupNum] = SwizzleLong(&gNumSpritesInGroupList[groupNum]);
+	MOMaterialData matData =
+	{
+		.flags			= BG3D_MATERIALFLAG_TEXTURED
+							//| (hasAlpha? BG3D_MATERIALFLAG_ALWAYSBLEND: 0),
+							| BG3D_MATERIALFLAG_ALWAYSBLEND,
+		.diffuseColor	= {1, 1, 1, 1},
+		.width			= width,
+		.height			= height,
+		.numMipmaps		= 1,
+		.textureName	= {textureName},
+	};
 
+	return (SpriteType)
+	{
+		.width = matData.width,
+		.height = matData.height,
+		.aspectRatio = (float)matData.height / (float)matData.height,
+		.materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData),
+	};
+}
 
-		/* ALLOCATE MEMORY FOR SPRITE RECORDS */
+/**************** LOAD SPRITE GROUP FROM SINGLE FILE **********************/
 
-	gSpriteGroupList[groupNum] = (SpriteType *)AllocPtr(sizeof(SpriteType) * gNumSpritesInGroupList[groupNum]);
-	if (gSpriteGroupList[groupNum] == nil)
-		DoFatalAlert("LoadSpriteFile: AllocPtr failed");
+void LoadSpriteGroupFromFile(int groupNum, const char* path, int flags)
+{
+	AllocSpriteGroup(groupNum, 1);
+	gSpriteGroupList[groupNum][0] = LoadSpriteFromTGA(path);
+	GAME_ASSERT(gSpriteGroupList[groupNum][0].materialObject);
+}
 
+/**************** LOAD SPRITE GROUP FROM SEQUENCE OF IMAGE FILES **********************/
 
-			/********************/
-			/* READ EACH SPRITE */
-			/********************/
+void LoadSpriteGroupFromSeries(int groupNum, int numSprites, const char* seriesName)
+{
+	AllocSpriteGroup(groupNum, numSprites);
 
 	for (int i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
 	{
-		SpriteType* sprite = &gSpriteGroupList[groupNum][i];
-		int32_t	bufferSize;
-		uint8_t *buffer;
+		char path[64];
+		snprintf(path, sizeof(path), ":Sprites:%s:%03d.tga", seriesName, i);
 
-			/* READ WIDTH/HEIGHT, ASPECT RATIO */
-
-		count = sizeof(sprite->width);
-		FSRead(refNum, &count, (Ptr) &sprite->width);
-		sprite->width = SwizzleLong(&sprite->width);
-
-		count = sizeof(sprite->height);
-		FSRead(refNum, &count, (Ptr) &sprite->height);
-		sprite->height = SwizzleLong(&sprite->height);
-
-		count = sizeof(sprite->aspectRatio);
-		FSRead(refNum, &count, (Ptr) &sprite->aspectRatio);
-		sprite->aspectRatio = SwizzleFloat(&sprite->aspectRatio);
-
-
-			/* READ SRC FORMAT */
-
-		count = sizeof(GLint);
-		FSRead(refNum, &count, (Ptr) &sprite->srcFormat);
-		sprite->srcFormat = SwizzleLong(&sprite->srcFormat);
-
-
-			/* READ DEST FORMAT */
-
-		count = sizeof(GLint);
-		FSRead(refNum, &count, (Ptr) &sprite->destFormat);
-		sprite->destFormat = SwizzleLong(&sprite->destFormat);
-
-
-			/* READ BUFFER SIZE */
-
-		count = sizeof(bufferSize);
-		FSRead(refNum, &count, (Ptr) &bufferSize);
-		bufferSize = SwizzleLong(&bufferSize);
-
-		buffer = AllocPtr(bufferSize);							// alloc memory for buffer
-		if (buffer == nil)
-			DoFatalAlert("LoadSpriteFile: AllocPtr failed");
-
-
-			/* READ THE SPRITE PIXEL BUFFER */
-
-		count = bufferSize;
-		FSRead(refNum, &count, (Ptr) buffer);
-
-		if (sprite->srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
-		{
-			int		q;
-			uint16_t *pix = (uint16_t *)buffer;
-			for (q = 0; q < (count/2); q++)
-			{
-				pix[q] = SwizzleUShort(&pix[q]);
-			}
-		}
-
-
-
-
-				/*****************************/
-				/* CREATE NEW TEXTURE OBJECT */
-				/*****************************/
-
-		matData.flags			= BG3D_MATERIALFLAG_TEXTURED;
-		matData.diffuseColor.r	= 1;
-		matData.diffuseColor.g	= 1;
-		matData.diffuseColor.b	= 1;
-		matData.diffuseColor.a	= 1;
-
-		matData.numMipmaps		= 1;
-		matData.width			= sprite->width;
-		matData.height			= sprite->height;
-
-		matData.pixelSrcFormat	= sprite->srcFormat;
-		matData.pixelDstFormat	= sprite->destFormat;
-
-		matData.texturePixels[0]= nil;											// we're going to preload
-
-					/* SPRITE IS 16-BIT PACKED PIXEL FORMAT */
-
-		if (matData.pixelSrcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
-		{
-			matData.textureName[0] = OGL_TextureMap_Load(buffer, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
-
-		}
-
-				/* CONVERT 24-BIT TO 16--BIT */
-
-#if 0
-		else
-		if ((matData.pixelSrcFormat == GL_RGB) && (matData.pixelDstFormat == GL_RGB5_A1))
-		{
-			uint16_t	*buff16 = (uint16_t *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
-
-			ConvertTexture24To16(buffer, buff16, matData.width, matData.height);
-			matData.textureName[0] = OGL_TextureMap_Load(buff16, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
-
-			SafeDisposePtr((Ptr)buff16);							// dispose buff
-		}
-#endif
-
-				/* USE INPUT FORMATS */
-		else
-		{
-			matData.textureName[0] 	= OGL_TextureMap_Load(buffer,
-													 matData.width,
-													 matData.height,
-													 matData.pixelSrcFormat,
-													 matData.pixelDstFormat, GL_UNSIGNED_BYTE);
-		}
-
-		sprite->materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-
-		if (sprite->materialObject == nil)
-			DoFatalAlert("LoadSpriteFile: MO_CreateNewObjectOfType failed");
-
-
-		SafeDisposePtr((Ptr)buffer);														// free the buffer
+		gSpriteGroupList[groupNum][i] = LoadSpriteFromTGA(path);
+		GAME_ASSERT(gSpriteGroupList[groupNum][i].materialObject);
 	}
-
-
-
-		/* CLOSE FILE */
-
-	FSClose(refNum);
 }
+
+
+/**************** LOAD SPRITE GROUP FROM SEQUENCE OF IMAGE FILES **********************/
+
+void LoadSpriteGroupFromFiles(int groupNum, int numSprites, const char** spritePaths)
+{
+	AllocSpriteGroup(groupNum, numSprites);
+
+	for (int i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
+	{
+		gSpriteGroupList[groupNum][i] = LoadSpriteFromTGA(spritePaths[i]);
+		GAME_ASSERT(gSpriteGroupList[groupNum][i].materialObject);
+	}
+}
+
 
 
 #pragma mark -
 
 /************* MAKE NEW SRITE OBJECT *************/
 
-ObjNode *MakeSpriteObject(NewObjectDefinitionType *newObjDef)
+ObjNode* MakeSpriteObject(NewObjectDefinitionType *newObjDef)
 {
 ObjNode				*newObj;
 MOSpriteObject		*spriteMO;
@@ -284,10 +204,10 @@ MOSpriteSetupData	spriteData;
 
 			/* MAKE SPRITE META-OBJECT */
 
-	spriteData.loadFile = false;										// these sprites are already loaded into gSpriteList
-	spriteData.group	= newObjDef->group;								// set group
-	spriteData.type 	= newObjDef->type;								// set group subtype
-
+	spriteData.loadFile 	= false;										// these sprites are already loaded into gSpriteList
+	spriteData.group		= newObjDef->group;								// set group
+	spriteData.type 		= newObjDef->type;								// set group subtype
+//	spriteData.drawCentered = drawCentered;
 
 	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, 0, &spriteData);
 	if (!spriteMO)
@@ -308,6 +228,7 @@ MOSpriteSetupData	spriteData;
 	return(newObj);
 }
 
+#if 0
 
 /*********************** MODIFY SPRITE OBJECT IMAGE ******************************/
 
@@ -349,6 +270,8 @@ MOSpriteObject		*spriteMO;
 	theNode->Type = type;
 }
 
+#endif
+
 
 #pragma mark -
 
@@ -366,8 +289,6 @@ MOMaterialObject	*m;
 	if ((n == 0) || (gSpriteGroupList[group] == nil))
 		DoFatalAlert("BlendAllSpritesInGroup: this group is empty");
 
-
-			/* DISPOSE OF ALL LOADED OPENGL TEXTURENAMES */
 
 	for (i = 0; i < n; i++)
 	{
@@ -390,10 +311,8 @@ void BlendASprite(int group, int type)
 MOMaterialObject	*m;
 
 	if (type >= gNumSpritesInGroupList[group])
-		DoFatalAlert("BlendASprite: illegal type");
+		DoFatalAlert("BlendASprite: illegal type (group=%d, type=%d)", group, type);
 
-
-			/* DISPOSE OF ALL LOADED OPENGL TEXTURENAMES */
 
 	m = gSpriteGroupList[group][type].materialObject; 				// get material object ptr
 	if (m == nil)
@@ -403,6 +322,7 @@ MOMaterialObject	*m;
 }
 
 
+#if 0
 /************************** DRAW SPRITE ************************/
 
 void DrawSprite(int	group, int type, float x, float y, float scale, float rot, uint32_t flags)
@@ -419,12 +339,12 @@ void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u
 
 	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);
+	OGL_DisableCullFace();
 	glDisable(GL_DEPTH_TEST);
 
 
 	if (flags & SPRITE_FLAG_GLOW)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		OGL_BlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	if (rot != 0.0f)
 		glRotatef(OGLMath_RadiansToDegrees(rot), 0, 0, 1);											// remember:  rotation is in degrees, not radians!
@@ -452,9 +372,5 @@ void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u
 
 	gPolysThisFrame += 2;						// 2 tris drawn
 }
-
-
-
-
-
+#endif
 

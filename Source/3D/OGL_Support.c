@@ -12,6 +12,7 @@
 
 #include "game.h"
 #include "utf8.h"
+#include "tga.h"
 
 
 /****************************/
@@ -812,6 +813,80 @@ GLuint	textureName;
 	return(textureName);
 }
 
+
+/***************** OGL TEXTUREMAP LOAD FROM TGA **********************/
+
+GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* outWidth, int* outHeight)
+{
+	puts(path);
+
+	FSSpec					spec;
+	uint8_t*				pixelData = nil;
+	TGAHeader				header;
+	OSErr					err;
+
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &spec);
+
+			/* LOAD RAW RGBA DATA FROM TGA FILE */
+
+	err = ReadTGA(&spec, &pixelData, &header, true);
+	GAME_ASSERT(err == noErr);
+
+	GAME_ASSERT(header.bpp == 32);
+	GAME_ASSERT(header.imageType == TGA_IMAGETYPE_CONVERTED_RGBA);
+
+			/* PRE-PROCESS IMAGE */
+
+#if 0
+	int internalFormat = GL_RGB;
+
+	if (flags & kLoadTextureFlags_GrayscaleIsAlpha)
+	{
+		for (int p = 0; p < 4 * header.width * header.height; p += 4)
+		{
+			// put Blue into Alpha & leave map white
+			pixelData[p+0] = pixelData[p+3];	// put blue into alpha
+			pixelData[p+1] = 255;
+			pixelData[p+2] = 255;
+			pixelData[p+3] = 255;
+		}
+		internalFormat = GL_RGBA;
+	}
+	else if (flags & kLoadTextureFlags_KeepOriginalAlpha)
+	{
+		internalFormat = GL_RGBA;
+	}
+	else
+	{
+		internalFormat = GL_RGB;
+	}
+#else
+	int internalFormat = GL_RGBA;
+#endif
+
+			/* LOAD TEXTURE */
+
+	GLuint glTextureName = OGL_TextureMap_Load(
+		pixelData,
+		header.width,
+		header.height,
+		GL_RGBA,
+		internalFormat,
+		GL_UNSIGNED_BYTE);
+
+			/* CLEAN UP */
+
+	SafeDisposePtr((Ptr) pixelData);
+
+	if (outWidth)
+		*outWidth = header.width;
+	if (outHeight)
+		*outHeight = header.height;
+
+	return glTextureName;
+}
+
+
 /******************** CONVERT TEXTURE TO GREY **********************/
 //
 // The NTSC luminance standard where grayscale = .299r + .587g + .114b
@@ -1468,12 +1543,6 @@ void OGL_DisableLighting(void)
 
 static void OGL_InitFont(void)
 {
-	if (!gNumSpritesInGroupList[SPRITE_GROUP_DIALOG])
-	{
-		FSSpec spec;
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
-	}
 }
 
 

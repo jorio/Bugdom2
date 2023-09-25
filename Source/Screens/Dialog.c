@@ -205,8 +205,7 @@ int		i;
 
 			/* LOAD THE SPRITES FOR THE DIALOGS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
+//	LoadSpriteGroupFromSeries(SPRITE_GROUP_DIALOG, DIALOG_SObjType_COUNT, "Dialog");
 }
 
 

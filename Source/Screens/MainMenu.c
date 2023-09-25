@@ -61,7 +61,8 @@ enum
 	MAINMENU_SObjType_HelpIcon,
 	MAINMENU_SObjType_QuitIcon,
 
-	MAINMENU_SObjType_Credits
+	MAINMENU_SObjType_Credits,
+	MAINMENU_SObjType_COUNT,
 };
 
 #define	ICON_SCALE		120.0f
@@ -187,22 +188,7 @@ int		i;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
-	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:MainMenu.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_MAINMENU);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
-
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, MAINMENU_SObjType_COUNT, "MainMenu");
 
 			/* LOAD SKELETONS */
 
@@ -248,7 +234,7 @@ int		i;
 
 		/* FLOWER WHEEL */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_MAINMENU;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= MAINMENU_SObjType_MenuFlower;
 	gNewObjectDefinition.coord.x 	= 640/2 + 0.0f;
 	gNewObjectDefinition.coord.y 	= 480/2 + 0.0f;
@@ -293,7 +279,7 @@ int		i;
 
 			/* LOGO */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_MAINMENU;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= MAINMENU_SObjType_MenuLogo;
 	gNewObjectDefinition.coord.x 	= 80;
 	gNewObjectDefinition.coord.y 	= 50;
@@ -339,7 +325,7 @@ static void FreeMainMenuScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_MAINMENU);
 }
@@ -680,7 +666,7 @@ ObjNode	*newObj, *pane;
 
 			/* MAKE CREDITS SPRITE */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_MAINMENU;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= MAINMENU_SObjType_Credits;
 	gNewObjectDefinition.coord.x 	= 640/2;
 	gNewObjectDefinition.coord.y 	= 480/2;

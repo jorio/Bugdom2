@@ -40,7 +40,8 @@ enum
 
 enum
 {
-	LOSE_SObjType_GameOver
+	LOSE_SObjType_GameOver,
+	LOSE_SObjType_COUNT,
 };
 
 
@@ -152,14 +153,7 @@ int			i;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:LoseScreen.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_LOSE);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, LOSE_SObjType_COUNT, "LoseScreen");
 
 
 			/* LOAD SKELETONS */
@@ -251,7 +245,7 @@ int			i;
 
 			/* MAKE TEXT SPRITE */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_LOSE;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= LOSE_SObjType_GameOver;
 	gNewObjectDefinition.coord.x 	= (640/2);
 	gNewObjectDefinition.coord.y 	= 150;
@@ -279,7 +273,7 @@ static void FreeLoseScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LOSE);
 }

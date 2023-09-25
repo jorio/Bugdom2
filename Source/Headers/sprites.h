@@ -10,12 +10,10 @@ enum
 };
 
 
-// Read in from file
 typedef struct
 {
-	int32_t			width,height;
+	int32_t			width,height;			// read from file
 	float			aspectRatio;			// h/w
-	int32_t			srcFormat, destFormat;
 	MetaObjectPtr	materialObject;
 }SpriteType;
 
@@ -23,9 +21,10 @@ typedef struct
 void InitSpriteManager(void);
 void DisposeAllSpriteGroups(void);
 void DisposeSpriteGroup(int groupNum);
-void LoadSpriteFile(FSSpec *spec, int groupNum);
-ObjNode *MakeSpriteObject(NewObjectDefinitionType *newObjDef);
+void LoadSpriteGroupFromFiles(int groupNum, int numSprites, const char** paths);
+void LoadSpriteGroupFromFile(int groupNum, const char* path, int flags);
+void LoadSpriteGroupFromSeries(int groupNum, int numSprites, const char* seriesName);
+ObjNode* MakeSpriteObject(NewObjectDefinitionType* newObjDef);
 void BlendAllSpritesInGroup(short group);
 void ModifySpriteObjectFrame(ObjNode *theNode, short type);
-void DrawSprite(int	group, int type, float x, float y, float scale, float rot, uint32_t flags);
 void BlendASprite(int group, int type);

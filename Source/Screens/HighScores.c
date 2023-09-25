@@ -40,7 +40,8 @@ enum
 enum
 {
 	HIGHSCORES_SObjType_EnterNameText,
-	HIGHSCORES_SObjType_ScoreText
+	HIGHSCORES_SObjType_ScoreText,
+	HIGHSCORES_SObjType_COUNT,
 };
 
 
@@ -211,15 +212,7 @@ ObjNode				*newObj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
-	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Dialog.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_DIALOG);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:HighScores.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_COUNT, "HighScores");
 
 
 			/* LOAD MODELS */
@@ -258,7 +251,7 @@ static void FreeScoreScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
 }
@@ -321,7 +314,7 @@ float	x;
 			/****************************/
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText);
+	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_ScoreText);
 
 
 			/**************/
@@ -377,7 +370,7 @@ char	s[33];
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText);
+	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_EnterNameText);
 
 
 	gGlobalTransparency = gFinalScoreAlpha;

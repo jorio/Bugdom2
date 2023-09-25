@@ -103,11 +103,6 @@ int			i,n;
 
 			/* LOAD SPRITES */
 
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":sprite//s:spheremap.sprites", &spec);
-//	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 				/* LOAD AUDIO */
 
@@ -242,7 +237,7 @@ static void FreeLevelIntroScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 }

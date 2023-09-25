@@ -46,7 +46,9 @@ enum
 
 	TITLE_SObjType_Fly,
 	TITLE_SObjType_Back,
-	TITLE_SObjType_Swatter
+	TITLE_SObjType_Swatter,
+
+	TITLE_SObjType_COUNT,
 };
 
 #define	 BUGDOM_TEXT_SCALE	500.0f
@@ -194,18 +196,7 @@ ObjNode			*fly;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
-	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Title.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_TITLE);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, TITLE_SObjType_COUNT, "Title");
 
 
 			/* LOAD SKELETONS */
@@ -228,7 +219,7 @@ ObjNode			*fly;
 
 			/* MAKE BACKGROUND */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= TITLE_SObjType_Back;
 	gNewObjectDefinition.coord.x 	= 640/2;
 	gNewObjectDefinition.coord.y 	= 480/2;
@@ -250,7 +241,7 @@ ObjNode			*fly;
 	{
 		uint32_t	volL,volR;
 
-		gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
+		gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= TITLE_SObjType_Fly;
 		gNewObjectDefinition.coord.x 	= RandomFloat() * 640.0f;
 		gNewObjectDefinition.coord.y 	= RandomFloat() * 480.0f;
@@ -357,7 +348,7 @@ static void FreeTitleScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_TITLE);
 	DisposeTerrain();
@@ -377,7 +368,7 @@ float	timer;
 
 			/* MAKE BUGDOM TEXT SPRITE */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= TITLE_SObjType_BugdomText;
 	gNewObjectDefinition.coord.x 	= (640/2) - 30;
 	gNewObjectDefinition.coord.y 	= -200;
@@ -448,7 +439,7 @@ Byte	swatMode = 0;
 
 			/* MAKE BUGDOM TEXT SPRITE */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= TITLE_SObjType_Swatter;
 	gNewObjectDefinition.coord.x 	= 260;
 	gNewObjectDefinition.coord.y 	= 350;
@@ -509,7 +500,7 @@ Byte	swatMode = 0;
 
 								/* MAKE THE 2 */
 
-						gNewObjectDefinition.group 		= SPRITE_GROUP_TITLE;
+						gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 						gNewObjectDefinition.type 		= TITLE_SObjType_2Text;
 						gNewObjectDefinition.coord.x 	= 320;
 						gNewObjectDefinition.coord.y 	= 220;

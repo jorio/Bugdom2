@@ -39,7 +39,8 @@ enum
 
 enum
 {
-	WIN_SObjType_YouWin
+	WIN_SObjType_YouWin,
+	WIN_SObjType_COUNT,
 };
 
 
@@ -152,14 +153,7 @@ ObjNode	*newObj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:WinScreen.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_WIN);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, WIN_SObjType_COUNT, "WinScreen");
 
 
 			/* LOAD SKELETONS */
@@ -242,7 +236,7 @@ ObjNode	*newObj;
 
 			/* MAKE BUGDOM TEXT SPRITE */
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_WIN;
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= WIN_SObjType_YouWin;
 	gNewObjectDefinition.coord.x 	= (640/2);
 	gNewObjectDefinition.coord.y 	= 100;
@@ -270,7 +264,7 @@ static void FreeWinScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 }
 

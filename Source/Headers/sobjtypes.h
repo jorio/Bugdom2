@@ -5,20 +5,12 @@
 
 enum
 {
-	SPRITE_GROUP_SPHEREMAPS 		= 	0,
-	SPRITE_GROUP_INFOBAR			=	1,
-	SPRITE_GROUP_LEVELINTRO			=	1,
-	SPRITE_GROUP_MODESCREEN			=	2,
-	SPRITE_GROUP_PARTICLES			=	3,
-	SPRITE_GROUP_BONUS				= 	4,
-	SPRITE_GROUP_HIGHSCORES			=	4,
-	SPRITE_GROUP_LOSE				=	4,
-	SPRITE_GROUP_WIN				= 	4,
-	SPRITE_GROUP_TITLE				=	4,
-	SPRITE_GROUP_MAINMENU			=	4,
-	SPRITE_GROUP_GLOBAL				= 	5,
-	SPRITE_GROUP_DIALOG				= 	6,
-	SPRITE_GROUP_LEVELSPECIFIC		= 	7,
+	SPRITE_GROUP_SPHEREMAPS 		=	0,
+	SPRITE_GROUP_GLOBAL				=	1,
+	SPRITE_GROUP_PARTICLES			=	2,
+	SPRITE_GROUP_DIALOG				=	3,
+	SPRITE_GROUP_INFOBAR			=	4,
+	SPRITE_GROUP_LEVELSPECIFIC		=	5,
 	MAX_SPRITE_GROUPS
 };
 
@@ -43,7 +35,8 @@ enum
 	GLOBAL_SObjType_HouseFlyBlink,
 
 	GLOBAL_SObjType_Fence_Grass,
-	GLOBAL_SObjType_Fence_Brick
+	GLOBAL_SObjType_Fence_Brick,
+	GLOBAL_SObjType_COUNT,
 };
 
 
@@ -62,7 +55,8 @@ enum
 	SPHEREMAP_SObjType_DarkYosemite,
 	SPHEREMAP_SObjType_Red,
 	SPHEREMAP_SObjType_Tundra,
-	SPHEREMAP_SObjType_SheenAlpha
+	SPHEREMAP_SObjType_SheenAlpha,
+	SPHEREMAP_SObjType_COUNT,
 };
 
 
@@ -103,7 +97,9 @@ enum
 	PARTICLE_SObjType_LensFlare0,
 	PARTICLE_SObjType_LensFlare1,
 	PARTICLE_SObjType_LensFlare2,
-	PARTICLE_SObjType_LensFlare3
+	PARTICLE_SObjType_LensFlare3,
+
+	PARTICLE_SObjType_COUNT,
 };
 
 /******************* DIALOG SOBJTYPES *************************/
@@ -214,8 +210,9 @@ enum
 	DIALOG_SObjType_Y,
 	DIALOG_SObjType_Z,
 
-	DIALOG_SObjType_Cursor
+	DIALOG_SObjType_Cursor,
 
+	DIALOG_SObjType_COUNT,
 };
 
 /******************* INFOBAR SOBJTYPES *************************/
@@ -256,7 +253,9 @@ enum
 	INFOBAR_SObjType_GoldClover1,
 	INFOBAR_SObjType_GoldClover2,
 	INFOBAR_SObjType_GoldClover3,
-	INFOBAR_SObjType_GoldClover4
+	INFOBAR_SObjType_GoldClover4,
+
+	INFOBAR_SObjType_COUNT,
 };
 
 
@@ -271,7 +270,9 @@ enum
 	GARDEN_SObjType_SnailShellIcon,
 	GARDEN_SObjType_ScarecrowHeadIcon,
 
-	GARDEN_SObjType_Fence_Edging
+	GARDEN_SObjType_Fence_Edging,
+
+	GARDEN_SObjType_COUNT,
 };
 
 
@@ -281,7 +282,8 @@ enum
 enum
 {
 	SIDEWALK_SObjType_SnakeSkin,
-	SIDEWALK_SObjType_SquishBerry
+	SIDEWALK_SObjType_SquishBerry,
+	SIDEWALK_SObjType_COUNT,
 };
 
 
@@ -294,7 +296,9 @@ enum
 
 	FIDO_SObjType_Fence_DogHair,
 	FIDO_SObjType_Fence_DogCollar,
-	FIDO_SObjType_Fence_DogHairDense
+	FIDO_SObjType_Fence_DogHairDense,
+
+	FIDO_SObjType_COUNT,
 };
 
 
@@ -307,7 +311,8 @@ enum
 	PLUMBING_SObjType_Water2,
 	PLUMBING_SObjType_Water3,
 	PLUMBING_SObjType_Water4,
-	PLUMBING_SObjType_Water5
+	PLUMBING_SObjType_Water5,
+	PLUMBING_SObjType_COUNT,
 };
 
 
@@ -315,7 +320,8 @@ enum
 
 enum
 {
-	GUTTER_SObjType_Water0 = 0
+	GUTTER_SObjType_Water0 = 0,
+	GUTTER_SObjType_COUNT,
 };
 
 
@@ -328,7 +334,9 @@ enum
 	PLAYROOM_SObjType_MarbleIcon,
 
 	PLAYROOM_SObjType_Fence_Cards,
-	PLAYROOM_SObjType_Fence_Blocks
+	PLAYROOM_SObjType_Fence_Blocks,
+
+	PLAYROOM_SObjType_COUNT,
 };
 
 
@@ -346,7 +354,9 @@ enum
 	CLOSET_SObjType_RedClover,
 
 	CLOSET_SObjType_ChipIcon,
-	CLOSET_SObjType_MothBallIcon
+	CLOSET_SObjType_MothBallIcon,
+
+	CLOSET_SObjType_COUNT,
 };
 
 /******************* GARBAGE LEVEL *************************/
@@ -357,7 +367,9 @@ enum
 	GARBAGE_SObjType_Fence_Box,
 	GARBAGE_SObjType_Mouse,
 	GARBAGE_SObjType_CanIcon,
-	GARBAGE_SObjType_PropIcon
+	GARBAGE_SObjType_PropIcon,
+
+	GARBAGE_SObjType_COUNT,
 };
 
 
@@ -368,7 +380,9 @@ enum
 {
 	BALSA_SObjType_AntHillIcon,
 
-	BALSA_SObjType_Fence_Balsa
+	BALSA_SObjType_Fence_Balsa,
+
+	BALSA_SObjType_COUNT,
 };
 
 /******************* PARK LEVEL *************************/
@@ -386,7 +400,9 @@ enum
 
 	PARK_SObjType_BobberIcon,
 	PARK_SObjType_FireIcon,
-	PARK_SObjType_HiveIcon
+	PARK_SObjType_HiveIcon,
+
+	PARK_SObjType_COUNT,
 };
 
 

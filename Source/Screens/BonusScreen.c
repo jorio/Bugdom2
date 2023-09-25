@@ -52,7 +52,7 @@ enum
 	BONUS_ObjType_BlueClover,
 	BONUS_ObjType_GoldClover,
 
-	BONUS_ObjType_Brick
+	BONUS_ObjType_Brick,
 };
 
 
@@ -72,7 +72,8 @@ enum
 	BONUS_SObjType_9,
 
 	BONUS_SObjType_SaveIcon,
-	BONUS_SObjType_NoSaveIcon
+	BONUS_SObjType_NoSaveIcon,
+	BONUS_SObjType_COUNT,
 };
 
 
@@ -227,14 +228,7 @@ ObjNode	*newObj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_COUNT, "Bonus");
 
 
 			/* LOAD SKELETONS */
@@ -322,7 +316,7 @@ static void FreeBonusScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
 }
@@ -756,7 +750,7 @@ float	x;
 
 			/* DRAW "SCORE" */
 
-	DrawInfobarSprite2_Centered(640/2, 50, 200, SPRITE_GROUP_BONUS, BONUS_SObjType_Score);
+	DrawInfobarSprite2_Centered(640/2, 50, 200, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_Score);
 
 			/* DRAW SCORE */
 
@@ -769,7 +763,7 @@ float	x;
 	{
 		texNum = BONUS_SObjType_0 + s[i] - '0';		// convert char to sprite
 		if (texNum != -1)
-			DrawInfobarSprite2_Centered(x, 115, SCORE_SPACING * 1.6f, SPRITE_GROUP_BONUS, texNum);
+			DrawInfobarSprite2_Centered(x, 115, SCORE_SPACING * 1.6f, SPRITE_GROUP_LEVELSPECIFIC, texNum);
 		x += SCORE_SPACING;
 	}
 
@@ -795,13 +789,13 @@ float	s;
 
 	if (gSaveGame)
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon);
-		DrawInfobarSprite2_Centered(320+75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon);
+		DrawInfobarSprite2_Centered(320-75, 300, s, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_SaveIcon);
+		DrawInfobarSprite2_Centered(320+75, 300, 100, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_NoSaveIcon);
 	}
 	else
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, 100, SPRITE_GROUP_BONUS, BONUS_SObjType_SaveIcon);
-		DrawInfobarSprite2_Centered(320+75, 300, s, SPRITE_GROUP_BONUS, BONUS_SObjType_NoSaveIcon);
+		DrawInfobarSprite2_Centered(320-75, 300, 100, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_SaveIcon);
+		DrawInfobarSprite2_Centered(320+75, 300, s, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_NoSaveIcon);
 	}
 
 	gGlobalTransparency = 1.0f;

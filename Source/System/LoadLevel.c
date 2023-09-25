@@ -73,19 +73,32 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	":Models:Level10_Park.bg3d"
 };
 
- const Str63	levelSpriteFiles[NUM_LEVELS] =
+const char*	levelSpriteFiles[NUM_LEVELS] =
 {
-	":Sprites:Level1_Garden.sprites",
-	":Sprites:Level2_Sidewalk.sprites",
-	":Sprites:Level3_DogHair.sprites",
+	"Level1_Garden",
+	"Level2_Sidewalk",
+	"Level3_DogHair",
 	"",
-	":Sprites:Level5_Playroom.sprites",
+	"Level5_Playroom",
+	"Level6_Closet",
+	"",
+	"Level8_Garbage",
+	"Level9_Balsa",
+	"Level10_Park",
+};
 
-	":Sprites:Level6_Closet.sprites",
-	"",
-	":Sprites:Level8_Garbage.sprites",
-	":Sprites:Level9_Balsa.sprites",
-	":Sprites:Level10_Park.sprites",
+const int levelSpriteCount[NUM_LEVELS] =
+{
+	GARDEN_SObjType_COUNT,
+	SIDEWALK_SObjType_COUNT,
+	FIDO_SObjType_COUNT,
+	0,
+	PLAYROOM_SObjType_COUNT,
+	CLOSET_SObjType_COUNT,
+	0,
+	GARBAGE_SObjType_COUNT,
+	BALSA_SObjType_COUNT,
+	PARK_SObjType_COUNT,
 };
 
 
@@ -145,20 +158,12 @@ const Str63	terrainFiles[NUM_LEVELS] =
 
 			/* LOAD SPRITES */
 
-	if (levelSpriteFiles[gLevelNum][0] > 0)
+	if (levelSpriteCount[gLevelNum] > 0)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSpriteFiles[gLevelNum], &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
+		LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, levelSpriteCount[gLevelNum], levelSpriteFiles[gLevelNum]);
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_COUNT, "Infobar");
 
 
 			/* LOAD PLAYER SKELETON */
@@ -762,23 +767,15 @@ FSSpec	spec, bg3dSpec;
 
 	if (gLevelNum == LEVEL_NUM_PLUMBING)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level4_Plumbing.sprites", &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
+		LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, PLUMBING_SObjType_COUNT, "Level4_Plumbing");
 	}
 	else
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:Level7_Gutter.sprites", &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
+		LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, GUTTER_SObjType_COUNT, "Level7_Gutter");
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_COUNT, "Infobar");
 
 
 			/* LOAD PLAYER SKELETON */

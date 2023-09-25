@@ -77,14 +77,12 @@ void InitEffects(void)
 
 void InitParticleSystem(void)
 {
-short	i;
-FSSpec	spec;
 ObjNode	*obj;
 
 
 			/* INIT GROUP ARRAY */
 
-	for (i = 0; i < MAX_PARTICLE_GROUPS; i++)
+	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
 		gParticleGroups[i] = nil;
 
 	gNumActiveParticleGroups = 0;
@@ -93,10 +91,8 @@ ObjNode	*obj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
-
-	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
+//	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
+//	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 
 		/*************************************************************************/
@@ -122,7 +118,7 @@ ObjNode	*obj;
 
 void DisposeParticleSystem(void)
 {
-	DisposeSpriteGroup(SPRITE_GROUP_PARTICLES);
+//	DisposeSpriteGroup(SPRITE_GROUP_PARTICLES);
 }
 
 

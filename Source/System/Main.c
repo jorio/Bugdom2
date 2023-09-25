@@ -992,7 +992,8 @@ static void CleanupLevel(void)
 	DeleteAllConfettiGroups();
 	DisposeInfobar();
 	DisposeParticleSystem();
-	DisposeAllSpriteGroups();
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
+	DisposeSpriteGroup(SPRITE_GROUP_INFOBAR);
 
 	DisposeAllBG3DContainers();
 
@@ -1032,6 +1033,13 @@ unsigned long	someLong;
 	SetMyRandomSeed(someLong);
 
 	HideRealCursor();
+
+	// Load some global sprites
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "SphereMap");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "Global");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_DIALOG, DIALOG_SObjType_COUNT, "Dialog");
+	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	IMPLEMENT_ME_SOFT();
 #if 0

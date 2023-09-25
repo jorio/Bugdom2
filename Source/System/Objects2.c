@@ -397,7 +397,7 @@ ObjNode	*shadowObj;
 	gNewObjectDefinition.coord.x 	= theNode->Coord.x;
 	gNewObjectDefinition.coord.z 	= theNode->Coord.z;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(gNewObjectDefinition.coord.x, gNewObjectDefinition.coord.z) + SHADOW_Y_OFF;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|gAutoFadeStatusBits;
+	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|gAutoFadeStatusBits;
 
 	if (theNode->Slot >= SLOT_OF_DUMB+1)					// shadow *must* be after parent!
 		gNewObjectDefinition.slot 	= theNode->Slot+1;
