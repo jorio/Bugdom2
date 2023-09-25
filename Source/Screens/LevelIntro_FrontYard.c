@@ -170,9 +170,20 @@ int		i;
 	gNewObjectDefinition.slot 		= 2;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 3.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	gNewObjectDefinition.scale 		= 3.0f;
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
+			/* WIDESCREEN FILL LEFT */
+
+	gNewObjectDefinition.coord.x 	= -2250;
+	gNewObjectDefinition.coord.y	= -20;
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
+
+			/* WIDESCREEN FILL RIGHT */
+
+	gNewObjectDefinition.coord.x 	= 2250;
+	gNewObjectDefinition.coord.y	= -20;
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 			/* CYC */
 

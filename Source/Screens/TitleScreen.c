@@ -104,6 +104,16 @@ bail:
 }
 
 
+/********************* FIT BACKGROUND TO SCREEN **********************/
+
+static void MoveBack(ObjNode* theNode)
+{
+	float sx = g2DLogicalRect.right - g2DLogicalRect.left;
+	float sy = g2DLogicalRect.bottom - g2DLogicalRect.top;
+	float s = SDL_max(sx, sy);
+	theNode->Scale.x = theNode->Scale.y = s;
+}
+
 
 /********************* SETUP TITLE SCREEN **********************/
 
@@ -228,7 +238,7 @@ ObjNode			*fly;
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT - 10;
-	gNewObjectDefinition.moveCall 	= nil;
+	gNewObjectDefinition.moveCall 	= MoveBack;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 1;
 	gBack = MakeSpriteObject(&gNewObjectDefinition);

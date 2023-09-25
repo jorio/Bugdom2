@@ -1,7 +1,8 @@
 /****************************/
 /*   	MAINMENU SCREEN.C	*/
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -238,7 +239,7 @@ int		i;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_Cyc;
 	gNewObjectDefinition.coord		= viewDef.camera.from;
 	gNewObjectDefinition.coord.y	+= 50.0f;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
+	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
@@ -501,7 +502,7 @@ static void MakeMenuCharacter(void)
 ObjNode	*newObj;
 
 
-	gNewObjectDefinition.coord.x 	= -1390;
+	gNewObjectDefinition.coord.x 	= -g2DLogicalRect.right * 2;		// was -1390 in 4:3 original
 	gNewObjectDefinition.coord.z 	= -500 - RandomFloat() * 300.0f;
 	gNewObjectDefinition.moveCall	= MoveMenuCharacter;
 	gNewObjectDefinition.slot 		= 10;
@@ -550,6 +551,8 @@ ObjNode	*newObj;
 				gNewObjectDefinition.coord.z 	= -700 - RandomFloat() * 300.0f;
 				gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
 
+				gNewObjectDefinition.coord.x	*= 1.25f;		// spawn gnome a little more offscreen
+
 				newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
 				newObj->Skeleton->AnimSpeed = .8f;
 
@@ -572,6 +575,9 @@ ObjNode	*newObj;
 		UpdateObjectTransforms(newObj);
 	}
 
+			/* FADE IN */
+
+	newObj->ColorFilter.a = 0.0f;
 }
 
 
@@ -581,14 +587,30 @@ static void MoveMenuCharacter(ObjNode *theNode)
 {
 	GetObjectInfo(theNode);
 
+			/* WALK */
+
 	gCoord.x += gDelta.x * gFramesPerSecondFrac;
 
-	if (fabs(gCoord.x) > 1400.0f)
-	{
-		DeleteObject(theNode);
-		return;
-	}
+			/* FADE IN/OUT */
 
+	float limit = g2DLogicalRect.right * 2;
+	Boolean fadeOut = (gDelta.x > 0 && gCoord.x > limit)
+					|| (gDelta.x < 0 && gCoord.x < -limit);
+
+	if (fadeOut)
+	{
+		theNode->ColorFilter.a -= gFramesPerSecondFrac;
+		if (theNode->ColorFilter.a < 0)		// kill when faded out completely
+		{
+			DeleteObject(theNode);
+			return;
+		}
+	}
+	else
+	{
+		theNode->ColorFilter.a += gFramesPerSecondFrac;
+		theNode->ColorFilter.a = SDL_min(1.0f, theNode->ColorFilter.a);
+	}
 
 	UpdateObject(theNode);
 }
