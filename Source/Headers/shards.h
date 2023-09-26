@@ -15,7 +15,5 @@ enum
 
 void InitShardSystem(void);
 void ExplodeGeometry(ObjNode *theNode, float boomForce, Byte particleMode, long particleDensity, float particleDecaySpeed);
-void MoveShards(void);
-void DrawShards(void);
 
 

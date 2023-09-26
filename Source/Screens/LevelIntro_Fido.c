@@ -18,7 +18,6 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveDogBone(ObjNode *theNode);
 
@@ -47,7 +46,7 @@ void DoLevelIntroScreen_Fido(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 
@@ -229,20 +228,12 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLevelIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
 			break;
 	}
-}
-
-
-/***************** DRAW LEVELINTRO CALLBACK *******************/
-
-static void DrawLevelIntroCallback(void)
-{
-	DrawObjects();
 }
 
 #pragma mark -

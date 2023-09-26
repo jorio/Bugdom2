@@ -16,6 +16,9 @@
 /*    PROTOTYPES            */
 /****************************/
 
+static void DrawShards(ObjNode*);
+static void MoveShards(ObjNode*);
+
 static int FindFreeShard(void);
 static void ExplodeGeometry_Recurse(MetaObjectPtr obj);
 static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overrideTexture);
@@ -61,13 +64,22 @@ static 	ObjNode		*gShardSrcObj;
 
 void InitShardSystem(void)
 {
-int	i;
-
 	gNumShards = 0;
 
-	for (i = 0; i < MAX_SHARDS; i++)
+	for (int i = 0; i < MAX_SHARDS; i++)
 		gShards[i].isUsed = false;
 
+	NewObjectDefinitionType def =
+	{
+		.flags = STATUS_BIT_DONTCULL|STATUS_BIT_NOCOLLISION|STATUS_BIT_DONTPURGE,//|STATUS_BIT_DOUBLESIDED,
+		.slot = PARTICLE_SLOT-1,
+		.scale = 1,
+		.genre = CUSTOM_GENRE,
+		.drawCall = DrawShards,
+		.moveCall = MoveShards,
+	};
+	
+	MakeNewObject(&def);
 }
 
 
@@ -153,8 +165,7 @@ MOVertexArrayData	*vaData;
 
 			/* VERIFY COOKIE */
 
-	if (objHead->cookie != MO_COOKIE)
-		DoFatalAlert("ExplodeGeometry_Recurse: cookie is invalid!");
+	GAME_ASSERT(objHead->cookie == MO_COOKIE);
 
 
 			/* HANDLE TYPE */
@@ -162,16 +173,9 @@ MOVertexArrayData	*vaData;
 	switch(objHead->type)
 	{
 		case	MO_TYPE_GEOMETRY:
-				switch(objHead->subType)
-				{
-					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-							vaData = &((MOVertexArrayObject *)obj)->objectData;
-							ExplodeVertexArray(vaData, nil);
-							break;
-
-					default:
-							DoFatalAlert("ExplodeGeometry_Recurse: unknown sub-type!");
-				}
+				GAME_ASSERT(objHead->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+				vaData = &((MOVertexArrayObject *)obj)->objectData;
+				ExplodeVertexArray(vaData, nil);
 				break;
 
 		case	MO_TYPE_MATERIAL:
@@ -331,9 +335,11 @@ OGLPoint3D			origin;
 
 /************************** MOVE SHARDS ****************************/
 
-void MoveShards(void)
+static void MoveShards(ObjNode* theNode)
 {
-float	ty,y,fps,x,z;
+	(void) theNode;
+
+	float	ty,y,fps,x,z;
 
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;
@@ -413,8 +419,10 @@ del:
 
 /************************* DRAW SHARDS ****************************/
 
-void DrawShards(void)
+static void DrawShards(ObjNode* theNode)
 {
+	(void) theNode;
+
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;
 
@@ -473,12 +481,3 @@ void DrawShards(void)
 	OGL_EnableLighting();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
-
-
-
-
-
-
-
-

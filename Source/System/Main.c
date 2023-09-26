@@ -396,13 +396,9 @@ void DrawArea(void)
 
 			/* DRAW MISC */
 
-	DrawShards();												// draw shards
 	DrawSparkles();											// draw light sparkles
 	DrawLensFlare();											// draw lens flare
 	DrawInfobar();												// draw infobar last
-
-
-
 }
 
 
@@ -412,7 +408,6 @@ void MoveEverything(void)
 {
 	MoveObjects();
 	MoveSplineObjects();
-	MoveShards();
 	UpdateCamera();								// update camera
 
 	/* LEVEL SPECIFIC UPDATES */

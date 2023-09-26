@@ -18,7 +18,6 @@
 
 static void SetupLevelIntroScreen(void);
 static void FreeLevelIntroScreen(void);
-static void DrawLevelIntroCallback(void);
 static void ProcessLevelIntro(void);
 static void MoveIntroPlane(ObjNode *theNode);
 static void MoveBalsaSky(ObjNode *theNode);
@@ -61,7 +60,7 @@ void DoLevelIntroScreen_Balsa(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawLevelIntroCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLevelIntroScreen();
 }
 
@@ -254,25 +253,15 @@ float	timer;
 				/* MOVE */
 
 		MoveObjects();
-		MoveShards();
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLevelIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 		if (timer < 0.0f)
 			break;
 	}
-}
-
-
-/***************** DRAW LEVELINTRO CALLBACK *******************/
-
-static void DrawLevelIntroCallback(void)
-{
-	DrawObjects();
-	DrawShards();
 }
 
 
