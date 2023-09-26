@@ -53,7 +53,6 @@
 #include "tunnel.h"
 #include "lzss.h"
 #include "bones.h"
-#include "vaportrails.h"
 #include "localization.h"
 #include "dialog.h"
 #include "atlas.h"

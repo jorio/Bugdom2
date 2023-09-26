@@ -151,12 +151,6 @@ uint32_t flags = newObjDef->flags;
 		newNodePtr->Scale.z = 0.0001f;
 
 
-		/* NO VAPOR TRAILS YET */
-
-	for (int i = 0; i < MAX_JOINTS; i++)
-		newNodePtr->VaporTrails[i] = -1;
-
-
 				/* INSERT NODE INTO LINKED LIST */
 
 	newNodePtr->StatusBits |= STATUS_BIT_DETACHED;		// its not attached to linked list yet

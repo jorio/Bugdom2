@@ -316,20 +316,6 @@ got_it:
 	gParticleGroups[group]->rotDZ[p] = def->rotDZ;
 	gParticleGroups[group]->isUsed[p] = true;
 
-
-			/* SEE IF ATTACH VAPOR TRAIL */
-
-	if (gParticleGroups[group]->flags & PARTICLE_FLAGS_VAPORTRAIL)
-	{
-		static OGLColorRGBA color = {1,.5,.5,1};
-
-		color.a = def->alpha;
-
-		gParticleGroups[group]->vaporTrail[p] = CreatetNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
-																	def->where, &color, .3, 2.0, 50);
-	}
-
-
 	return(false);
 }
 
@@ -531,28 +517,6 @@ OGLVector3D	*delta;
 			gParticleGroups[i]->alpha[p] -= fadeRate * fps;				// fade it
 			if (gParticleGroups[i]->alpha[p] <= 0.0f)					// see if gone
 				gParticleGroups[i]->isUsed[p] = false;
-
-
-					/*****************************/
-					/* SEE IF UPDATE VAPOR TRAIL */
-					/*****************************/
-
-			if (gParticleGroups[i]->flags & PARTICLE_FLAGS_VAPORTRAIL)
-			{
-				static OGLColorRGBA color = {.9,1,.8,1};
-				short	v = gParticleGroups[i]->vaporTrail[p];
-
-				if (v != -1)
-				{
-					if (VerifyVaporTrail(v, nil, i))					// if valid then update it
-					{
-						color.a = gParticleGroups[i]->alpha[p];
-						AddToVaporTrail(&v, coord, &color);
-					}
-					else
-						gParticleGroups[i]->vaporTrail[p] = -1;			// no longer valid
-				}
-			}
 		}
 
 			/* SEE IF GROUP WAS EMPTY, THEN DELETE */
@@ -975,79 +939,6 @@ OGLPoint3D			p;
 		}
 	}
 }
-
-
-
-#pragma mark -
-
-
-/************** MAKE BOMB EXPLOSION *********************/
-
-void MakeBombExplosion(float x, float z, OGLVector3D *delta)
-{
-long					pg,i;
-OGLVector3D				d;
-OGLPoint3D				pt;
-NewParticleDefType		newParticleDef;
-float					y;
-float					dx,dz;
-OGLPoint3D				where;
-
-	where.x = x;
-	where.z = z;
-	where.y = GetTerrainY(x,z);
-
-		/*********************/
-		/* FIRST MAKE SPARKS */
-		/*********************/
-
-	gNewParticleGroupDef.magicNum				= 0;
-	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
-	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_VAPORTRAIL|PARTICLE_FLAGS_BOUNCE;
-	gNewParticleGroupDef.gravity				= 900;
-	gNewParticleGroupDef.magnetism				= 0;
-	gNewParticleGroupDef.baseScale				= 190;
-	gNewParticleGroupDef.decayRate				=  .4;
-	gNewParticleGroupDef.fadeRate				= .7;
-	gNewParticleGroupDef.particleTextureNum		= PARTICLE_SObjType_WhiteSpark3;
-	gNewParticleGroupDef.srcBlend				= GL_SRC_ALPHA;
-	gNewParticleGroupDef.dstBlend				= GL_ONE;
-	pg = NewParticleGroup(&gNewParticleGroupDef);
-	if (pg != -1)
-	{
-		x = where.x;
-		y = where.y;
-		z = where.z;
-		dx = delta->x * .2f;
-		dz = delta->z * .2f;
-
-
-		for (i = 0; i < 20; i++)
-		{
-			pt.x = x + (RandomFloat()-.5f) * 200.0f;
-			pt.y = y + RandomFloat() * 60.0f;
-			pt.z = z + (RandomFloat()-.5f) * 200.0f;
-
-			d.y = RandomFloat() * 1500.0f;
-			d.x = (RandomFloat()-.5f) * d.y * 3.0f + dx;
-			d.z = (RandomFloat()-.5f) * d.y * 3.0f + dz;
-
-
-			newParticleDef.groupNum		= pg;
-			newParticleDef.where		= &pt;
-			newParticleDef.delta		= &d;
-			newParticleDef.scale		= RandomFloat() + 1.5f;
-			newParticleDef.rotZ			= 0;
-			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);
-			AddParticleToGroup(&newParticleDef);
-		}
-	}
-
-
-}
-
-
 
 
 #pragma mark -

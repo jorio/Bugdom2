@@ -352,7 +352,6 @@ struct ObjNode
 	int					ParticleMagicNum;
 	float				ParticleTimer;
 
-	short				VaporTrails[MAX_JOINTS];		// indecies into vapor trail list
 	short				Sparkles[MAX_NODE_SPARKLES];	// indecies into sparkles list
 
 

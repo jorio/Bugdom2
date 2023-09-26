@@ -40,7 +40,6 @@ typedef struct
 	float			rotDZ[MAX_PARTICLES];
 	OGLPoint3D		coord[MAX_PARTICLES];
 	OGLVector3D		delta[MAX_PARTICLES];
-	short			vaporTrail[MAX_PARTICLES];
 
 	float			maxY;
 
@@ -89,7 +88,7 @@ enum
 	PARTICLE_FLAGS_HURTPLAYERBAD 	= (1<<2),	//combine with PARTICLE_FLAGS_HURTPLAYER
 	PARTICLE_FLAGS_HURTENEMY 		= (1<<3),
 	PARTICLE_FLAGS_DONTCHECKGROUND 	= (1<<4),
-	PARTICLE_FLAGS_VAPORTRAIL 		= (1<<5),
+//	PARTICLE_FLAGS_VAPORTRAIL 		= (1<<5),	// unsupported in Bugdom 2
 	PARTICLE_FLAGS_DISPERSEIFBOUNCE = (1<<6),
 	PARTICLE_FLAGS_ALLAIM 			= (1<<7),	// want to calc look-at matrix for all particles
 	PARTICLE_FLAGS_HASMAXY			= (1<<8)	// if particle can only go so high
@@ -170,7 +169,6 @@ void DisposeParticleSystem(void);
 void MakePuff(OGLPoint3D *where, float scale, short texNum, GLint src, GLint dst, float decayRate);
 void MakeSparkExplosion(float x, float y, float z, float force, float scale, short sparkTexture, short quantityLimit, float fadeRate);
 
-void MakeBombExplosion(float x, float z, OGLVector3D *delta);
 void MakeSplash(float x, float y, float z, float scale);
 
 void SprayWater(ObjNode *theNode, float x, float y, float z);

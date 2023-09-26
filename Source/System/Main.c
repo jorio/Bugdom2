@@ -397,7 +397,6 @@ void DrawArea(void)
 			/* DRAW MISC */
 
 	DrawShards();												// draw shards
-	DrawVaporTrails();											// draw vapor trails
 	DrawSparkles();											// draw light sparkles
 	DrawLensFlare();											// draw lens flare
 	DrawInfobar();												// draw infobar last
@@ -411,8 +410,6 @@ void DrawArea(void)
 
 void MoveEverything(void)
 {
-
-	MoveVaporTrails();
 	MoveObjects();
 	MoveSplineObjects();
 	MoveShards();
@@ -902,7 +899,6 @@ OGLSetupInputType	viewDef;
 
 	InitEnemyManager();
 	InitEffects();
-	InitVaporTrails();
 	InitSparkles();
 	InitItemsManager();
 	InitDialogManager();
