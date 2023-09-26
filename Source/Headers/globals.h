@@ -155,12 +155,11 @@ enum
 	STATUS_BIT_DETACHED		=	(1<<21),	// set if objnode is free-floating and not attached to linked list
 	STATUS_BIT_ONSPLINE		=	(1<<22),	// if objnode is attached to spline
 	STATUS_BIT_REVERSESPLINE =	(1<<23),	// if going reverse direction on spline
-	STATUS_BIT_xxx =	(1<<24),			// ????????????
+	STATUS_BIT_MOVEINPAUSE	=	(1<<24),
 	STATUS_BIT_AIMATCAMERA 	=	(1<<25),		// if need to aim at player's camera (for sprite billboards)
 	STATUS_BIT_USEALIGNMENTMATRIX =  (1<<26),	// use AlignmentMatrix instead of Rot x,y,z for object alignment
 	STATUS_BIT_UVTRANSFORM	=	(1<<27),		// do uv transform on object when drawing
 	STATUS_BIT_ROTZXY 		= 	(1<<28),
-	STATUS_BIT_qqqq		= 	(1<<29)
 };
 
 #define STATUS_BITS_FOR_2D \

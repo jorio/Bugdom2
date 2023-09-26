@@ -24,7 +24,6 @@ float RandomFloat2(void);
 void SafeDisposePtr(void *ptr);
 void MyFlushEvents(void);
 
-
 int16_t SwizzleShort(const int16_t *shortPtr);
 int32_t SwizzleLong(const int32_t *longPtr);
 float SwizzleFloat(const float *floatPtr);
@@ -33,6 +32,16 @@ uint16_t SwizzleUShort(const uint16_t *shortPtr);
 void SwizzlePoint3D(OGLPoint3D *pt);
 void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
+
+static inline int PositiveModulo(int value, unsigned int m)
+{
+	int mod = value % (int) m;
+	if (mod < 0)
+	{
+		mod += m;
+	}
+	return mod;
+}
 
 void RGBtoHSV( float r, float g, float b, float *h, float *s, float *v );
 void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v );

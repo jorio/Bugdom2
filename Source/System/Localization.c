@@ -69,10 +69,13 @@ void LoadLocalizedStrings(GameLanguageID languageID)
 
 		if (myPhrase != NULL)
 		{
+			GAME_ASSERT(row < NUM_LOCALIZED_STRINGS);
 			gStringsTable[row] = myPhrase;
 			row++;
 		}
 	}
+
+	GAME_ASSERT(row == NUM_LOCALIZED_STRINGS);
 }
 
 const char* Localize(LocStrID stringID)

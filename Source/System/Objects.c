@@ -669,6 +669,7 @@ int				i;
 					break;
 
 			case	DISPLAY_GROUP_GENRE:
+			case	QUADMESH_GENRE:
 					if (theNode->BaseGroup)
 					{
 						MO_DrawObject(theNode->BaseGroup);
@@ -693,24 +694,22 @@ int				i;
 					}
 					break;
 
-
-			case	FONTSTRING_GENRE:
-					OGL_PushState();								// keep state
-
-					for (i = 0; i < theNode->NumStringSprites; i++)
+			case	TEXTMESH_GENRE:
+					if (theNode->BaseGroup)
 					{
-						glMatrixMode(GL_PROJECTION);					// clear projection matrix
-						glLoadIdentity();
-						glOrtho(0, 640, 480, 0, 0, 1);
-						glMatrixMode(GL_MODELVIEW);
-						glLoadIdentity();
+						OGL_PushState();	//--
+						SetInfobarSpriteState();	//--
 
-						MO_DrawObject(theNode->StringCharacters[i]);
+						MO_DrawObject(theNode->BaseGroup);
+
+						if (gDebugMode >= 2)
+						{
+							TextMesh_DrawExtents(theNode);
+						}
+
+						OGL_PopState();	//--
 					}
-
-					OGL_PopState();									// restore state
 					break;
-
 
 			case	CUSTOM_GENRE:
 custom_draw:
@@ -1164,11 +1163,6 @@ int		i;
 		case	SPRITE_GENRE:
 				MO_DisposeObjectReference(theNode->SpriteMO);	// dispose reference to sprite meta object
 		   		theNode->SpriteMO = nil;
-				break;
-
-		case	FONTSTRING_GENRE:
-				for (i = 0; i < theNode->NumStringSprites; i++)
-					MO_DisposeObjectReference(theNode->StringCharacters[i]);	// dispose reference to sprite meta objects
 				break;
 	}
 

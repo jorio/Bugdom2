@@ -8,6 +8,7 @@
 
 #include "game.h"
 #include "utf8.h"
+#include "quadmesh.h"
 
 /****************************/
 /*    CONSTANTS             */
@@ -707,7 +708,6 @@ static OGLRect GetExtentsFromMetrics(const TextMetrics* metrics)
 	};
 }
 
-#if 0
 void TextMesh_Update(const char* text, int flags, ObjNode* textNode)
 {
 	const Atlas* font = gAtlases[textNode->Group];
@@ -808,7 +808,7 @@ static void DrawExtents(OGLRect extents, float z)
 {
 	OGL_PushState();								// keep state
 //	SetInfobarSpriteState(true);
-	OGL_DisableTexture2D();
+	glDisable(GL_TEXTURE_2D); //OGL_DisableTexture2D();
 
 	glColor4f(1,1,1,1);
 	glBegin(GL_LINE_LOOP);
@@ -844,7 +844,6 @@ void TextMesh_DrawExtents(ObjNode* textNode)
 
 	OGL_PopState();
 }
-#endif
 
 void Atlas_ImmediateDraw(int groupNum, const char* text, uint32_t flags)
 {
@@ -865,13 +864,11 @@ void Atlas_ImmediateDraw(int groupNum, const char* text, uint32_t flags)
 
 			/* DRAW BOUNDING RECT */
 
-#if 0
 	if (gDebugMode >= 2)
 	{
 		OGLRect extents = GetExtentsFromMetrics(&metrics);
 		DrawExtents(extents, 0);
 	}
-#endif
 
 			/* ACTIVATE THE MATERIAL */
 

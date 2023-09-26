@@ -100,7 +100,7 @@ void DoLevelIntro(void);
 
 
 
-
-
+void DoSettingsOverlay(void (*updateRoutine)(void),
+					   void (*backgroundDrawRoutine)(void));
 
 

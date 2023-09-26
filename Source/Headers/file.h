@@ -58,6 +58,8 @@ typedef struct
 	Boolean	kiddieMode;
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
+	
+	Boolean	music;
 
 	Byte	monitorNum;
 	Byte	antialiasingLevel;
@@ -66,6 +68,7 @@ typedef struct
 
 	Byte	rumbleIntensity;
 	Byte	mouseSensitivityLevel;
+	Boolean	gamepadRumble;
 	InputBinding	bindings[NUM_CONTROL_NEEDS];
 }PrefsType;
 

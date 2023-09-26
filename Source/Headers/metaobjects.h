@@ -138,6 +138,9 @@ typedef struct
 	MOTriangleIndecies	*triangles;						// ptr to array of triangle triad indecies
 
 	OGLBoundingBox		bBox;								// local BBox
+	
+	int					pointCapacity;						// size of point buffer. If 0, assume it's no larger than numPoints.
+	int					triangleCapacity;					// size of triangle buffer. If 0, assume it's no larger than numTriangles.
 }MOVertexArrayData;
 
 typedef struct

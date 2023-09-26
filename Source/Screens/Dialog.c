@@ -351,6 +351,8 @@ float	x,y;
 				{
 					gDialogAlpha = 0.0f;
 					gDialogMode = DIALOG_MODE_NONE;
+					gNumLinesInCurrentDialog = 0;
+					gCurrentDialogString = NULL;
 					gCurrentDialogMessagePriority = 100;
 					gCurrentDialogMessageNum = -1;
 					if (gNextMessageNum != -1)
@@ -360,6 +362,7 @@ float	x,y;
 						else
 							CreateDialogMessage(gNextMessageNum, gNextMessagePriority, gNextMessageDuration, &gNextMessageWhere);
 					}
+					return;
 				}
 				break;
 

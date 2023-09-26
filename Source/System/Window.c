@@ -241,4 +241,6 @@ void SetFullscreenMode(bool enforceDisplayPref)
 		// Enter fullscreen mode
 		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	}
+
+	SDL_GL_SetSwapInterval(gGamePrefs.vsync);
 }

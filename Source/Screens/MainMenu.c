@@ -421,7 +421,7 @@ static void DoMenuControls(void)
 					break;
 
 			case	2:
-					DoGameOptionsDialog();
+					DoSettingsOverlay(NULL, DrawMainMenuCallback);
 					break;
 
 			case	3:
@@ -904,4 +904,5 @@ static void DrawDarkenPane(ObjNode *theNode)
 
 	glDisable(GL_BLEND);
 }
+
 
