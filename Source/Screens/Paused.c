@@ -82,10 +82,11 @@ void DoPaused(void)
 		KeepTerrainAlive();
 		OGL_DrawScene(DrawPaused);
 	}
-
-	PauseAllChannels(false);
-	GrabMouse(true);
+	
 	gGamePaused = false;
+	PauseAllChannels(false);
+	EnforceMusicPausePref();
+	GrabMouse(true);
 }
 
 

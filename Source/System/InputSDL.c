@@ -886,3 +886,11 @@ void GrabMouse(Boolean capture)
 //		BackupRestoreCursorCoord(false);
 	}
 }
+
+SDL_GameController* GetController(void)
+{
+	if (gController.open)
+		return gController.controllerInstance;
+	
+	return NULL;
+}

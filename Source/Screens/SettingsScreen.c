@@ -109,11 +109,6 @@ static void SetFullscreenModeFromPrefs(void)
 	SetFullscreenMode(true);
 }
 
-static void EnforceMusicPausePref(void)
-{
-	IMPLEMENT_ME();
-}
-
 /***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/

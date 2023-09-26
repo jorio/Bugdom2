@@ -372,6 +372,10 @@ Fullscreen,Plein écran,,,,,
 The new antialiasing settings will,,,,,,
 take effect when you restart the game.,,,,,,
 V-Sync,,,,,,
+Antialiasing,Anticrénelage
+MSAA 2x
+MSAA 4x
+MSAA 8x
 ---,,,,,,
 Press!,Appuie!,Drück!,,Premi!,Tryck!,Druk!
 Click!,Clique!,,,Fai click!,,

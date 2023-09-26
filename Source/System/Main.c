@@ -121,6 +121,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
 	gGamePrefs.fullscreen			= true;
+	gGamePrefs.music				= true;
 
 	_Static_assert(sizeof(gGamePrefs.bindings) == sizeof(kDefaultInputBindings), "input binding size mismatch: prefs vs defaults");
 	SDL_memcpy(&gGamePrefs.bindings, &kDefaultInputBindings, sizeof(kDefaultInputBindings));

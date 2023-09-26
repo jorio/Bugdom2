@@ -67,12 +67,8 @@ static short				gMostRecentChannel = -1;
 
 static short				gNumSndsInBank[MAX_SOUND_BANKS] = {0,0,0};
 
-
-Boolean						gSongPlayingFlag = false;
-Boolean						gLoopSongFlag = true;
 Boolean						gAllowAudioKeys = true;
 
-Boolean				gMuteMusicFlag = false;
 short				gCurrentSong = -1;
 short				gSongChannel = -1;
 
@@ -538,18 +534,17 @@ float	volumeTweaks[]=
 
 
 	gCurrentSong 	= songNum;
-	gLoopSongFlag 	= loopFlag;
 	volume = FULL_CHANNEL_VOLUME * volumeTweaks[songNum];
 	gSongChannel = PlayEffect_Parms(EFFECT_SONG, volume, volume, NORMAL_CHANNEL_RATE);
+	
+	
+	
+	
+				/* SEE IF WANT TO MUTE THE MUSIC */
 
-	gSongPlayingFlag = true;
-
-			/* SEE IF WANT TO MUTE THE MUSIC */
-
-	if (gMuteMusicFlag)
+	if (!gGamePrefs.music)
 	{
-		gMuteMusicFlag = false;			// set not muted
-		ToggleMusic();					// and then mute it
+		SndPauseFilePlay(gSndChannel[gSongChannel]);			// pause it
 	}
 }
 
@@ -559,47 +554,31 @@ float	volumeTweaks[]=
 
 void KillSong(void)
 {
-
-	gCurrentSong = -1;
-
-	if (!gSongPlayingFlag)
+	if (gCurrentSong < 0)
 		return;
 
-	gSongPlayingFlag = false;											// tell callback to do nothing
+	gCurrentSong = -1;
 
 	StopAChannel(&gSongChannel);
 
 	DisposeSoundBank(SOUND_BANK_SONG);
-
 }
+
 
 /******************** TOGGLE MUSIC *********************/
 
-void ToggleMusic(void)
+void EnforceMusicPausePref(void)
 {
-SndCommand 		mySndCmd;
-
-	gMuteMusicFlag = !gMuteMusicFlag;
-
-	if ((gSongChannel < 0) || (gSongChannel >= gMaxChannels))		// make sure its a legal #
+	if (gGamePaused)
 		return;
 
-	if (gMuteMusicFlag)
-	{
-		mySndCmd.cmd = quietCmd;									// stop it
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = 0;
-		SndDoImmediate(gSndChannel[gSongChannel], &mySndCmd);
-	}
-	else
-	{
-		mySndCmd.cmd = bufferCmd;									// start it
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = ((long)*gSndHandles[SOUND_BANK_SONG][0])+gSndOffsets[SOUND_BANK_SONG][0];
-	    SndDoImmediate(gSndChannel[gSongChannel], &mySndCmd);
-	}
-}
+	SCStatus	theStatus;
 
+	SndChannelStatus(gSndChannel[gSongChannel], sizeof(SCStatus), &theStatus);	// get channel info
+
+	if (gGamePrefs.music == theStatus.scChannelPaused)
+		SndPauseFilePlay(gSndChannel[gSongChannel]);
+}
 
 
 #pragma mark -
@@ -938,7 +917,7 @@ uint32_t			lv2,rv2;
 
 	mySndCmd.cmd = bufferCmd;										// make it play
 	mySndCmd.param1 = 0;
-	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
+	mySndCmd.ptr = (Ptr)(*gSndHandles[bankNum][soundNum]) + gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
     SndDoImmediate(chanPtr, &mySndCmd);
 	if (myErr)
 		return(-1);
