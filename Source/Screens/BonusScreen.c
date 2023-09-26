@@ -138,7 +138,7 @@ void DoBonusScreen(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawBonusCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeBonusScreen();
 }
 
@@ -709,7 +709,6 @@ static void DoSaveSelect(void)
 static void DrawBonusCallback(void)
 {
 	DrawObjects();
-	DrawSparkles();											// draw light sparkles
 
 
 			/* DRAW SPRITES */

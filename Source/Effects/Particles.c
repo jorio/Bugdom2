@@ -77,22 +77,12 @@ void InitEffects(void)
 
 void InitParticleSystem(void)
 {
-ObjNode	*obj;
-
-
 			/* INIT GROUP ARRAY */
 
 	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
 		gParticleGroups[i] = nil;
 
 	gNumActiveParticleGroups = 0;
-
-
-
-			/* LOAD SPRITES */
-
-//	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
-//	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 
 		/*************************************************************************/
@@ -102,15 +92,8 @@ ObjNode	*obj;
 		// The particles need to be drawn after the fences object, but before any sprite or font objects.
 		//
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= PARTICLE_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveParticleGroups;
-	gNewObjectDefinition.scale 		= 1;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES|STATUS_BIT_NOFOG;
-
-	obj = MakeNewObject(&gNewObjectDefinition);
-	obj->CustomDrawFunction = DrawParticleGroup;
-
+	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT, DrawParticleGroup, MoveParticleGroups);
+	driver->StatusBits |= STATUS_BIT_DOUBLESIDED|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES|STATUS_BIT_NOFOG;
 }
 
 

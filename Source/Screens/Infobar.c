@@ -17,6 +17,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
+static void DrawInfobar(ObjNode* theNode);
 static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot);
 static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum);
 static void Infobar_DrawHealth(void);
@@ -115,6 +116,8 @@ void InitInfobar(void)
 	gShowRedClovers = false;
 	gFishAlpha = gFoodAlpha = 1.0f;
 	gShowFish = gShowFood = true;
+	
+	MakeNewDriverObject(INFOBAR_SLOT, DrawInfobar, NULL);
 }
 
 
@@ -122,7 +125,6 @@ void InitInfobar(void)
 
 void DisposeInfobar(void)
 {
-
 }
 
 
@@ -194,8 +196,10 @@ void SetInfobarSpriteState(void)
 
 /********************** DRAW INFOBAR ****************************/
 
-void DrawInfobar(void)
+static void DrawInfobar(ObjNode* theNode)
 {
+	(void) theNode;
+
 	if (gHideInfobar)
 		return;
 

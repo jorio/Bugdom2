@@ -34,5 +34,4 @@ OSErr CheckPrefsFolder(bool createIt);
 void GameMain(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
-void DrawArea(void);
 void StartLevelCompletion(float coolDownTimer);

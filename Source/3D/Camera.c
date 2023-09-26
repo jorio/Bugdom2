@@ -98,7 +98,7 @@ static const Byte	gFlareImageTable[]=
 
 /*********************** DRAW LENS FLARE ***************************/
 
-void DrawLensFlare(void)
+static void DrawLensFlare(ObjNode* theNode)
 {
 short			i;
 float			x,y,dot;
@@ -108,6 +108,8 @@ float			dx,dy,length;
 OGLVector3D		axis,lookAtVector,sunVector;
 static OGLColorRGBA	transColor = {1,1,1,1};
 int				px,py,pw,ph;
+
+	(void) theNode;
 
 	if (!gDrawLensFlare)
 		return;
@@ -301,6 +303,10 @@ ObjNode	*playerObj = gPlayerInfo.objNode;
 		gGameView->cameraPlacement.pointOfInterest.y = playerObj->Coord.y + gCameraLookAtYOff;
 		gGameView->cameraPlacement.pointOfInterest.z = playerObj->Coord.z;
 	}
+
+			/* MAKE LENS FLARE MANAGER */
+
+	MakeNewDriverObject(PARTICLE_SLOT+20, DrawLensFlare, NULL);
 }
 
 

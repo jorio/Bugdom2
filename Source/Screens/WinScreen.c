@@ -18,7 +18,6 @@
 
 static void SetupWinScreen(void);
 static void FreeWinScreen(void);
-static void DrawWinCallback(void);
 static void ProcessWin(void);
 static void MakeWinConfetti(ObjNode *player);
 static void MoveWinText(ObjNode *theNode);
@@ -71,7 +70,7 @@ void DoWinScreen(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawWinCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeWinScreen();
 }
 
@@ -301,7 +300,7 @@ float	timer = 0.0f;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawWinCallback);
+		OGL_DrawScene(DrawObjects);
 
 
 		timer += fps;
@@ -316,15 +315,6 @@ float	timer = 0.0f;
 
 }
 
-
-/***************** DRAW WIN CALLBACK *******************/
-
-static void DrawWinCallback(void)
-{
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
-}
 
 
 #pragma mark -

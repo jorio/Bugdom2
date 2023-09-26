@@ -184,14 +184,8 @@ ObjNode	*obj;
 		/* CREATE DUMMY CUSTOM OBJECT TO CAUSE TERRAIN DRAWING AT THE DESIRED TIME */
 		/*************************************************************************/
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING;
-
-	obj = MakeNewObject(&gNewObjectDefinition);
-	obj->CustomDrawFunction = DrawTerrain;
-
+	obj = MakeNewDriverObject(TERRAIN_SLOT, DrawTerrain, NULL);
+	obj->StatusBits |= STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING;
 }
 
 

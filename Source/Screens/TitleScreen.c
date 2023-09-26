@@ -18,7 +18,6 @@
 
 static void SetupTitleScreen(void);
 static void FreeTitleScreen(void);
-static void DrawTitleCallback(void);
 static void DoBugdomEntrance(void);
 static void MoveTitleFlies(ObjNode *fly);
 static void DoSwatter(void);
@@ -98,7 +97,7 @@ void DoTitleScreen(void)
 			/* CLEANUP */
 
 bail:
-	OGL_FadeOutScene(DrawTitleCallback, KeepTerrainAlive);
+	OGL_FadeOutScene(DrawObjects, KeepTerrainAlive);
 	FreeTitleScreen();
 }
 
@@ -420,7 +419,7 @@ float	timer;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawTitleCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 	}
@@ -549,7 +548,7 @@ Byte	swatMode = 0;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawTitleCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 	}
@@ -652,7 +651,7 @@ ObjNode	*newObj;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawTitleCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= fps;
 	}
@@ -917,24 +916,3 @@ ObjNode *bag, *player;
 
 
 }
-
-
-#pragma mark -
-
-/***************** DRAW BONUS CALLBACK *******************/
-
-static void DrawTitleCallback(void)
-{
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
-}
-
-
-
-
-
-
-
-
-

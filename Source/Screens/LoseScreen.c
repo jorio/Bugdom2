@@ -18,7 +18,6 @@
 
 static void SetupLoseScreen(void);
 static void FreeLoseScreen(void);
-static void DrawLoseCallback(void);
 static void ProcessLose(void);
 static void MoveMenuFlower(ObjNode *theNode);
 static void MoveLoseBee(ObjNode *bee);
@@ -69,7 +68,7 @@ void DoLoseScreen(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawLoseCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLoseScreen();
 }
 
@@ -304,24 +303,13 @@ float	timer = 25.0f;
 
 				/* DRAW */
 
-		OGL_DrawScene(DrawLoseCallback);
+		OGL_DrawScene(DrawObjects);
 
 
 		timer -= fps;
 		if (timer <= 0.0f)
 			break;
 	}
-
-}
-
-
-/***************** DRAW LOSE CALLBACK *******************/
-
-static void DrawLoseCallback(void)
-{
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
 }
 
 

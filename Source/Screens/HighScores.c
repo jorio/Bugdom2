@@ -18,7 +18,7 @@
 
 static void SetupScoreScreen(void);
 static void FreeScoreScreen(void);
-static void DrawHighScoresCallback(void);
+static void DrawHighScoresCallback(ObjNode* theNode);
 static void DrawScoreVerbage(void);
 static void DrawHighScoresAndCursor(void);
 static void StartEnterName(void);
@@ -80,6 +80,8 @@ void NewScore(void)
 	SetupScoreScreen();										// setup OGL
 	MakeFadeEvent(true, 1);
 
+	MakeNewDriverObject(PARTICLE_SLOT-1, DrawHighScoresCallback, NULL);
+	
 
 			/* LOOP */
 
@@ -92,7 +94,7 @@ void NewScore(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(DrawHighScoresCallback);
+		OGL_DrawScene(DrawObjects);
 
 				/*****************************/
 				/* SEE IF USER ENTERING NAME */
@@ -144,7 +146,7 @@ void NewScore(void)
 	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file
 		SaveHighScores();
 
-	OGL_FadeOutScene(DrawHighScoresCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 
 	FreeScoreScreen();
 
@@ -261,10 +263,9 @@ static void FreeScoreScreen(void)
 
 /***************** DRAW HIGHSCORES CALLBACK *******************/
 
-static void DrawHighScoresCallback(void)
+static void DrawHighScoresCallback(ObjNode* theNode)
 {
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
+	(void) theNode;
 
 
 			/* DRAW SPRITES */

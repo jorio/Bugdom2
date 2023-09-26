@@ -16,6 +16,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
+static void DrawSparkles(ObjNode* theNode);
 
 
 /****************************/
@@ -37,15 +38,14 @@ int	gNumSparkles;
 
 void InitSparkles(void)
 {
-int		i;
-
-	for (i = 0; i < MAX_SPARKLES; i++)
+	for (int i = 0; i < MAX_SPARKLES; i++)
 	{
 		gSparkles[i].isActive = false;
 	}
-
-
+	
 	gNumSparkles = 0;
+
+	MakeNewDriverObject(PARTICLE_SLOT-1, DrawSparkles, NULL);
 }
 
 
@@ -54,7 +54,7 @@ int		i;
 // OUTPUT:  -1 if none
 //
 
-short GetFreeSparkle(ObjNode *theNode)
+short GetFreeSparkle(ObjNode *owner)
 {
 int		i;
 
@@ -71,7 +71,7 @@ int		i;
 got_it:
 
 	gSparkles[i].isActive = true;
-	gSparkles[i].owner = theNode;
+	gSparkles[i].owner = owner;
 	gNumSparkles++;
 
 	return(i);
@@ -99,7 +99,7 @@ void DeleteSparkle(short i)
 
 /*************************** DRAW SPARKLES ******************************/
 
-void DrawSparkles(void)
+static void DrawSparkles(ObjNode* theNode)
 {
 uint32_t	flags;
 int		i;
@@ -118,6 +118,8 @@ static OGLPoint3D		frame[4] =
 	-130,-130,0
 };
 
+
+	(void) theNode;
 
 	OGL_PushState();
 
@@ -244,18 +246,3 @@ static OGLPoint3D		frame[4] =
 
 	OGL_PopState();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

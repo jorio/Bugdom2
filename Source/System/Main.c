@@ -161,6 +161,7 @@ const short songs[] =
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
+//		gLevelNum = LEVEL_NUM_GUTTER;
 //		gLevelNum = LEVEL_NUM_PARK;
 //		gLevelNum = LEVEL_NUM_PLAYROOM;
 
@@ -258,7 +259,7 @@ static void PlayArea(void)
 
 		default:
 				PlayArea_Terrain();
-				OGL_FadeOutScene(DrawArea, KeepTerrainAlive);
+				OGL_FadeOutScene(DrawObjects, KeepTerrainAlive);
 	}
 }
 
@@ -297,7 +298,7 @@ static void PlayArea_Terrain(void)
 			/* DRAW IT ALL */
 
 
-		OGL_DrawScene(DrawArea);
+		OGL_DrawScene(DrawObjects);
 
 
 
@@ -380,25 +381,7 @@ static void PlayArea_Terrain(void)
 		}
 
 		gDisableHiccupTimer = false;									// reenable this after the 1st frame
-
 	}
-
-}
-
-
-/****************** DRAW AREA *******************************/
-
-void DrawArea(void)
-{
-		/* DRAW OBJECTS & TERAIN */
-
-	DrawObjects();												// draw objNodes which includes fences, terrain, etc.
-
-			/* DRAW MISC */
-
-	DrawSparkles();											// draw light sparkles
-	DrawLensFlare();											// draw lens flare
-	DrawInfobar();												// draw infobar last
 }
 
 

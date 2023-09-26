@@ -69,17 +69,7 @@ void InitShardSystem(void)
 	for (int i = 0; i < MAX_SHARDS; i++)
 		gShards[i].isUsed = false;
 
-	NewObjectDefinitionType def =
-	{
-		.flags = STATUS_BIT_DONTCULL|STATUS_BIT_NOCOLLISION|STATUS_BIT_DONTPURGE,//|STATUS_BIT_DOUBLESIDED,
-		.slot = PARTICLE_SLOT-1,
-		.scale = 1,
-		.genre = CUSTOM_GENRE,
-		.drawCall = DrawShards,
-		.moveCall = MoveShards,
-	};
-	
-	MakeNewObject(&def);
+	MakeNewDriverObject(PARTICLE_SLOT-1, DrawShards, MoveShards);
 }
 
 

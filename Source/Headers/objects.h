@@ -12,6 +12,7 @@
 #define LURE_SLOT		(TRIGGER_SLOT + 5)
 #define	SLOT_OF_DUMB	3000
 #define	SPRITE_SLOT		(SLOT_OF_DUMB+100)
+#define	INFOBAR_SLOT	(SPRITE_SLOT+100)
 #define	FENCE_SLOT		4
 #define	PARTICLE_SLOT	(SPRITE_SLOT-2)
 #define	CONFETTI_SLOT	(PARTICLE_SLOT-1)		// do confetti before particles since particles are xparent
@@ -92,6 +93,8 @@ void MoveStaticObject2(ObjNode *theNode);
 void MoveStaticObject3(ObjNode *theNode);
 
 void CalcNewTargetOffsets(ObjNode *theNode, float scale);
+
+ObjNode* MakeNewDriverObject(int slot, void (*drawCall)(ObjNode *), void (*moveCall)(ObjNode *));
 
 //===================
 

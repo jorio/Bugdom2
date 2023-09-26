@@ -99,16 +99,13 @@ static float	dotAlpha = 1.0f;
 
 			/* DRAW THE BACKGROUND */
 
-	switch(gLevelNum)
+	if (gLevelNum == LEVEL_NUM_PLUMBING || gLevelNum == LEVEL_NUM_GUTTER)
 	{
-		case	LEVEL_NUM_PLUMBING:
-		case	LEVEL_NUM_GUTTER:
-				DrawTunnel();
-				break;
-
-		default:
-				DrawArea();
-
+		DrawTunnel();
+	}
+	else
+	{
+		DrawObjects();
 	}
 
 

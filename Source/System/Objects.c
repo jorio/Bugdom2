@@ -1619,16 +1619,18 @@ float	d,minDist = 10000000;
 }
 
 
+/********************* MAKE NEW DRIVER OBJECT *****************************/
 
-
-
-
-
-
-
-
-
-
-
-
-
+ObjNode* MakeNewDriverObject(int slot, void (*drawCall)(ObjNode *), void (*moveCall)(ObjNode *))
+{
+	NewObjectDefinitionType def =
+	{
+		.flags = STATUS_BIT_DONTCULL|STATUS_BIT_NOCOLLISION|STATUS_BIT_DONTPURGE,
+		.slot = slot,
+		.scale = 1,
+		.genre = CUSTOM_GENRE,
+		.drawCall = drawCall,
+		.moveCall = moveCall,
+	};
+	return MakeNewObject(&def);
+}

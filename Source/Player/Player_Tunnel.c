@@ -487,7 +487,7 @@ int			i,t;
 			/* DRAW THE REGULAR CACHE OF OBJECTS AND EFFECTS */
 			/*************************************************/
 
-	DrawArea();
+	DrawObjects();
 }
 
 #pragma mark -

@@ -452,7 +452,6 @@ static void DoMenuControls(void)
 static void DrawMainMenuCallback(void)
 {
 	DrawObjects();
-	DrawSparkles();											// draw light sparkles
 
 			/* DRAW HIGH SCORES */
 
