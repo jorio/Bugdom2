@@ -19,7 +19,6 @@ enum
 	MO_TYPE_GEOMETRY	=	'geom',
 	MO_TYPE_MATERIAL	=	'matl',
 	MO_TYPE_MATRIX		=	'mtrx',
-	MO_TYPE_PICTURE		=	'pict',
 	MO_TYPE_SPRITE		=	'sprt'
 };
 
@@ -160,30 +159,6 @@ typedef struct
 }MOMatrixObject;
 
 
-		/******************/
-		/* PICTURE OBJECT */
-		/******************/
-
-#define PICTURE_FULL_SCREEN_SIZE_X	1024				// use this as scaling reference base
-#define PICTURE_FULL_SCREEN_SIZE_Y	768
-
-
-typedef struct
-{
-	OGLPoint3D			drawCoord;
-	float				drawScaleX,drawScaleY;
-	int					fullWidth,fullHeight;
-	int					numCellsWide, numCellsHigh;		// # cells w/h
-	int					cellWidth,cellHeight;			// cell w/h
-	MOMaterialObject	**materials;					// array of materials for each cell
-}MOPictureData;
-
-typedef struct
-{
-	MetaObjectHeader	objectHeader;
-	MOPictureData		objectData;
-}MOPictureObject;
-
 
 		/*****************/
 		/* SPRITE OBJECT */
@@ -233,17 +208,13 @@ void MO_DrawGroup(const MOGroupObject *object);
 void MO_DrawObject(const MetaObjectPtr object);
 void MO_DrawMaterial(MOMaterialObject *matObj);
 void MO_DrawMatrix(const MOMatrixObject *matObj);
-void MO_DrawPicture(const MOPictureObject *picObj);
 void MO_DisposeObjectReference(MetaObjectPtr obj);
 void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *outData);
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox, OGLMatrix4x4 *m);
-MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, int destPixelFormat);
-void MO_SetPictureObjectCoordsToMouse(MOPictureObject *obj);
 
 void MO_DrawSprite(const MOSpriteObject *spriteObj);
 void MO_VertexArray_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Object_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Geometry_OffserUVs(short group, short type, short geometryNum, float du, float dv);
-MOMaterialObject *MO_LoadTextureObjectFromFile(FSSpec *spec, Boolean useAlpha);
 MOMaterialObject *MO_CreateTextureObjectFromBuffer(int width, int height, Ptr buffer);
