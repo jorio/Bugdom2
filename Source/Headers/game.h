@@ -11,6 +11,7 @@
 #endif
 
 #define APPSTORE	0
+#define SKIPFLUFF	0
 
 #include "version.h"
 #include "globals.h"
@@ -103,7 +104,6 @@ extern	LineMarkerDefType		gLineMarkerList[];
 extern	MOMaterialObject		*gMostRecentMaterial;
 extern	MOMaterialObject		*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	MOMaterialObject		*gTunnelTextureObj;
-extern	MOPictureObject			*gBackgoundPicture;
 extern	MOVertexArrayData		**gLocalTriMeshesOfSkelType;
 extern	MOVertexArrayObject		*gTunnelSectionObjects[];
 extern	MOVertexArrayObject		*gTunnelSectionWaterObjects[];

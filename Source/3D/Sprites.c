@@ -189,8 +189,7 @@ MOSpriteSetupData	spriteData;
 
 			/* ERROR CHECK */
 
-	if (newObjDef->type >= gNumSpritesInGroupList[newObjDef->group])
-		DoFatalAlert("MakeSpriteObject: illegal type");
+	GAME_ASSERT(newObjDef->type < gNumSpritesInGroupList[newObjDef->group]);
 
 
 			/* MAKE OBJNODE */
@@ -204,14 +203,13 @@ MOSpriteSetupData	spriteData;
 
 			/* MAKE SPRITE META-OBJECT */
 
-	spriteData.loadFile 	= false;										// these sprites are already loaded into gSpriteList
+//	spriteData.loadFile 	= false;										// these sprites are already loaded into gSpriteList
 	spriteData.group		= newObjDef->group;								// set group
 	spriteData.type 		= newObjDef->type;								// set group subtype
 //	spriteData.drawCentered = drawCentered;
 
 	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, 0, &spriteData);
-	if (!spriteMO)
-		DoFatalAlert("MakeSpriteObject: MO_CreateNewObjectOfType failed!");
+	GAME_ASSERT(spriteMO);
 
 
 			/* SET SPRITE MO INFO */

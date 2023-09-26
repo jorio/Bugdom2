@@ -78,7 +78,6 @@ extern	OSErr LoadPrefs(void);
 void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr);
-OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
 
 Boolean SaveGame(void);
 Boolean LoadSavedGame(void);

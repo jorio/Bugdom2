@@ -385,7 +385,7 @@ wait:
 	}
 
 #if _DEBUG
-	if (GetKeyState(SDL_SCANCODE_KP_PLUS))		// debug speed-up with KP_PLUS
+	if (GetKeyState(SDL_SCANCODE_BACKSLASH))	// debug speed-up with backslash key
 		fps = DEFAULT_FPS;
 #endif
 

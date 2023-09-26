@@ -16,33 +16,25 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DisplayPicture_Draw(void);
-
 
 /****************************/
 /*    CONSTANTS             */
 /****************************/
 
 
-
 /*********************/
 /*    VARIABLES      */
 /*********************/
 
-MOPictureObject 	*gBackgoundPicture = nil;
 
+#pragma mark -
 
-/********************** DISPLAY PICTURE **************************/
-//
-// Displays a picture using OpenGL until the user clicks the mouse or presses any key.
-// If showAndBail == true, then show it and bail out
-//
+/************** DO LEGAL SCREEN *********************/
 
-void DisplayPicture(FSSpec *spec)
+void DoLegalScreen(void)
 {
-OGLSetupInputType	viewDef;
-float	timeout = 40.0f;
-
+	OGLSetupInputType	viewDef;
+	float	timeout = 8.0f;
 
 
 			/* SETUP VIEW */
@@ -59,13 +51,21 @@ float	timeout = 40.0f;
 	OGL_SetupWindow(&viewDef, &gGameView);
 
 
-
 			/* CREATE BACKGROUND OBJECT */
 
-	gBackgoundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, spec);
-	if (!gBackgoundPicture)
-		DoFatalAlert("DisplayPicture: MO_CreateNewObjectOfType failed");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, 1, "Pangea");
 
+	NewObjectDefinitionType def =
+	{
+		.coord = {320, 240, 0},
+		.group = SPRITE_GROUP_LEVELSPECIFIC,
+		.type = 0,
+		.scale = 640,
+		.slot = SPRITE_SLOT,
+	};
+	
+	ObjNode* theNode = MakeSpriteObject(&def);
+	GAME_ASSERT(theNode);
 
 
 		/***********/
@@ -77,57 +77,31 @@ float	timeout = 40.0f;
 	UpdateInput();
 	CalcFramesPerSecond();
 
-					/* MAIN LOOP */
+		/* MAIN LOOP */
 
-		while(!UserWantsOut())
-		{
-			CalcFramesPerSecond();
-			MoveObjects();
-			OGL_DrawScene(DisplayPicture_Draw);
+	while(!UserWantsOut())
+	{
+		CalcFramesPerSecond();
+		MoveObjects();
+		OGL_DrawScene(DrawObjects);
 
-			UpdateInput();
-			if (UserWantsOut())
-				break;
+		UpdateInput();
+		if (UserWantsOut())
+			break;
 
-			timeout -= gFramesPerSecondFrac;
-			if (timeout < 0.0f)
-				break;
-		}
+		timeout -= gFramesPerSecondFrac;
+		if (timeout < 0.0f)
+			break;
+	}
 
+		/* FADE OUT */
 
-			/* CLEANUP */
+	OGL_FadeOutScene(DrawObjects, NULL);
+
+		/* CLEANUP */
 
 	DeleteAllObjects();
-	MO_DisposeObjectReference(gBackgoundPicture);
-//	DisposeAllSpriteGroups();
-
-
-			/* FADE OUT */
-
-	OGL_FadeOutScene(DisplayPicture_Draw, NULL);
-}
-
-
-/***************** DISPLAY PICTURE: DRAW *******************/
-
-static void DisplayPicture_Draw(void)
-{
-	MO_DrawObject(gBackgoundPicture);
-	DrawObjects();
-}
-
-
-#pragma mark -
-
-/************** DO LEGAL SCREEN *********************/
-
-void DoLegalScreen(void)
-{
-FSSpec	spec;
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:Pangea", &spec);
-
-	DisplayPicture(&spec);
+	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 }
 
 

@@ -1041,17 +1041,12 @@ unsigned long	someLong;
 	LoadSpriteAtlas(ATLAS_GROUP_FONT1, ":Sprites:Font:font", kAtlasLoadFont);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	IMPLEMENT_ME_SOFT();
-#if 0
+#if !SKIPFLUFF
 		/* SHOW TITLES */
 
 	DoLegalScreen();
-#endif
 	DoTitleScreen();
-
-
-//	gScore = 1337;
-//	NewScore();
+#endif
 
 
 		/* MAIN LOOP */

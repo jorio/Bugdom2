@@ -551,89 +551,6 @@ long				count;
 	FSClose(refNum);
 }
 
-#pragma mark -
-
-
-
-
-/**************** DRAW PICTURE INTO GWORLD ***********************/
-//
-// Uses Quicktime to load any kind of picture format file and draws
-// it into the GWorld
-//
-//
-// INPUT: myFSSpec = spec of image file
-//
-// OUTPUT:	theGWorld = gworld contining the drawn image.
-//
-
-OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth)
-{
-	(void) myFSSpec;
-	(void) theGWorld;
-	(void) depth;
-	IMPLEMENT_ME();
-	return unimpErr;
-#if 0
-OSErr						iErr;
-GraphicsImportComponent		gi;
-Rect						r;
-ComponentResult				result;
-PixMapHandle 				hPixMap;
-
-
-			/* PREP IMPORTER COMPONENT */
-
-	result = GetGraphicsImporterForFile(myFSSpec, &gi);		// load importer for this image file
-	if (result != noErr)
-	{
-		DoAlert("DrawPictureIntoGWorld: GetGraphicsImporterForFile failed!  You do not have Quicktime properly installed, reinstall Quicktime and do a FULL install.");
-		return(result);
-	}
-	if (GraphicsImportGetBoundsRect(gi, &r) != noErr)		// get dimensions of image
-		DoFatalAlert("DrawPictureIntoGWorld: GraphicsImportGetBoundsRect failed!");
-
-
-			/* MAKE GWORLD */
-
-	iErr = NewGWorld(theGWorld, depth, &r, nil, nil, 0);					// try app mem
-	if (iErr)
-	{
-		DoAlert("DrawPictureIntoGWorld: using temp mem");
-		iErr = NewGWorld(theGWorld, depth, &r, nil, nil, useTempMem);		// try sys mem
-		if (iErr)
-		{
-			DoAlert("DrawPictureIntoGWorld: MakeMyGWorld failed");
-			return(1);
-		}
-	}
-
-	if (depth == 32)
-	{
-		hPixMap = GetGWorldPixMap(*theGWorld);				// get gworld's pixmap
-		(**hPixMap).cmpCount = 4;							// we want full 4-component argb (defaults to only rgb)
-	}
-
-
-			/* DRAW INTO THE GWORLD */
-
-	DoLockPixels(*theGWorld);
-	GraphicsImportSetGWorld(gi, *theGWorld, nil);			// set the gworld to draw image into
-	GraphicsImportSetQuality(gi,codecLosslessQuality);		// set import quality
-
-	result = GraphicsImportDraw(gi);						// draw into gworld
-	CloseComponent(gi);										// cleanup
-	if (result != noErr)
-	{
-		DoAlert("DrawPictureIntoGWorld: GraphicsImportDraw failed!");
-		ShowSystemErr(result);
-		DisposeGWorld (*theGWorld);
-		*theGWorld= nil;
-		return(result);
-	}
-	return(noErr);
-#endif
-}
 
 #pragma mark -
 
@@ -943,7 +860,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		}
 		ReleaseResource(hand);
 	}
-
+	gNumFences = 0;
 
 			/****************************/
 			/* WATER RELATED RESOURCES */

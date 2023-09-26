@@ -575,38 +575,21 @@ static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, MOSpriteSetupData *
 {
 MOSpriteData	*spriteData = &spriteObj->objectData;
 
-
-		/* CREATE MATERIAL OBJECT FROM FSSPEC */
-
-	if (inData->loadFile)
-	{
-		GLint	destPixelFormat = inData->pixelFormat;									// use passed in format
-
-		spriteData->material = MO_GetTextureFromFile(&inData->spec, destPixelFormat);
-
-		spriteData->width = spriteData->material->objectData.width;						// get dimensions of the texture
-		spriteData->height = spriteData->material->objectData.width;
-		spriteData->aspectRatio = spriteData->height / spriteData->width;				// calc aspect ratio
-	}
-
 			/* GET MATERIAL FROM SPRITE LIST */
-	else
-	{
-		short	group,type;
 
-		group = inData->group;
-		type = inData->type;
+	short	group,type;
 
-		if (inData->type >= gNumSpritesInGroupList[group])								// make sure type is valid
-			DoFatalAlert("SetMetaObjectToSprite: illegal type");
+	group = inData->group;
+	type = inData->type;
 
-		spriteData->material = gSpriteGroupList[group][type].materialObject;
-		MO_GetNewReference(spriteData->material);										// this is a new reference, so inc ref count
+	GAME_ASSERT(inData->type < gNumSpritesInGroupList[group]);						// make sure type is valid
 
-		spriteData->width 		= gSpriteGroupList[group][type].width;					// get width and height of texture
-		spriteData->height 		= gSpriteGroupList[group][type].height;
-		spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio
-	}
+	spriteData->material = gSpriteGroupList[group][type].materialObject;
+	MO_GetNewReference(spriteData->material);										// this is a new reference, so inc ref count
+
+	spriteData->width 		= gSpriteGroupList[group][type].width;					// get width and height of texture
+	spriteData->height 		= gSpriteGroupList[group][type].height;
+	spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio
 
 
 			/*******************************/
