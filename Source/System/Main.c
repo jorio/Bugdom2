@@ -252,7 +252,8 @@ static void PlayArea(void)
 		case	LEVEL_NUM_PLUMBING:
 		case	LEVEL_NUM_GUTTER:
 				PlayArea_Tunnel();
-				OGL_FadeOutScene(DrawTunnel, KeepTerrainAlive);
+				if (!gGameOver)
+					OGL_FadeOutScene(DrawTunnel, KeepTerrainAlive);
 				break;
 
 
@@ -260,7 +261,8 @@ static void PlayArea(void)
 
 		default:
 				PlayArea_Terrain();
-				OGL_FadeOutScene(DrawObjects, KeepTerrainAlive);
+				if (!gGameOver)
+					OGL_FadeOutScene(DrawObjects, KeepTerrainAlive);
 	}
 }
 
