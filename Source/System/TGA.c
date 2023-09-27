@@ -200,7 +200,7 @@ static void FlipPixelData(uint8_t* data, TGAHeader* header)
 	SafeDisposePtr((Ptr) topRowCopy);
 }
 
-OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceRGBA)
+OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, int* outOriginalBPP)
 {
 	short		refNum;
 	OSErr		err;
@@ -244,6 +244,10 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 	Boolean compressed		= header.imageType & 8;
 	Boolean needFlip		= 0 == (header.imageDescriptor & (1u << 5u));
 	long pixelDataLength	= header.width * header.height * (header.bpp / 8);
+
+	// Pass back original BPP
+	if (outOriginalBPP)
+		*outOriginalBPP = header.bpp;
 
 	// For Bugdom 2 we're going to pre-flip everything
 	needFlip ^= 1;
@@ -309,13 +313,12 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 		SafeDisposePtr((Ptr) pixelData);
 		pixelData = remapped;
 
-		// Update header to make it an BGR image
+		// Update header to make it a BGR image
 		header.imageType = TGA_IMAGETYPE_RAW_BGR;
 		header.bpp = header.paletteBitsPerColor;
 	}
 
-	// Convert to RGBA if required
-	if (forceRGBA)
+	// Convert to RGBA
 	{
 		uint8_t* converted = ConvertToRGBA(pixelData, &header);
 

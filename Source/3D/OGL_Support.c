@@ -828,7 +828,8 @@ GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* outWidth, int* o
 
 			/* LOAD RAW RGBA DATA FROM TGA FILE */
 
-	err = ReadTGA(&spec, &pixelData, &header, true);
+	int tgaBPP = 0;
+	err = ReadTGA(&spec, &pixelData, &header, &tgaBPP);
 	GAME_ASSERT(err == noErr);
 
 	GAME_ASSERT(header.bpp == 32);
@@ -860,7 +861,14 @@ GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* outWidth, int* o
 		internalFormat = GL_RGB;
 	}
 #else
+			/* GET ALPHA DEPTH FROM ORIGINAL FILE */
+
 	int internalFormat = GL_RGBA;
+
+	if (tgaBPP == 24)
+		internalFormat = GL_RGB;
+	else if (tgaBPP == 16 || tgaBPP == 8)
+		internalFormat = GL_RGB5_A1;
 #endif
 
 			/* LOAD TEXTURE */

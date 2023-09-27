@@ -30,4 +30,6 @@ enum
 	TGA_IMAGETYPE_CONVERTED_RGBA = 255,	// doesn't appear in actual files; set in memory header when pixel data was converted
 };
 
-OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceRGBA);
+// Load 32-bit RGBA pixels from a Targa file.
+// Outputs 32-bit RGBA pixels regardless of the file's original pixel type.
+OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, int* outOriginalBPP);
