@@ -129,7 +129,10 @@ void NewScore(void)
 					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = '\0';
 				}
 			}
-			else if (gTextInput[0] && gCursorIndex < MAX_NAME_LENGTH)			// dont add anything more if maxxed out now
+			else if (gTextInput[0]
+				&& gTextInput[0] >= ' '
+				&& gTextInput[0] <= '~'						// only ASCII to avoid dealing with utf-8
+				&& gCursorIndex < MAX_NAME_LENGTH)			// dont add anything more if maxxed out now
 			{
 				char theChar = gTextInput[0];
 				if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
@@ -386,6 +389,8 @@ char	s[33];
 			for (int j = 0; j < gCursorIndex && gHighScores[i].name[j]; j++)
 			{
 				const AtlasGlyph* g = GetAtlasSpriteInfo(ATLAS_GROUP_FONT1, gHighScores[i].name[j]);
+				if (!g)
+					g = GetAtlasSpriteInfo(ATLAS_GROUP_FONT1, '?');
 				cursorX += g->xadv * .32f;
 			}
 		}
