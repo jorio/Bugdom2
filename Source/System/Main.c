@@ -159,19 +159,8 @@ const short songs[] =
 			/* PLAY THRU LEVELS SEQUENTIALLY */
 			/*********************************/
 
-	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
-	{
-		gLevelNum = 0;
-//		gLevelNum = LEVEL_NUM_GUTTER;
-//		gLevelNum = LEVEL_NUM_PARK;
-//		gLevelNum = LEVEL_NUM_PLAYROOM;
 
-//			if (GetKeyState(KEY_F10))		// see if do Level cheat
-//				if (DoLevelCheatDialog())
-//					CleanQuit();
-	}
-
-	for (;gLevelNum < NUM_LEVELS; gLevelNum++)
+	for (; gLevelNum < NUM_LEVELS; gLevelNum++)		// assume gLevelNum was initially set from menu
 	{
 		PlaySong(songs[gLevelNum], true);
 

@@ -105,64 +105,6 @@ void DoLegalScreen(void)
 }
 
 
-
-#pragma mark -
-
-
-/********************* DO LEVEL CHEAT DIALOG **********************/
-
-#if 0
-Boolean DoLevelCheatDialog(void)
-{
-DialogPtr 		myDialog;
-short			itemHit;
-Boolean			dialogDone = false;
-
-	Enter2D();
-
-	ShowRealCursor();
-	myDialog = GetNewDialog(132,nil,MOVE_TO_FRONT);
-	if (!myDialog)
-	{
-		DoAlert("DoLevelCheatDialog: GetNewDialog failed!");
-		ShowSystemErr(ResError());
-	}
-
-	AutoSizeDialog(myDialog);
-
-
-
-	GammaFadeIn();
-
-
-				/* DO IT */
-
-	MyFlushEvents();
-	while(!dialogDone)
-	{
-		ModalDialog(nil, &itemHit);
-		switch (itemHit)
-		{
-			case 	1:									// hit Quit
-					CleanQuit();
-
-			default:									// selected a level
-					gLevelNum = (itemHit - 2);
-					dialogDone = true;
-		}
-	}
-	DisposeDialog(myDialog);
-	HideRealCursor();
-	GammaFadeOut();
-	GameScreenToBlack();
-
-
-	Exit2D();
-
-	return(false);
-}
-#endif
-
 #pragma mark -
 
 /********************** DO GAME SETTINGS DIALOG ************************/

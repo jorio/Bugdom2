@@ -410,6 +410,13 @@ static void DoMenuControls(void)
 		{
 			case	0:
 					gPlayNow = true;
+					gPlayingFromSavedGame = false;
+					gLevelNum = 0;
+					for (int i = 0; i < 10; i++)		// quick n dirty level cheat
+					{
+						if (IsKeyActive(SDL_SCANCODE_1+i))
+							gLevelNum = i;
+					}
 					break;
 
 			case	1:

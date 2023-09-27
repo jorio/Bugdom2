@@ -62,7 +62,6 @@ void DoPaused(void);
 
 Boolean DoFailedMenu(const Str31	headerString);
 void DoLegalScreen(void);
-Boolean DoLevelCheatDialog(void);
 void DoGameOptionsDialog(void);
 
 void DoBonusScreen(void);
