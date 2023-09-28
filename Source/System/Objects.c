@@ -373,7 +373,6 @@ Boolean			texWrap = false;
 Boolean			noFog = false;
 Boolean			clipAlpha= false;
 float			cameraX, cameraZ;
-int				i;
 
 
 	if (gFirstNodePtr == nil)									// see if there are any objects

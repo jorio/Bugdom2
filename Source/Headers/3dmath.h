@@ -27,7 +27,6 @@ float IntersectionOfYAndPlane_Func(float x, float z, const OGLPlaneEquation *p);
 void OGLVector3D_Cross(const OGLVector3D *v1, const OGLVector3D	*v2, OGLVector3D *result);
 void OGLMatrix4x4_Invert(const OGLMatrix4x4 *inMatrix, OGLMatrix4x4 *result);
 
-extern	Boolean IsPointInTriangle3D(const OGLPoint3D *point3D,	const OGLPoint3D *trianglePoints, OGLVector3D *normal);
 void OGLCreateFromToRotationMatrix(OGLMatrix4x4 *matrix4x4,	const OGLVector3D *v1, const OGLVector3D *v2);
 void SetLookAtMatrix(OGLMatrix4x4 *m, const OGLVector3D *upVector, const OGLPoint3D *from, const OGLPoint3D *to);
 void SetLookAtMatrixAndTranslate(OGLMatrix4x4 *m, const OGLVector3D *upVector, const OGLPoint3D *from, const OGLPoint3D *to);
@@ -345,8 +344,8 @@ static inline float CalcQuickDistance(float x1, float y1, float x2, float y2)
 {
 float	diffX,diffY;
 
-	diffX = fabs(x1-x2);
-	diffY = fabs(y1-y2);
+	diffX = fabsf(x1-x2);
+	diffY = fabsf(y1-y2);
 
 	if (diffX > diffY)
 	{

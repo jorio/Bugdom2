@@ -12,23 +12,7 @@
 
 			/* SOME FLOATING POINT HELPERS */
 
-#define INFINITE	1e20
 #define EPS .0001					// a very small number which is useful for FP compares close to 0
-#define	IS_ZERO(_x)  (fabs(_x) < EPS)
-
-
-#define	MOVE_TO_FRONT		(WindowPtr)-1L
-#define	NIL_STRING			""
-#define REMOVE_ALL_EVENTS	 0
-
-
-
-		/* CLOSE ENOUGH TO ZERO */
-		//
-		// If float value is close enough to 0, then make it 0
-		//
-
-#define	CLOSE_ENOUGH_TO_ZERO(theFloat)	if (fabs(theFloat) < EPS) theFloat = 0;
 
 
 		/*******************/

@@ -817,8 +817,6 @@ GLuint	textureName;
 
 GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* outWidth, int* outHeight)
 {
-	puts(path);
-
 	FSSpec					spec;
 	uint8_t*				pixelData = nil;
 	TGAHeader				header;
@@ -1318,9 +1316,9 @@ OGLLightDefType	*lights;
 	{
 		float	left, right;
 		float	halfFOV = gGameView->fov * .5f;
-		float	near 	= gGameView->hither;
-	   	float	wd2     = near * tan(halfFOV);
-		float	ndfl    = near / gAnaglyphFocallength;
+		float	hither 	= gGameView->hither;
+	   	float	wd2     = hither * tanf(halfFOV);
+		float	ndfl    = hither / gAnaglyphFocallength;
 
 		if (gAnaglyphPass == 0)
 		{

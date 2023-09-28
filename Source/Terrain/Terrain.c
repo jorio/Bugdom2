@@ -1449,7 +1449,7 @@ void DoPlayerTerrainUpdate(float x, float y)
 {
 int			row,col,maxRow,maxCol,maskRow,maskCol,deltaRow,deltaCol;
 Boolean		fullItemScan,moved;
-Byte		mask;
+Byte		mask = 0;
 
 static const Byte gridMask9[9*2][9*2] =
 {

@@ -1092,7 +1092,7 @@ static void LayOutCycler(int row, float sweepFactor)
 
 	const MenuItem* entry = &gMenu[row];
 
-	snprintf(buf, sizeof(buf), "%s:", GetMenuItemLabel(entry));
+	SDL_snprintf(buf, sizeof(buf), "%s:", GetMenuItemLabel(entry));
 
 	ObjNode* node1 = MakeTextAtRowCol(buf, row, 0);
 	node1->MoveCall = MoveAction;

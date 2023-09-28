@@ -629,7 +629,7 @@ float			intersectX,intersectZ;
 OGLVector2D		lineNormal;
 double			radius;
 double			oldX,oldZ,newX,newZ;
-Boolean			hit = false,letGoOver, letGoUnder;
+Boolean			hit = false,letGoOver = false, letGoUnder = false;
 
 			/* CALC MY MOTION LINE SEGMENT */
 

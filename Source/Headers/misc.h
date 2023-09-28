@@ -3,11 +3,11 @@
 //
 
 void	DoAlert(const char* fmt, ...);
-void	DoFatalAlert(const char* fmt, ...);
+SDL_NORETURN void	DoFatalAlert(const char* fmt, ...);
 extern unsigned char	*NumToHex(unsigned short);
 extern unsigned char	*NumToHex2(unsigned long, short);
 extern unsigned char	*NumToDec(unsigned long);
-extern	void CleanQuit(void);
+SDL_NORETURN	void CleanQuit(void);
 extern	void SetMyRandomSeed(unsigned long seed);
 uint32_t MyRandomLong(void);
 extern	Handle	AllocHandle(long size);

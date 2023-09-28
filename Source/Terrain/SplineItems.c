@@ -331,9 +331,7 @@ long	row,col;
 
 void AddToSplineObjectList(ObjNode *theNode, Boolean setAim)
 {
-
-	if (gNumSplineObjects >= MAX_SPLINE_OBJECTS)
-		DoFatalAlert("AddToSplineObjectList: too many spline objects");
+	GAME_ASSERT(gNumSplineObjects < MAX_SPLINE_OBJECTS);
 
 	theNode->SplineObjectIndex = gNumSplineObjects;					// remember where in list this is
 
@@ -546,7 +544,7 @@ float			numPointsInSpline;
 
 /******************** DETACH OBJECT FROM SPLINE ***********************/
 
-void DetachObjectFromSpline(ObjNode *theNode, void *moveCall)
+void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*))
 {
 
 	if (!(theNode->StatusBits & STATUS_BIT_ONSPLINE))

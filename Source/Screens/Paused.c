@@ -96,7 +96,7 @@ void DoPaused(void)
 static void DrawPaused(void)
 {
 float	x,y,leftX;
-float	dotX,dotY;
+float	dotX = 0, dotY = 0;
 static float	dotAlpha = 1.0f;
 
 			/* DRAW THE BACKGROUND */
@@ -153,7 +153,7 @@ static float	dotAlpha = 1.0f;
 		}
 
 
-		const char* caption;
+		const char* caption = "???";
 		switch (j)
 		{
 			case 0: caption = Localize(STR_RESUME); break;

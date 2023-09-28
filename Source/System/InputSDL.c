@@ -558,7 +558,7 @@ static SDL_GameController* TryOpenControllerFromJoystick(int joystickIndex)
 #endif
 	};
 
-	printf("Opened joystick %d as controller: %s\n",
+	SDL_Log("Opened joystick %d as controller: %s\n",
 		gController.joystickInstance,
 		SDL_GameControllerName(gController.controllerInstance));
 
@@ -606,11 +606,11 @@ static SDL_GameController* TryOpenAnyUnusedController(bool showMessage)
 		return NULL;
 	}
 
-	printf("Joystick(s) found, but none is suitable as an SDL_GameController.\n");
+	SDL_Log("Joystick(s) found, but none is suitable as an SDL_GameController.\n");
 	if (showMessage)
 	{
 		char messageBuf[1024];
-		snprintf(messageBuf, sizeof(messageBuf),
+		SDL_snprintf(messageBuf, sizeof(messageBuf),
 					"The game does not support your controller yet (\"%s\").\n\n"
 					"You can play with the keyboard and mouse instead. Sorry!",
 					SDL_JoystickNameForIndex(0));

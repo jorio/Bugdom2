@@ -109,8 +109,7 @@ static SpriteType LoadSpriteFromTGA(const char* path)
 
 	int width = 0;
 	int height = 0;
-	int hasAlpha = 0;
-	GLuint textureName = OGL_TextureMap_LoadTGA(path, 0, &width, &height);//, &hasAlpha);
+	GLuint textureName = OGL_TextureMap_LoadTGA(path, 0, &width, &height);
 	GAME_ASSERT(textureName);
 
 		/* SET UP MATERIAL */
@@ -154,7 +153,7 @@ void LoadSpriteGroupFromSeries(int groupNum, int numSprites, const char* seriesN
 	for (int i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
 	{
 		char path[64];
-		snprintf(path, sizeof(path), ":Sprites:%s:%03d.tga", seriesName, i);
+		SDL_snprintf(path, sizeof(path), ":Sprites:%s:%03d.tga", seriesName, i);
 
 		gSpriteGroupList[groupNum][i] = LoadSpriteFromTGA(path);
 		GAME_ASSERT(gSpriteGroupList[groupNum][i].materialObject);

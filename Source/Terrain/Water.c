@@ -166,22 +166,20 @@ void DisposeWater(void)
 
 void PrimeTerrainWater(void)
 {
-long					f,i,numNubs;
+int						numNubs;
 OGLPoint2D				*nubs;
 ObjNode					*obj;
 float					y,centerX,centerZ;
 
 	InitRipples();
 
-	if (gNumWaterPatches > MAX_WATER)
-		DoFatalAlert("PrimeTerrainWater: gNumWaterPatches > MAX_WATER");
-
-
 			/******************************/
 			/* ADJUST TO GAME COORDINATES */
 			/******************************/
 
-	for (f = 0; f < gNumWaterPatches; f++)
+	GAME_ASSERT(gNumWaterPatches <= MAX_WATER);
+
+	for (int f = 0; f < gNumWaterPatches; f++)
 	{
 		nubs 				= &gWaterList[f].nubList[0];				// point to nub list
 		numNubs 			= gWaterList[f].numNubs;					// get # nubs in water
@@ -205,7 +203,7 @@ float					y,centerX,centerZ;
 
 				/* CONVERT TO WORLD COORDS */
 
-		for (i = 0; i < numNubs; i++)
+		for (int i = 0; i < numNubs; i++)
 		{
 			nubs[i].x *= gMapToUnitValue;
 			nubs[i].y *= gMapToUnitValue;
@@ -248,7 +246,7 @@ float					y,centerX,centerZ;
 		gWaterInitY[f] = y;									// save water's y coord
 
 
-		for (i = 0; i < numNubs; i++)
+		for (int i = 0; i < numNubs; i++)
 		{
 			gWaterPoints[f][i].x = nubs[i].x;
 			gWaterPoints[f][i].y = y;
@@ -258,7 +256,7 @@ float					y,centerX,centerZ;
 			/* APPEND THE CENTER POINT TO THE POINT LIST */
 
 		centerX = centerZ = 0;											// calc average of points
-		for (i = 0; i < numNubs; i++)
+		for (int i = 0; i < numNubs; i++)
 		{
 			centerX += gWaterPoints[f][i].x;
 			centerZ += gWaterPoints[f][i].z;
@@ -477,7 +475,7 @@ float	ud1, uv1, ud2, uv2;
 
 void RaiseWater(void)
 {
-float		y;
+float		y = 0;
 float		fps = gFramesPerSecondFrac;
 
 	for (int f = 0; f < gNumWaterPatches; f++)

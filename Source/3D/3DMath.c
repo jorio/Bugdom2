@@ -905,119 +905,6 @@ float	dx,dy,dz;
 
 #pragma mark -
 
-/********************** IS POINT IN TRIANGLE 3D **************************/
-//
-// INPUT:	point3D			= the point to test
-//			trianglePoints	= triangle's 3 points
-//			normal			= triangle's normal
-//
-
-Boolean IsPointInTriangle3D(const OGLPoint3D *point3D,	const OGLPoint3D *trianglePoints, OGLVector3D *normal)
-{
-Byte					maximalComponent;
-unsigned long			skip;
-float					*tmp;
-float 					xComp, yComp, zComp;
-float					pX,pY;
-float					verts0x,verts0y;
-float					verts1x,verts1y;
-float					verts2x,verts2y;
-
-	tmp = (float *)trianglePoints;
-	skip = sizeof(OGLPoint3D) / sizeof(float);
-
-
-			/*****************************************/
-			/* DETERMINE LONGEST COMPONENT OF NORMAL */
-			/*****************************************/
-
-	xComp = fabs(normal->x);
-	yComp = fabs(normal->y);
-	zComp = fabs(normal->z);
-
-	if (xComp > yComp)
-	{
-		if (xComp > zComp)
-			maximalComponent = VectorComponent_X;
-		else
-			maximalComponent = VectorComponent_Z;
-	}
-	else
-	{
-		if (yComp > zComp)
-			maximalComponent = VectorComponent_Y;
-		else
-			maximalComponent = VectorComponent_Z;
-	}
-
-
-
-				/* PROJECT 3D POINTS TO 2D */
-
-	switch(maximalComponent)
-	{
-		OGLPoint3D	*point;
-
-		case	VectorComponent_X:
-				pX = point3D->y;
-				pY = point3D->z;
-
-				point = (OGLPoint3D *)tmp;
-				verts0x = point->y;
-				verts0y = point->z;
-
-				point = (OGLPoint3D *)(tmp + skip);
-				verts1x = point->y;
-				verts1y = point->z;
-
-				point = (OGLPoint3D *)(tmp + skip + skip);
-				verts2x = point->y;
-				verts2y = point->z;
-				break;
-
-		case	VectorComponent_Y:
-				pX = point3D->z;
-				pY = point3D->x;
-
-				point = (OGLPoint3D *)tmp;
-				verts0x = point->z;
-				verts0y = point->x;
-
-				point = (OGLPoint3D *)(tmp + skip);
-				verts1x = point->z;
-				verts1y = point->x;
-
-				point = (OGLPoint3D *)(tmp + skip + skip);
-				verts2x = point->z;
-				verts2y = point->x;
-				break;
-
-		case	VectorComponent_Z:
-				pX = point3D->x;
-				pY = point3D->y;
-
-				point = (OGLPoint3D *)tmp;
-				verts0x = point->x;
-				verts0y = point->y;
-
-				point = (OGLPoint3D *)(tmp + skip);
-				verts1x = point->x;
-				verts1y = point->y;
-
-				point = (OGLPoint3D *)(tmp + skip + skip);
-				verts2x = point->x;
-				verts2y = point->y;
-				break;
-	}
-
-
-			/* NOW DO 2D POINT-IN-TRIANGLE CHECK */
-
-	return ((Boolean)IsPointInTriangle(pX, pY, verts0x, verts0y, verts1x, verts1y, verts2x, verts2y));
-}
-
-#pragma mark -
-
 
 /******************** INTERSECT LINE SEGMENTS ************************/
 //
@@ -2573,7 +2460,9 @@ float			m30, m31, m32, m33;
 
 float			lX, lY, lZ;				// Local space co-ordinates
 float			hX, hY, hZ, hW;			// Homogeneous co-ordinates
-float			minusHW;				// -hW
+float			minusHW;				// -hW	GAME_ASSERT(gNumSplineObjects < MAX_SPLINE_OBJECTS);
+
+
 
 uint32_t		clipFlags;				// Clip in/out tests for point
 uint32_t		clipCodeAND;			// Clip test for entire object
@@ -2622,7 +2511,7 @@ OGLMatrix4x4	m2,*m;
 	maxY = bBox->max.y;
 	maxZ = bBox->max.z;
 
-	clipCodeAND = ~0;
+	clipCodeAND = ~0u;
 
 	for (i = 0; i < 8; i++)
 	{

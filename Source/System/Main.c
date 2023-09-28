@@ -964,6 +964,8 @@ static void CleanupLevel(void)
 	DisposeAllBG3DContainers();
 
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
+
+	gPlayerInfo.objNode = NULL;
 }
 
 

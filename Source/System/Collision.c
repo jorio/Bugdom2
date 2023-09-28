@@ -630,7 +630,7 @@ again:
 
 
 
-#pragma mark ############ POINT COLLISION #################
+#pragma mark ------------- POINT COLLISION -----------------
 
 /****************** IS POINT IN POLY ****************************/
 /*

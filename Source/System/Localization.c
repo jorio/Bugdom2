@@ -117,7 +117,7 @@ int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const
 
 	va_list args;
 	va_start(args, format);
-	int rc = vsnprintf(buf, bufSize, format, args);
+	int rc = SDL_vsnprintf(buf, bufSize, format, args);
 	va_end(args);
 
 	if (rc >= 0)
@@ -125,7 +125,7 @@ int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const
 		buf += rc;
 		bufSize -= rc;
 
-		rc = snprintf(buf, bufSize, "%s", placeholder + 1);
+		rc = SDL_snprintf(buf, bufSize, "%s", placeholder + 1);
 		if (rc >= 0)
 		{
 			buf += rc;
@@ -136,7 +136,7 @@ int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const
 	return (int) (buf - buf0);
 
 fail:
-	return snprintf(buf, bufSize, "%s", localizedString);
+	return SDL_snprintf(buf, bufSize, "%s", localizedString);
 }
 
 bool IsNativeEnglishSystem(void)

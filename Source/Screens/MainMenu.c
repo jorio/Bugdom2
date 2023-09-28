@@ -531,7 +531,7 @@ ObjNode	*newObj;
 
 							/* MAKE GNOME */
 
-		case	2:
+		default:
 				gNewObjectDefinition.type 		= SKELETON_TYPE_GNOME;
 				gNewObjectDefinition.animNum	= 1;
 				gNewObjectDefinition.scale 		= 12.0;
@@ -546,8 +546,6 @@ ObjNode	*newObj;
 
 				newObj->Delta.x = 350.0f;
 				break;
-
-
 		}
 
 

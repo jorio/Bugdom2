@@ -85,7 +85,7 @@ static void Atlas_SetGlyph(Atlas* atlas, uint32_t codepoint, AtlasGlyph* src)
 	uint32_t page = codepoint >> 8;
 	if (page >= atlas->maxPages)
 	{
-		printf("WARNING: codepoint 0x%x exceeds supported maximum (0x%x)\n", codepoint, atlas->maxPages * 256 - 1);
+		SDL_Log("WARNING: codepoint 0x%x exceeds supported maximum (0x%x)\n", codepoint, atlas->maxPages * 256 - 1);
 		return;
 	}
 
