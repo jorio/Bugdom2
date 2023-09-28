@@ -611,16 +611,10 @@ Boolean			snapTo = false;
 
 		if (lookAtObj == nil)
 		{
-			if (GetNeedAnalogValue(kNeed_CameraLeft))
+			float cameraDelta = GetNeedAnalogSteering(kNeed_CameraLeft, kNeed_CameraRight);
+			if (cameraDelta != 0)
 			{
-				OGLMatrix3x3_SetRotate(&m, fps * -6.0f);
-				OGLVector2D_Transform(&pToC, &m, &pToC);
-				snapTo = true;
-			}
-			else
-			if (GetNeedAnalogValue(kNeed_CameraRight))
-			{
-				OGLMatrix3x3_SetRotate(&m, fps * 6.0f);
+				OGLMatrix3x3_SetRotate(&m, fps * 6.0f * cameraDelta);
 				OGLVector2D_Transform(&pToC, &m, &pToC);
 				snapTo = true;
 			}
