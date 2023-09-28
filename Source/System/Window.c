@@ -64,39 +64,8 @@ void GammaFadeIn(void)
 void Enter2D(void)
 {
 	GrabMouse(false);
-	IMPLEMENT_ME_SOFT();
-#if 0
 	ShowRealCursor();
 	MyFlushEvents();
-
-	g2DStackDepth++;
-	if (g2DStackDepth > 1)						// see if already in 2D
-	{
-		GammaOn();
-		return;
-	}
-
-	if (gPlayFullScreen)
-	{
-		GammaOff();
-
-		if (gAGLContext)
-		{
-			glFlush();
-			glFinish();
-
-			aglSetDrawable(gAGLContext, nil);		// diable GL so our dialogs will show up
-			glFlush();
-			glFinish();
-		}
-
-			/* NEED TO UN-CAPTURE THE CG DISPLAY */
-
-		CGDisplayRelease(gCGDisplayID);
-	}
-
-	GammaOn();
-#endif
 }
 
 
@@ -107,25 +76,7 @@ void Enter2D(void)
 
 void Exit2D(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
-	g2DStackDepth--;
-	if (g2DStackDepth > 0)			// don't exit unless on final exit
-		return;
-
 	HideRealCursor();
-
-
-	if (gPlayFullScreen)
-	{
-//		if (gAGLContext)
-		{
-			CGDisplayCapture(gCGDisplayID);
-			if (gAGLContext)
-				aglSetFullScreen(gAGLContext, 0, 0, 0, 0);		//re-enable GL
-		}
-	}
-#endif
 }
 
 
@@ -136,13 +87,8 @@ void Exit2D(void)
 
 void HideRealCursor(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
-	if (gRealCursorVisible)
-	{
-		CGDisplayHideCursor(gCGDisplayID);
-		gRealCursorVisible = false;
-	}
+#if !SKIPFLUFF
+	SDL_ShowCursor(0);
 #endif
 }
 
@@ -151,14 +97,7 @@ void HideRealCursor(void)
 
 void ShowRealCursor(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
-	if (!gRealCursorVisible)
-	{
-		CGDisplayShowCursor(gCGDisplayID);
-		gRealCursorVisible = true;
-	}
-#endif
+	SDL_ShowCursor(1);
 }
 
 
@@ -170,7 +109,7 @@ void ShowRealCursor(void)
 void GetDefaultWindowSize(int display, int* width, int* height)
 {
 	const float aspectRatio = 4.0 / 3.0f;
-	const float screenCoverage = .75f;
+	const float screenCoverage = .8f;
 
 	SDL_Rect displayBounds = { .x = 0, .y = 0, .w = 640, .h = 480 };
 	SDL_GetDisplayUsableBounds(display, &displayBounds);

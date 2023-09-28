@@ -871,6 +871,7 @@ void BackupRestoreCursorCoord(Boolean backup)
 
 void GrabMouse(Boolean capture)
 {
+#if !SKIPFLUFF
 	if (capture)
 	{
 //		BackupRestoreCursorCoord(true);
@@ -885,6 +886,7 @@ void GrabMouse(Boolean capture)
 	{
 //		BackupRestoreCursorCoord(false);
 	}
+#endif
 }
 
 SDL_GameController* GetController(void)
