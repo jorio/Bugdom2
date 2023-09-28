@@ -111,6 +111,10 @@ ObjNode	*player = gPlayerInfo.objNode;
 	{
 		ball->Coord = ball->InitCoord;					// don't delete the ball, just make sure it's @ it's init coord
 		ball->Rot.y = ball->InitRotY;
+		ball->AccelVector.x = 0;
+		ball->AccelVector.y = 0;
+		ball->Speed2D = 0;
+		ball->StatusBits &= ~STATUS_BIT_UNDERWATER;
 		gResetRideBall = false;
 		return;
 	}
