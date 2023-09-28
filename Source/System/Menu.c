@@ -35,8 +35,6 @@ static ObjNode* LayOutCyclerValueText(int row);
 #define MAX_MENU_ROWS	32
 #define MAX_MENU_COLS	5
 
-#define kSfxNavigate	EFFECT_SPLASH
-#define kSfxMenuChange	EFFECT_CHANGESELECT
 #define kSfxCycle		EFFECT_FLYGOTKICKED
 #define kSfxError		EFFECT_CHANGESELECT
 #define kSfxDelete		EFFECT_CHANGESELECT
@@ -59,13 +57,13 @@ const MenuStyle kDefaultMenuStyle =
 {
 	.darkenPane			= true,
 	.darkenPaneScaleY	= 480,
-	.darkenPaneOpacity	= .8f,
+	.darkenPaneOpacity	= .9f,
 	.fadeInSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,
 	.titleColor			= {1.0f, 1.0f, 0.7f, 1.0f},
-	.inactiveColor		= {0.3f, 0.5f, 0.2f, 1.0f},
-	.inactiveColor2		= {0.8f, 0.0f, 0.5f, 0.5f},
+	.inactiveColor		= {0.3f, 0.7f, 0.2f, 1.0f},
+	.inactiveColor2		= {0.2f, 0.4f, 0.8f, 0.5f},
 	.standardScale		= GS * 1.0f,
 	.titleScale			= GS * 1.25f,
 	.subtitleScale		= GS * .5f,
@@ -114,7 +112,7 @@ static OGLColorRGBA TwinkleColor(void)
 static OGLColorRGBA PulsateColor(float* time)
 {
 	*time += gFramesPerSecondFrac;
-	float intensity = (1.0f + sinf(*time * 10.0f)) * 0.5f;
+	float intensity = 0.66f + 0.33 * SDL_sinf(*time * 10.0f);
 	return (OGLColorRGBA) {1,1,1,intensity};
 }
 
@@ -132,9 +130,21 @@ static const char* GetKeyBindingName(int row, int col)
 		case 0:
 			return Localize(STR_UNBOUND_PLACEHOLDER);
 		case SDL_SCANCODE_COMMA:				// on a US layout, it makes more sense to show "<" for camera left
-			return "<";						
+			return "<";
 		case SDL_SCANCODE_PERIOD:				// on a US layout, it makes more sense to show ">" for camera right
-			return ">";						
+			return ">";
+		case SDL_SCANCODE_LGUI:
+			return "Left ⌘";
+		case SDL_SCANCODE_RGUI:
+			return "Right ⌘";
+		case SDL_SCANCODE_LSHIFT:
+			return "Left ⇧";
+		case SDL_SCANCODE_RSHIFT:
+			return "Right ⇧";
+		case SDL_SCANCODE_LALT:
+			return "Left ⌥";
+		case SDL_SCANCODE_RALT:
+			return "Right ⌥";
 		default:
 			return SDL_GetScancodeName(scancode);
 	}
@@ -153,14 +163,18 @@ static const char* GetPadBindingName(int row, int col)
 			switch (kb->pad[col].id)
 			{
 				case SDL_CONTROLLER_BUTTON_INVALID:			return Localize(STR_UNBOUND_PLACEHOLDER);
-				case SDL_CONTROLLER_BUTTON_A:				return "A";
-				case SDL_CONTROLLER_BUTTON_B:				return "B";
-				case SDL_CONTROLLER_BUTTON_X:				return "X";
-				case SDL_CONTROLLER_BUTTON_Y:				return "Y";
+				case SDL_CONTROLLER_BUTTON_A:				return "Ⓐ";
+				case SDL_CONTROLLER_BUTTON_B:				return "Ⓑ";
+				case SDL_CONTROLLER_BUTTON_X:				return "Ⓧ";
+				case SDL_CONTROLLER_BUTTON_Y:				return "Ⓨ";
 				case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:	return "LB";
 				case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:	return "RB";
 				case SDL_CONTROLLER_BUTTON_LEFTSTICK:		return "Push LS";
 				case SDL_CONTROLLER_BUTTON_RIGHTSTICK:		return "Push RS";
+				case SDL_CONTROLLER_BUTTON_DPAD_UP:			return "D-pad up";
+				case SDL_CONTROLLER_BUTTON_DPAD_DOWN:		return "D-pad down";
+				case SDL_CONTROLLER_BUTTON_DPAD_LEFT:		return "D-pad left";
+				case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:		return "D-pad right";
 				default:
 					return SDL_GameControllerGetStringForButton(kb->pad[col].id);
 			}
@@ -245,6 +259,16 @@ static void ReplaceMenuText(LocStrID originalTextInMenuDefinition, LocStrID newT
 	}
 }
 
+static void PlayNavigateEffect(void)
+{
+	PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
+}
+
+static void PlayMenuChangeEffect(void)
+{
+	PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE*3/2);
+}
+
 /****************************/
 /*    MENU MOVE CALLS       */
 /****************************/
@@ -267,13 +291,13 @@ static void MoveGenericMenuItem(ObjNode* node)
 	{
 		node->ColorFilter.a *= node->SpecialSweepTimer;
 
-		float xBackup = node->Coord.x;
-
-		float p = (1.0f - node->SpecialSweepTimer);
-		node->Coord.x -= p*p * 50.0f;
-		UpdateObjectTransforms(node);
-
-		node->Coord.x = xBackup;
+//		float xBackup = node->Coord.x;
+//
+//		float p = (1.0f - node->SpecialSweepTimer);
+//		node->Coord.x -= p*p * 50.0f;
+//		UpdateObjectTransforms(node);
+//
+//		node->Coord.x = xBackup;
 	}
 	else
 	{
@@ -290,7 +314,7 @@ static void MoveLabel(ObjNode* node)
 static void MoveAction(ObjNode* node)
 {
 	if (node->SpecialRow == gMenuRow)
-		node->ColorFilter = gMenuStyle->titleColor; //TwinkleColor();
+		node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 	else
 		node->ColorFilter = gMenuStyle->inactiveColor;
 
@@ -305,7 +329,7 @@ static void MoveKeyBinding(ObjNode* node)
 		if (gMenuState == kMenuStateAwaitingKeyPress)
 			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
-			node->ColorFilter = gMenuStyle->titleColor; //TwinkleColor();
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 	}
 	else
 		node->ColorFilter = gMenuStyle->inactiveColor;
@@ -321,7 +345,7 @@ static void MovePadBinding(ObjNode* node)
 		if (gMenuState == kMenuStateAwaitingPadPress)
 			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
-			node->ColorFilter = TwinkleColor();
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 	}
 	else
 		node->ColorFilter = gMenuStyle->inactiveColor;
@@ -337,7 +361,7 @@ static void MoveMouseBinding(ObjNode* node)
 		if (gMenuState == kMenuStateAwaitingMouseClick)
 			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
-			node->ColorFilter = TwinkleColor();
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 	}
 	else
 		node->ColorFilter = gMenuStyle->inactiveColor;
@@ -381,6 +405,8 @@ static void NavigateSettingEntriesVertically(int delta)
 {
 	int browsed = 0;
 	bool skipEntry = false;
+	
+	bool mute = gMenuRow < 0;
 
 	do
 	{
@@ -396,7 +422,8 @@ static void NavigateSettingEntriesVertically(int delta)
 		}
 	} while (skipEntry);
 
-	PlayEffect(kSfxNavigate);
+	if (!mute)
+		PlayNavigateEffect();
 	gMouseHoverValidRow = false;
 }
 
@@ -468,7 +495,7 @@ static void NavigateSettingEntriesMouseHover(void)
 			if (gMenuRow != row)
 			{
 				gMenuRow = row;
-//				PlayEffect(kSfxNavigate);
+//				PlayNavigateEffect();
 			}
 
 			return;
@@ -489,7 +516,7 @@ static void NavigateAction(const MenuItem* entry)
 		if (entry->action.callback != MenuCallback_Back)
 			PlayEffect(kSfxCycle);
 		else if (gMenuStyle->playMenuChangeSounds)
-			PlayEffect(kSfxMenuChange);
+			PlayMenuChangeEffect();
 
 		if (entry->action.callback)
 			entry->action.callback();
@@ -511,7 +538,7 @@ static void NavigateSubmenuButton(const MenuItem* entry)
 	if (IsNeedDown(kNeed_UIConfirm) || (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_LEFT)))
 	{
 		if (gMenuStyle->playMenuChangeSounds)
-			PlayEffect(kSfxMenuChange);
+			PlayMenuChangeEffect();
 
 		MyFlushEvents();	// flush keypresses
 
@@ -561,7 +588,7 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	if (IsNeedDown(kNeed_UIPrev))
 	{
 		gKeyColumn = PositiveModulo(gKeyColumn - 1, MAX_USER_BINDINGS_PER_NEED);
-		PlayEffect(kSfxNavigate);
+		PlayNavigateEffect();
 		gMouseHoverValidRow = false;
 		return;
 	}
@@ -569,7 +596,7 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	if (IsNeedDown(kNeed_UINext))
 	{
 		gKeyColumn = PositiveModulo(gKeyColumn + 1, MAX_USER_BINDINGS_PER_NEED);
-		PlayEffect(kSfxNavigate);
+		PlayNavigateEffect();
 		gMouseHoverValidRow = false;
 		return;
 	}
@@ -611,7 +638,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 	if (IsNeedDown(kNeed_UIPrev))
 	{
 		gPadColumn = PositiveModulo(gPadColumn - 1, MAX_USER_BINDINGS_PER_NEED);
-		PlayEffect(kSfxNavigate);
+		PlayNavigateEffect();
 		gMouseHoverValidRow = false;
 		return;
 	}
@@ -619,7 +646,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 	if (IsNeedDown(kNeed_UINext))
 	{
 		gPadColumn = PositiveModulo(gPadColumn + 1, MAX_USER_BINDINGS_PER_NEED);
-		PlayEffect(kSfxNavigate);
+		PlayNavigateEffect();
 		gMouseHoverValidRow = false;
 		return;
 	}
@@ -745,7 +772,6 @@ static void UnbindScancodeFromAllRemappableInputNeeds(int16_t sdlScancode)
 			continue;
 
 		InputBinding* binding = GetBindingAtRow(row);
-
 		for (int j = 0; j < MAX_USER_BINDINGS_PER_NEED; j++)
 		{
 			if (binding->key[j] == sdlScancode)
@@ -845,6 +871,7 @@ static void AwaitPadPress(void)
 
 	for (int8_t button = 0; button < SDL_CONTROLLER_BUTTON_MAX; button++)
 	{
+#if 0
 		switch (button)
 		{
 			case SDL_CONTROLLER_BUTTON_DPAD_UP:			// prevent binding those
@@ -853,6 +880,7 @@ static void AwaitPadPress(void)
 			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
 				continue;
 		}
+#endif
 
 		if (SDL_GameControllerGetButton(gSDLController, button))
 		{
@@ -870,6 +898,7 @@ static void AwaitPadPress(void)
 
 	for (int8_t axis = 0; axis < SDL_CONTROLLER_AXIS_MAX; axis++)
 	{
+#if 0
 		switch (axis)
 		{
 			case SDL_CONTROLLER_AXIS_LEFTX:				// prevent binding those
@@ -878,6 +907,7 @@ static void AwaitPadPress(void)
 			case SDL_CONTROLLER_AXIS_RIGHTY:
 				continue;
 		}
+#endif
 
 		int16_t axisValue = SDL_GameControllerGetAxis(gSDLController, axis);
 		if (abs(axisValue) > kJoystickDeadZone_BindingThreshold)
@@ -929,7 +959,7 @@ static void AwaitMouseClick(void)
 #pragma mark - Page Layout
 
 #if 0
-static ObjNode* MakeDarkenPane(void)
+static ObjNode* MakeMenuDarkenPane(void)
 {
 	ObjNode* pane;
 
@@ -1180,7 +1210,7 @@ static void LayOutMenu(const MenuItem* menu)
 			{
 				SDL_snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
-				gNewObjectDefinition.scale = GS*0.6f;
+//				gNewObjectDefinition.scale = GS*0.6f;
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor2;
 				label->MoveCall = MoveLabel;
@@ -1235,8 +1265,8 @@ static void LayOutMenu(const MenuItem* menu)
 
 		y += kMenuItemHeightMultipliers[entry->type] * gMenuStyle->rowHeight;
 
-		if (entry->type != kMenuItem_Spacer)
-			sweepFactor -= .2f;
+//		if (entry->type != kMenuItem_Spacer)
+//			sweepFactor -= .2f;
 
 		gNumMenuEntries++;
 		GAME_ASSERT(gNumMenuEntries < MAX_MENU_ROWS);
@@ -1282,7 +1312,10 @@ int StartMenu(
 	ObjNode* pane = nil;
 
 	if (gMenuStyle->darkenPane)
+	{
 		pane = MakeDarkenPane();
+		pane->MoveCall = MoveDarkenPane;
+	}
 
 	LayOutMenu(menu);
 

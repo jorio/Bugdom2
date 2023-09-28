@@ -162,12 +162,26 @@ static const MenuItem gGamepadMenu[] =
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
 	{.type = kMenuItem_Subtitle, .generateText = GenerateGamepadLabel },
 	{.type = kMenuItem_Subtitle, .text = STR_CONFIGURE_GAMEPAD_HELP},
+	
+	{.type = kMenuItem_Spacer },
+
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_Forward },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_Backward },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnLeft_Key },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnRight_Key },
+	
 	{.type = kMenuItem_Spacer },
 
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Jump },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Kick },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_LaunchBuddy },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_PickupDrop },
+	
+	
+	{ .type = kMenuItem_Spacer },
+
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraLeft },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraRight },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraMode },
 
 	{ .type = kMenuItem_Spacer },
@@ -178,6 +192,7 @@ static const MenuItem gGamepadMenu[] =
 		.action = { .callback = cb_ResetPadBindings },
 	},
 
+#if 0
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -191,6 +206,7 @@ static const MenuItem gGamepadMenu[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
+#endif
 
 	{ .type = kMenuItem_Spacer },
 
