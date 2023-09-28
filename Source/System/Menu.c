@@ -1315,6 +1315,7 @@ int StartMenu(
 	{
 		pane = MakeDarkenPane();
 		pane->MoveCall = MoveDarkenPane;
+		pane->StatusBits |= STATUS_BIT_MOVEINPAUSE;
 	}
 
 	LayOutMenu(menu);
@@ -1397,7 +1398,9 @@ int StartMenu(
 	if (gMenuStyle->asyncFadeOut)
 	{
 		if (pane)
+		{
 			pane->MoveCall = MoveAsyncFadeOutAndDelete;
+		}
 
 		for (int row = 0; row < MAX_MENU_ROWS; row++)
 		{

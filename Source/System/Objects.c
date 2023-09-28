@@ -325,6 +325,10 @@ ObjNode		*thisNodePtr;
 		gNextNode	 = thisNodePtr->NextNode;				// get next node now (cuz current node might get deleted)
 
 
+		if (gGamePaused && !(thisNodePtr->StatusBits & STATUS_BIT_MOVEINPAUSE))
+			goto next;
+
+
 				/* UPDATE ANIMATION */
 
 		UpdateSkeletonAnimation(thisNodePtr);
@@ -332,14 +336,15 @@ ObjNode		*thisNodePtr;
 
 					/* NEXT TRY TO MOVE IT */
 
-		if (!(thisNodePtr->StatusBits & STATUS_BIT_ONSPLINE))		// make sure don't call a move call if on spline
+		if (!(thisNodePtr->StatusBits & STATUS_BIT_ONSPLINE)		// make sure don't call a move call if on spline
+			&& (!(thisNodePtr->StatusBits & STATUS_BIT_NOMOVE))
+			&& (thisNodePtr->MoveCall != nil))
 		{
-			if ((!(thisNodePtr->StatusBits & STATUS_BIT_NOMOVE)) &&	(thisNodePtr->MoveCall != nil))
-			{
-				KeepOldCollisionBoxes(thisNodePtr);					// keep old boxes & other stuff
-				thisNodePtr->MoveCall(thisNodePtr);				// call object's move routine
-			}
+			KeepOldCollisionBoxes(thisNodePtr);				// keep old boxes & other stuff
+			thisNodePtr->MoveCall(thisNodePtr);				// call object's move routine
 		}
+
+next:
 		thisNodePtr = gNextNode;							// next node
 	}
 	while (thisNodePtr != nil);

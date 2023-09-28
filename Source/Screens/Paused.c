@@ -79,6 +79,7 @@ void DoPaused(void)
 
 		CalcFramesPerSecond();
 		UpdateInput();
+		MoveObjects();
 		KeepTerrainAlive();
 		OGL_DrawScene(DrawPaused);
 	}
@@ -151,7 +152,14 @@ static float	dotAlpha = 1.0f;
 			dotY = y + 3.0f;
 		}
 
-		const char* caption = Localize(STR_PAUSEOPTION1 + j);
+
+		const char* caption;
+		switch (j)
+		{
+			case 0: caption = Localize(STR_RESUME); break;
+			case 1: caption = Localize(STR_SETTINGS); break;
+			case 2: caption = Localize(STR_RETIRE); break;
+		}
 
 		GameFont_DrawString(caption, x, y, .3f, kTextMeshAlignLeft | kTextMeshAlignTop);
 		y += LETTER_SPACING_Y;
@@ -213,23 +221,21 @@ Boolean	continueGame = false;
 
 	if (IsNeedDown(kNeed_UIConfirm))
 	{
-		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/2,NORMAL_CHANNEL_RATE);
-
+		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE*3/2);
 		switch(gPausedMenuSelection)
 		{
 			case	0:								// RESUME
 					continueGame = true;
 					break;
 
-			case	1:								// EXIT
+			case	1:								// SETTINGS
+					DoSettingsOverlay(KeepTerrainAlive, DrawObjects);
+					break;
+
+			case	2:								// EXIT
 					gGameOver = true;
 					continueGame = true;
 					break;
-
-			case	2:								// QUIT
-					CleanQuit();
-					break;
-
 		}
 	}
 

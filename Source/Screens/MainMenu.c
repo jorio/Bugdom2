@@ -898,18 +898,21 @@ static void MoveDarkenPane(ObjNode *theNode)
 
 static void DrawDarkenPane(ObjNode *theNode)
 {
+	OGL_PushState();
+	SetInfobarSpriteState();
+
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);
 	glEnable(GL_BLEND);
 
 	glBegin(GL_QUADS);
-	glVertex3f(-1000,-1000,DARKEN_PANE_Z);
-	glVertex3f(1000,-1000,DARKEN_PANE_Z);
-	glVertex3f(1000,1000,DARKEN_PANE_Z);
-	glVertex3f(-1000,1000,DARKEN_PANE_Z);
+	glVertex3f(-1000,-1000,0);
+	glVertex3f(1000,-1000,0);
+	glVertex3f(1000,1000,0);
+	glVertex3f(-1000,1000,0);
 	glEnd();
 
-	glDisable(GL_BLEND);
+	OGL_PopState();
 }
 
 

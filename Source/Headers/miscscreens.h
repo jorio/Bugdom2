@@ -53,8 +53,6 @@ typedef struct
 	uint32_t		score;
 }HighScoreType;
 
-#define	DARKEN_PANE_Z	450.0f
-
 ObjNode *MakeDarkenPane(void);
 
 void KeepTerrainAlive(void);
