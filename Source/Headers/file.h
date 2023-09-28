@@ -2,6 +2,8 @@
 // file.h
 //
 
+#define NUM_SAVE_SLOTS 8
+
 		/***********************/
 		/* RESOURCE STURCTURES */
 		/***********************/
@@ -73,6 +75,23 @@ typedef struct
 }PrefsType;
 
 
+
+		/* SAVE GAME */
+
+#define	SAVE_GAME_VERSION	0x0400		// 4.0
+
+typedef struct
+{
+	uint64_t	timestamp;
+	uint32_t	version;
+	uint32_t	score;
+	float		health;
+	Byte		realLevel;
+	Byte		numLives;
+	Byte		numGoldClovers;
+}SaveGameType;
+
+
 //=================================================
 
 SkeletonDefType *LoadSkeletonFile(short skeletonType);
@@ -82,9 +101,9 @@ void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr);
 
-Boolean SaveGame(void);
-Boolean LoadSavedGame(void);
-
+Boolean SaveGame(int slot);
+Boolean LoadSavedGameStruct(int slot, SaveGameType* outSaveData); 
+Boolean LoadSavedGame(int slot);
 
 void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec);
 

@@ -39,6 +39,11 @@ enum
 };
 
 
+enum
+{
+	FILE_SCREEN_TYPE_LOAD,
+	FILE_SCREEN_TYPE_SAVE,
+};
 
 #define	NUM_SCORES		15
 #define	MAX_NAME_LENGTH	15
@@ -101,3 +106,4 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 					   void (*backgroundDrawRoutine)(void));
 
 
+bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void));

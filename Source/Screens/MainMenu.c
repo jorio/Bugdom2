@@ -420,7 +420,7 @@ static void DoMenuControls(void)
 					break;
 
 			case	1:
-					if (LoadSavedGame())
+					if (DoFileScreen(FILE_SCREEN_TYPE_LOAD, DrawObjects))
 					{
 						gPlayNow = true;
 						gPlayingFromSavedGame = true;

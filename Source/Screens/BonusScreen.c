@@ -698,7 +698,9 @@ static void DoSaveSelect(void)
 		/* SAVE GAME */
 
 	if (gSaveGame)
-		SaveGame();
+	{
+		DoFileScreen(FILE_SCREEN_TYPE_SAVE, DrawObjects);
+	}
 }
 
 

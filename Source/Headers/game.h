@@ -11,7 +11,7 @@
 #endif
 
 #define APPSTORE	0
-#define SKIPFLUFF	0
+#define SKIPFLUFF	1
 
 #include "version.h"
 #include "globals.h"

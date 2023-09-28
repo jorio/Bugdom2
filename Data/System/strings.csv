@@ -1,7 +1,7 @@
 "Hi Skip!  I’m Sam the Snail, and I seem to have lost my shell.
 If you can find it for me, I’ll give you the key to the gate.","Hé Skip!  Je suis Sam l’Escargot, et je crois que j’ai perdu
-ma coquille. Si tu réussis à me la retrouver, je te donnerai
-la clé de la porte.","Hallo Skip! Ich bin Sam die Schnecke und ich scheine mein Haus
+ma coquille. Si tu me la retrouves, je te donnerai la clé de
+la porte.","Hallo Skip! Ich bin Sam die Schnecke und ich scheine mein Haus
 verloren zu haben. Wenn Du es für mich findest, gebe ich Dir
 den Schlüssel für das Tor.","¡Hola Skip! Soy Sam el caracol y parece que he perdido mi
 caparazón. Si lo encuentras, te daré la llave de la puerta.","Ciao Skip! Sono Sam la lumaca e credo di aver perso il mio
@@ -16,8 +16,8 @@ prometida!","Grazie per aver trovato il mio guscio, Skip! Ecco la chiave
 che ti ho promesso!","Tack för att du hittade mitt skal, Skip! Här är nyckeln
 som jag lovade!","Bedankt voor het vinden van mijn huis, Skip! Hier is de sleutel
 die ik je beloofd heb!"
-"Hi Skip! If you can put my scarecrow’s head back on,
-I’ll give you another key.","Hé Skip! Si tu arrives à remettre la tête de mon épouvantail
+"Hi Skip! If you can put my scarecrow’s head back on, I’ll give
+you another key.","Hé Skip! Si tu arrives à remettre la tête de mon épouvantail
 en place, je te donnerai une autre clé.","Hallo Skip! Wenn Du meiner Vogelscheuche wieder ihren Kopf
 aufsetzen kannst, gebe ich Dir einen weiteren Schlüssel.","¡Hola Skip! Si consigues volver a colocar la cabeza del
 espantapájaros te daré otra llave.","Ciao Skip! Se puoi rimettere al suo posto la testa dello
@@ -40,7 +40,7 @@ nyckel!","Bedankt voor het repareren van mijn vogelverschrikker, Skip!
 Hier is je sleutel!"
 "Find my marble and use it to knock down these batteries.
 I’ll give you a key if you can do it!","Trouve ma bille et utilise-la pour renverser ces piles.
-Je te donnerai une clé si tu réussis à le faire!","Finde meine Murmel und verwende sie, um diese Batterien
+Je te donnerai une clé si tu y arrives!","Finde meine Murmel und verwende sie, um diese Batterien
 umzuschmeißen. Ich gebe Dir einen Schlüssel, wenn Du das
 machen kannst!","Busca mi canica y úsala para derribar todas estas baterías.
 ¡Te daré una llave si lo consigues!","Trova la mia biglia e usala per abbattere queste pile.
@@ -48,9 +48,8 @@ Se riesci, ti daró una chiave!","Hitta min kula och använd den för att knuffa
 batterier. Jag ger dig en nyckel om du kan göra det!","Zoek mijn knikker en gebruik hem om deze batterijen om te
 gooien. Ik geef je een sleutel als het je lukt!"
 "Good job finding my marble, Skip!
-Now kick the marble to knock down all the batteries.","Bon travail, tu as trouvé ma bille, Skip!
-Maintenant, donne un coup de pied dedans
-pour renverser toutes les piles.","Gut gemacht, Skip, Du hast meine Murmel gefunden! Nun trete
+Now kick the marble to knock down all the batteries.","Bon travail, tu as trouvé ma bille, Skip!  Maintenant, donne
+un coup de pied dedans pour renverser toutes les piles.","Gut gemacht, Skip, Du hast meine Murmel gefunden! Nun trete
 die Murmel, um alle Batterien umzuschmeißen.","¡Fantástico, encontraste la canica, Skip! Ahora dale una
 patada para derribar todas las baterías.","Ben fatto! Hai trovato la biglia, Skip! Ora, usala per
 abbattere tutte le pile, dandole un calcio.","Bra jobb med att hitta min kula, Skip!  Sparka nu kulan
@@ -64,9 +63,9 @@ Eichel bringst.","¡Hombre, hola Skip! Te daré un mapa si me traes una bellota.
 een eikel brengt."
 Howdy Skip! I’ll trade you this checkpoint for an acorn.,"Coucou Skip! Je peux t’échanger ce témoin de passage
 contre un gland.",Tag Skip! Ich gebe Dir diesen Kontrollpunkt für eine Eichel.,¡Hombre Skip! Te cambio este punto de control por una bellota.,"Come va Skip? In cambio di una ghianda, pianteró un marcatore.",Hejsan Skip! Jag byter den här kontrollpunkten för ett ekollon.,Hoi Skip! Ik ruil dit checkpoint voor een eikel.
-"Skip, this critter looks stuck. See if you can
-lift the bar by pressing the Pickup button.","Skip, cette bestiole a l’air coincée. Essaye de soulever
-cette barre pour la libérer en appuyant sur “Ramasser”.","Skip, dieses Wesen scheint festzustecken. Schau, ob Du durch
+"Skip, this critter looks stuck. See if you can lift the bar by
+pressing your Pickup button.","Skip, cette bestiole a l’air coincée. Essaye de soulever
+cette barre pour la libérer avec le bouton “Ramasser”.","Skip, dieses Wesen scheint festzustecken. Schau, ob Du durch
 Drücken des Aufheben-Knopfes die Klammer hochheben kannst.","Skip, este bicho está atrapado. Intenta levantar la barra
 pulsando el botón Coger.","Skip, questo topolino sembra intrappolato. Vedi se puoi alzare
 la barra usando il tasto di presa.","Skip, denna stackare ser ut att sitta fast. Se om du kan lyfta
@@ -77,8 +76,8 @@ te maken door op de ‘Oppak’ knop te drukken."
 Checkpoint!,Et un témoin de passage!,Kontrollpunkt!,¡Un punto de control!,Marcatore!,Kontrollpunkt!,Checkpoint!
 "Skip, the red key is floating on a leaf somewhere in the pool.
 But be careful, the chlorine in the water will hurt ya!","Skip, la clé rouge est sur l’une des feuilles qui flottent
-dans la piscine. Mais attention! Le chlore de l’eau
-peut te blesser!","Skip, der rote Schlüssel schwimmt auf einem Blatt irgendwo im
+dans la piscine. Mais attention! Le chlore de l’eau peut
+te blesser!","Skip, der rote Schlüssel schwimmt auf einem Blatt irgendwo im
 Pool. Aber sei vorsichtig, das Chlor im Wasser wird Dich
 verletzen!","Skip, la llave roja está flotando en el estanque. ¡Ten cuidado,
 el cloro del agua te hará daño!","Skip, la chiave rossa galleggia su una foglia nella piscina.
@@ -104,8 +103,8 @@ Tiens, voilà ta clé!","Du hast da eine ganz schöne Sauerei hinterlassen!
 Hier ist der Schlüssel!",¡Menuda la que has armado! ¡Toma la llave!,"Hai fatto un bel macello, là dietro! Eccoti la chiave!",Du ställde till en riktig röra därborta! Här är nyckeln!,Je hebt er nogal een smeerboel van gemaakt! Hier is de sleutel!
 "Skip, this pipe will take you inside the house. I’ll let you in if
 you can get all the ticks and fleas off my friend Fido.","Skip, cette canalisation te mènera dans la maison.
-Je te laisserai entrer si tu débarrasses mon ami
-Fido de toutes ses tiques et ses puces.","Skip, dieses Rohr bringt Dich ins Haus. Ich lasse Dich hinein,
+Je te laisserai entrer si tu débarrasses mon ami Fido
+de toutes ses tiques et ses puces.","Skip, dieses Rohr bringt Dich ins Haus. Ich lasse Dich hinein,
 wenn Du meinen Freund Fido von allen Zecken und Flöhen
 befreien kannst.","Skip, entrarás a la casa por esta tubería. Te dejaré entrar si
 le quitas a mi amigo Fido todas la garrapatas y pulgas.","Skip, questo tubo ti porterà dentro la casa. Ti lasceró
@@ -120,9 +119,9 @@ Maintenant, finissons-en avec les puces!",Du hast alle Zecken erwischt! Nun küm
 Good job! You’ve made Fido a happy dog!,"Beau travail!
 Grâce à toi, Fido est enfin un chien heureux!",Gute Arbeit! Du hast Fido zu einem glücklichen Hund gemacht!,¡Bien hecho! ¡Mira qué contento está Fido!,Ottimo lavoro! Hai reso Fido un cagnolino felice!,Bra jobb! Du har gjort Fido till en lycklig hund!,Goed zo! Nu is Fido weer een blije hond!
 "Remember Skip, if you’ll get all the ticks and fleas off
-of my friend Fido, I’ll let you into the drain pipe.","Souviens-toi, Skip: si tu débarrasses mon ami
-Fido de toutes ses tiques et de toutes ses puces,
-je te laisserai entrer dans la canalisation.","Denke dran, Skip, wenn Du meinen Freund Fido von allen Flöhen
+of my friend Fido, I’ll let you into the drain pipe.","Souviens-toi, Skip: si tu débarrasses mon ami Fido
+de toutes ses tiques et de toutes ses puces, je te
+laisserai entrer dans la canalisation.","Denke dran, Skip, wenn Du meinen Freund Fido von allen Flöhen
 und Zecken befreien kannst, lasse ich Dich ins Abwasserrohr.","Recuerda Skip, si le quitas a mi amigo Fido todas las garrapatas
 y las pulgas te dejaré entrar por la cañería.","Ricorda, Skip, se liberi il mio amico Fido da tutte le pulci
 e gli acari, ti lasceró entrare nel tubo di scarico.","Kom ihåg Skip, om du får tag i alla fästingarna och lopporna från
@@ -143,7 +142,8 @@ sleutel. Spring dus in de auto en ga racen!"
 "Skip, there are mice in the yard who are caught in traps.
 If you can rescue at least 4 of them I’ll give you another key!","Skip, des souris sont prises au piège dans la cour.
 Si tu en libères au moins 4, je te donnerai une autre clé!","Skip, es gibt Mäuse hier, die in Fallen gefangen sind, Wenn Du
-mindestens 4 davon befreien kannst, gebe ich Dir einen weiteren Schlüssel!","Skip, hay varios ratones en el patio atrapados en trampas. ¡Si
+mindestens 4 davon befreien kannst, gebe ich Dir einen weiteren
+Schlüssel!","Skip, hay varios ratones en el patio atrapados en trampas. ¡Si
 logras rescatar por lo menos a 4 te daré otra llave!","Skip, nel recinto ci sono dei topolini presi in trappola.
 Se ne liberi 4, ti daró un’altra chiave!","Skip, det är möss på gården som har fastnat i fällor. Om du
 kan rädda minst 4 av dom så ger jag dig en nyckel till!","Skip, er zijn muizen in de tuin die gevangen zijn in vallen.
@@ -180,7 +180,7 @@ een sleutel voor je!"
 "If you can destroy all of the Ant Hills I’ll tell you which way
 Bully Bee went!
 To destroy an Ant Hill, drop a bomb down the hole.","Si tu détruis toutes les Fourmilières, je te dirai où est partie
-la Bully Bee! Lâcher une bombe dans le trou d’une Fourmilière
+la Bully Bee! Lâche une bombe dans le trou d’une Fourmilière
 pour la détruire.","Wenn Du alle Ameisenhügel zerstörst, sage ich Dir, wohin
 Tyrannen-Biene geflogen ist! Um einen Ameisenhügel zu
 zerstören, lasse eine Bombe ins Loch fallen.","¡Destruye todos los hormigueros y te diré por dónde se ha ido
@@ -191,9 +191,9 @@ väg Bully Bi tog! Fäll en bomb ned i hålet för att förstöra en
 myrstack.","Als je alle mierenhopen kunt vernietigen zal ik je vertellen
 welke kant Pest Wesp heen is gegaan! Om een mierenhoop te
 vernietigen gooi je een bom in het gat."
-"To drop a bomb, press the Pickup button.
-To shoot at Dragonflies, press the Kick button.","Pour lâcher une bombe, appuie sur “Ramasser”.
-Pour tirer sur les Libellules, appuie sur “Coup de pied”.","Um eine Bombe fallenzulassen, drücke die Aufheben-Fallenlassen-
+"To drop a bomb, press the Pickup/Drop button.
+To shoot at Dragonflies, press the Kick button.","Lâche une bombe avec le bouton “Ramasser”.
+Tire sur les Libellules avec le bouton “Coup de pied”.","Um eine Bombe fallenzulassen, drücke die Aufheben-Fallenlassen-
 Taste. Um auf Libellen zu schießen, drücke die Treten-Taste","Para lanzar la bomba pulsa el botón Coger/Soltar. Para disparar
 a las libélulas, pulsa el botón Patada.","Per sganciare una bomba, usa il tasto Prendi. Per sparare
 a una libellula, usa il tasto per dare un Calcio.","För att fälla en bomb tryck Plocka upp-Släpp-knappen.
@@ -329,9 +329,9 @@ Voilà la clé!","Gute Arbeit beim Befreien der Mäuse, Skip! Hier ist der
 Schlüssel!","¡Bien hecho, liberaste a los ratones, Skip! ¡Aquí tienes tu
 llave!","Sei stato bravo a liberare i topolini, Skip! Ecco la chiave!","Bra jobb med att rädda dom där mössen, Skip! Här är nyckeln!","Goed gedaan Skip, je hebt alle muizen bevrijd! Hier is de
 sleutel!"
-"I think your best way out of here is to fly this plane, but
-It’s missing some parts. I bet if you put the propeller and
-wheels back on it it’ll fly!","Je pense que le meilleur moyen de s’enfuir d’ici est de prendre
+"I think your best way out of here is to fly this plane, but it’s
+missing some parts. I bet if you put the propeller and wheels
+back on it it’ll fly!","Je pense que le meilleur moyen de s’enfuir d’ici est de prendre
 cet avion, mais il lui manque des pièces. Je parie qu’il
 fonctionnera si tu réussis à remonter l’hélice et les roues!","Ich denke, der beste Weg hier raus ist, dieses Flugzeug zu
 fliegen, es fehlen aber ein paar Teile. Wetten, es fliegt, wenn Du
@@ -353,29 +353,61 @@ ad aprirle tutte, tirando la linguetta sul coperchio!","Hörru Skip, dom här l�
 vad om att du kan öppna fliken på dom!","Hé Skip, deze blikjes fris zijn nog steeds vol. Ik wed dat
 je de lipjes open kunt trekken!"
 MAX DIALOG STRINGS,,,,,,
-
+,,,,,,
 Resume Game,Continuer,Spiel fortsetzen,Reanudar,Continua,Återuppta spelet,Hervat spel
 Retire Game,Abandonner,Spiel abbrechen,Retirarse,Annulla,Dra dig ur spelet,Stop spel
 Quit Application,Quitter,Beenden,Cerrar el juego,Esci dal gioco,Avsluta,Stop programma
-
+,,,,,,
+Load Saved Game,Charger une partie,Spiel laden,Cargar una partida,Carica una partita,Ladda spel,Opgeslagen spel laden
+Save Game,Enregistrer la partie,Spiel speichern,Guardar el juego,Salva la partita,Spara spelet,Spel opslaan
+Entering level #. Save where?,Bienvenue au niveau #. Enregistrer où?,Level # erreicht. Wo willst du speichern?,Entrando en level #. ¿Dónde guardar?,Accesso al livello #. Dove salvare?,Går nu in på bana #. Vart ska vi spara?,Niveau # bereikt. Waar wil je opslaan?
+Continue Without Saving,Continuer sans enregistrer,Fortfahren ohne zu speichern,Continuar sin guardar,Continua senza salvare,Fortsätta utan att spara,Doorgaan zonder op te slaan
+Empty,Vide,Leer,Vacío,Vuoto,Tom,Leeg
+Level,Niveau,Level,Level,Livello,Bana,Niveau
+File,Fichier,Datei,Archivo,File,Fil,Bestand
+,,,,,,
+Jan.,Janv.,Jan,Enero,genn.,Jan.,Jan.
+Feb.,Févr.,Feb,Feb.,febb.,Febr.,Feb.
+Mar.,Mars,Mar,Marzo,mar.,Mars,Mrt.
+Apr.,Avr.,Apr,Abr.,apr.,April,Apr.
+May,Mai,Mai,Mayo,magg.,Maj,Mei
+June,Juin,Jun,Jun.,giu.,Juni,Juni
+July,Juil.,Jul,Jul.,lug.,Juli,Juli
+Aug.,Août,Aug,Agosto,ago.,Aug.,Aug.
+Sept.,Sept.,Sep,Set.,sett.,Sept.,Sep.
+Oct.,Oct.,Okt,Oct.,ott.,Okt.,Okt.
+Nov.,Nov.,Nov,Nov.,nov.,Nov.,Nov.
+Dec.,Déc.,Dez,Dic.,dic.,Dec.,Dec.
+,,,,,,
+The Back Yard,Le jardinet,,,,,
+The Front Yard,Le grand jardin,,,,,
+Fido’s Fur,La fourrure de Fido,,,,,
+The Sewer,L’égoût,,,,,
+The Playroom,La salle de jeux,,,,,
+The Closet,Le placard,,,,,
+The Gutter,La gouttière,,,,,
+The Garbage Can,La poubelle,,,,,
+Flight of the Grasshopper,L’envol de la sauterelle,,,,,
+The Park,Le parc,,,,,
+,,,,,,
 English,Français,Deutsch,Español,Italiano,Svenska,Nederlands
 OK,,,,,,
-Back,Retour,,,,,
+Back,Retour,Zurück,Atrás,Indietro,Tillbaka,Terug
 On,Oui,Ein,Sí,Sì,På,
 Off,Non,Aus,No,No,Av,
-Settings,Réglages,,,,,
-Music,Musique,,,,,
+Settings,Préférences,Einstellungen,Preferencias,Impostazioni,Inställningar,Instellingen
+Music,Musique,Musik,Música,Musica,Musik,Muziek
 Language,Langue,Sprache,Idioma,Lingua,Språk,Taal
-Monitor,Écran,,,,,
-Monitor,Écran,,,,,
-Fullscreen,Plein écran,,,,,
-The new antialiasing settings will,,,,,,
-take effect when you restart the game.,,,,,,
+Monitor,Écran,,,Schermo preferito,,
+Monitor,Écran,,,Schermo,,
+Fullscreen,Plein écran,Vollbild,Pantalla completa,Schermo intero,Fullskärm,Volledig scherm
+The new antialiasing settings will take,Le nouveau niveau d’anticrénelage sera,,,Il nuovo livello di antialiasing avrà,,
+effect when you restart the game.,effectif après un redémarrage du jeu.,,,effetto quanto riavvierai il gioco.,,
 V-Sync,,,,,,
-Antialiasing,Anticrénelage
-MSAA 2x
-MSAA 4x
-MSAA 8x
+Antialiasing,Anticrénelage,Antialiasing,Antialiasing,Antialiasing,Kantutjämning,
+MSAA 2x,,,,,,
+MSAA 4x,,,,,,
+MSAA 8x,,,,,,
 ---,,,,,,
 Press!,Appuie!,Drück!,,Premi!,Tryck!,Druk!
 Click!,Clique!,,,Fai click!,,
@@ -387,16 +419,20 @@ Scroll Up,Défiler Haut,,,Scorri verso l’alto,,
 Scroll Down,Défiler Bas,,,Scorri verso il basso,,
 Scroll Left,Défiler Gauche,,,Scorri verso sinistra,,
 Scroll Right,Défiler Droite,,,Scorri verso destra,,
-Configure Keyboard,,,,,,
-Configure Keyboard Help,,,,,,
-Configure Keyboard Help Cancel,,,,,,
-Configure Gamepad,,,,,,
-Configure Gamepad Help,,,,,,
-Configure Gamepad Help Cancel,,,,,,
-Configure Mouse,,,,,,
-No Gamepad Detected,,,,,,
-Rumble,Vibration,,,,,
-Reset To Defaults,,,,,,
+Keyboard controls,Commandes clavier,Tastatur konfigurieren,Configurar el teclado,Configura la tastiera,Konfigurera tangentbordet,Toetsenbord
+"Press <RETURN> to assign a new key, or <X> to clear it","Appuie sur <ENTRÉE> pour réaffecter une touche, ou <X> pour l'effacer",,,"Premi <INVIO> per assegnare un nuovo tasto, oppure <X> per rimuoverlo","Tryck på <ENTER> för att tilldela en ny
+tangent, eller <X> för att rensa",
+"Press a key now, or <ESC> to cancel","Appuie sur la touche de ton choix, ou <ÉCHAP> pour annuler",,,"Premi un tasto ora, oppure <ESC> per annullare","Tryck på valfri tangent nu, eller <ESC> för att avbryta",
+Gamepad controls,Commandes manette,Gamepad konfigurieren,Configurar el mando,Configura il gamepad,Konfigurera handkontrollen,Controller
+"Press <A> to assign a new button, or <X> to clear it","Appuie sur <A> pour réaffecter un bouton, ou <X> pour l'effacer",,,"Premi <A> per assegnare un nuovo bottone, oppure <X> per rimuoverlo","Tryck på <A> för att tilldela en ny knapp, eller <X> för att rensa",
+"Press a button now, or <START> to cancel","Appuie sur le bouton de ton choix,
+ou <START> pour annuler",,,"Premi un bottone ora,
+oppure <START> per annullare","Tryck på valfri knapp nu,
+eller <START> för att avbryta",
+Mouse controls,Commandes souris,Maus konfigurieren,Configurar el ratón,Configura il mouse,Konfigurera musen,Muis
+No gamepad detected,Aucune manette détectée,Kein Controller erkannt,,Nessun gamepad rilevato,Ingen handkontroll hittades,
+Rumble,Vibrations,Vibration,Vibración,Vibrazioni,Vibration,
+Restore default configuration,Restaurer la config. par défaut,Standardkonfiguration zurücksetzen,,Ripristina la configurazione predefinita,Återställ standardkonfiguration,
 ,,,,,,
 Turn Left,À gauche,,,,,
 Turn Right,À droite,,,,,

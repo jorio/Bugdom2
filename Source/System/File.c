@@ -11,6 +11,7 @@
 /***************/
 
 #include "game.h"
+#include <time.h>
 
 
 /****************************/
@@ -29,22 +30,6 @@ static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short f
 /****************************/
 
 #define	SKELETON_FILE_VERS_NUM	0x0110			// v1.1
-
-#define	SAVE_GAME_VERSION	0x0100		// 1.0
-
-
-
-		/* SAVE GAME */
-
-typedef struct
-{
-	uint32_t		version;
-	uint32_t		score;
-	short		realLevel;
-	short		numLives;
-	float		health;
-	short		numGoldClovers;
-}SaveGameType;
 
 
 		/* PLAYFIELD HEADER */
@@ -1101,174 +1086,127 @@ uint16_t	pixel,*bottom;
 // Returns true if saving was successful
 //
 
-Boolean SaveGame(void)
+Boolean SaveGame(int slot)
 {
-	IMPLEMENT_ME_SOFT();
-	return false;
-#if 0
 SaveGameType	saveData;
 short			fRefNum;
-FSSpec			*specPtr;
-NavReplyRecord	navReply;
-long			count;
+FSSpec			spec;
+OSErr			err;
+Str255			saveFilePath;
 Boolean			success = false;
-
-	Enter2D();
 
 			/*************************/
 			/* CREATE SAVE GAME DATA */
 			/*************************/
 
+	saveData.timestamp		= time(NULL);
 	saveData.version		= SAVE_GAME_VERSION;				// save file version #
-	saveData.version		= SwizzleULong(&saveData.version);
-
 	saveData.score 			= gScore;
-	saveData.score			= SwizzleULong(&saveData.score);
-
-	saveData.realLevel		= gLevelNum+1;						// save @ beginning of next level
-	saveData.realLevel		= SwizzleShort(&saveData.realLevel);
-
-	saveData.numLives 		= gPlayerInfo.lives;
-	saveData.numLives		= SwizzleShort(&saveData.numLives);
-
 	saveData.health			= gPlayerInfo.health;
+	saveData.realLevel		= gLevelNum + 1;					// save @ beginning of next level
+	saveData.numLives		= gPlayerInfo.lives;
+	saveData.numGoldClovers	= gPlayerInfo.numGoldClovers;		// save # gold clovers we have at this point
+
+	saveData.timestamp		= SwizzleULong64(&saveData.timestamp);
+	saveData.version		= SwizzleULong(&saveData.version);
+	saveData.score			= SwizzleULong(&saveData.score);
 	saveData.health			= SwizzleFloat(&saveData.health);
-
-	saveData.numGoldClovers	 = gPlayerInfo.numGoldClovers;		// save # gold clovers we have at this point
-	saveData.numGoldClovers		= SwizzleShort(&saveData.numGoldClovers);
-
 
 		/*******************/
 		/* DO NAV SERVICES */
 		/*******************/
 
-	if (PutFileWithNavServices(&navReply, &gSavedGameSpec))
-		goto bail;
-	specPtr = &gSavedGameSpec;
-	if (navReply.replacing)										// see if delete old
-		FSpDelete(specPtr);
+	SDL_snprintf(saveFilePath, sizeof(saveFilePath), ":" PROJECT_NAME ":Save%c", 'A' + slot);
 
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
 
-				/* CREATE & OPEN THE REZ-FORK */
-
-	if (FSpCreate(specPtr, kGameID,'B2sv',nil) != noErr)
+	err = FSpCreate(&spec, kGameID, 'B2Sv', 0);
+	if (err != noErr)
 	{
-		DoAlert("Error creating Save file");
-		goto bail;
+		DoAlert("Couldn't create save file.");
+		return false;
 	}
 
-	FSpOpenDF(specPtr,fsRdWrPerm, &fRefNum);
-	if (fRefNum == -1)
+	err = FSpOpenDF(&spec, fsWrPerm, &fRefNum);
+
+	if (err != noErr)
 	{
-		DoAlert("Error opening Save file");
-		goto bail;
+		DoAlert("Couldn't open file for writing.");
+		return false;
 	}
 
-
-				/* WRITE TO FILE */
-
-	count = sizeof(SaveGameType);
-	if (FSWrite(fRefNum, &count, (Ptr)&saveData) != noErr)
-	{
-		DoAlert("Error writing Save file");
-		FSClose(fRefNum);
-		goto bail;
-	}
-
-			/* CLOSE FILE */
-
+	long count = sizeof(SaveGameType);
+	err = FSWrite(fRefNum, &count, (Ptr)&saveData);
 	FSClose(fRefNum);
 
+	if (count != sizeof(SaveGameType) || err != noErr)
+	{
+		DoAlert("Couldn't write saved game file.");
+		return false;
+	}
 
-			/* CLEANUP NAV SERVICES */
-
-	NavCompleteSave(&navReply, kNavTranslateInPlace);
-
-	success = true;
-
-bail:
-	NavDisposeReply(&navReply);
-	HideRealCursor();
-	Exit2D();
-	return(success);
-#endif
+	return true;
 }
 
 
 /***************************** LOAD SAVED GAME ********************************/
 
-Boolean LoadSavedGame(void)
+Boolean LoadSavedGameStruct(int slot, SaveGameType* saveData)
 {
-	IMPLEMENT_ME_SOFT();
-	return false;
-#if 0
-SaveGameType	saveData;
-short			fRefNum;
-long			count;
-Boolean			success = false;
-//short			oldSong;
+FSSpec			spec;
+OSErr			err;
+short			refNum;
+Str255			saveFilePath;
 
-//	oldSong = gCurrentSong;							// turn off playing music to get around bug in OS X
-//	KillSong();
+	SDL_snprintf(saveFilePath, sizeof(saveFilePath), ":" PROJECT_NAME ":Save%c", 'A' + slot);
 
-	Enter2D();
-	MyFlushEvents();
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
+	err = FSpOpenDF(&spec, fsRdPerm, &refNum);
 
-
-				/* GET FILE WITH NAVIGATION SERVICES */
-
-	if (GetFileWithNavServices(&gSavedGameSpec) != noErr)
-		goto bail;
-
-
-				/* OPEN THE REZ-FORK */
-
-	FSpOpenDF(&gSavedGameSpec,fsRdPerm, &fRefNum);
-	if (fRefNum == -1)
+	if (err != noErr)
 	{
-		DoAlert("Error opening Save file");
-		goto bail;
+		return false;
 	}
 
-				/* READ FROM FILE */
+	long count = sizeof(SaveGameType);
+	err = FSRead(refNum, &count, (Ptr)saveData);
+	FSClose(refNum);
 
-	count = sizeof(SaveGameType);
-	if (FSRead(fRefNum, &count, &saveData) != noErr)
+	if (count != sizeof(SaveGameType) || err != noErr)
 	{
-		DoAlert("Error reading Save file");
-		FSClose(fRefNum);
-		goto bail;
+		return false;
 	}
 
-			/* CLOSE FILE */
+	saveData->timestamp			= SwizzleULong64(&saveData->timestamp);
+	saveData->version			= SwizzleULong(&saveData->version);
+	saveData->score				= SwizzleULong(&saveData->score);
+	saveData->health			= SwizzleFloat(&saveData->health);
 
-	FSClose(fRefNum);
+	if (saveData->version != SAVE_GAME_VERSION)
+		return false;
 
+	if (saveData->realLevel >= NUM_LEVELS)
+		return false;
 
-			/**********************/
-			/* USE SAVE GAME DATA */
-			/**********************/
+	return true;
+}
 
-	gLoadedScore = gScore = SwizzleULong(&saveData.score);
+Boolean LoadSavedGame(int slot)
+{
+	SaveGameType saveData;
 
-	gLevelNum			= SwizzleShort(&saveData.realLevel);
+	if (!LoadSavedGameStruct(slot, &saveData))
+		return false;
 
-	gPlayerInfo.lives 	= SwizzleShort(&saveData.numLives);
-	gPlayerInfo.health	= SwizzleFloat(&saveData.health);
-	gPlayerInfo.numGoldClovers = SwizzleShort(&saveData.numGoldClovers);
+	gLoadedScore = gScore = saveData.score;
 
-	success = true;
+	gLevelNum = saveData.realLevel;
 
+	gPlayerInfo.lives = saveData.numLives;
+	gPlayerInfo.health = saveData.health;
+	gPlayerInfo.numGoldClovers = saveData.numGoldClovers;
 
-bail:
-	Exit2D();
-	HideRealCursor();
-
-//	if (!success)								// user cancelled, so start song again before returning
-//		PlaySong(oldSong, true);
-
-	return(success);
-#endif
+	return true;
 }
 
 
