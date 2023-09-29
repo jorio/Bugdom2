@@ -71,7 +71,7 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-static 	ObjNode	*gMenuFlower, *gMenuLogo;
+static 	ObjNode *gMenuLogo;
 
 #define	WaveXIndex	SpecialF[0]
 #define	WaveZIndex	SpecialF[1]
@@ -228,7 +228,7 @@ int		i;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= gGameView->yon * .90f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
 
@@ -244,7 +244,7 @@ int		i;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 480;
-	gMenuFlower = MakeSpriteObject(&gNewObjectDefinition);
+	MakeSpriteObject(&gNewObjectDefinition);
 
 
 

@@ -1557,7 +1557,6 @@ ObjNode	*newObj;
 static void MoveBubbler(ObjNode *theNode)
 {
 float				fps = gFramesPerSecondFrac;
-int					i;
 int					particleGroup,magicNum;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
@@ -1625,12 +1624,10 @@ float	x,y,z;
 
 		if (particleGroup != -1)
 		{
-
 			x = theNode->Coord.x;
-			y = theNode->Coord.y;
 			z = theNode->Coord.z;
 
-			for (i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 10.0f;
 				p.y = y;

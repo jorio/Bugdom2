@@ -109,7 +109,7 @@ static SpriteType LoadSpriteFromTGA(const char* path)
 
 	int width = 0;
 	int height = 0;
-	GLuint textureName = OGL_TextureMap_LoadTGA(path, 0, &width, &height);
+	GLuint textureName = OGL_TextureMap_LoadTGA(path, &width, &height);
 	GAME_ASSERT(textureName);
 
 		/* SET UP MATERIAL */
@@ -137,7 +137,7 @@ static SpriteType LoadSpriteFromTGA(const char* path)
 
 /**************** LOAD SPRITE GROUP FROM SINGLE FILE **********************/
 
-void LoadSpriteGroupFromFile(int groupNum, const char* path, int flags)
+void LoadSpriteGroupFromFile(int groupNum, const char* path)
 {
 	AllocSpriteGroup(groupNum, 1);
 	gSpriteGroupList[groupNum][0] = LoadSpriteFromTGA(path);

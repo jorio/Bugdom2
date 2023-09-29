@@ -2217,8 +2217,6 @@ float	m30,m31,m32,m33;
 void OGLPoint3D_TransformArray(const OGLPoint3D *inVertex, const OGLMatrix4x4  *matrix,
 									OGLPoint3D *outVertex,  long numVertices)
 {
-float 	accum;
-long	i;
 float	m00,m01,m02,m03;
 float	m10,m11,m12,m13;
 float	m20,m21,m22,m23;
@@ -2227,9 +2225,9 @@ float	m20,m21,m22,m23;
 	m10 = matrix->value[M10];	m11 = matrix->value[M11];	m12 = matrix->value[M12];	m13 = matrix->value[M13];
 	m20 = matrix->value[M20];	m21 = matrix->value[M21];	m22 = matrix->value[M22];	m23 = matrix->value[M23];
 
-	for (i = 0; i < numVertices; i++)
+	for (int i = 0; i < numVertices; i++)
 	{
-		float	x,y,z;
+		float	x,y,z,accum;
 
 		x = inVertex[i].x;
 		y = inVertex[i].y;
@@ -2799,7 +2797,7 @@ short			i;
 
 	p[0].x = inBox->min.x;								// upper far left corner
 	p[0].y = inBox->max.y;
-	p[0].y = inBox->min.z;
+	p[0].z = inBox->min.z;
 
 	p[1].x = inBox->max.x;								// upper far right corner
 	p[1].y = inBox->max.y;
@@ -2815,7 +2813,7 @@ short			i;
 
 	p[4].x = inBox->min.x;								// lower far left corner
 	p[4].y = inBox->min.y;
-	p[4].y = inBox->min.z;
+	p[4].z = inBox->min.z;
 
 	p[5].x = inBox->max.x;								// lower far right corner
 	p[5].y = inBox->min.y;

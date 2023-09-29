@@ -871,7 +871,9 @@ void BackupRestoreCursorCoord(Boolean backup)
 
 void GrabMouse(Boolean capture)
 {
-#if !SKIPFLUFF
+#if SKIPFLUFF
+	(void) capture;
+#else
 	if (capture)
 	{
 //		BackupRestoreCursorCoord(true);

@@ -322,7 +322,7 @@ Atlas* Atlas_Load(const char* fontName, int flags)
 		GLuint textureName = 0;
 
 		SDL_snprintf(pathBuf, sizeof(pathBuf), "%s.tga", fontName);
-		textureName = OGL_TextureMap_LoadTGA(pathBuf, 0, &atlas->textureWidth, &atlas->textureHeight);
+		textureName = OGL_TextureMap_LoadTGA(pathBuf, &atlas->textureWidth, &atlas->textureHeight);
 
 		GAME_ASSERT(atlas->textureWidth != 0);
 		GAME_ASSERT(atlas->textureHeight != 0);

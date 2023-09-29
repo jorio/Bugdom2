@@ -237,7 +237,7 @@ int		i;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
 			/* MUD SPLOTCHES */

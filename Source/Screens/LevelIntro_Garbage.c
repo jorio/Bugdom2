@@ -58,6 +58,7 @@ void DoLevelIntroScreen_Garbage(void)
 
 static void SetupLevelIntroScreen(void)
 {
+NewObjectDefinitionType def;
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
@@ -131,18 +132,16 @@ int			i,n;
 			/*******/
 			/* CYC */
 			/*******/
-
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= PARK_ObjType_Cyclorama;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= PARK_ObjType_Cyclorama,
+		.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
+		.slot 		= TERRAIN_SLOT+1,
+		.scale 		= gGameView->yon * .995f / 100.0f,
+	};
+	newObj = MakeNewDisplayGroupObject(&def);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
 
@@ -150,39 +149,37 @@ int			i,n;
 
 
 				/* GROUND */
-
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_GarbageGround;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 4.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type		= LEVELINTRO_ObjType_GarbageGround,
+		.flags		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_DONTCULL,
+		.slot		= 5,
+		.scale		= 4.0,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 				/* MAKE GARBAGE CAN */
 
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_GarbageCan;
-	gNewObjectDefinition.scale 		= 1.3;
-	gCan = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def.type 		= LEVELINTRO_ObjType_GarbageCan;
+	def.scale 		= 1.3;
+	gCan = MakeNewDisplayGroupObject(&def);
 
 
 			/* LEVEL NAME TEXT */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_GarbageText;
-	gNewObjectDefinition.scale 		= 1.0;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 350;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 70;
-	gNewObjectDefinition.moveCall 	= MoveGarbageTitle;
-	gNewObjectDefinition.rot 		= 0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type 		= LEVELINTRO_ObjType_GarbageText,
+		.scale 		= 1.0,
+		.coord		= {0,350,0},
+		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL,
+		.slot 		= 70,
+		.moveCall 	= MoveGarbageTitle,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 
@@ -201,18 +198,20 @@ int			i,n;
 
 	for (i = 0; i < n; i++)
 	{
-		gNewObjectDefinition.type 		= SKELETON_TYPE_HOUSEFLY;
-		gNewObjectDefinition.animNum 	= 2;						// flying
-		gNewObjectDefinition.coord.x 	= RandomFloat2() * 70.0f;
-		gNewObjectDefinition.coord.y 	= 230.0f + RandomFloat() * 80.0f;
-		gNewObjectDefinition.coord.z 	= RandomFloat2() * 70.0f;
-		gNewObjectDefinition.scale 		= .1;
-		gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
-		gNewObjectDefinition.slot 		= 499;
-		gNewObjectDefinition.moveCall 	= MoveIntroFly;
-		gNewObjectDefinition.rot 		= RandomFloat() * PI2;
-
-		newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
+		def = (NewObjectDefinitionType)
+		{
+			.type 		= SKELETON_TYPE_HOUSEFLY,
+			.animNum 	= 2,						// flying
+			.coord.x 	= RandomFloat2() * 70.0f,
+			.coord.y 	= 230.0f + RandomFloat() * 80.0f,
+			.coord.z 	= RandomFloat2() * 70.0f,
+			.scale 		= .1,
+			.flags 		= STATUS_BIT_NOTEXTUREWRAP,
+			.slot 		= 499,
+			.moveCall 	= MoveIntroFly,
+			.rot 		= RandomFloat() * PI2,
+		};
+		newObj = MakeNewSkeletonObject(&def);
 
 		newObj->Skeleton->CurrentAnimTime = RandomFloat() * .1f;
 

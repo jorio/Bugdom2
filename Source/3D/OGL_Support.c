@@ -815,7 +815,7 @@ GLuint	textureName;
 
 /***************** OGL TEXTUREMAP LOAD FROM TGA **********************/
 
-GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* outWidth, int* outHeight)
+GLuint OGL_TextureMap_LoadTGA(const char* path, int* outWidth, int* outHeight)
 {
 	FSSpec					spec;
 	uint8_t*				pixelData = nil;

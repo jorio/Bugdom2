@@ -165,8 +165,6 @@ FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode				*newObj;
 
-//	PlaySong(SONG_HIGHSCORE, true);
-
 	gDrawScoreVerbage = true;
 	gExitHighScores = false;
 	gFinalScoreAlpha = 1.0f;

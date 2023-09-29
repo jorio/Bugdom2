@@ -67,6 +67,7 @@ void DoLevelIntroScreen_Sewer(void)
 
 static void SetupLevelIntroScreen(void)
 {
+NewObjectDefinitionType def;
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
@@ -148,35 +149,31 @@ ObjNode	*newObj, *pipe, *grate;
 
 				/* GROUND */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level2Ground;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= -400;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 9.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type		= LEVELINTRO_ObjType_Level2Ground,
+		.coord		= {0,0,-400},
+		.flags		= STATUS_BIT_DONTCULL,
+		.slot		= 5,
+		.scale		= 9.0,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* CYC */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GARDEN_ObjType_Cyclorama;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	newObj->CustomDrawFunction = DrawCyclorama;
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= GARDEN_ObjType_Cyclorama,
+		.coord		= {0,0,0},
+		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
+		.slot 		= TERRAIN_SLOT+1,
+		.drawCall 	= DrawCyclorama,	// draw after terrain for better performance since terrain blocks much of the pixels
+		.scale 		= gGameView->yon * .995f / 100.0f,
+	};
+	newObj = MakeNewDisplayGroupObject(&def);
 	newObj->TargetOff.y = -300.0f;
 
 			/******************/
@@ -185,32 +182,32 @@ ObjNode	*newObj, *pipe, *grate;
 
 				/* PIPE */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= SIDEWALK_ObjType_DrainPipe;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 100;
-	gNewObjectDefinition.moveCall 	= MoveIntroDrain;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 2.0f;
-	pipe = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= SIDEWALK_ObjType_DrainPipe,
+		.coord		= {0,0,0},
+		.flags 		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_DONTCULL,
+		.slot 		= 100,
+		.moveCall 	= MoveIntroDrain,
+		.rot 		= 0,
+		.scale 		= 2.0f,
+	};
+	pipe = MakeNewDisplayGroupObject(&def);
 
 	pipe->Mode = PIPE_MODE_START;
 	pipe->Timer	= 1.0f;
 
 				/* GRATE */
 
-	gNewObjectDefinition.type 		= SIDEWALK_ObjType_Grate;
-	gNewObjectDefinition.coord.x 	+= 79.0f * gNewObjectDefinition.scale;
-	gNewObjectDefinition.coord.y 	+= 110.0f * gNewObjectDefinition.scale;
-	gNewObjectDefinition.slot++;
-	gNewObjectDefinition.moveCall 	= nil;
-	grate = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def.type 		= SIDEWALK_ObjType_Grate;
+	def.coord.x 	+= 79.0f * def.scale;
+	def.coord.y 	+= 110.0f * def.scale;
+	def.slot++;
+	def.moveCall 	= nil;
+	grate = MakeNewDisplayGroupObject(&def);
 
 	pipe->ChainNode = grate;
-
 }
 
 
@@ -313,18 +310,20 @@ ObjNode	*grate = pipe->ChainNode;
 
 					for (i = 0; i < 6; i++)						// make n overlapping copies
 					{
-						gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-						gNewObjectDefinition.type 		= LEVELINTRO_ObjType_SewerText;
-						gNewObjectDefinition.coord.x 	= pipe->Coord.x;
-						gNewObjectDefinition.coord.y 	= pipe->Coord.y + 650.0f;
-						gNewObjectDefinition.coord.z 	= pipe->Coord.z;
-						gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL |
-															STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_GLOW | STATUS_BIT_NOZBUFFER;
-						gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-						gNewObjectDefinition.moveCall 	= MoveSewerText;
-						gNewObjectDefinition.rot 		= 0;
-						gNewObjectDefinition.scale 		= .5;
-						newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+						NewObjectDefinitionType def =
+						{
+							.group		= MODEL_GROUP_LEVELINTRO,
+							.type 		= LEVELINTRO_ObjType_SewerText,
+							.coord.x 	= pipe->Coord.x,
+							.coord.y 	= pipe->Coord.y + 650.0f,
+							.coord.z 	= pipe->Coord.z,
+							.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL |
+											STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_GLOW | STATUS_BIT_NOZBUFFER,
+							.slot 		= SLOT_OF_DUMB,
+							.moveCall 	= MoveSewerText,
+							.scale 		= .5,
+						};
+						newObj = MakeNewDisplayGroupObject(&def);
 
 						newObj->DeltaRot.y = RandomFloat() * PI2;
 						newObj->SpecialF[0] = RandomFloat() * PI2;

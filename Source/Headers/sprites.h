@@ -22,7 +22,7 @@ void InitSpriteManager(void);
 void DisposeAllSpriteGroups(void);
 void DisposeSpriteGroup(int groupNum);
 void LoadSpriteGroupFromFiles(int groupNum, int numSprites, const char** paths);
-void LoadSpriteGroupFromFile(int groupNum, const char* path, int flags);
+void LoadSpriteGroupFromFile(int groupNum, const char* path);
 void LoadSpriteGroupFromSeries(int groupNum, int numSprites, const char* seriesName);
 ObjNode* MakeSpriteObject(NewObjectDefinitionType* newObjDef);
 void BlendAllSpritesInGroup(short group);

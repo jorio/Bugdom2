@@ -56,10 +56,10 @@ void DoLevelIntroScreen_Fido(void)
 
 static void SetupLevelIntroScreen(void)
 {
+NewObjectDefinitionType def;
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.7, -.7 };
-ObjNode	*newObj;
 
 			/**************/
 			/* SETUP VIEW */
@@ -125,66 +125,60 @@ ObjNode	*newObj;
 
 				/* GROUND */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level2Ground;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= -700;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 11.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type		= LEVELINTRO_ObjType_Level2Ground,
+		.coord		= { 0, 0, -700 },
+		.flags		= STATUS_BIT_DONTCULL,
+		.slot		= 5,
+		.scale		= 11.0,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* CYC */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= SIDEWALK_ObjType_Cyclorama;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	newObj->CustomDrawFunction = DrawCyclorama;
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type		= SIDEWALK_ObjType_Cyclorama,
+		.coord		= {0,0,0},
+		.flags		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
+		.slot		= TERRAIN_SLOT+1,		// draw after terrain for better performance since terrain blocks much of the pixels
+		.drawCall	= DrawCyclorama,
+		.scale		= gGameView->yon * .995f / 100.0f,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* DOG HOUSE */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= SIDEWALK_ObjType_DogHouse;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= -1500;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 2.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type		= SIDEWALK_ObjType_DogHouse,
+		.coord		= {0,0,-1500},
+		.flags		= STATUS_BIT_DONTCULL,
+		.slot		= 5,
+		.scale		= 2.0f,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* DOG BONE */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_DogBone;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 2600;
-	gNewObjectDefinition.coord.z 	= -300;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= MoveDogBone;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= .9;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type		= LEVELINTRO_ObjType_DogBone,
+		.coord		= {0,2600,-300},
+		.flags		= STATUS_BIT_DONTCULL,
+		.slot		= 5,
+		.moveCall 	= MoveDogBone,
+		.scale 		= .9,
+	};
+	MakeNewDisplayGroupObject(&def);
 }
 
 

@@ -536,10 +536,17 @@ float	volumeTweaks[]=
 	gCurrentSong 	= songNum;
 	volume = FULL_CHANNEL_VOLUME * volumeTweaks[songNum];
 	gSongChannel = PlayEffect_Parms(EFFECT_SONG, volume, volume, NORMAL_CHANNEL_RATE);
-	
-	
-	
-	
+	if (gSongChannel < 0)
+		return;
+
+
+				/* SET LOOP FLAG ON STREAM */
+
+	SndCommand loopCommand = {.cmd=pommeSetLoopCmd, .param1=loopFlag? 1: 0};
+	iErr = SndDoImmediate(gSndChannel[gSongChannel], &loopCommand);
+	GAME_ASSERT(!iErr);
+
+
 				/* SEE IF WANT TO MUTE THE MUSIC */
 
 	if (!gGamePrefs.music)

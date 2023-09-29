@@ -97,12 +97,6 @@ static int					gMouseHoverColumn = -1;
 /****************************/
 #pragma mark - Utilities
 
-static OGLColorRGBA TwinkleColor(void)
-{
-	float rf = .7f + RandomFloat() * .29f;
-	return (OGLColorRGBA){rf, rf, rf, 1};
-}
-
 static OGLColorRGBA PulsateColor(float* time)
 {
 	*time += gFramesPerSecondFrac;

@@ -408,7 +408,8 @@ static void UpdateCamera_Terrain(void)
 {
 float	fps = gFramesPerSecondFrac;
 OGLPoint3D	from,to,target;
-float		distX,distZ,distY,dist,fromAcc;
+float		distX,distZ,distY,dist;
+float		fromAcc = 0;
 OGLVector2D	pToC;
 float		myX,myY,myZ,delta;
 ObjNode		*playerObj = gPlayerInfo.objNode;

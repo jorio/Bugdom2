@@ -506,8 +506,7 @@ int	numChildren,i;
 void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data)
 {
 Boolean		useTexture = false, multiTexture = false, texGen = false;
-uint32_t 		materialFlags;
-short		i;
+uint32_t 	materialFlags;
 Boolean		needNormals;
 
 			/**********************/
@@ -591,7 +590,7 @@ Boolean		needNormals;
 		{
 			useTexture = multiTexture = true;
 
-			for (i = 0 ;i < data->numMaterials; i++)
+			for (int i = 0; i < data->numMaterials; i++)
 			{
 				glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 				glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
@@ -649,7 +648,7 @@ use_current:
 								/* REFLECTION SPHERE */
 
 						case	MULTI_TEXTURE_MODE_REFLECTIONSPHERE:
-								for (i = 0 ;i < 2; i++)
+								for (int i = 0; i < 2; i++)
 								{
 									glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 									glClientActiveTextureARB(GL_TEXTURE0_ARB+i);

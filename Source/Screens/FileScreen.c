@@ -92,7 +92,7 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 
 	menu[menuIndex++].type = kMenuItem_END_SENTINEL;
 
-	GAME_ASSERT(menuIndex <= sizeof(menu)/sizeof(menu[0]));
+	GAME_ASSERT(menuIndex <= (int) SDL_arraysize(menu));
 
 	//-----------------------------------
 

@@ -56,6 +56,7 @@ void DoLevelIntroScreen_BackYard(void)
 
 static void SetupLevelIntroScreen(void)
 {
+NewObjectDefinitionType def;
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
@@ -140,35 +141,31 @@ int		i,x,z;
 
 				/* GROUND */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level2Ground;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= -480;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 5;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 8.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type 		= LEVELINTRO_ObjType_Level2Ground,
+		.coord		= {0,0,-480},
+		.flags 		= STATUS_BIT_DONTCULL,
+		.slot 		= 5,
+		.scale 		= 8.0f,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* CYC */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GARDEN_ObjType_Cyclorama;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	newObj->CustomDrawFunction = DrawCyclorama;
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= GARDEN_ObjType_Cyclorama,
+		.coord		= {0,0,0},
+		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
+		.slot 		= TERRAIN_SLOT+1,					// draw after terrain for better performance since terrain blocks much of the pixels
+		.scale 		= gGameView->yon * .995f / 100.0f,
+		.drawCall	= DrawCyclorama,
+	};
+	newObj = MakeNewDisplayGroupObject(&def);
 	newObj->TargetOff.y = -300.0f;
 
 			/* BOTTLES */
@@ -178,17 +175,20 @@ int		i,x,z;
 	{
 		for (x = -1100.0f + RandomFloat() * 200.0f; x < 1100.0f; x += 300.0f)
 		{
-			gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-			gNewObjectDefinition.type 		= SIDEWALK_ObjType_Bottle;
-			gNewObjectDefinition.coord.x 	= x + RandomFloat2() * 20.0f;
-			gNewObjectDefinition.coord.y 	= 0;
-			gNewObjectDefinition.coord.z 	= z + RandomFloat2() * 20.0f;
-			gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
-			gNewObjectDefinition.slot 		= 90 + i;
-			gNewObjectDefinition.moveCall 	= MoveIntroBottle;
-			gNewObjectDefinition.rot 		= RandomFloat() * PI2;
-			gNewObjectDefinition.scale 		= 2.0f;
-			newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+			def = (NewObjectDefinitionType)
+			{
+				.group		= MODEL_GROUP_LEVELSPECIFIC,
+				.type 		= SIDEWALK_ObjType_Bottle,
+				.coord.x 	= x + RandomFloat2() * 20.0f,
+				.coord.y 	= 0,
+				.coord.z 	= z + RandomFloat2() * 20.0f,
+				.flags 		= STATUS_BIT_NOTEXTUREWRAP,
+				.slot 		= 90 + i,
+				.moveCall 	= MoveIntroBottle,
+				.rot 		= RandomFloat() * PI2,
+				.scale 		= 2.0f,
+			};
+			newObj = MakeNewDisplayGroupObject(&def);
 
 			newObj->Timer = 2.0f + RandomFloat() * 7.0f;
 			newObj->Mode = 0;
@@ -199,19 +199,16 @@ int		i,x,z;
 
 			/* LEVEL NAME TEXT */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level2Text;
-	gNewObjectDefinition.scale 		= 5.0;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 260;
-	gNewObjectDefinition.coord.z 	= -1000;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP;
-	gNewObjectDefinition.slot 		= 50;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type 		= LEVELINTRO_ObjType_Level2Text,
+		.scale 		= 5.0,
+		.coord		= {0, 260, -1000},
+		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP,
+		.slot 		= 50,
+	};
+	MakeNewDisplayGroupObject(&def);
 }
 
 

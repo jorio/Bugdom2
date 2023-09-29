@@ -1093,7 +1093,6 @@ short			fRefNum;
 FSSpec			spec;
 OSErr			err;
 Str255			saveFilePath;
-Boolean			success = false;
 
 			/*************************/
 			/* CREATE SAVE GAME DATA */
