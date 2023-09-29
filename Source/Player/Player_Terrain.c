@@ -1655,32 +1655,29 @@ Boolean		killed = false;
 
 	for (int i = 0; i < gNumCollisions; i++)
 	{
-		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
-		{
-			hitObj = gCollisionList[i].objectPtr;				// get ObjNode of this collision
+		hitObj = gCollisionList[i].objectPtr;				// get ObjNode of this collision
 
-			if (hitObj->CType == INVALID_NODE_FLAG)				// see if has since become invalid
-				continue;
+		if (hitObj->CType == INVALID_NODE_FLAG)				// see if has since become invalid
+			continue;
 
 
 
 			/* CHECK FOR TOTALLY IMPENETRABLE */
 
-			if (hitObj->CBits & CBITS_IMPENETRABLE2)
+		if (hitObj->CBits & CBITS_IMPENETRABLE2)
+		{
+			if (!(gCollisionList[i].sides & SIDE_BITS_BOTTOM))	// dont do this if we landed on top of it
 			{
-				if (!(gCollisionList[i].sides & SIDE_BITS_BOTTOM))	// dont do this if we landed on top of it
-				{
-					gCoord.x = theNode->OldCoord.x;					// dont take any chances, just move back to original safe place
-					gCoord.z = theNode->OldCoord.z;
-				}
+				gCoord.x = theNode->OldCoord.x;					// dont take any chances, just move back to original safe place
+				gCoord.z = theNode->OldCoord.z;
 			}
+		}
 
 			/* CHECK FOR HURT ME */
 
-			if (hitObj->CType & CTYPE_HURTME)
-			{
-				PlayerGotHit(hitObj, 0, PLAYER_ANIM_GOTHIT_GENERIC);
-			}
+		if (hitObj->CType & CTYPE_HURTME)
+		{
+			PlayerGotHit(hitObj, 0, PLAYER_ANIM_GOTHIT_GENERIC);
 		}
 	}
 

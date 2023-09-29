@@ -238,30 +238,27 @@ int		i;
 
 	for (i=0; i < gNumCollisions; i++)
 	{
-		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
+		ObjNode	*hitObj = gCollisionList[i].objectPtr;		// get ObjNode of this collision
+		ctype = hitObj->CType;
+
+		if (ctype == INVALID_NODE_FLAG)						// see if has since become invalid
+			continue;
+
+				/* HURT */
+
+		if (ctype & CTYPE_HURTENEMY)
 		{
-			ObjNode	*hitObj = gCollisionList[i].objectPtr;		// get ObjNode of this collision
-			ctype = hitObj->CType;
+			if (theEnemy->HurtCallback != nil)							// if has a hurt callback
+				if (theEnemy->HurtCallback(theEnemy, hitObj->Damage))	// handle hit (returns true if was deleted)
+					return(true);
+		}
 
-			if (ctype == INVALID_NODE_FLAG)						// see if has since become invalid
-				continue;
+			/* TOUCHED PLAYER */
 
-					/* HURT */
-
-			if (ctype & CTYPE_HURTENEMY)
-			{
-				if (theEnemy->HurtCallback != nil)							// if has a hurt callback
-					if (theEnemy->HurtCallback(theEnemy, hitObj->Damage))	// handle hit (returns true if was deleted)
-						return(true);
-			}
-
-				/* TOUCHED PLAYER */
-
-			else
-			if (ctype & CTYPE_PLAYER)
-			{
-				EnemyTouchedPlayer(theEnemy, hitObj);
-			}
+		else
+		if (ctype & CTYPE_PLAYER)
+		{
+			EnemyTouchedPlayer(theEnemy, hitObj);
 		}
 	}
 

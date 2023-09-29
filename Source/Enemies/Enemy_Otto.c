@@ -802,13 +802,10 @@ int		i;
 			/* SEE IF HIT PLAYER */
 		for (i = 0; i < gNumCollisions; i++)
 		{
-			if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
+			ObjNode	*player = gCollisionList[i].objectPtr;
+			if (player == gPlayerInfo.objNode)					// see if this is the player
 			{
-				ObjNode	*player = gCollisionList[i].objectPtr;
-				if (player == gPlayerInfo.objNode)					// see if this is the player
-				{
-					PlayerGotHit(theNode, 0, PLAYER_ANIM_GOTHIT_GENERIC);
-				}
+				PlayerGotHit(theNode, 0, PLAYER_ANIM_GOTHIT_GENERIC);
 			}
 		}
 

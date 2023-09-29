@@ -1475,9 +1475,6 @@ float			speed;
 
 	for (i = 0; i < gNumCollisions; i++)
 	{
-		if (gCollisionList[i].type != COLLISION_TYPE_OBJ)				// see if obj
-			continue;
-
 		hitObj = gCollisionList[i].objectPtr;							// get the hit obj
 		if (hitObj->Genre != DISPLAY_GROUP_GENRE)						// see if it's a pin
 			continue;
@@ -1548,9 +1545,6 @@ float			speed;
 
 	for (i = 0; i < gNumCollisions; i++)
 	{
-		if (gCollisionList[i].type != COLLISION_TYPE_OBJ)				// see if obj
-			continue;
-
 		hitObj = gCollisionList[i].objectPtr;							// get the hit obj
 		if (hitObj->Genre != DISPLAY_GROUP_GENRE)						// see if it's a pin
 			continue;

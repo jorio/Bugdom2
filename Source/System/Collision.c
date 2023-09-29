@@ -268,7 +268,6 @@ got_sides:
 				gCollisionList[gNumCollisions].baseBox 		= 0;
 				gCollisionList[gNumCollisions].targetBox 	= target;
 				gCollisionList[gNumCollisions].sides 		= sideBits;
-				gCollisionList[gNumCollisions].type 		= COLLISION_TYPE_OBJ;
 				gCollisionList[gNumCollisions].objectPtr 	= thisNode;
 				gNumCollisions++;
 				gTotalSides |= sideBits;											// remember total of this
@@ -367,18 +366,16 @@ again:
 		targetObj 	= gCollisionList[i].objectPtr;			// get ptr to target objnode
 
 		baseBoxPtr 	= boxList + base;						// calc ptrs to base & target collision boxes
-		if (targetObj)
-		{
-			targetBoxPtr = targetObj->CollisionBoxes;
-			targetBoxPtr += target;
-		}
 
 					/********************************/
 					/* HANDLE OBJECT COLLISIONS 	*/
 					/********************************/
 
-		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
+		GAME_ASSERT(targetObj);
 		{
+			targetBoxPtr = targetObj->CollisionBoxes;
+			targetBoxPtr += target;
+
 				/* SEE IF THIS OBJECT HAS SINCE BECOME INVALID */
 
 			uint32_t	targetCType = targetObj->CType;						// get ctype of hit obj
@@ -1051,7 +1048,6 @@ CollisionBoxType *targetBoxList;
 					/* THERE HAS BEEN A COLLISION */
 
 			gCollisionList[gNumCollisions].targetBox = target;
-			gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
 			gCollisionList[gNumCollisions].objectPtr = thisNode;
 			gNumCollisions++;
 		}
@@ -1133,7 +1129,6 @@ CollisionBoxType *targetBoxList;
 					/* THERE HAS BEEN A COLLISION */
 
 			gCollisionList[gNumCollisions].targetBox = target;
-			gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
 			gCollisionList[gNumCollisions].objectPtr = thisNode;
 			gNumCollisions++;
 		}
