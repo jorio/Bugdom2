@@ -25,6 +25,23 @@ static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum);
 
 
+static Ptr TileImage(Ptr imageBank, int col, int row);
+
+static inline void Blit16(
+		const char*			src,
+		int					srcWidth,
+		int					srcHeight,
+		int					srcRectX,
+		int					srcRectY,
+		int					srcRectWidth,
+		int					srcRectHeight,
+		char*				dst,
+		int 				dstWidth,
+		int 				dstHeight,
+		int					dstRectX,
+		int					dstRectY);
+
+
 /****************************/
 /*    CONSTANTS             */
 /****************************/
@@ -572,17 +589,26 @@ static void ReadDataFromPlayfieldFile(FSSpec *specPtr)
 {
 Handle					hand;
 PlayfieldHeaderType		**header;
-long					row,col,size;
 float					yScale;
 short					fRefNum;
 OSErr					iErr;
-Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
+
+				/* MAKE SURE NO DANGLING POINTERS FROM PREVIOUS SCENE */
+
+	GAME_ASSERT(!gSuperTileTextureGrid);
+	GAME_ASSERT(!gMapYCoords);
+	GAME_ASSERT(!gMapYCoordsOriginal);
+	GAME_ASSERT(!gMasterItemList);
+	GAME_ASSERT(!gSplineList);
+	GAME_ASSERT(!gFenceList);
+	GAME_ASSERT(!gWaterListHandle);
+	GAME_ASSERT(!gWaterList);
+
 
 				/* OPEN THE REZ-FORK */
 
-	fRefNum = FSpOpenResFile(specPtr,fsRdPerm);
-	if (fRefNum == -1)
-		DoFatalAlert("LoadPlayfield: FSpOpenResFile failed.  You seem to have a corrupt or missing file.  Please reinstall the game.");
+	fRefNum = FSpOpenResFile(specPtr, fsRdPerm);
+	GAME_ASSERT(fRefNum != -1);
 	UseResFile(fRefNum);
 
 
@@ -591,11 +617,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			/************************/
 
 	hand = GetResource('Hedr',1000);
-	if (hand == nil)
-	{
-		DoAlert("ReadDataFromPlayfieldFile: Error reading header resource!");
-		return;
-	}
+	GAME_ASSERT(hand);
 
 	header = (PlayfieldHeaderType **)hand;
 	gNumTerrainItems		= SwizzleLong(&(**header).numItems);
@@ -634,8 +656,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ SUPERTILE GRID MATRIX */
 
-	if (gSuperTileTextureGrid)														// free old array
-		Free_2d_array(gSuperTileTextureGrid);
+//	if (gSuperTileTextureGrid)														// free old array
+//		Free_2d_array(gSuperTileTextureGrid);
 	Alloc_2d_array(short, gSuperTileTextureGrid, gNumSuperTilesDeep, gNumSuperTilesWide);
 
 	hand = GetResource('STgd',1000);												// load grid from rez
@@ -645,13 +667,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{
 		int16_t *srcShort = (int16_t *)*hand;
 
-		for (row = 0; row < gNumSuperTilesDeep; row++)
-			for (col = 0; col < gNumSuperTilesWide; col++)
-			{
-				gSuperTileTextureGrid[row][col] = SwizzleShort(srcShort++);
-			}
-		ReleaseResource(hand);
+		for (int row = 0; row < gNumSuperTilesDeep; row++)
+		for (int col = 0; col < gNumSuperTilesWide; col++)
+		{
+			gSuperTileTextureGrid[row][col] = SwizzleShort(srcShort++);
+		}
 	}
+	ReleaseResource(hand);
 
 
 
@@ -662,7 +684,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	if (gLevelNum == LEVEL_NUM_PARK)			// modify y scale for this level since we need more range
 		yScale *= 2.0f;
 
-
 	Alloc_2d_array(float, gMapYCoords, gTerrainTileDepth+1, gTerrainTileWidth+1);			// alloc 2D array for map
 	Alloc_2d_array(float, gMapYCoordsOriginal, gTerrainTileDepth+1, gTerrainTileWidth+1);	// and the copy of it
 
@@ -670,11 +691,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	GAME_ASSERT(hand);
 	{
 		float* src = (float *)*hand;
-		for (row = 0; row <= gTerrainTileDepth; row++)
-			for (col = 0; col <= gTerrainTileWidth; col++)
-				gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
-		ReleaseResource(hand);
+		for (int row = 0; row <= gTerrainTileDepth; row++)
+		for (int col = 0; col <= gTerrainTileWidth; col++)
+		{
+			gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
+		}
 	}
+	ReleaseResource(hand);
 
 				/**************************/
 				/* ITEM RELATED RESOURCES */
@@ -946,13 +969,14 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* ALLOC BUFFERS */
 
-	size = SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 2;						// calc size of supertile 16-bit texture
-	tempBuffer16 = AllocPtr(size);
-	tempBuffer24 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 3);		// alloc for 24bit pixels
-	tempBuffer32 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 4);		// alloc for 32bit pixels
-	GAME_ASSERT(tempBuffer16);
-	GAME_ASSERT(tempBuffer24);
-	GAME_ASSERT(tempBuffer32);
+	int size = SQUARED(SUPERTILE_TEXMAP_SIZE) * sizeof(uint16_t);			// calc size of supertile 16-bit texture
+
+	int seamlessCanvasSize = SQUARED(SUPERTILE_TEXMAP_SIZE + 2) * sizeof(uint16_t);		// seamless texture needs 1px border around supertile image
+
+	Ptr imageBank = AllocPtrClear(gNumUniqueSuperTiles * size);							// all supertile images from .ter data fork
+	Ptr canvas = AllocPtrClear(seamlessCanvasSize);										// we'll assemble the final supertile texture in there
+
+	SDL_memset(gSuperTileTextureObjects, 0, sizeof(gSuperTileTextureObjects));			// clear all supertile texture pointers
 
 
 
@@ -968,8 +992,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		static long	sizeoflong = 4;
 		int32_t	compressedSize;
 		int32_t	width,height;
-		MOMaterialData	matData;
 
+		Ptr image = imageBank + i * size;
 
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
 
@@ -981,102 +1005,158 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* READ & DECOMPRESS IT */
 
-		long decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
+		long decompressedSize = LZSS_Decode(fRefNum, image, compressedSize);
 		GAME_ASSERT(decompressedSize == size);
 
 		width = SUPERTILE_TEXMAP_SIZE;
 		height = SUPERTILE_TEXMAP_SIZE;
 
+				/* CONVERT PIXEL FORMAT */
 
-
-				/**************************/
-				/* CREATE MATERIAL OBJECT */
-				/**************************/
-
-
-			/* USE PACKED PIXEL TYPE */
-
-		ConvertTexture16To16((uint16_t *)tempBuffer16, width, height);
-		matData.pixelSrcFormat 	= GL_BGRA_EXT;
-		matData.pixelDstFormat 	= GL_RGBA;
-		matData.textureName[0] 	= OGL_TextureMap_Load(tempBuffer16, width, height,
-												 GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
-
-			/* INIT NEW MATERIAL DATA */
-
-		matData.flags 					= 	BG3D_MATERIALFLAG_CLAMP_U|
-											BG3D_MATERIALFLAG_CLAMP_V|
-											BG3D_MATERIALFLAG_TEXTURED;
-
-		matData.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE;
-		matData.multiTextureCombine		= MULTI_TEXTURE_COMBINE_ADD;
-		matData.diffuseColor.r			= 1;
-		matData.diffuseColor.g			= 1;
-		matData.diffuseColor.b			= 1;
-		matData.diffuseColor.a			= 1;
-		matData.numMipmaps				= 1;										// 1 texture
-		matData.width					= width;
-		matData.height					= height;
-		matData.texturePixels[0] 		= nil;										// the original pixels are gone (or will be soon)
-		gSuperTileTextureObjects[i] 	= MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
-
-
+		ConvertTexture16To16((uint16_t *) image, width, height);
 	}
 
-			/* CLOSE THE FILE */
+
+				/******************************/
+				/* CREATE SUPERTILE MATERIALS */
+				/******************************/
+
+	for (int row = 0; row < gNumSuperTilesDeep; row++)
+	for (int col = 0; col < gNumSuperTilesWide; col++)
+	{
+		int unique = gSuperTileTextureGrid[row][col];//.superTileID;
+		if (unique == -1)											// if -1 then it's a blank
+		{
+			continue;
+		}
+
+		GAME_ASSERT_MESSAGE(gSuperTileTextureObjects[unique] == NULL, "supertile isn't unique!");
+
+		int cw, ch;	// canvas width & height
+
+		if (!gG4)	// No seamless texturing if we're in low-detail mode (requires NPOT textures)
+		{
+			cw = SUPERTILE_TEXMAP_SIZE;
+			ch = SUPERTILE_TEXMAP_SIZE;
+			SDL_memcpy(canvas, TileImage(imageBank, col, row), size);
+		}
+		else		// Do seamless texturing
+		{
+			int tw = SUPERTILE_TEXMAP_SIZE;		// supertile width & height
+			int th = SUPERTILE_TEXMAP_SIZE;
+			cw = tw + 2;
+			ch = th + 2;
+
+			// Clear canvas to black
+			SDL_memset(canvas, 0, seamlessCanvasSize);
+
+			// Blit supertile image to middle of canvas
+			Blit16(TileImage(imageBank, col, row), tw, th, 0, 0, tw, th, canvas, cw, ch, 1, 1);
+
+			// Scan for neighboring supertiles
+			// (Any of these may come out to NULL, in which case Blit16 will skip them later)
+			Ptr neighborN	= TileImage(imageBank, col  , row-1);
+			Ptr neighborS	= TileImage(imageBank, col  , row+1);
+			Ptr neighborW	= TileImage(imageBank, col-1, row  );
+			Ptr neighborE	= TileImage(imageBank, col+1, row  );
+			Ptr neighborNE	= TileImage(imageBank, col+1, row-1);
+			Ptr neighborNW	= TileImage(imageBank, col-1, row-1);
+			Ptr neighborSW	= TileImage(imageBank, col-1, row+1);
+			Ptr neighborSE	= TileImage(imageBank, col+1, row+1);
+
+			// Stitch edges from neighboring supertiles on each side and copy 1px corners from diagonal neighbors
+			//     srcBuf      sW  sH    sX    sY  rW  rH  dstBuf  dW  dH    dX    dY
+			Blit16(neighborN , tw, th,    0, th-1, tw,  1, canvas, cw, ch,    1,    0);		// north
+			Blit16(neighborS , tw, th,    0,    0, tw,  1, canvas, cw, ch,    1, ch-1);		// south
+			Blit16(neighborW , tw, th, tw-1,    0,  1, th, canvas, cw, ch,    0,    1);		// west
+			Blit16(neighborE , tw, th,    0,    0,  1, th, canvas, cw, ch, cw-1,    1);		// east
+			Blit16(neighborNE, tw, th,    0, th-1,  1,  1, canvas, cw, ch, cw-1,    0);		// northeast
+			Blit16(neighborNW, tw, th, tw-1, th-1,  1,  1, canvas, cw, ch,    0,    0);		// northwest
+			Blit16(neighborSW, tw, th, tw-1,    0,  1,  1, canvas, cw, ch,    0, ch-1);		// southwest
+			Blit16(neighborSE, tw, th,    0,    0,  1,  1, canvas, cw, ch, cw-1, ch-1);		// southeast
+		}
+
+		int texture = OGL_TextureMap_Load(canvas, cw, ch, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
+		OGL_CheckError();
+
+				/* INIT NEW MATERIAL DATA */
+
+		MOMaterialData	matData =
+		{
+			.pixelSrcFormat			= GL_BGRA_EXT,
+			.pixelDstFormat			= GL_RGBA,
+			.textureName[0]			= texture,
+			.flags					= BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V | BG3D_MATERIALFLAG_TEXTURED,
+			.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE,
+			.multiTextureCombine	= MULTI_TEXTURE_COMBINE_ADD,
+			.diffuseColor			= {1,1,1,1},
+			.numMipmaps				= 1,										// 1 texture
+			.width					= cw,
+			.height					= ch,
+			.texturePixels[0] 		= nil,										// the original pixels are gone (or will be soon)
+		};
+
+
+		gSuperTileTextureObjects[unique] = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
+	}
+
+			/* CLOSE THE FILE AND CLEAN UP */
 
 	FSClose(fRefNum);
-	if (tempBuffer16)
-		SafeDisposePtr(tempBuffer16);
-	if (tempBuffer24)
-		SafeDisposePtr(tempBuffer24);
-	if (tempBuffer32)
-		SafeDisposePtr(tempBuffer32);
+	SafeDisposePtr(imageBank);
+	SafeDisposePtr(canvas);
 }
 
 
+/*********************** TILE TEXTURE LOADER HELPER ***********************************/
+
+static Ptr TileImage(Ptr imageBank, int col, int row)
+{
+	if (col < 0)
+		return NULL;
+
+	if (col >= gNumSuperTilesWide)
+		return NULL;
+
+	if (row < 0)
+		return NULL;
+
+	if (row >= gNumSuperTilesDeep)
+		return NULL;
+
+	int imageNum = gSuperTileTextureGrid[row][col];
+
+	if (imageNum < 0)	// it's a blank
+		return NULL;
+
+	return imageBank + imageNum * SQUARED(SUPERTILE_TEXMAP_SIZE) * sizeof(uint16_t);
+}
 
 
 /*********************** CONVERT TEXTURE; 16 TO 16 ***********************************/
 //
-// Simply flips Y since OGL Textures are screwey
+// Converts big-endian 1-5-5-5 to native endianness and cleans up the alpha bit.
 //
 
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 {
-uint16_t	pixel,*bottom;
+//	bool blackOpaq = (gLevelNum != LEVEL_NUM_CLOUD);		// make black transparent on cloud
+	bool blackOpaq = true;
 
-
-	bottom = textureBuffer + ((height - 1) * width);
-
-	for (int y = 0; y < height / 2; y++)
+	for (int p = 0; p < width*height; p++)
 	{
-		for (int x = 0; x < width; x++)
-		{
-			pixel = textureBuffer[x];						// get 16bit pixel from top
-#if __BIG_ENDIAN__
+		uint16_t pixel = SwizzleUShort(textureBuffer);
+
+		if (blackOpaq || (pixel & 0x7fff))
 			pixel |= 0x8000;
-#else
-			pixel = SwizzleUShort(&pixel);
-			pixel |= 0x8000;
-#endif
+		else
+			pixel &= 0x7fff;
 
-			textureBuffer[x] = bottom[x];					// copy bottom to top
-#if __BIG_ENDIAN__
-			textureBuffer[x] |= 0x8000;
-#else
-			textureBuffer[x] = SwizzleUShort(&textureBuffer[x]);
-			textureBuffer[x] |= 0x8000;
-#endif
+		*textureBuffer = pixel;
 
-			bottom[x] = pixel;								// save top into bottom
-		}
-
-		textureBuffer += width;
-		bottom -= width;
+		textureBuffer++;
 	}
 }
-
 
 #pragma mark -
 
@@ -1545,4 +1625,47 @@ Ptr LoadDataFile(const char* path, long* outLength)
 char* LoadTextFile(const char* spec, long* outLength)
 {
 	return LoadDataFile(spec, outLength);
+}
+
+
+
+/****************** COPY REGION BETWEEN 16-BIT PIXEL BUFFERS **********************/
+
+static inline void Blit16(
+		const char*			src,
+		int					srcWidth,
+		int					srcHeight,
+		int					srcRectX,
+		int					srcRectY,
+		int					srcRectWidth,
+		int					srcRectHeight,
+		char*				dst,
+		int 				dstWidth,
+		int 				dstHeight,
+		int					dstRectX,
+		int					dstRectY
+)
+{
+	if (!src)
+		return;
+
+	if (!dst)
+		return;
+
+	const int bytesPerPixel = 2;
+
+	GAME_ASSERT(srcRectX + srcRectWidth <= srcWidth);
+	GAME_ASSERT(srcRectY + srcRectHeight <= srcHeight);
+	GAME_ASSERT(dstRectX + srcRectWidth <= dstWidth);
+	GAME_ASSERT(dstRectY + srcRectHeight <= dstHeight);
+
+	src += bytesPerPixel * (srcRectX + srcWidth * srcRectY);
+	dst += bytesPerPixel * (dstRectX + dstWidth * dstRectY);
+
+	for (int row = 0; row < srcRectHeight; row++)
+	{
+		SDL_memcpy(dst, src, bytesPerPixel * srcRectWidth);
+		src += bytesPerPixel * srcWidth;
+		dst += bytesPerPixel * dstWidth;
+	}
 }

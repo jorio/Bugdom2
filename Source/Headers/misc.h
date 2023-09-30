@@ -34,6 +34,8 @@ void SwizzlePoint3D(OGLPoint3D *pt);
 void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
 
+#define SQUARED(x) ((x)*(x))
+
 static inline int PositiveModulo(int value, unsigned int m)
 {
 	int mod = value % (int) m;

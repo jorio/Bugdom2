@@ -69,7 +69,7 @@ extern	Boolean					gEnableSnakes;
 extern	Boolean					gFreezeCameraFromXZ;
 extern	Boolean					gFreezeCameraFromY;
 extern	Boolean					gGamePaused;
-extern	Boolean					gG4;
+extern	Boolean					gG4;	// enables more enemies, effects, and seamless terrain texturing
 extern	Boolean					gGameOver;
 extern	Boolean					gHeadOnScarecrow;
 extern	Boolean					gIgnoreBottleKeySnail;

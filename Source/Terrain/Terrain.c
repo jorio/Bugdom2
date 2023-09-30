@@ -1,7 +1,8 @@
 /****************************/
 /*     TERRAIN.C           	*/
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 /***************/
@@ -411,13 +412,23 @@ int	u,v,i,j;
 
 				/* SET UV & COLOR VALUES */
 
+		const float seamlessTexmapSize	= (2.0f + SUPERTILE_TEXMAP_SIZE);
+		const float seamlessUVScale		= SUPERTILE_TEXMAP_SIZE / seamlessTexmapSize;
+		const float seamlessUVTranslate	= 1.0f / seamlessTexmapSize;
+
 		j = 0;
 		for (v = 0; v <= SUPERTILE_SIZE; v++)
 		{
 			for (u = 0; u <= SUPERTILE_SIZE; u++)
 			{
 				uvPtr[j].u = (float)u / (float)SUPERTILE_SIZE;		// sets uv's 0.0 -> 1.0 for single texture map
-				uvPtr[j].v = 1.0f - ((float)v / (float)SUPERTILE_SIZE);
+				uvPtr[j].v = (float)v / (float)SUPERTILE_SIZE;
+
+				if (gG4)											// do seamless texturing if we're in high-detail mode
+				{
+					uvPtr[j].u = (uvPtr[j].u * seamlessUVScale) + seamlessUVTranslate;
+					uvPtr[j].v = (uvPtr[j].v * seamlessUVScale) + seamlessUVTranslate;
+				}
 
 				j++;
 			}
@@ -571,8 +582,8 @@ OGLVector3D			*vertexNormals;
 
 					/* SET UV */
 
-			gWorkGrid[row2][col2].uv.u = (float)col2 * (.99f / (float)SUPERTILE_SIZE);		// sets uv's 0.0 -> .99 for single texture map
-			gWorkGrid[row2][col2].uv.v = .99f - ((float)row2 * (.99f / (float)SUPERTILE_SIZE));
+			gWorkGrid[row2][col2].uv.u = (float)col2 * (1.0f / (float)SUPERTILE_SIZE);		// sets uv's 0.0 -> .99 for single texture map
+			gWorkGrid[row2][col2].uv.v = 1.0f - ((float)row2 * (1.0f / (float)SUPERTILE_SIZE));
 
 
 					/* SET COLOR */
