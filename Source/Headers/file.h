@@ -67,6 +67,7 @@ typedef struct
 	Byte	antialiasingLevel;
 	Boolean	vsync;
 	Boolean	fullscreen;
+	Boolean	uiCentering;
 
 	Byte	rumbleIntensity;
 	Byte	mouseSensitivityLevel;

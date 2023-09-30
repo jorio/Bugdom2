@@ -303,10 +303,8 @@ int		effect;
 
 /************************ DRAW DIALOG MESSAGE ********************/
 
-void DrawDialogMessage(void)
+void DrawDialogMessage(float x, float y)
 {
-float	x,y;
-
 			/* UPDATE ANY CURRENT VOICE */
 
 	if (gDialogSoundChannel != -1)
@@ -385,8 +383,9 @@ float	x,y;
 
 			/* DRAW FRAME FIRST */
 
-	x = (640-DIALOG_FRAME_WIDTH)/2 + 5.0f;
-	y = 410.0f;
+//	x = (640-DIALOG_FRAME_WIDTH)/2 + 5.0f;
+//	y = 410.0f;
+	x += -DIALOG_FRAME_WIDTH*0.5f + 5.0f;
 	DrawInfobarSprite2(x, y, DIALOG_FRAME_WIDTH, SPRITE_GROUP_INFOBAR, INFOBAR_SObjTypes_DialogFrame);
 
 

@@ -640,6 +640,11 @@ float	fps = gFramesPerSecondFrac;
 
 static void MoveMenuLogo(ObjNode *theNode)
 {
+	theNode->Coord.x = 80;
+	if (!gGamePrefs.uiCentering)
+		theNode->Coord.x += g2DLogicalRect.left;
+	UpdateObjectTransforms(theNode);
+
 			/* SHOW LOGO IF USER IS INACTIVE */
 
 	if (gInactivityTimer > 10.0f)
@@ -905,10 +910,10 @@ static void DrawDarkenPane(ObjNode *theNode)
 	glEnable(GL_BLEND);
 
 	glBegin(GL_QUADS);
-	glVertex3f(-1000,-1000,0);
-	glVertex3f(1000,-1000,0);
-	glVertex3f(1000,1000,0);
-	glVertex3f(-1000,1000,0);
+	glVertex3f(g2DLogicalRect.right,	g2DLogicalRect.top, 0);
+	glVertex3f(g2DLogicalRect.left,		g2DLogicalRect.top, 0);
+	glVertex3f(g2DLogicalRect.left,		g2DLogicalRect.bottom, 0);
+	glVertex3f(g2DLogicalRect.right,	g2DLogicalRect.bottom, 0);
 	glEnd();
 
 	OGL_PopState();

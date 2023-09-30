@@ -39,59 +39,57 @@ static void Infobar_DrawFood(void);
 /*    CONSTANTS             */
 /****************************/
 
-#define MAP_SCALE	150.0f
-#define	MAP_X		410.0f			//(640.0f - MAP_SCALE)
-#define	MAP_Y		0.0f
+#define MAP_SCALE		150.0f
+#define	MAP_X			AnchorRight(230.0f)
+#define	MAP_Y			AnchorTop(0.0f)
 
-#define	HEALTH_X		22.0f
-#define	HEALTH_Y		20.0f
 #define	HEALTH_SCALE	16.0f
+#define	HEALTH_X		AnchorLeft(22.0f)
+#define	HEALTH_Y		AnchorTop(20.0f)
 
-#define	LIVES_X			170.0f
-#define	LIVES_Y			0.0f
 #define	LIVES_SCALE		30.0f
+#define	LIVES_X			AnchorLeft(170.0f)
+#define	LIVES_Y			AnchorTop(0.0f)
 
-#define	FLIGHT_X		88.0f
-#define	FLIGHT_Y		20.0f
 #define	FLIGHT_SCALE	16.0f
+#define	FLIGHT_X		AnchorLeft(88.0f)
+#define	FLIGHT_Y		AnchorTop(20.0f)
 
 #define	COLORKEY_SCALE	40.0f
-#define	COLORKEY_X		143.0f
-#define	COLORKEY_Y		32.0f
-
+#define	COLORKEY_X		AnchorLeft(143.0f)
+#define	COLORKEY_Y		AnchorTop(32.0f)
 
 #define	MOUSE_SCALE		20.0f
-#define	MOUSE_X			0.0f
-#define	MOUSE_Y			100.0f
+#define	MOUSE_X			AnchorLeft(0.0f)
+#define	MOUSE_Y			AnchorTop(100.0f)
 
-#define	TICK_X			0.0f
-#define	TICK_Y			MOUSE_Y
 #define	TICK_SCALE		30.0f
+#define	TICK_X			AnchorLeft(0.0f)
+#define	TICK_Y			MOUSE_Y
 
+#define	FLEA_SCALE		TICK_SCALE
 #define	FLEA_X			(TICK_X + TICK_SCALE)
 #define	FLEA_Y			TICK_Y
-#define	FLEA_SCALE		TICK_SCALE
-
 
 #define	ANTHILL_SCALE	22.0f
-#define	ANTHILL_X		0.0f
+#define	ANTHILL_X		AnchorLeft(0.0f)
 #define	ANTHILL_Y		MOUSE_Y
 
 #define	CLOVERS_SCALE	40.0f
-#define	CLOVERS_X		595.0f
-#define	CLOVERS_Y		0.0f
+#define	CLOVERS_X		AnchorRight(45.0f)
+#define	CLOVERS_Y		AnchorTop(0.0f)
 
-#define	REDCLOVER_SCALE		20.0f
-#define	REDCLOVERS_X		(640.0f - REDCLOVER_SCALE)
-#define	REDCLOVERS_Y		100.0f
+#define	REDCLOVER_SCALE	20.0f
+#define	REDCLOVERS_X	AnchorRight(REDCLOVER_SCALE)
+#define	REDCLOVERS_Y	AnchorTop(100.0f)
 
-#define	FISH_X			0.0f
-#define	FISH_Y			170.0f
 #define	FISH_SCALE		30.0f
+#define	FISH_X			AnchorLeft(0.0f)
+#define	FISH_Y			AnchorTop(170.0f)
 
-#define	FOOD_X			0.0f
-#define	FOOD_Y			170.0f
 #define	FOOD_SCALE		30.0f
+#define	FOOD_X			AnchorLeft(0.0f)
+#define	FOOD_Y			AnchorTop(170.0f)
 
 
 /*********************/
@@ -105,6 +103,46 @@ Byte			gFoodTypes[FOOD_TO_GET];
 
 OGLRect			g2DLogicalRect = {0, 480, 0, 640};
 static float	g640x480Scaling = 1.0f;
+
+static OGLRect	gUIAnchors;
+
+
+/*************** ASPECT RATIO-INDEPENDENT ANCHORS ******************/
+
+static inline float AnchorLeft(float x)
+{
+	return gUIAnchors.left + x;
+}
+
+static inline float AnchorRight(float x)
+{
+	return gUIAnchors.right - x;
+}
+
+static inline float AnchorTop(float y)
+{
+	return gUIAnchors.top + y;
+}
+
+static inline float AnchorBottom(float y)
+{
+	return gUIAnchors.bottom - y;
+}
+
+static inline float AnchorCenterX(float x)
+{
+	float cx = 0.5f * (gUIAnchors.right + gUIAnchors.left);
+	return x + cx;
+}
+
+/*
+static inline float AnchorCenterY(float y)
+{
+	float cy = 0.5f * (gUIAnchors.bottom + gUIAnchors.top);
+	return y + cy;
+}
+*/
+
 
 /********************* INIT INFOBAR ****************************/
 //
@@ -203,6 +241,24 @@ static void DrawInfobar(ObjNode* theNode)
 	if (gHideInfobar)
 		return;
 
+		/*********************/
+		/* SET UP UI ANCHORS */
+		/*********************/
+
+	if (gGamePrefs.uiCentering)
+	{
+		gUIAnchors = (OGLRect) {.left=0, .right=640, .top=0, .bottom=480};
+	}
+	else
+	{
+		float logicalWidth = g2DLogicalRect.right - g2DLogicalRect.left;
+		float logicalHeight = g2DLogicalRect.bottom - g2DLogicalRect.top;
+		float overflowX = 0.5f * (logicalWidth - 640);
+		float overflowY = 0.5f * (logicalHeight - 480);
+		gUIAnchors = (OGLRect) {.left=-overflowX, .right=640+overflowX, .top=-overflowY, .bottom=480+overflowY};
+	}
+
+
 		/************/
 		/* SET TAGS */
 		/************/
@@ -223,8 +279,8 @@ static void DrawInfobar(ObjNode* theNode)
 
 			/* DRAW CORNER LEAVES */
 
-	DrawInfobarSprite(0, -7, 230, INFOBAR_SObjType_LeftCorner);
-	DrawInfobarSprite(CLOVERS_X-26, -7, CLOVERS_SCALE * 2, INFOBAR_SObjType_RightCorner);
+	DrawInfobarSprite(AnchorLeft(0), AnchorTop(-7), 230, INFOBAR_SObjType_LeftCorner);
+	DrawInfobarSprite(CLOVERS_X-26, AnchorTop(-7), CLOVERS_SCALE * 2, INFOBAR_SObjType_RightCorner);
 
 
 
@@ -266,7 +322,7 @@ static void DrawInfobar(ObjNode* theNode)
 				break;
 	}
 
-	DrawDialogMessage();
+	DrawDialogMessage(AnchorCenterX(0), AnchorBottom(70));
 
 
 			/***********/
