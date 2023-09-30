@@ -268,8 +268,6 @@ FSSpec			spec;
 	}
 
 
-	SDL_Log("TODO: Copy snd init from nano 2");
-
 		/***********************/
 		/* LOAD DEFAULT SOUNDS */
 		/***********************/
@@ -286,8 +284,6 @@ FSSpec			spec;
 
 void ShutdownSound(void)
 {
-int	i;
-
 			/* STOP ANY PLAYING AUDIO */
 
 	StopAllEffectChannels();
@@ -296,11 +292,20 @@ int	i;
 
 		/* DISPOSE OF CHANNELS */
 
-	for (i = 0; i < gMaxChannels; i++)
+	for (int i = 0; i < gMaxChannels; i++)
+	{
 		SndDisposeChannel(gSndChannel[i], true);
+	}
 	gMaxChannels = 0;
 
 
+		/* DISPOSE OF SOUND BANKS */
+
+	for (int i = 0; i < MAX_SOUND_BANKS; i++)
+	{
+		if (gNumSndsInBank[i] > 0)
+			DisposeSoundBank(i);
+	}
 }
 
 #pragma mark -
@@ -834,14 +839,14 @@ void UpdateListenerLocation(void)
 {
 OGLVector3D	v;
 
-	v.x = gGameView->cameraPlacement.pointOfInterest.x - gGameView->cameraPlacement.cameraLocation.x;	// calc line of sight vector
-	v.y = gGameView->cameraPlacement.pointOfInterest.y - gGameView->cameraPlacement.cameraLocation.y;
-	v.z = gGameView->cameraPlacement.pointOfInterest.z - gGameView->cameraPlacement.cameraLocation.z;
+	v.x = gGameView.cameraPlacement.pointOfInterest.x - gGameView.cameraPlacement.cameraLocation.x;	// calc line of sight vector
+	v.y = gGameView.cameraPlacement.pointOfInterest.y - gGameView.cameraPlacement.cameraLocation.y;
+	v.z = gGameView.cameraPlacement.pointOfInterest.z - gGameView.cameraPlacement.cameraLocation.z;
 	FastNormalizeVector(v.x, v.y, v.z, &v);
 
-	gEarCoords.x = gGameView->cameraPlacement.cameraLocation.x + (v.x * 300.0f);			// put ear coord in front of camera
-	gEarCoords.y = gGameView->cameraPlacement.cameraLocation.y + (v.y * 300.0f);
-	gEarCoords.z = gGameView->cameraPlacement.cameraLocation.z + (v.z * 300.0f);
+	gEarCoords.x = gGameView.cameraPlacement.cameraLocation.x + (v.x * 300.0f);			// put ear coord in front of camera
+	gEarCoords.y = gGameView.cameraPlacement.cameraLocation.y + (v.y * 300.0f);
+	gEarCoords.z = gGameView.cameraPlacement.cameraLocation.z + (v.z * 300.0f);
 
 	gEyeVector = v;
 }

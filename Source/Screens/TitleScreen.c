@@ -159,8 +159,8 @@ ObjNode			*fly;
 	OGL_SetupWindow(&viewDef, &gGameView);
 
 	gAutoFadeStatusBits = STATUS_BIT_AUTOFADE;
-	gAutoFadeStartDist	= gGameView->yon * .80;
-	gAutoFadeEndDist	= gGameView->yon * .95f;
+	gAutoFadeStartDist	= gGameView.yon * .80;
+	gAutoFadeEndDist	= gGameView.yon * .95f;
 	gAutoFadeRange_Frac	= 1.0f / (gAutoFadeEndDist - gAutoFadeStartDist);
 
 
@@ -590,7 +590,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall = nil;
 	gNewObjectDefinition.rot 	= 0;
-	gNewObjectDefinition.scale 	= gGameView->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 	= gGameView.yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;

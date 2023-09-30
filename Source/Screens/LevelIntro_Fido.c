@@ -147,7 +147,7 @@ static const OGLVector3D	fillDirection1 = { -1.0, -.7, -.7 };
 		.flags		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
 		.slot		= TERRAIN_SLOT+1,		// draw after terrain for better performance since terrain blocks much of the pixels
 		.drawCall	= DrawCyclorama,
-		.scale		= gGameView->yon * .995f / 100.0f,
+		.scale		= gGameView.yon * .995f / 100.0f,
 	};
 	MakeNewDisplayGroupObject(&def);
 

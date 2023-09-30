@@ -133,10 +133,10 @@ int				px,py,pw,ph;
 
 			/* CALC SUN COORD */
 
-	from = gGameView->cameraPlacement.cameraLocation;
-	gSunCoord.x = from.x - (gWorldSunDirection.x * gGameView->yon);
-	gSunCoord.y = from.y - (gWorldSunDirection.y * gGameView->yon);
-	gSunCoord.z = from.z - (gWorldSunDirection.z * gGameView->yon);
+	from = gGameView.cameraPlacement.cameraLocation;
+	gSunCoord.x = from.x - (gWorldSunDirection.x * gGameView.yon);
+	gSunCoord.y = from.y - (gWorldSunDirection.y * gGameView.yon);
+	gSunCoord.z = from.z - (gWorldSunDirection.z * gGameView.yon);
 
 
 
@@ -147,9 +147,9 @@ int				px,py,pw,ph;
 						from.z - gSunCoord.z,
 						&sunVector);
 
-	FastNormalizeVector(gGameView->cameraPlacement.pointOfInterest.x - from.x,
-						gGameView->cameraPlacement.pointOfInterest.y - from.y,
-						gGameView->cameraPlacement.pointOfInterest.z - from.z,
+	FastNormalizeVector(gGameView.cameraPlacement.pointOfInterest.x - from.x,
+						gGameView.cameraPlacement.pointOfInterest.y - from.y,
+						gGameView.cameraPlacement.pointOfInterest.z - from.z,
 						&lookAtVector);
 
 	dot = OGLVector3D_Dot(&lookAtVector, &sunVector);
@@ -295,13 +295,13 @@ ObjNode	*playerObj = gPlayerInfo.objNode;
 		dx = sin(r) * gCameraDistFromMe;
 		dz = cos(r) * gCameraDistFromMe;
 
-		x = gGameView->cameraPlacement.cameraLocation.x = playerObj->Coord.x + dx;
-		z = gGameView->cameraPlacement.cameraLocation.z = playerObj->Coord.z + dz;
-		gGameView->cameraPlacement.cameraLocation.y = GetTerrainY(x, z) + 200.0f;
+		x = gGameView.cameraPlacement.cameraLocation.x = playerObj->Coord.x + dx;
+		z = gGameView.cameraPlacement.cameraLocation.z = playerObj->Coord.z + dz;
+		gGameView.cameraPlacement.cameraLocation.y = GetTerrainY(x, z) + 200.0f;
 
-		gGameView->cameraPlacement.pointOfInterest.x = playerObj->Coord.x;
-		gGameView->cameraPlacement.pointOfInterest.y = playerObj->Coord.y + gCameraLookAtYOff;
-		gGameView->cameraPlacement.pointOfInterest.z = playerObj->Coord.z;
+		gGameView.cameraPlacement.pointOfInterest.x = playerObj->Coord.x;
+		gGameView.cameraPlacement.pointOfInterest.y = playerObj->Coord.y + gCameraLookAtYOff;
+		gGameView.cameraPlacement.pointOfInterest.z = playerObj->Coord.z;
 	}
 
 			/* MAKE LENS FLARE MANAGER */
@@ -331,8 +331,8 @@ ObjNode	*playerObj = gPlayerInfo.objNode;
 		if (i < 0.0f)
 			i = 0;
 
-		gGameView->cameraPlacement.cameraLocation = gTunnelSplinePoints[i].point;
-		gGameView->cameraPlacement.pointOfInterest = playerObj->Coord;
+		gGameView.cameraPlacement.cameraLocation = gTunnelSplinePoints[i].point;
+		gGameView.cameraPlacement.pointOfInterest = playerObj->Coord;
 
 	}
 
@@ -431,13 +431,13 @@ Boolean			snapTo = false;
 				/* GET COORD DATA */
 				/******************/
 
-	oldCamX = gGameView->cameraPlacement.cameraLocation.x;				// get current/old cam coords
-	oldCamY = gGameView->cameraPlacement.cameraLocation.y;
-	oldCamZ = gGameView->cameraPlacement.cameraLocation.z;
+	oldCamX = gGameView.cameraPlacement.cameraLocation.x;				// get current/old cam coords
+	oldCamY = gGameView.cameraPlacement.cameraLocation.y;
+	oldCamZ = gGameView.cameraPlacement.cameraLocation.z;
 
-	oldPointOfInterestX = gGameView->cameraPlacement.pointOfInterest.x;
-	oldPointOfInterestY = gGameView->cameraPlacement.pointOfInterest.y;
-	oldPointOfInterestZ = gGameView->cameraPlacement.pointOfInterest.z;
+	oldPointOfInterestX = gGameView.cameraPlacement.pointOfInterest.x;
+	oldPointOfInterestY = gGameView.cameraPlacement.pointOfInterest.y;
+	oldPointOfInterestZ = gGameView.cameraPlacement.pointOfInterest.z;
 
 	myX = gPlayerInfo.coord.x;
 	myY = gPlayerInfo.coord.y + playerObj->BottomOff;
@@ -722,8 +722,8 @@ got_target:
 			}
 		}
 
-		dist = (target.y - gGameView->cameraPlacement.cameraLocation.y) * gCameraFromAccelY;	// calc dist from current y to desired y
-		from.y = gGameView->cameraPlacement.cameraLocation.y + (dist * fps);
+		dist = (target.y - gGameView.cameraPlacement.cameraLocation.y) * gCameraFromAccelY;	// calc dist from current y to desired y
+		from.y = gGameView.cameraPlacement.cameraLocation.y + (dist * fps);
 
 
 				/* MAKE SURE NOT UNDERGROUND OR WATER */
@@ -769,14 +769,14 @@ ObjNode	*playerObj = gPlayerInfo.objNode;
 		if (i < 0.0f)
 			i = 0.0;
 
-		CalcTunnelCoordFromIndex(i, &gGameView->cameraPlacement.cameraLocation);
+		CalcTunnelCoordFromIndex(i, &gGameView.cameraPlacement.cameraLocation);
 		if (gLevelNum == LEVEL_NUM_GUTTER)
-			gGameView->cameraPlacement.cameraLocation.y += 5.0f;
+			gGameView.cameraPlacement.cameraLocation.y += 5.0f;
 		else
-			gGameView->cameraPlacement.cameraLocation.y -= 12.0f;
+			gGameView.cameraPlacement.cameraLocation.y -= 12.0f;
 
-		CalcTunnelCoordFromIndex(gPlayerTunnelIndex, &gGameView->cameraPlacement.pointOfInterest);
-		gGameView->cameraPlacement.pointOfInterest.y -= 11.0f;
+		CalcTunnelCoordFromIndex(gPlayerTunnelIndex, &gGameView.cameraPlacement.pointOfInterest);
+		gGameView.cameraPlacement.pointOfInterest.y -= 11.0f;
 
 	}
 
@@ -854,7 +854,7 @@ const OGLVector3D	up = {0,1,0};
 
 void PrepAnaglyphCameras(void)
 {
-	gAnaglyphCameraBackup = gGameView->cameraPlacement;
+	gAnaglyphCameraBackup = gGameView.cameraPlacement;
 
 }
 
@@ -862,7 +862,7 @@ void PrepAnaglyphCameras(void)
 
 void RestoreCamerasFromAnaglyph(void)
 {
-	gGameView->cameraPlacement = gAnaglyphCameraBackup;
+	gGameView.cameraPlacement = gAnaglyphCameraBackup;
 }
 
 
@@ -890,14 +890,14 @@ const	OGLVector3D up = {0,1,0};
 
 				/* OFFSET CAMERA FROM */
 
-	gGameView->cameraPlacement.cameraLocation.x = gAnaglyphCameraBackup.cameraLocation.x + (xaxis.x * sep);
-	gGameView->cameraPlacement.cameraLocation.z = gAnaglyphCameraBackup.cameraLocation.z + (xaxis.z * sep);
+	gGameView.cameraPlacement.cameraLocation.x = gAnaglyphCameraBackup.cameraLocation.x + (xaxis.x * sep);
+	gGameView.cameraPlacement.cameraLocation.z = gAnaglyphCameraBackup.cameraLocation.z + (xaxis.z * sep);
 
 
 				/* OFFSET CAMERA TO */
 
-	gGameView->cameraPlacement.pointOfInterest.x = gAnaglyphCameraBackup.pointOfInterest.x + (xaxis.x * sep);
-	gGameView->cameraPlacement.pointOfInterest.z = gAnaglyphCameraBackup.pointOfInterest.z + (xaxis.z * sep);
+	gGameView.cameraPlacement.pointOfInterest.x = gAnaglyphCameraBackup.pointOfInterest.x + (xaxis.x * sep);
+	gGameView.cameraPlacement.pointOfInterest.z = gAnaglyphCameraBackup.pointOfInterest.z + (xaxis.z * sep);
 
 
 }

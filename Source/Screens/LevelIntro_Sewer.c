@@ -171,7 +171,7 @@ ObjNode	*newObj, *pipe, *grate;
 		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
 		.slot 		= TERRAIN_SLOT+1,
 		.drawCall 	= DrawCyclorama,	// draw after terrain for better performance since terrain blocks much of the pixels
-		.scale 		= gGameView->yon * .995f / 100.0f,
+		.scale 		= gGameView.yon * .995f / 100.0f,
 	};
 	newObj = MakeNewDisplayGroupObject(&def);
 	newObj->TargetOff.y = -300.0f;
@@ -246,8 +246,8 @@ float	timer;
 
 				/* MOVE CAMERA */
 
-		gGameView->cameraPlacement.cameraLocation.z += 35.0f * fps;
-		gGameView->cameraPlacement.cameraLocation.y -= 25.0f * fps;
+		gGameView.cameraPlacement.cameraLocation.z += 35.0f * fps;
+		gGameView.cameraPlacement.cameraLocation.y -= 25.0f * fps;
 
 
 				/* MOVE */

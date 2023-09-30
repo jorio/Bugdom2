@@ -49,7 +49,7 @@ Byte				gDebugMode = 0;				// 0 == none, 1 = fps, 2 = all
 
 uint32_t				gAutoFadeStatusBits;
 
-OGLSetupOutputType		*gGameView = nil;
+OGLSetupOutputType		gGameView = {0};
 
 PrefsType			gGamePrefs;
 
@@ -120,7 +120,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
-	gGamePrefs.fullscreen			= true;
+	gGamePrefs.fullscreen			= false;
 	gGamePrefs.uiCentering			= false;
 	gGamePrefs.music				= true;
 
@@ -428,10 +428,10 @@ float	decay = (1.0f / 2600.0f);			// decay based on upper margin
 
 
 	start = .0f + (y * decay);
-	start *= gGameView->yon;
+	start *= gGameView.yon;
 
 	end = .8f + (y * decay);
-	end *= gGameView->yon;
+	end *= gGameView.yon;
 
 	if (start > end)
 		start = end;
@@ -836,8 +836,8 @@ OGLSetupInputType	viewDef;
 				break;
 
 		default:
-				gAutoFadeStartDist	= gGameView->yon * .80;
-				gAutoFadeEndDist	= gGameView->yon * .95f;
+				gAutoFadeStartDist	= gGameView.yon * .80;
+				gAutoFadeEndDist	= gGameView.yon * .95f;
 	}
 
 

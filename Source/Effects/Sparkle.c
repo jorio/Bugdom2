@@ -123,7 +123,7 @@ OGLPoint3D					*cameraLocation;
 			/* DRAW EACH SPARKLE */
 			/*********************/
 
-	cameraLocation = &gGameView->cameraPlacement.cameraLocation;		// point to camera coord
+	cameraLocation = &gGameView.cameraPlacement.cameraLocation;		// point to camera coord
 
 	for (int i = Pool_First(gSparklePool); i >= 0; i = Pool_Next(gSparklePool, i))
 	{

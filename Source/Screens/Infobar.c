@@ -265,7 +265,7 @@ static void DrawInfobar(ObjNode* theNode)
 
 	OGL_PushState();
 
-	if (gGameView->useFog)
+	if (gGameView.useFog)
 		glDisable(GL_FOG);
 
 	SetInfobarSpriteState();
@@ -331,7 +331,7 @@ static void DrawInfobar(ObjNode* theNode)
 
 	OGL_PopState();
 	gGlobalMaterialFlags = 0;
-	if (gGameView->useFog)
+	if (gGameView.useFog)
 		glEnable(GL_FOG);
 }
 

@@ -90,7 +90,7 @@ void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 	OGL_DrawScene(drawCall);
 
 #if FADE_SOUND
-	if (gGameView->fadeSound)
+	if (gGameView.fadeSound)
 	{
 		FadeSound(0);
 		KillSong();
@@ -201,7 +201,7 @@ static void MoveFadePane(ObjNode *theNode)
 	}
 
 #if FADE_SOUND
-	if (gGameView->fadeSound)
+	if (gGameView.fadeSound)
 	{
 		FadeSound(gGammaFadeFrac);
 	}

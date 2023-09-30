@@ -4,78 +4,37 @@
 /* By Brian Greenstone      */
 /****************************/
 
-
-/***************/
-/* EXTERNALS   */
-/***************/
-
 #include "game.h"
 
-
-/**********************/
-/*     PROTOTYPES     */
-/**********************/
-
-static void InitLZSSMemory(void);
-
-
-
-/****************************/
-/*    CONSTANTS             */
-/****************************/
-
-
-#define RING_BUFF_SIZE		 		4096			/* size of ring buffer */
-
-#define F		   		18							/* upper limit for match_length */
-#define THRESHOLD		2   						/* encode string into position and length if match_length is greater than this */
-#define LZSS_NIL		RING_BUFF_SIZE				/* index for root of binary search trees */
-
-
-/****************************/
-/*    VARIABLES             */
-/****************************/
-
-unsigned long
-		textsize = 0,								/* text size counter */
-		codesize = 0,								/* code size counter */
-		printcount = 0;								/* counter for reporting progress every 1K bytes */
-
-
-unsigned char	text_buf[RING_BUFF_SIZE + F - 1];	/* ring buffer of size N,with extra F-1 bytes to facilitate string comparison */
-
-short	*lson = nil,
-		*rson = nil,
-		*dad = nil; 								/* left & right children &	parents -- These constitute binary search trees. */
-
-
-
-
-
-
-
-/*==============================================================================*/
+#define RING_BUFF_SIZE	4096			// size of ring buffer
+#define F				18				// upper limit for match_length
+#define THRESHOLD		2				// encode string into position and length if match_length is greater than this
 
 long LZSS_Decode(short fRefNum, Ptr destPtr, long sourceSize)
 {
 short  		i, j, k, r;
 unsigned short  flags;
 Ptr			srcOriginalPtr;
-unsigned char *sourcePtr,c;
+uint8_t		*sourcePtr;
+uint8_t		c;
 Ptr			destStartPtr = destPtr;
-
-	textsize = 0;						/* text size counter */
-	codesize = 0;						/* code size counter */
-	printcount = 0;						/* counter for reporting progress every 1K bytes */
 
 				/* GET MEMORY FOR LZSS DATA */
 
-	InitLZSSMemory();										// init internal stuff
+	// ring buffer of size N, with extra F-1 bytes to facilitate string comparison
+	uint8_t* text_buf = (uint8_t *)AllocPtrClear(RING_BUFF_SIZE + F - 1);
 
-	srcOriginalPtr = (Ptr)AllocPtr(sourceSize+1);
+	// left & right children & parents -- These constitute binary search trees.
+	short* lson = (short *)AllocPtrClear(sizeof(short)*(RING_BUFF_SIZE + 1));
+	short* rson = (short *)AllocPtrClear(sizeof(short)*(RING_BUFF_SIZE + 257));
+	short* dad  = (short *)AllocPtrClear(sizeof(short)*(RING_BUFF_SIZE + 1));
+
+	GAME_ASSERT(text_buf && lson && rson && dad);
+
+	srcOriginalPtr = (Ptr)AllocPtrClear(sourceSize+1);
 	GAME_ASSERT(srcOriginalPtr);
 
-	sourcePtr = (unsigned char *)srcOriginalPtr;
+	sourcePtr = (uint8_t *)srcOriginalPtr;
 
 				/* READ LZSS DATA */
 
@@ -135,43 +94,11 @@ Ptr			destStartPtr = destPtr;
 
 			/* CLEANUP */
 
-	SafeDisposePtr(srcOriginalPtr);				// release the memory for packed buffer
-
+	SafeDisposePtr(srcOriginalPtr);
 	SafeDisposePtr((Ptr)lson);
-	lson = nil;
 	SafeDisposePtr((Ptr)rson);
-	rson = nil;
 	SafeDisposePtr((Ptr)dad);
-	dad = nil;
+	SafeDisposePtr((Ptr)text_buf);
 
 	return (long) decompSize;
 }
-
-/********************* INIT LZSS MEMORY **********************/
-
-static void InitLZSSMemory(void)
-{
-	if (lson == nil)
-	{
-		lson = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 1));
-		if (lson == nil)
-			DoFatalAlert("Couldnt alloc memory for lson!");
-	}
-
-	if (rson == nil)
-	{
-		rson = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 257));
-		if (rson == nil)
-			DoFatalAlert("Couldnt alloc memory for rson!");
-	}
-
-	if (dad == nil)
-	{
-		dad = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 1));
-		if (dad == nil)
-			DoFatalAlert("Couldnt alloc memory for dad!");
-	}
-}
-
-
-

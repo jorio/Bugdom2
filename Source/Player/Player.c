@@ -741,8 +741,8 @@ float	fps = gFramesPerSecondFrac;
 	playerAim.x = -sin(playerRotY);
 	playerAim.y = -cos(playerRotY);
 
-	cameraAim.x = gGameView->cameraPlacement.pointOfInterest.x - gGameView->cameraPlacement.cameraLocation.x;
-	cameraAim.y = gGameView->cameraPlacement.pointOfInterest.z - gGameView->cameraPlacement.cameraLocation.z;
+	cameraAim.x = gGameView.cameraPlacement.pointOfInterest.x - gGameView.cameraPlacement.cameraLocation.x;
+	cameraAim.y = gGameView.cameraPlacement.pointOfInterest.z - gGameView.cameraPlacement.cameraLocation.z;
 	FastNormalizeVector2D(cameraAim.x, cameraAim.y, &cameraAim, true);
 
 	dot = fabs(OGLVector2D_Dot(&playerAim, &cameraAim));

@@ -92,31 +92,24 @@ static Boolean	beenHere = false;
 	{
 		beenHere = true;
 
+		SavePrefs();									// save prefs before bailing
+
 		EmptySplineObjectList();
 		DisposeObjectManager();
 		DisposeSkeletonManager();
+		DisposeEffects();
 		DisposeTunnelData();
 		DisposeTerrain();								// dispose of any memory allocated by terrain manager
 		DisposeAllBG3DContainers();						// nuke all models
 		DisposeAllSpriteGroups();						// nuke all sprites
 		DisposeAllSpriteAtlases();						// nuke all atlases
 
-		if (gGameView)							// see if need to dispose this
+		if (gGameView.isActive)							// see if need to dispose this
 			OGL_DisposeWindowSetup(&gGameView);
 
 		ShutdownSound();								// cleanup sound stuff
+		DisposeLocalizedStrings();
 	}
-
-//	if (gHIDInitialized)							// unload HID
-//	{
-//	    HIDReleaseDeviceList ();
-//		TearDownHIDCFM ();
-//	}
-
-
-	MyFlushEvents();
-
-	SavePrefs();							// save prefs before bailing
 
 	ExitToShell();
 }

@@ -677,25 +677,25 @@ OGLVector3D			*vertexNormals;
 
 			/* GET LIGHT DATA */
 
-		ambientR = gGameView->lightList.ambientColor.r;			// get ambient color
-		ambientG = gGameView->lightList.ambientColor.g;
-		ambientB = gGameView->lightList.ambientColor.b;
+		ambientR = gGameView.lightList.ambientColor.r;			// get ambient color
+		ambientG = gGameView.lightList.ambientColor.g;
+		ambientB = gGameView.lightList.ambientColor.b;
 
-		fillR0 = gGameView->lightList.fillColor[0].r;			// get fill color
-		fillG0 = gGameView->lightList.fillColor[0].g;
-		fillB0 = gGameView->lightList.fillColor[0].b;
-		fillDir0 = gGameView->lightList.fillDirection[0];		// get fill direction
+		fillR0 = gGameView.lightList.fillColor[0].r;			// get fill color
+		fillG0 = gGameView.lightList.fillColor[0].g;
+		fillB0 = gGameView.lightList.fillColor[0].b;
+		fillDir0 = gGameView.lightList.fillDirection[0];		// get fill direction
 		fillDir0.x = -fillDir0.x;
 		fillDir0.y = -fillDir0.y;
 		fillDir0.z = -fillDir0.z;
 
-		numFillLights = gGameView->lightList.numFillLights;
+		numFillLights = gGameView.lightList.numFillLights;
 		if (numFillLights > 1)
 		{
-			fillR1 = gGameView->lightList.fillColor[1].r;
-			fillG1 = gGameView->lightList.fillColor[1].g;
-			fillB1 = gGameView->lightList.fillColor[1].b;
-			fillDir1 = gGameView->lightList.fillDirection[1];
+			fillR1 = gGameView.lightList.fillColor[1].r;
+			fillG1 = gGameView.lightList.fillColor[1].g;
+			fillB1 = gGameView.lightList.fillColor[1].b;
+			fillDir1 = gGameView.lightList.fillDirection[1];
 			fillDir1.x = -fillDir1.x;
 			fillDir1.y = -fillDir1.y;
 			fillDir1.z = -fillDir1.z;

@@ -190,7 +190,7 @@ int		i;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView.yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -301,7 +301,7 @@ float	timer;
 
 				/* MOVE CAMERA */
 
-		gGameView->cameraPlacement.cameraLocation.z -= 30.0f * fps;
+		gGameView.cameraPlacement.cameraLocation.z -= 30.0f * fps;
 
 
 

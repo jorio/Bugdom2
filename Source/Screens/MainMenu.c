@@ -227,7 +227,7 @@ int		i;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .90f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView.yon * .90f / 100.0f;
 	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 

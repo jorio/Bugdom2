@@ -139,7 +139,7 @@ int			i,n;
 		.type 		= PARK_ObjType_Cyclorama,
 		.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
 		.slot 		= TERRAIN_SLOT+1,
-		.scale 		= gGameView->yon * .995f / 100.0f,
+		.scale 		= gGameView.yon * .995f / 100.0f,
 	};
 	newObj = MakeNewDisplayGroupObject(&def);
 
@@ -271,7 +271,7 @@ OGLVector2D		v;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gCan->Coord, 0, .2 * fps, 0);
-		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
+		OGLPoint3D_Transform(&gGameView.cameraPlacement.cameraLocation, &m, &p);
 
 		v.x = gCan->Coord.x - p.x;										// also move toward can
 		v.y = gCan->Coord.z - p.z;
@@ -326,7 +326,7 @@ OGLMatrix4x4	m;
 
 static void MoveGarbageTitle(ObjNode *theNode)
 {
-	theNode->Rot.y = PI+CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->Coord.x, theNode->Coord.z, gGameView->cameraPlacement.cameraLocation.x, gGameView->cameraPlacement.cameraLocation.z);
+	theNode->Rot.y = PI+CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->Coord.x, theNode->Coord.z, gGameView.cameraPlacement.cameraLocation.x, gGameView.cameraPlacement.cameraLocation.z);
 
 	UpdateObjectTransforms(theNode);
 

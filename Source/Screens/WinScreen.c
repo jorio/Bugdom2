@@ -179,7 +179,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .99f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView.yon * .99f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -294,7 +294,7 @@ float	timer = 0.0f;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gHive->Coord, 0, .1f * gFramesPerSecondFrac, 0);
-		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
+		OGLPoint3D_Transform(&gGameView.cameraPlacement.cameraLocation, &m, &p);
 		OGL_UpdateCameraFromTo(&p, nil);
 
 

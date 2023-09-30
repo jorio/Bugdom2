@@ -418,8 +418,8 @@ float			cameraX, cameraZ;
 
 			/* GET CAMERA COORDS */
 
-	cameraX = gGameView->cameraPlacement.cameraLocation.x;
-	cameraZ = gGameView->cameraPlacement.cameraLocation.z;
+	cameraX = gGameView.cameraPlacement.cameraLocation.x;
+	cameraZ = gGameView.cameraPlacement.cameraLocation.z;
 
 			/***********************/
 			/* MAIN NODE TASK LOOP */
@@ -522,7 +522,7 @@ float			cameraX, cameraZ;
 			/* CHECK NO FOG */
 			/****************/
 
-		if (gGameView->useFog)
+		if (gGameView.useFog)
 		{
 			if (statusBits & STATUS_BIT_NOFOG)
 			{
@@ -781,7 +781,7 @@ next:
 	if (noLighting)
 		OGL_EnableLighting();
 
-	if (gGameView->useFog && noFog)
+	if (gGameView.useFog && noFog)
 		glEnable(GL_FOG);
 
 	if (glow)

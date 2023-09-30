@@ -230,7 +230,6 @@ typedef struct
 typedef struct
 {
 	Boolean					isActive;
-	SDL_GLContext			drawContext;
 	OGLLightDefType			lightList;
 	OGLCameraPlacement		cameraPlacement;
 	float					fov,hither,yon;
@@ -244,8 +243,8 @@ typedef struct
 
 void OGL_Boot(void);
 void OGL_NewViewDef(OGLSetupInputType *viewDef);
-void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType **outputHandle);
-void OGL_DisposeWindowSetup(OGLSetupOutputType **dataHandle);
+void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType *outputPtr);
+void OGL_DisposeWindowSetup(OGLSetupOutputType *outputPtr);
 void OGL_DrawScene(void (*drawRoutine)(void));
 void OGL_Camera_SetPlacementAndUpdateMatrices(void);
 void OGL_MoveCameraFromTo(float fromDX, float fromDY, float fromDZ, float toDX, float toDY, float toDZ);

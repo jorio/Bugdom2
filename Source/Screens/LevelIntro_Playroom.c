@@ -257,8 +257,8 @@ float	timer;
 
 				/* MOVE */
 
-		gGameView->cameraPlacement.cameraLocation.x += 20.0f * fps;
-		gGameView->cameraPlacement.pointOfInterest.x += 20.0f * fps;
+		gGameView.cameraPlacement.cameraLocation.x += 20.0f * fps;
+		gGameView.cameraPlacement.pointOfInterest.x += 20.0f * fps;
 
 		MoveObjects();
 

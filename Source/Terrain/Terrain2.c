@@ -589,11 +589,11 @@ float				shadeFactor;
 
 			/* GET MAIN LIGHT VECTOR INFO */
 
-	lightVector.x = gGameView->lightList.fillDirection[0].x;
-	lightVector.y = gGameView->lightList.fillDirection[0].z;
+	lightVector.x = gGameView.lightList.fillDirection[0].x;
+	lightVector.y = gGameView.lightList.fillDirection[0].z;
 	OGLVector2D_Normalize(&lightVector, &lightVector);
 
-	dot = OGLVector3D_Dot(&up, &gGameView->lightList.fillDirection[0]);
+	dot = OGLVector3D_Dot(&up, &gGameView.lightList.fillDirection[0]);
 	dot = 1.0f - dot;
 
 			/***********************/

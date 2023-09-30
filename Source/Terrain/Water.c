@@ -185,6 +185,7 @@ ObjNode					*obj;
 float					y,centerX,centerZ;
 
 	InitRipples();
+	InitRainEffect();
 
 			/******************************/
 			/* ADJUST TO GAME COORDINATES */
@@ -666,6 +667,10 @@ void InitRainEffect(void)
 
 void StartRainEffect(void)
 {
+	GAME_ASSERT(gRainGroundDropPool);			// ensure effect was initialized
+	GAME_ASSERT(gRainScreenDropPool);
+
+
 	if (gRainMode == RAIN_MODE_RAMPDOWN)		// see if stop ramping down
 	{
 		gRainMode = RAIN_MODE_RAMPUP;
@@ -689,6 +694,9 @@ void StartRainEffect(void)
 
 void StopRainEffect(void)
 {
+	GAME_ASSERT(gRainGroundDropPool);			// ensure effect was initialized
+	GAME_ASSERT(gRainScreenDropPool);
+
 	gRainMode = RAIN_MODE_RAMPDOWN;
 }
 
@@ -784,11 +792,11 @@ Boolean	makeNewDrops = false;
 
 				/* CALC CENTER POINT WHERE CAN ADD DROPS */
 
-			centerX = gGameView->cameraPlacement.pointOfInterest.x - gGameView->cameraPlacement.cameraLocation.x;
-			centerZ = gGameView->cameraPlacement.pointOfInterest.z - gGameView->cameraPlacement.cameraLocation.z;
+			centerX = gGameView.cameraPlacement.pointOfInterest.x - gGameView.cameraPlacement.cameraLocation.x;
+			centerZ = gGameView.cameraPlacement.pointOfInterest.z - gGameView.cameraPlacement.cameraLocation.z;
 			FastNormalizeVector2D(centerX, centerZ, &v, false);
-			centerX = gGameView->cameraPlacement.cameraLocation.x + v.x * 1000.0f;
-			centerZ = gGameView->cameraPlacement.cameraLocation.z + v.y * 1000.0f;
+			centerX = gGameView.cameraPlacement.cameraLocation.x + v.x * 1000.0f;
+			centerZ = gGameView.cameraPlacement.cameraLocation.z + v.y * 1000.0f;
 
 
 			for (int j = 0; j < 4; j++)									// n drops per pass

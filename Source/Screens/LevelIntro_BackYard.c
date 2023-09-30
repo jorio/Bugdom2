@@ -162,7 +162,7 @@ int		i,x,z;
 		.coord		= {0,0,0},
 		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
 		.slot 		= TERRAIN_SLOT+1,					// draw after terrain for better performance since terrain blocks much of the pixels
-		.scale 		= gGameView->yon * .995f / 100.0f,
+		.scale 		= gGameView.yon * .995f / 100.0f,
 		.drawCall	= DrawCyclorama,
 	};
 	newObj = MakeNewDisplayGroupObject(&def);
@@ -251,7 +251,7 @@ float	timer;
 
 				/* MOVE CAMERA */
 
-		gGameView->cameraPlacement.cameraLocation.y += 30.0f * fps;
+		gGameView.cameraPlacement.cameraLocation.y += 30.0f * fps;
 
 
 				/* DRAW */

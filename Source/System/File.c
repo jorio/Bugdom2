@@ -868,7 +868,6 @@ OSErr					iErr;
 		}
 		ReleaseResource(hand);
 	}
-	gNumFences = 0;
 
 			/****************************/
 			/* WATER RELATED RESOURCES */

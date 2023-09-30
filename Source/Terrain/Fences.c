@@ -441,8 +441,8 @@ float			cameraX, cameraZ;
 
 			/* GET CAMERA COORDS */
 
-	cameraX = gGameView->cameraPlacement.cameraLocation.x;
-	cameraZ = gGameView->cameraPlacement.cameraLocation.z;
+	cameraX = gGameView.cameraPlacement.cameraLocation.x;
+	cameraZ = gGameView.cameraPlacement.cameraLocation.z;
 
 
 			/* SET GLOBAL MATERIAL FLAGS */

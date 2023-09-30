@@ -119,24 +119,31 @@ void InitConfettiManager(void)
 
 void DisposeConfettiManager(void)
 {
-	GAME_ASSERT(gConfettiGroupPool);
-
 	for (int g = 0; g < MAX_CONFETTI_GROUPS; g++)
 	{
 		ConfettiGroupType* confettiGroup = &gConfettiGroups[g];
 
-		// We didn't ref count the materials, so prevent MetaObjects from trying to free a dangling pointer
-		confettiGroup->geometryObj->objectData.numMaterials = 0;
+		if (confettiGroup->geometryObj)
+		{
+			// We didn't ref count the materials, so prevent MetaObjects from trying to free a dangling pointer
+			confettiGroup->geometryObj->objectData.numMaterials = 0;
 
-		MO_DisposeObjectReference(confettiGroup->geometryObj);
-		confettiGroup->geometryObj = NULL;
+			MO_DisposeObjectReference(confettiGroup->geometryObj);
+			confettiGroup->geometryObj = NULL;
+		}
 
-		Pool_Free(confettiGroup->pool);
-		confettiGroup->pool = NULL;
+		if (confettiGroup->pool)
+		{
+			Pool_Free(confettiGroup->pool);
+			confettiGroup->pool = NULL;
+		}
 	}
 
-	Pool_Free(gConfettiGroupPool);
-	gConfettiGroupPool = NULL;
+	if (gConfettiGroupPool)
+	{
+		Pool_Free(gConfettiGroupPool);
+		gConfettiGroupPool = NULL;
+	}
 }
 
 

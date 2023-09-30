@@ -227,8 +227,8 @@ float				x,y,z,dist;
 				/**************/
 
 	dist = CalcQuickDistance(theNode->Coord.x, theNode->Coord.z,
-							 gGameView->cameraPlacement.cameraLocation.x,
-							 gGameView->cameraPlacement.cameraLocation.z);
+							 gGameView.cameraPlacement.cameraLocation.x,
+							 gGameView.cameraPlacement.cameraLocation.z);
 
 	if ((theNode->StatusBits & STATUS_BIT_ISCULLED) && (dist > 1000.0f))	// no spray if culled & far enough away
 		return;

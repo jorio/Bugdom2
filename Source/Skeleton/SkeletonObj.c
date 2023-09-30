@@ -42,15 +42,14 @@ static Pool					*gSkeletonObjDataPool = NULL;
 
 void InitSkeletonManager(void)
 {
-short	i;
-
 	CalcAccelerationSplineCurve();									// calc accel curve
 
-	for (i =0; i < MAX_SKELETON_TYPES; i++)
+	for (int i = 0; i < MAX_SKELETON_TYPES; i++)
 		gLoadedSkeletonsList[i] = nil;
 
 		/* ALLOCATE LOCAL TRIMESHES FOR ALL SKELETON TYPES */
 
+	GAME_ASSERT(!gLocalTriMeshesOfSkelType);
 	Alloc_2d_array(MOVertexArrayData, gLocalTriMeshesOfSkelType, MAX_SKELETON_TYPES, MAX_DECOMPOSED_TRIMESHES);
 
 	gSkeletonObjDataPool = Pool_New(MAX_SKELETON_OBJS);
@@ -62,6 +61,14 @@ void DisposeSkeletonManager(void)
 	{
 		Pool_Free(gSkeletonObjDataPool);
 		gSkeletonObjDataPool = NULL;
+	}
+
+	FreeAllSkeletonFiles(-1);
+
+	if (gLocalTriMeshesOfSkelType)
+	{
+		Free_2d_array(gLocalTriMeshesOfSkelType);
+		gLocalTriMeshesOfSkelType = NULL;
 	}
 }
 

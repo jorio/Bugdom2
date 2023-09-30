@@ -152,7 +152,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView->yon * .995f / 100.0f;
+	gNewObjectDefinition.scale 		= gGameView.yon * .995f / 100.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawCyclorama;
@@ -203,7 +203,7 @@ OGLPoint3D		p;
 				/* SPIN CAMERA */
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &gPinecone->Coord, 0, .3f * gFramesPerSecondFrac, 0);
-		OGLPoint3D_Transform(&gGameView->cameraPlacement.cameraLocation, &m, &p);
+		OGLPoint3D_Transform(&gGameView.cameraPlacement.cameraLocation, &m, &p);
 		OGL_UpdateCameraFromTo(&p, &gPinecone->Coord);
 
 
@@ -253,7 +253,7 @@ float	fps = gFramesPerSecondFrac;
 		gNewObjectDefinition.rot 		= 0;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-		TurnObjectTowardTarget(newObj, &gCoord, gGameView->cameraPlacement.cameraLocation.x, gGameView->cameraPlacement.cameraLocation.z, 2000, false);
+		TurnObjectTowardTarget(newObj, &gCoord, gGameView.cameraPlacement.cameraLocation.x, gGameView.cameraPlacement.cameraLocation.z, 2000, false);
 		newObj->Rot.y -= 2.0;
 		UpdateObjectTransforms(newObj);
 		return;

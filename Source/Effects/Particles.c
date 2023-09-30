@@ -59,7 +59,6 @@ void InitEffects(void)
 	InitSparkles();
 	InitConfettiManager();
 	InitShardSystem();
-	InitRainEffect();
 }
 
 /************************* DISPOSE EFFECTS ***************************/
@@ -164,18 +163,27 @@ void DisposeParticleSystem(void)
 	{
 		ParticleGroupType* particleGroup = &gParticleGroups[g];
 
-		// We didn't ref count the materials, so prevent MetaObjects from trying to free a dangling pointer
-		particleGroup->geometryObj->objectData.numMaterials = 0;
+		if (particleGroup->geometryObj)
+		{
+			// We didn't ref count the materials, so prevent MetaObjects from trying to free a dangling pointer
+			particleGroup->geometryObj->objectData.numMaterials = 0;
 
-		MO_DisposeObjectReference(particleGroup->geometryObj);
-		particleGroup->geometryObj = NULL;
+			MO_DisposeObjectReference(particleGroup->geometryObj);
+			particleGroup->geometryObj = NULL;
+		}
 
-		Pool_Free(particleGroup->pool);
-		particleGroup->pool = NULL;
+		if (particleGroup->pool)
+		{
+			Pool_Free(particleGroup->pool);
+			particleGroup->pool = NULL;
+		}
 	}
 
-	Pool_Free(gParticleGroupPool);
-	gParticleGroupPool = NULL;
+	if (gParticleGroupPool)
+	{
+		Pool_Free(gParticleGroupPool);
+		gParticleGroupPool = NULL;
+	}
 }
 
 
@@ -524,7 +532,7 @@ OGLBoundingBox	bbox;
 	glEnable(GL_BLEND);
 	SetColor4f(1,1,1,1);													// full white & alpha to start with
 
-	camCoords = &gGameView->cameraPlacement.cameraLocation;
+	camCoords = &gGameView.cameraPlacement.cameraLocation;
 
 	for (int g = Pool_First(gParticleGroupPool); g >= 0; g = Pool_Next(gParticleGroupPool, g))
 	{
