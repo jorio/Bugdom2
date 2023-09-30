@@ -26,6 +26,7 @@ static void DrawBoundingBoxes(ObjNode *theNode);
 /****************************/
 
 #define	OBJ_DEL_Q_SIZE	200
+#define	MAX_POOLED_OBJS	2500
 
 
 /**********************/
@@ -43,14 +44,15 @@ NewObjectDefinitionType	gNewObjectDefinition;
 OGLPoint3D	gCoord;
 OGLVector3D	gDelta;
 
-long		gNumObjsInDeleteQueue = 0;
-ObjNode		*gObjectDeleteQueue[OBJ_DEL_Q_SIZE];
-
 float		gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac;
 
-int			gNumObjectNodes;
-
 OGLMatrix4x4	*gCurrentObjMatrix;
+
+int					gNumObjectNodes;
+static Pool			*gObjectPool = NULL;
+static ObjNode		gObjectMemory[MAX_POOLED_OBJS];
+static int			gNumObjsInDeleteQueue = 0;
+static ObjNode		*gObjectDeleteQueue[OBJ_DEL_Q_SIZE];
 
 //============================================================================================================
 //============================================================================================================
@@ -73,6 +75,19 @@ void InitObjectManager(void)
 	gFirstNodePtr = nil;									// no node yet
 
 	gNumObjectNodes = 0;
+	gNumObjsInDeleteQueue = 0;
+
+
+	GAME_ASSERT(!gObjectPool);
+	gObjectPool = Pool_New(MAX_POOLED_OBJS);
+}
+
+
+void DisposeObjectManager(void)
+{
+	DeleteAllObjects();
+	Pool_Free(gObjectPool);
+	gObjectPool = NULL;
 }
 
 
@@ -89,10 +104,25 @@ ObjNode	*newNodePtr;
 long	slot;
 uint32_t flags = newObjDef->flags;
 
+	int pooledIndex = Pool_AllocateIndex(gObjectPool);
+	if (pooledIndex < 0)
+	{
 				/* ALLOCATE NEW NODE(CLEARED TO 0'S) */
 
-	newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
+		newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
+		SDL_Log("ObjNode pool full (%d). Allocating ObjNode on heap.\n", MAX_POOLED_OBJS);
+	}
+	else
+	{
+		newNodePtr = &gObjectMemory[pooledIndex];
+		SDL_zerop(newNodePtr);
+	}
+
+
 	GAME_ASSERT(newNodePtr);
+	newNodePtr->pooledIndex = pooledIndex;
+
+
 
 
 
@@ -1107,10 +1137,15 @@ void MoveStaticObject3(ObjNode *theNode)
 
 void DeleteAllObjects(void)
 {
+	GAME_ASSERT(gObjectPool);
+
 	while (gFirstNodePtr != nil)
 		DeleteObject(gFirstNodePtr);
 
 	FlushObjectDeleteQueue();
+	GAME_ASSERT(gNumObjsInDeleteQueue == 0);
+
+	GAME_ASSERT(Pool_Empty(gObjectPool));
 }
 
 
@@ -1118,27 +1153,13 @@ void DeleteAllObjects(void)
 
 void DeleteObject(ObjNode	*theNode)
 {
-int		i;
-
 	if (theNode == nil)								// see if passed a bogus node
 		return;
 
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if already deleted
 	{
-#if 0
-		Str255	errString;
-
-		DebugStr("Double Delete Object");	//-------
-		DoAlert("Attempted to Double Delete an Object.  Object was already deleted!");
-		NumToString(theNode->Genre,errString);		//------------
-		DoAlert(errString);					//---------
-		NumToString(theNode->Group,errString);		//------------
-		DoAlert(errString);					//---------
-		NumToString(theNode->Type,errString);		//------------
-		DoFatalAlert(errString);					//---------
-#else
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Attempted to double delete object");
 		return;
-#endif
 	}
 
 			/* RECURSIVE DELETE OF CHAIN NODE & SHADOW NODE */
@@ -1170,7 +1191,7 @@ int		i;
 				break;
 	}
 
-	for (i = 0; i < MAX_NODE_SPARKLES; i++)				// free sparkles
+	for (int i = 0; i < MAX_NODE_SPARKLES; i++)				// free sparkles
 	{
 		if (theNode->Sparkles[i] != -1)
 		{
@@ -1192,6 +1213,8 @@ int		i;
 			/* REMOVE NODE FROM LINKED LIST */
 
 	DetachObject(theNode, false);
+
+	GAME_ASSERT(theNode != gFirstNodePtr);
 
 
 			/* SEE IF MARK AS NOT-IN-USE IN ITEM LIST */
@@ -1216,8 +1239,10 @@ int		i;
 
 	gObjectDeleteQueue[gNumObjsInDeleteQueue++] = theNode;
 	if (gNumObjsInDeleteQueue >= OBJ_DEL_Q_SIZE)
+	{
 		FlushObjectDeleteQueue();
-
+		GAME_ASSERT(gNumObjsInDeleteQueue == 0);
+	}
 }
 
 
@@ -1354,16 +1379,19 @@ out:
 
 static void FlushObjectDeleteQueue(void)
 {
-long	i,num;
+	for (int i = 0; i < gNumObjsInDeleteQueue; i++)
+	{
+		if (gObjectDeleteQueue[i]->pooledIndex < 0)			// allocated on heap
+		{
+			SafeDisposePtr((Ptr) gObjectDeleteQueue[i]);
+		}
+		else
+		{
+			Pool_ReleaseIndex(gObjectPool, gObjectDeleteQueue[i]->pooledIndex);
+		}
+	}
 
-	num = gNumObjsInDeleteQueue;
-
-	gNumObjectNodes -= num;
-
-
-	for (i = 0; i < num; i++)
-		SafeDisposePtr((Ptr)gObjectDeleteQueue[i]);
-
+	gNumObjectNodes -= gNumObjsInDeleteQueue;
 	gNumObjsInDeleteQueue = 0;
 }
 

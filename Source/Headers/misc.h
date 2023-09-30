@@ -58,3 +58,12 @@ char* CSVIterator(char** csvCursor, bool* eolOut);
 
 #define GAME_ASSERT(condition) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, #condition); } while(0)
 #define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, message); } while(0)
+
+#if _DEBUG
+	#define GAME_DEBUGASSERT			GAME_ASSERT
+	#define GAME_DEBUGASSERT_MESSAGE	GAME_ASSERT_MESSAGE
+#else
+	#define GAME_DEBUGASSERT(...)
+	#define GAME_DEBUGASSERT_MESSAGE(...)
+#endif
+

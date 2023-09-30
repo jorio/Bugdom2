@@ -388,12 +388,9 @@ Boolean RemoveFromSplineObjectList(ObjNode *theNode)
 
 void EmptySplineObjectList(void)
 {
-int	i;
-ObjNode	*o;
-
-	for (i = 0; i < gNumSplineObjects; i++)
+	for (int i = 0; i < gNumSplineObjects; i++)
 	{
-		o = gSplineObjectList[i];
+		ObjNode	*o = gSplineObjectList[i];
 		if (o)
 			DeleteObject(o);			// This will dispose of all memory used by the node.
 										// RemoveFromSplineObjectList will be called by it.

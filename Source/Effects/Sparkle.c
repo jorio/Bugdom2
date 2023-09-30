@@ -30,22 +30,29 @@ static void DrawSparkles(ObjNode* theNode);
 /*********************/
 
 SparkleType	gSparkles[MAX_SPARKLES];
+static Pool	*gSparklePool = NULL;
 
-
-int	gNumSparkles;
 
 /*************************** INIT SPARKLES **********************************/
 
 void InitSparkles(void)
 {
-	for (int i = 0; i < MAX_SPARKLES; i++)
-	{
-		gSparkles[i].isActive = false;
-	}
-	
-	gNumSparkles = 0;
+	GAME_ASSERT(!gSparklePool);
+
+	gSparklePool = Pool_New(MAX_SPARKLES);
 
 	MakeNewDriverObject(PARTICLE_SLOT-1, DrawSparkles, NULL);
+}
+
+/*************************** DISPOSE SPARKLES *******************************/
+
+void DisposeSparkles(void)
+{
+	if (gSparklePool)
+	{
+		Pool_Free(gSparklePool);
+		gSparklePool = NULL;
+	}
 }
 
 
@@ -54,27 +61,15 @@ void InitSparkles(void)
 // OUTPUT:  -1 if none
 //
 
-short GetFreeSparkle(ObjNode *owner)
+int GetFreeSparkle(ObjNode *owner)
 {
-int		i;
+	int i = Pool_AllocateIndex(gSparklePool);
 
-			/* FIND A FREE SLOT */
+	if (i < 0)
+		return i;
 
-	for (i = 0; i < MAX_SPARKLES; i++)
-	{
-		if (!gSparkles[i].isActive)
-			goto got_it;
-
-	}
-	return(-1);
-
-got_it:
-
-	gSparkles[i].isActive = true;
 	gSparkles[i].owner = owner;
-	gNumSparkles++;
-
-	return(i);
+	return i;
 }
 
 
@@ -82,18 +77,12 @@ got_it:
 
 /***************** DELETE SPARKLE *********************/
 
-void DeleteSparkle(short i)
+void DeleteSparkle(int i)
 {
 	if (i == -1)
 		return;
 
-	if (gSparkles[i].isActive)
-	{
-		gSparkles[i].isActive = false;
-		gNumSparkles--;
-	}
-	else
-		DoAlert("DeleteSparkle: double delete sparkle");
+	Pool_ReleaseIndex(gSparklePool, i);
 }
 
 
@@ -102,24 +91,22 @@ void DeleteSparkle(short i)
 static void DrawSparkles(ObjNode* theNode)
 {
 uint32_t	flags;
-int		i;
 float	dot,separation;
 OGLMatrix4x4	m;
 OGLVector3D	v;
 OGLPoint3D	where;
 OGLVector3D	aim;
 static const OGLVector3D 	up = {0,1,0};
-OGLPoint3D					tc[4], *cameraLocation;
-static OGLPoint3D		frame[4] =
-{
-	-130,130,0,
-	130,130,0,
-	130,-130,0,
-	-130,-130,0
-};
+OGLPoint3D					*cameraLocation;
+
 
 
 	(void) theNode;
+
+			/* EARLY OUT IF NONE */
+
+	if (Pool_Empty(gSparklePool))
+		return;
 
 	OGL_PushState();
 
@@ -138,12 +125,11 @@ static OGLPoint3D		frame[4] =
 
 	cameraLocation = &gGameView->cameraPlacement.cameraLocation;		// point to camera coord
 
-	for (i = 0; i < MAX_SPARKLES; i++)
+	for (int i = Pool_First(gSparklePool); i >= 0; i = Pool_Next(gSparklePool, i))
 	{
-		ObjNode	*owner;
+		GAME_ASSERT(Pool_IsUsed(gSparklePool, i));
 
-		if (!gSparkles[i].isActive)							// must be active
-			continue;
+		ObjNode	*owner;
 
 		flags = gSparkles[i].flags;							// get sparkle flags
 
@@ -198,17 +184,17 @@ static OGLPoint3D		frame[4] =
 
 			/* CALC TRANSFORM MATRIX */
 
-		frame[0].x = -gSparkles[i].scale;								// set size of quad
-		frame[0].y = gSparkles[i].scale;
-		frame[1].x = gSparkles[i].scale;
-		frame[1].y = gSparkles[i].scale;
-		frame[2].x = gSparkles[i].scale;
-		frame[2].y = -gSparkles[i].scale;
-		frame[3].x = -gSparkles[i].scale;
-		frame[3].y = -gSparkles[i].scale;
+		float s = gSparkles[i].scale;
+		OGLPoint3D tc[4] =			// set size of quad
+		{
+			{-s,s,0},
+			{s,s,0},
+			{s,-s,0},
+			{-s,-s,0},
+		};
 
 		SetLookAtMatrixAndTranslate(&m, &up, &where, cameraLocation);	// aim at camera & translate
-		OGLPoint3D_TransformArray(&frame[0], &m, tc, 4);
+		OGLPoint3D_TransformArray(tc, &m, tc, 4);
 
 
 

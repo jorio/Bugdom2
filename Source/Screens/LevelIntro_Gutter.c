@@ -62,7 +62,7 @@ OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
 ObjNode	*newObj;
 
-	InitShardSystem();
+	InitEffects();
 
 			/**************/
 			/* SETUP VIEW */
@@ -168,6 +168,7 @@ static void FreeLevelIntroScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);

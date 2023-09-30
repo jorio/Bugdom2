@@ -19,7 +19,6 @@
 static void DrawShards(ObjNode*);
 static void MoveShards(ObjNode*);
 
-static int FindFreeShard(void);
 static void ExplodeGeometry_Recurse(MetaObjectPtr obj);
 static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overrideTexture);
 
@@ -32,7 +31,6 @@ static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overri
 
 typedef struct
 {
-	Boolean					isUsed;
 	OGLVector3D				rot,rotDelta;
 	OGLPoint3D				coord,coordDelta;
 	float					decaySpeed,scale;
@@ -43,7 +41,7 @@ typedef struct
 	OGLTextureCoord			uvs[3];
 	MOMaterialObject		*material;
 	OGLColorRGBA			colorFilter;
-	uint32_t					glow;
+	uint32_t				glow;
 }ShardType;
 
 
@@ -51,8 +49,8 @@ typedef struct
 /*    VARIABLES      */
 /*********************/
 
-int			gNumShards = 0;
-ShardType	gShards[MAX_SHARDS];
+static ShardType	gShards[MAX_SHARDS];
+static Pool			*gShardPool = NULL;
 
 static	float		gBoomForce,gShardDecaySpeed;
 static	Byte		gShardMode;
@@ -64,34 +62,21 @@ static 	ObjNode		*gShardSrcObj;
 
 void InitShardSystem(void)
 {
-	gNumShards = 0;
-
-	for (int i = 0; i < MAX_SHARDS; i++)
-		gShards[i].isUsed = false;
+	GAME_ASSERT(!gShardPool);
+	gShardPool = Pool_New(MAX_SHARDS);
 
 	MakeNewDriverObject(PARTICLE_SLOT-1, DrawShards, MoveShards);
 }
 
+/*********************** DISPOSE SHARD SYSTEM ***********************/
 
-
-
-/********************* FIND FREE PARTICLE ***********************/
-//
-// OUTPUT: -1 == none free found
-//
-
-static int FindFreeShard(void)
+void DisposeShardSystem(void)
 {
-int	i;
-
-	if (gNumShards >= MAX_SHARDS)
-		return(-1);
-
-	for (i = 0; i < MAX_SHARDS; i++)
-		if (gShards[i].isUsed == false)
-			return(i);
-
-	return(-1);
+	if (gShardPool)
+	{
+		Pool_Free(gShardPool);
+		gShardPool = NULL;
+	}
 }
 
 
@@ -199,9 +184,10 @@ static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overri
 OGLPoint3D			centerPt = {0,0,0};
 uint32_t				ind[3];
 OGLTextureCoord		*uvPtr;
-long				i, t;
 float				boomForce = gBoomForce;
 OGLPoint3D			origin = { 0,0,0 };
+
+	GAME_ASSERT(gShardPool);
 
 	if (gShardMode & SHARD_MODE_FROMORIGIN)
 	{
@@ -214,13 +200,14 @@ OGLPoint3D			origin = { 0,0,0 };
 			/* SCAN THRU ALL TRIANGLES */
 			/***************************/
 
-	for (t = 0; t < data->numTriangles; t += gShardDensity)				// scan thru all triangles
+	for (int t = 0; t < data->numTriangles; t += gShardDensity)				// scan thru all triangles
 	{
 				/* GET FREE PARTICLE INDEX */
 
-		i = FindFreeShard();
+		int i = Pool_AllocateIndex(gShardPool);
 		if (i == -1)														// see if all out
 			break;
+		GAME_ASSERT(i < MAX_SHARDS);
 
 
 				/* DO POINTS */
@@ -314,11 +301,6 @@ OGLPoint3D			origin = { 0,0,0 };
 
 		gShards[i].decaySpeed 	= gShardDecaySpeed;
 		gShards[i].mode 		= gShardMode;
-
-				/* SET VALID & INC COUNTER */
-
-		gShards[i].isUsed = true;
-		gNumShards++;
 	}
 }
 
@@ -331,17 +313,18 @@ static void MoveShards(ObjNode* theNode)
 
 	float	ty,y,fps,x,z;
 
-	if (gNumShards == 0)												// quick check if any particles at all
+	if (Pool_Empty(gShardPool))							// quick check if any particles at all
 		return;
-
-	GAME_ASSERT(gNumShards > 0);
 
 	fps = gFramesPerSecondFrac;
 
-	for (int i = 0; i < MAX_SHARDS; i++)
+	for (int i = Pool_First(gShardPool), next; i >= 0; i = next)
 	{
-		if (!gShards[i].isUsed)
-			continue;
+#if _DEBUG
+		GAME_ASSERT(Pool_IsUsed(gShardPool, i));
+#endif
+
+		next = Pool_Next(gShardPool, i);					// get next index now so we can release the current one in this loop
 
 				/* ROTATE IT */
 
@@ -384,8 +367,7 @@ static void MoveShards(ObjNode* theNode)
 		{
 				/* DEACTIVATE THIS PARTICLE */
 del:
-			gShards[i].isUsed = false;
-			gNumShards--;
+			Pool_ReleaseIndex(gShardPool, i);
 			continue;
 		}
 
@@ -413,20 +395,19 @@ static void DrawShards(ObjNode* theNode)
 {
 	(void) theNode;
 
-	if (gNumShards == 0)												// quick check if any particles at all
+	if (Pool_Empty(gShardPool))						// quick check if any particles at all
 		return;
-
-	GAME_ASSERT(gNumShards > 0);
 
 			/* SET STATE */
 
 	glDisable(GL_CULL_FACE);
 	OGL_DisableLighting();
 
-	for (int i = 0; i < MAX_SHARDS; i++)
+	for (int i = Pool_First(gShardPool); i >= 0; i = Pool_Next(gShardPool, i))
 	{
-		if (!gShards[i].isUsed)
-			continue;
+#if _DEBUG
+		GAME_ASSERT(Pool_IsUsed(gShardPool, i));
+#endif
 
 				/* SUBMIT MATERIAL */
 
@@ -453,9 +434,9 @@ static void DrawShards(ObjNode* theNode)
 				/* DRAW THE TRIANGLE */
 
 		glBegin(GL_TRIANGLES);
-		glTexCoord2f(gShards[i].uvs[0].u, gShards[i].uvs[0].v);	glVertex3f(gShards[i].points[0].x, gShards[i].points[0].y, gShards[i].points[0].z);
-		glTexCoord2f(gShards[i].uvs[1].u, gShards[i].uvs[1].v);	glVertex3f(gShards[i].points[1].x, gShards[i].points[1].y, gShards[i].points[1].z);
-		glTexCoord2f(gShards[i].uvs[2].u, gShards[i].uvs[2].v);	glVertex3f(gShards[i].points[2].x, gShards[i].points[2].y, gShards[i].points[2].z);
+		glTexCoord2fv(&gShards[i].uvs[0].u);	glVertex3fv(&gShards[i].points[0].x);
+		glTexCoord2fv(&gShards[i].uvs[1].u);	glVertex3fv(&gShards[i].points[1].x);
+		glTexCoord2fv(&gShards[i].uvs[2].u);	glVertex3fv(&gShards[i].points[2].x);
 		glEnd();
 
 		glPopMatrix();

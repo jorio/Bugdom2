@@ -173,7 +173,7 @@ ObjNode			*fly;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":audio:Title.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_TITLE);
 
-	InitSparkles();
+	InitEffects();
 
 			/* LOAD TERRAIN */
 
@@ -347,6 +347,8 @@ static void FreeTitleScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeWater();
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_TITLE);

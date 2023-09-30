@@ -140,7 +140,7 @@ int			i;
 				/* LOAD ART */
 				/************/
 
-	InitSparkles();
+	InitEffects();
 
 			/* LOAD MODELS */
 
@@ -272,6 +272,7 @@ static void FreeLoseScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_LOSE);

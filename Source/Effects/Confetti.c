@@ -16,9 +16,8 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DeleteConfettiGroup(long groupNum);
 static void MoveConfettiGroups(ObjNode *theNode);
-static void DrawConfettiGroup(ObjNode *theNode);
+static void DrawConfettiGroups(ObjNode *theNode);
 
 /****************************/
 /*    CONSTANTS             */
@@ -29,11 +28,10 @@ static void DrawConfettiGroup(ObjNode *theNode);
 /*    VARIABLES      */
 /*********************/
 
-ConfettiGroupType	*gConfettiGroups[MAX_CONFETTI_GROUPS];
+static Pool					*gConfettiGroupPool = NULL;
+static ConfettiGroupType	gConfettiGroups[MAX_CONFETTI_GROUPS];
 
 NewConfettiGroupDefType	gNewConfettiGroupDef;
-
-short			gNumActiveConfettiGroups = 0;
 
 
 
@@ -45,12 +43,64 @@ short			gNumActiveConfettiGroups = 0;
 
 void InitConfettiManager(void)
 {
+	GAME_ASSERT(!gConfettiGroupPool);
+
+	gConfettiGroupPool = Pool_New(MAX_CONFETTI_GROUPS);
+
 			/* INIT GROUP ARRAY */
 
-	for (int i = 0; i < MAX_CONFETTI_GROUPS; i++)
-		gConfettiGroups[i] = nil;
+	for (int g = 0; g < MAX_CONFETTI_GROUPS; g++)
+	{
+		gConfettiGroups[g].pool = Pool_New(MAX_CONFETTIS);
 
-	gNumActiveConfettiGroups = 0;
+			/*****************************/
+			/* INIT THE GROUP'S GEOMETRY */
+			/*****************************/
+
+			/* SET THE DATA */
+
+		MOVertexArrayData vertexArrayData =
+		{
+			.numMaterials 	= 0,
+			.numPoints		= 0,
+			.numTriangles	= 0,
+			.points 		= (OGLPoint3D *) AllocPtrClear(sizeof(OGLPoint3D) * MAX_CONFETTIS * 4),
+			.normals 		= nil,
+			.uvs[0]	 		= (OGLTextureCoord *) AllocPtrClear(sizeof(OGLTextureCoord) * MAX_CONFETTIS * 4),
+			.colorsByte 	= (OGLColorRGBA_Byte *) AllocPtrClear(sizeof(OGLColorRGBA_Byte) * MAX_CONFETTIS * 4),
+			.colorsFloat	= nil,
+			.triangles		= (MOTriangleIndecies *) AllocPtrClear(sizeof(MOTriangleIndecies) * MAX_CONFETTIS * 2),
+		};
+
+			/* INIT UV ARRAYS */
+
+		for (int j = 0; j < (MAX_CONFETTIS*4); j+=4)
+		{
+			vertexArrayData.uvs[0][j+0] = (OGLTextureCoord) {0,1};			// upper left
+			vertexArrayData.uvs[0][j+1] = (OGLTextureCoord) {0,0};			// lower left
+			vertexArrayData.uvs[0][j+2] = (OGLTextureCoord) {1,0};			// lower right
+			vertexArrayData.uvs[0][j+3] = (OGLTextureCoord) {1,1};			// upper right
+		}
+
+			/* INIT TRIANGLE ARRAYS */
+
+		for (int j = 0, k = 0; j < (MAX_CONFETTIS*2); j+=2, k+=4)
+		{
+			vertexArrayData.triangles[j].vertexIndices[0] = k;				// triangle A
+			vertexArrayData.triangles[j].vertexIndices[1] = k+1;
+			vertexArrayData.triangles[j].vertexIndices[2] = k+2;
+
+			vertexArrayData.triangles[j+1].vertexIndices[0] = k;			// triangle B
+			vertexArrayData.triangles[j+1].vertexIndices[1] = k+2;
+			vertexArrayData.triangles[j+1].vertexIndices[2] = k+3;
+		}
+
+			/* CREATE NEW GEOMETRY OBJECT */
+
+		GAME_ASSERT(gConfettiGroups[g].geometryObj == NULL);
+
+		gConfettiGroups[g].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
+	}
 
 
 		/*************************************************************************/
@@ -60,42 +110,33 @@ void InitConfettiManager(void)
 		// The confettis need to be drawn after the fences object, but before any sprite or font objects.
 		//
 
-	ObjNode* driver = MakeNewDriverObject(CONFETTI_SLOT, DrawConfettiGroup, MoveConfettiGroups);
+	ObjNode* driver = MakeNewDriverObject(CONFETTI_SLOT, DrawConfettiGroups, MoveConfettiGroups);
 	driver->StatusBits |= STATUS_BIT_DOUBLESIDED;
 }
 
 
 /******************** DELETE ALL CONFETTI GROUPS *********************/
 
-void DeleteAllConfettiGroups(void)
+void DisposeConfettiManager(void)
 {
-long	i;
+	GAME_ASSERT(gConfettiGroupPool);
 
-	for (i = 0; i < MAX_CONFETTI_GROUPS; i++)
+	for (int g = 0; g < MAX_CONFETTI_GROUPS; g++)
 	{
-		DeleteConfettiGroup(i);
+		ConfettiGroupType* confettiGroup = &gConfettiGroups[g];
+
+		// We didn't ref count the materials, so prevent MetaObjects from trying to free a dangling pointer
+		confettiGroup->geometryObj->objectData.numMaterials = 0;
+
+		MO_DisposeObjectReference(confettiGroup->geometryObj);
+		confettiGroup->geometryObj = NULL;
+
+		Pool_Free(confettiGroup->pool);
+		confettiGroup->pool = NULL;
 	}
-}
 
-
-/******************* DELETE CONFETTI GROUP ***********************/
-
-static void DeleteConfettiGroup(long groupNum)
-{
-	if (gConfettiGroups[groupNum])
-	{
-			/* NUKE GEOMETRY DATA */
-
-		MO_DisposeObjectReference(gConfettiGroups[groupNum]->geometryObj);
-
-
-				/* NUKE GROUP ITSELF */
-
-		SafeDisposePtr((Ptr)gConfettiGroups[groupNum]);
-		gConfettiGroups[groupNum] = nil;
-
-		gNumActiveConfettiGroups--;
-	}
+	Pool_Free(gConfettiGroupPool);
+	gConfettiGroupPool = NULL;
 }
 
 
@@ -109,106 +150,48 @@ static void DeleteConfettiGroup(long groupNum)
 // OUTPUT:	group ID#
 //
 
-short NewConfettiGroup(NewConfettiGroupDefType *def)
+int NewConfettiGroup(const NewConfettiGroupDefType *def)
 {
-short					p,i,j,k;
-OGLTextureCoord			*uv;
-MOVertexArrayData 		vertexArrayData;
-MOTriangleIndecies		*t;
-
-
 			/*************************/
 			/* SCAN FOR A FREE GROUP */
 			/*************************/
 
-	for (i = 0; i < MAX_CONFETTI_GROUPS; i++)
-	{
-		if (gConfettiGroups[i] == nil)
-		{
-				/* ALLOCATE NEW GROUP */
+	int g = Pool_AllocateIndex(gConfettiGroupPool);
+	if (g < 0)		// nothing free
+		return g;
 
-			gConfettiGroups[i] = (ConfettiGroupType *)AllocPtr(sizeof(ConfettiGroupType));
-			if (gConfettiGroups[i] == nil)
-				return(-1);									// out of memory
+	GAME_ASSERT(g < MAX_CONFETTI_GROUPS);
+	ConfettiGroupType* confettiGroup = &gConfettiGroups[g];
 
 
 				/* INITIALIZE THE GROUP */
 
-			for (p = 0; p < MAX_CONFETTIS; p++)						// mark all unused
-				gConfettiGroups[i]->isUsed[p] = false;
+	Pool_Reset(confettiGroup->pool);			// mark all confettis unused
 
-			gConfettiGroups[i]->flags 				= def->flags;
-			gConfettiGroups[i]->gravity 			= def->gravity;
-			gConfettiGroups[i]->baseScale 			= def->baseScale;
-			gConfettiGroups[i]->decayRate 			= def->decayRate;
-			gConfettiGroups[i]->fadeRate 			= def->fadeRate;
-			gConfettiGroups[i]->magicNum 			= def->magicNum;
-			gConfettiGroups[i]->confettiTextureNum 	= def->confettiTextureNum;
+	confettiGroup->flags				= def->flags;
+	confettiGroup->gravity				= def->gravity;
+	confettiGroup->baseScale			= def->baseScale;
+	confettiGroup->decayRate			= def->decayRate;
+	confettiGroup->fadeRate				= def->fadeRate;
+	confettiGroup->magicNum				= def->magicNum;
+	confettiGroup->confettiTextureNum	= def->confettiTextureNum;
+
 
 
 				/*****************************/
 				/* INIT THE GROUP'S GEOMETRY */
 				/*****************************/
+				// Note: most everything was pre-initialized in InitConfettiGroups
 
-					/* SET THE DATA */
+	MOVertexArrayData* vertexArrayData = &confettiGroup->geometryObj->objectData;
 
-			vertexArrayData.numMaterials 	= 1;
-			vertexArrayData.materials[0]	= gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->confettiTextureNum].materialObject;	// set illegal ref because it is made legit below
+	vertexArrayData->numPoints = 0;		// no quads until we call AddConfettiToGroup
+	vertexArrayData->numTriangles = 0;
 
-			vertexArrayData.numPoints 		= 0;
-			vertexArrayData.numTriangles 	= 0;
-			vertexArrayData.points 			= (OGLPoint3D *)AllocPtr(sizeof(OGLPoint3D) * MAX_CONFETTIS * 4);
-			vertexArrayData.normals 		= nil;
-			vertexArrayData.uvs[0]	 		= (OGLTextureCoord *)AllocPtr(sizeof(OGLTextureCoord) * MAX_CONFETTIS * 4);
-			vertexArrayData.colorsByte 		= (OGLColorRGBA_Byte *)AllocPtr(sizeof(OGLColorRGBA_Byte) * MAX_CONFETTIS * 4);
-			vertexArrayData.colorsFloat		= nil;
-			vertexArrayData.triangles		= (MOTriangleIndecies *)AllocPtr(sizeof(MOTriangleIndecies) * MAX_CONFETTIS * 2);
+	vertexArrayData->numMaterials = 1;
+	vertexArrayData->materials[0] = gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->confettiTextureNum].materialObject;	// NOTE: not refcounted
 
-
-					/* INIT UV ARRAYS */
-
-			uv = vertexArrayData.uvs[0];
-			for (j=0; j < (MAX_CONFETTIS*4); j+=4)
-			{
-				uv[j].u = 0;									// upper left
-				uv[j].v = 1;
-				uv[j+1].u = 0;									// lower left
-				uv[j+1].v = 0;
-				uv[j+2].u = 1;									// lower right
-				uv[j+2].v = 0;
-				uv[j+3].u = 1;									// upper right
-				uv[j+3].v = 1;
-			}
-
-					/* INIT TRIANGLE ARRAYS */
-
-			t = vertexArrayData.triangles;
-			for (j = k = 0; j < (MAX_CONFETTIS*2); j+=2, k+=4)
-			{
-				t[j].vertexIndices[0] = k;							// triangle A
-				t[j].vertexIndices[1] = k+1;
-				t[j].vertexIndices[2] = k+2;
-
-				t[j+1].vertexIndices[0] = k;							// triangle B
-				t[j+1].vertexIndices[1] = k+2;
-				t[j+1].vertexIndices[2] = k+3;
-			}
-
-
-				/* CREATE NEW GEOMETRY OBJECT */
-
-			gConfettiGroups[i]->geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
-
-			gNumActiveConfettiGroups++;
-
-			return(i);
-		}
-	}
-
-			/* NOTHING FREE */
-
-//	DoFatalAlert("NewConfettiGroup: no free groups!");
-	return(-1);
+	return g;
 }
 
 
@@ -219,43 +202,34 @@ MOTriangleIndecies		*t;
 
 Boolean AddConfettiToGroup(NewConfettiDefType *def)
 {
-short	p,group;
+	short group = def->groupNum;
 
-	group = def->groupNum;
-
-	if ((group < 0) || (group >= MAX_CONFETTI_GROUPS))
-		DoFatalAlert("AddConfettiToGroup: illegal group #");
-
-	if (gConfettiGroups[group] == nil)
+	if (!Pool_IsUsed(gConfettiGroupPool, group))
 	{
 		return(true);
 	}
 
+	ConfettiGroupType* confettiGroup = &gConfettiGroups[group];
 
 			/* SCAN FOR FREE SLOT */
 
-	for (p = 0; p < MAX_CONFETTIS; p++)
-	{
-		if (!gConfettiGroups[group]->isUsed[p])
-			goto got_it;
-	}
+	int p = Pool_AllocateIndex(confettiGroup->pool);
 
 			/* NO FREE SLOTS */
 
-	return(true);
+	if (p < 0)
+		return true;
 
 
 			/* INIT PARAMETERS */
-got_it:
-	gConfettiGroups[group]->fadeDelay[p] 	= 	def->fadeDelay;
-	gConfettiGroups[group]->alpha[p] 	= 	def->alpha;
-	gConfettiGroups[group]->scale[p] 	= 	def->scale;
-	gConfettiGroups[group]->coord[p] 	= 	*def->where;
-	gConfettiGroups[group]->delta[p] 	= 	*def->delta;
-	gConfettiGroups[group]->rot[p] 		= 	def->rot;
-	gConfettiGroups[group]->deltaRot[p] = 	def->deltaRot;
-	gConfettiGroups[group]->isUsed[p] 	= 	true;
 
+	confettiGroup->fadeDelay[p]	= def->fadeDelay;
+	confettiGroup->alpha[p]		= def->alpha;
+	confettiGroup->scale[p]		= def->scale;
+	confettiGroup->coord[p]		= *def->where;
+	confettiGroup->delta[p]		= *def->delta;
+	confettiGroup->rot[p]		= def->rot;
+	confettiGroup->deltaRot[p]	= def->deltaRot;
 
 	return(false);
 }
@@ -274,39 +248,44 @@ OGLVector3D	*delta;
 
 	(void) theNode;
 
-	for (int i = 0; i < MAX_CONFETTI_GROUPS; i++)
+	for (int g = Pool_First(gConfettiGroupPool), nextG = -1;
+		 g >= 0;
+		 g = nextG)
 	{
-		if (!gConfettiGroups[i])
-			continue;
+		GAME_ASSERT(Pool_IsUsed(gConfettiGroupPool, g));
 
-//		baseScale 	= gConfettiGroups[i]->baseScale;					// get base scale
+		nextG = Pool_Next(gConfettiGroupPool, g);				// get next index now so we can release the current one in this loop
+
+		ConfettiGroupType* confettiGroup = &gConfettiGroups[g];
+		Pool* confettiPool = confettiGroup->pool;
+
+//		baseScale 	= confettiGroup->baseScale;					// get base scale
 //		oneOverBaseScaleSquared = 1.0f/(baseScale*baseScale);
-		gravity 	= gConfettiGroups[i]->gravity;						// get gravity
-		decayRate 	= gConfettiGroups[i]->decayRate;					// get decay rate
-		fadeRate 	= gConfettiGroups[i]->fadeRate;						// get fade rate
-		flags 		= gConfettiGroups[i]->flags;
+		gravity 	= confettiGroup->gravity;
+		decayRate 	= confettiGroup->decayRate;
+		fadeRate 	= confettiGroup->fadeRate;
+		flags 		= confettiGroup->flags;
 
-
-		int n = 0;														// init counter
-		for (int p = 0; p < MAX_CONFETTIS; p++)
+		for (int p = Pool_First(confettiPool), nextP = -1;
+			 p >= 0;
+			 p = nextP)
 		{
-			if (!gConfettiGroups[i]->isUsed[p])							// make sure this confetti is used
-				continue;
+			GAME_DEBUGASSERT(Pool_IsUsed(confettiPool, p));
 
-			n++;														// inc counter
-			delta = &gConfettiGroups[i]->delta[p];						// get ptr to deltas
-			coord = &gConfettiGroups[i]->coord[p];						// get ptr to coords
+			nextP = Pool_Next(confettiPool, p);							// get next index now so we can release the current one in this loop
+
+			delta = &confettiGroup->delta[p];							// get ptr to deltas
+			coord = &confettiGroup->coord[p];							// get ptr to coords
 
 						/* ADD GRAVITY */
 
 			delta->y -= gravity * fps;									// add gravity
 
-
 					/* DO ROTATION & MOTION */
 
-			gConfettiGroups[i]->rot[p].x += gConfettiGroups[i]->deltaRot[p].x * fps;
-			gConfettiGroups[i]->rot[p].y += gConfettiGroups[i]->deltaRot[p].y * fps;
-			gConfettiGroups[i]->rot[p].z += gConfettiGroups[i]->deltaRot[p].z * fps;
+			confettiGroup->rot[p].x += confettiGroup->deltaRot[p].x * fps;
+			confettiGroup->rot[p].y += confettiGroup->deltaRot[p].y * fps;
+			confettiGroup->rot[p].z += confettiGroup->deltaRot[p].z * fps;
 
 			coord->x += delta->x * fps;									// move it
 			coord->y += delta->y * fps;
@@ -326,22 +305,19 @@ OGLVector3D	*delta;
 
 				if (flags & PARTICLE_FLAGS_BOUNCE)
 				{
-					if (delta->y < 0.0f)									// if moving down, see if hit floor
+					if (delta->y < 0.0f && coord->y < y)					// if moving down, see if hit floor
 					{
-						if (coord->y < y)
+						coord->y = y;
+						delta->y *= -.4f;
+
+						delta->x += gRecentTerrainNormal.x * 300.0f;	// reflect off of surface
+						delta->z += gRecentTerrainNormal.z * 300.0f;
+
+						if (flags & PARTICLE_FLAGS_DISPERSEIFBOUNCE)	// see if disperse on impact
 						{
-							coord->y = y;
-							delta->y *= -.4f;
-
-							delta->x += gRecentTerrainNormal.x * 300.0f;	// reflect off of surface
-							delta->z += gRecentTerrainNormal.z * 300.0f;
-
-							if (flags & PARTICLE_FLAGS_DISPERSEIFBOUNCE)	// see if disperse on impact
-							{
-								delta->y *= .4f;
-								delta->x *= 5.0f;
-								delta->z *= 5.0f;
-							}
+							delta->y *= .4f;
+							delta->x *= 5.0f;
+							delta->z *= 5.0f;
 						}
 					}
 				}
@@ -350,40 +326,43 @@ OGLVector3D	*delta;
 				/* SEE IF GONE */
 				/***************/
 
-				else
+				else if (coord->y < y)									// if hit floor then nuke confetti
 				{
-					if (coord->y < y)									// if hit floor then nuke confetti
-					{
-						gConfettiGroups[i]->isUsed[p] = false;
-					}
+					goto deleteConfetti;
 				}
 			}
 
 
-				/* DO SCALE */
+				/* DO SCALE  */
 
-			gConfettiGroups[i]->scale[p] -= decayRate * fps;			// shrink it
-			if (gConfettiGroups[i]->scale[p] <= 0.0f)					// see if gone
-				gConfettiGroups[i]->isUsed[p] = false;
+			confettiGroup->scale[p] -= decayRate * fps;			// shrink it
+			if (confettiGroup->scale[p] <= 0.0f)					// see if gone
+				goto deleteConfetti;
 
 				/* DO FADE */
 
-			gConfettiGroups[i]->fadeDelay[p] -= fps;
-			if (gConfettiGroups[i]->fadeDelay[p] <= 0.0f)
+			confettiGroup->fadeDelay[p] -= fps;
+			if (confettiGroup->fadeDelay[p] <= 0.0f)
 			{
-				gConfettiGroups[i]->alpha[p] -= fadeRate * fps;				// fade it
-				if (gConfettiGroups[i]->alpha[p] <= 0.0f)					// see if gone
-					gConfettiGroups[i]->isUsed[p] = false;
+				confettiGroup->alpha[p] -= fadeRate * fps;				// fade it
+				if (confettiGroup->alpha[p] <= 0.0f)					// see if gone
+					goto deleteConfetti;
 			}
 
 
+				/* IF GONE THEN RELEASE INDEX */
+
+			continue;
+
+deleteConfetti:
+			Pool_ReleaseIndex(confettiPool, p);
 		}
 
-			/* SEE IF GROUP WAS EMPTY, THEN DELETE */
+			/* SEE IF GROUP HAS BECOME EMPTY, THEN DELETE */
 
-		if (n == 0)
+		if (Pool_Empty(confettiPool))
 		{
-			DeleteConfettiGroup(i);
+			Pool_ReleaseIndex(gConfettiGroupPool, g);
 		}
 	}
 }
@@ -391,7 +370,7 @@ OGLVector3D	*delta;
 
 /**************** DRAW CONFETTI GROUPS *********************/
 
-static void DrawConfettiGroup(ObjNode *theNode)
+static void DrawConfettiGroups(ObjNode *theNode)
 {
 float				scale,baseScale;
 OGLColorRGBA_Byte	*vertexColors;
@@ -400,6 +379,12 @@ OGLPoint3D		v[4];
 OGLBoundingBox	bbox;
 
 	(void) theNode;
+
+				/* EARLY OUT IF NO GROUPS ACTIVE */
+
+	if (Pool_Empty(gConfettiGroupPool))
+		return;
+
 
 	v[0].z = 												// init z's to 0
 	v[1].z =
@@ -412,16 +397,18 @@ OGLBoundingBox	bbox;
 
 	SetColor4f(1,1,1,1);										// full white & alpha to start with
 
-	for (int g = 0; g < MAX_CONFETTI_GROUPS; g++)
+	for (int g = Pool_First(gConfettiGroupPool); g >= 0; g = Pool_Next(gConfettiGroupPool, g))
 	{
+		GAME_ASSERT(Pool_IsUsed(gConfettiGroupPool, g));
+
 		float	minX,minY,minZ,maxX,maxY,maxZ;
 
-		if (!gConfettiGroups[g])
-			continue;
+		ConfettiGroupType* confettiGroup = &gConfettiGroups[g];
 
-		geoData 		= &gConfettiGroups[g]->geometryObj->objectData;			// get pointer to geometry object data
-		vertexColors 	= geoData->colorsByte;									// get pointer to vertex color array
-		baseScale 		= gConfettiGroups[g]->baseScale;						// get base scale
+		Pool* confettiPool = confettiGroup->pool;
+		geoData 		= &confettiGroup->geometryObj->objectData;		// get pointer to geometry object data
+		vertexColors 	= geoData->colorsByte;							// get pointer to vertex color array
+		baseScale 		= confettiGroup->baseScale;						// get base scale
 
 				/********************************/
 				/* ADD ALL CONFETTIS TO TRIMESH */
@@ -430,17 +417,18 @@ OGLBoundingBox	bbox;
 		minX = minY = minZ = 100000000;									// init bbox
 		maxX = maxY = maxZ = -minX;
 
-		int n = 0;
-		for (int p = 0; p < MAX_CONFETTIS; p++)
-		{
-			OGLMatrix4x4	m;
+		GAME_DEBUGASSERT_MESSAGE(!Pool_Empty(confettiPool), "empty confetti pool should have been purged in MoveConfettiGroups");
 
-			if (!gConfettiGroups[g]->isUsed[p])							// make sure this confetti is used
-				continue;
+		int n = 0;
+		for (int p = Pool_First(confettiPool); p >= 0; p = Pool_Next(confettiPool, p))
+		{
+			GAME_DEBUGASSERT(Pool_IsUsed(confettiGroup->pool, p));
+
+			OGLMatrix4x4	m;
 
 						/* SET VERTEX COORDS */
 
-			scale = gConfettiGroups[g]->scale[p] * baseScale;
+			scale = confettiGroup->scale[p] * baseScale;
 
 			v[0].x = -scale;
 			v[0].y = scale;
@@ -457,10 +445,10 @@ OGLBoundingBox	bbox;
 
 				/* TRANSFORM THIS CONFETTI'S VERTICES & ADD TO TRIMESH */
 
-			OGLMatrix4x4_SetRotate_XYZ(&m, gConfettiGroups[g]->rot[p].x, gConfettiGroups[g]->rot[p].y, gConfettiGroups[g]->rot[p].z);
-			m.value[M03] = gConfettiGroups[g]->coord[p].x;								// set translate
-			m.value[M13] = gConfettiGroups[g]->coord[p].y;
-			m.value[M23] = gConfettiGroups[g]->coord[p].z;
+			OGLMatrix4x4_SetRotate_XYZ(&m, confettiGroup->rot[p].x, confettiGroup->rot[p].y, confettiGroup->rot[p].z);
+			m.value[M03] = confettiGroup->coord[p].x;								// set translate
+			m.value[M13] = confettiGroup->coord[p].y;
+			m.value[M23] = confettiGroup->coord[p].z;
 			OGLPoint3D_TransformArray(&v[0], &m, &geoData->points[n*4], 4);				// transform
 
 
@@ -470,18 +458,12 @@ OGLBoundingBox	bbox;
 			{
 				int j = n*4+i;
 
-				if (geoData->points[j].x < minX)
-					minX = geoData->points[j].x;
-				if (geoData->points[j].x > maxX)
-					maxX = geoData->points[j].x;
-				if (geoData->points[j].y < minY)
-					minY = geoData->points[j].y;
-				if (geoData->points[j].y > maxY)
-					maxY = geoData->points[j].y;
-				if (geoData->points[j].z < minZ)
-					minZ = geoData->points[j].z;
-				if (geoData->points[j].z > maxZ)
-					maxZ = geoData->points[j].z;
+				if (geoData->points[j].x < minX) minX = geoData->points[j].x;
+				if (geoData->points[j].x > maxX) maxX = geoData->points[j].x;
+				if (geoData->points[j].y < minY) minY = geoData->points[j].y;
+				if (geoData->points[j].y > maxY) maxY = geoData->points[j].y;
+				if (geoData->points[j].z < minZ) minZ = geoData->points[j].z;
+				if (geoData->points[j].z > maxZ) maxZ = geoData->points[j].z;
 			}
 
 				/* UPDATE COLOR/TRANSPARENCY */
@@ -492,14 +474,11 @@ OGLBoundingBox	bbox;
 				vertexColors[i].r =
 				vertexColors[i].g =
 				vertexColors[i].b = 0xff;
-				vertexColors[i].a = gConfettiGroups[g]->alpha[p] * 255.0f;		// set transparency alpha
+				vertexColors[i].a = confettiGroup->alpha[p] * 255.0f;		// set transparency alpha
 			}
 
 			n++;											// inc confetti count
 		}
-
-		if (n == 0)											// if no confettis, then skip
-			continue;
 
 			/* UPDATE FINAL VALUES */
 
@@ -521,7 +500,7 @@ OGLBoundingBox	bbox;
 drawme:
 				/* DRAW IT */
 
-			MO_DrawObject(gConfettiGroups[g]->geometryObj);						// draw geometry
+			MO_DrawObject(confettiGroup->geometryObj);			// draw geometry
 		}
 	}
 
@@ -535,12 +514,12 @@ drawme:
 
 /**************** VERIFY CONFETTI GROUP MAGIC NUM ******************/
 
-Boolean VerifyConfettiGroupMagicNum(short group, uint32_t magicNum)
+Boolean VerifyConfettiGroupMagicNum(int group, uint32_t magicNum)
 {
-	if (gConfettiGroups[group] == nil)
+	if (!Pool_IsUsed(gConfettiGroupPool, group))
 		return(false);
 
-	if (gConfettiGroups[group]->magicNum != magicNum)
+	if (gConfettiGroups[group].magicNum != magicNum)
 		return(false);
 
 	return(true);
@@ -553,7 +532,6 @@ Boolean VerifyConfettiGroupMagicNum(short group, uint32_t magicNum)
 
 void MakeConfettiExplosion(float x, float y, float z, float force, float scale, short texture, short quantity)
 {
-long					pg,i;
 OGLVector3D				delta,v;
 OGLPoint3D				pt;
 NewConfettiDefType		newConfettiDef;
@@ -567,50 +545,38 @@ float					radius = 40.0f * scale;
 	gNewConfettiGroupDef.fadeRate				= 1.5;
 	gNewConfettiGroupDef.confettiTextureNum		= texture;
 
-	pg = NewConfettiGroup(&gNewConfettiGroupDef);
-	if (pg != -1)
+	int pg = NewConfettiGroup(&gNewConfettiGroupDef);
+	if (pg < 0)			// out of memory
+		return;
+
+	for (int i = 0; i < quantity; i++)
 	{
-		for (i = 0; i < quantity; i++)
-		{
-			pt.x = x + RandomFloat2() * radius;
-			pt.y = y + RandomFloat2() * radius;
-			pt.z = z + RandomFloat2() * radius;
+		pt.x = x + RandomFloat2() * radius;
+		pt.y = y + RandomFloat2() * radius;
+		pt.z = z + RandomFloat2() * radius;
 
-			v.x = pt.x - x;
-			v.y = pt.y - y;
-			v.z = pt.z - z;
-			FastNormalizeVector(v.x,v.y,v.z,&v);
+		v.x = pt.x - x;
+		v.y = pt.y - y;
+		v.z = pt.z - z;
+		FastNormalizeVector(v.x,v.y,v.z,&v);
 
-			delta.x = v.x * (force * scale);
-			delta.y = v.y * (force * scale);
-			delta.z = v.z * (force * scale);
+		delta.x = v.x * (force * scale);
+		delta.y = v.y * (force * scale);
+		delta.z = v.z * (force * scale);
 
-
-			newConfettiDef.groupNum		= pg;
-			newConfettiDef.where		= &pt;
-			newConfettiDef.delta		= &delta;
-			newConfettiDef.scale		= 1.0f + RandomFloat()  * .5f;
-			newConfettiDef.rot.x		= RandomFloat()*PI2;
-			newConfettiDef.rot.y		= RandomFloat()*PI2;
-			newConfettiDef.rot.z		= RandomFloat()*PI2;
-			newConfettiDef.deltaRot.x	= RandomFloat2()*5.0f;
-			newConfettiDef.deltaRot.y	= RandomFloat2()*5.0f;
-			newConfettiDef.deltaRot.z	= RandomFloat2()*15.0f;
-			newConfettiDef.alpha		= FULL_ALPHA;
-			newConfettiDef.fadeDelay	= .5f + RandomFloat();
-			if (AddConfettiToGroup(&newConfettiDef))
-				break;
-		}
+		newConfettiDef.groupNum		= pg;
+		newConfettiDef.where		= &pt;
+		newConfettiDef.delta		= &delta;
+		newConfettiDef.scale		= 1.0f + RandomFloat()  * .5f;
+		newConfettiDef.rot.x		= RandomFloat()*PI2;
+		newConfettiDef.rot.y		= RandomFloat()*PI2;
+		newConfettiDef.rot.z		= RandomFloat()*PI2;
+		newConfettiDef.deltaRot.x	= RandomFloat2()*5.0f;
+		newConfettiDef.deltaRot.y	= RandomFloat2()*5.0f;
+		newConfettiDef.deltaRot.z	= RandomFloat2()*15.0f;
+		newConfettiDef.alpha		= FULL_ALPHA;
+		newConfettiDef.fadeDelay	= .5f + RandomFloat();
+		if (AddConfettiToGroup(&newConfettiDef))
+			break;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-

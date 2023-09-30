@@ -1071,16 +1071,9 @@ MOVertexArrayObject	*vObj;
 					break;
 
 			case	MO_TYPE_GEOMETRY:
-					switch(header->subType)
-					{
-						case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-								vObj = obj;
-								MO_DeleteObjectInfo_Geometry_VertexArray(&vObj->objectData);
-								break;
-
-						default:
-								DoFatalAlert("MO_DisposeObject: unknown sub-type");
-					}
+					GAME_ASSERT(header->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+					vObj = obj;
+					MO_DeleteObjectInfo_Geometry_VertexArray(&vObj->objectData);
 					break;
 
 			case	MO_TYPE_MATERIAL:

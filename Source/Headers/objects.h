@@ -71,7 +71,8 @@ enum
 
 //========================================================
 
-extern	void InitObjectManager(void);
+void InitObjectManager(void);
+void DisposeObjectManager(void);
 extern	ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef);
 extern	void MoveObjects(void);
 void DrawObjects(void);

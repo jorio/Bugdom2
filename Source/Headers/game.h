@@ -16,6 +16,7 @@
 #include "version.h"
 #include "globals.h"
 #include "structs.h"
+#include "pool.h"
 
 #include "metaobjects.h"
 #include "ogl_support.h"
@@ -128,7 +129,6 @@ extern	ObjNode					*gCurrentNode;
 extern	ObjNode					*gFirstNodePtr;
 extern	ObjNode					*gKillerDragonFly;
 extern	ObjNode					*gSuckingVacuume;
-extern	ParticleGroupType		*gParticleGroups[];
 extern	PlayerInfoType			gPlayerInfo;
 extern	PrefsType				gGamePrefs;
 extern	SDL_GLContext			gAGLContext;
@@ -188,7 +188,6 @@ extern	int						gGatheredRedClovers;
 extern	int						gKindlingCount;
 extern	int						gLevelNum;
 extern	int						gMaxEnemies;
-extern	int						gNumActiveParticleGroups;
 extern	int						gNumAntHills;
 extern	int						gNumAntHillsDestroyed;
 extern	int						gNumBowlingPinsDown;
@@ -210,7 +209,6 @@ extern	int						gNumObjectNodes;
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
 extern	int						gNumPointers;
 extern	int						gNumPuzzlePiecesFit;
-extern	int						gNumSparkles;
 extern	int						gNumSplines;
 extern	int						gNumSuperTilesDeep;
 extern	int						gNumSuperTilesDrawn;

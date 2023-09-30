@@ -176,7 +176,7 @@ int		i;
 				/* LOAD ART */
 				/************/
 
-	InitSparkles();
+	InitEffects();
 
 			/* LOAD MODELS */
 
@@ -325,6 +325,7 @@ static void FreeMainMenuScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_MAINMENU);

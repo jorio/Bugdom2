@@ -92,7 +92,10 @@ static Boolean	beenHere = false;
 	{
 		beenHere = true;
 
-		DeleteAllObjects();
+		EmptySplineObjectList();
+		DisposeObjectManager();
+		DisposeSkeletonManager();
+		DisposeTunnelData();
 		DisposeTerrain();								// dispose of any memory allocated by terrain manager
 		DisposeAllBG3DContainers();						// nuke all models
 		DisposeAllSpriteGroups();						// nuke all sprites

@@ -2,8 +2,7 @@
 // SkeletonObj.h
 //
 
-#ifndef __SKELOBJ
-#define __SKELOBJ
+#pragma once
 
 enum
 {
@@ -42,14 +41,12 @@ enum
 
 //===============================
 
-extern	ObjNode	*MakeNewSkeletonObject(NewObjectDefinitionType *newObjDef);
-extern	void AllocSkeletonDefinitionMemory(SkeletonDefType *skeleton);
-extern	void InitSkeletonManager(void);
+ObjNode	*MakeNewSkeletonObject(NewObjectDefinitionType *newObjDef);
+void AllocSkeletonDefinitionMemory(SkeletonDefType *skeleton);
+void InitSkeletonManager(void);
+void DisposeSkeletonManager(void);
 void LoadASkeleton(Byte num);
 extern	void FreeSkeletonFile(Byte skeletonType);
 extern	void FreeAllSkeletonFiles(short skipMe);
 extern	void FreeSkeletonBaseData(SkeletonObjDataType *data);
 void DrawSkeleton(ObjNode *theNode);
-
-
-#endif

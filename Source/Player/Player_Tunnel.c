@@ -176,7 +176,6 @@ OGLSetupInputType	viewDef;
 
 	InitEnemyManager();
 	InitEffects();
-	InitSparkles();
 	InitDialogManager();						// init all help messages
 
 

@@ -141,7 +141,6 @@ ObjNode	*newObj;
 				/* LOAD ART */
 				/************/
 
-	InitSparkles();
 	InitEffects();
 
 			/* LOAD MODELS */
@@ -263,6 +262,7 @@ static void FreeWinScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
 }

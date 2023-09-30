@@ -22,7 +22,7 @@
 typedef struct
 {
 	long			magicNum;
-	Byte			isUsed[MAX_PARTICLES];
+	Pool			*pool;
 	Byte			type;
 	uint32_t		flags;
 	Byte			particleTextureNum;
@@ -44,7 +44,6 @@ typedef struct
 	float			maxY;
 
 	MOVertexArrayObject	*geometryObj;
-
 }ParticleGroupType;
 
 
@@ -53,7 +52,7 @@ typedef struct
 typedef struct
 {
 	uint32_t		magicNum;
-	Byte			isUsed[MAX_CONFETTIS];
+	Pool			*pool;
 	uint32_t		flags;
 	Byte			confettiTextureNum;
 	float			gravity;
@@ -70,7 +69,6 @@ typedef struct
 	OGLVector3D		delta[MAX_CONFETTIS];
 
 	MOVertexArrayObject	*geometryObj;
-
 }ConfettiGroupType;
 
 
@@ -128,8 +126,8 @@ typedef struct
 
 typedef struct
 {
-	uint32_t 	magicNum;
-	uint32_t  flags;
+	uint32_t	magicNum;
+	uint32_t	flags;
 	float 	gravity;
 	float 	baseScale;
 	float 	decayRate;
@@ -156,15 +154,14 @@ typedef struct
 
 
 void InitEffects(void);
+void DisposeEffects(void);
+
 void InitParticleSystem(void);
-
-
-void DeleteAllParticleGroups(void);
+void DisposeParticleSystem(void);
 short NewParticleGroup(NewParticleGroupDefType *def);
 Boolean AddParticleToGroup(NewParticleDefType *def);
 Boolean VerifyParticleGroupMagicNum(short group, long magicNum);
 Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags);
-void DisposeParticleSystem(void);
 
 void MakePuff(OGLPoint3D *where, float scale, short texNum, GLint src, GLint dst, float decayRate);
 void MakeSparkExplosion(float x, float y, float z, float force, float scale, short sparkTexture, short quantityLimit, float fadeRate);
@@ -190,15 +187,8 @@ Boolean AddBubbler(TerrainItemEntryType *itemPtr, float  x, float z);
 		/* CONFETTI */
 
 void InitConfettiManager(void);
-void DeleteAllConfettiGroups(void);
-short NewConfettiGroup(NewConfettiGroupDefType *def);
+void DisposeConfettiManager(void);
+int NewConfettiGroup(const NewConfettiGroupDefType *def);
 Boolean AddConfettiToGroup(NewConfettiDefType *def);
-Boolean VerifyConfettiGroupMagicNum(short group, uint32_t magicNum);
+Boolean VerifyConfettiGroupMagicNum(int group, uint32_t magicNum);
 void MakeConfettiExplosion(float x, float y, float z, float force, float scale, short texture, short quantityLimit);
-
-
-
-
-
-
-

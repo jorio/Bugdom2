@@ -32,6 +32,10 @@ static void MoveRippleEvent(ObjNode *theNode);
 #define MAX_WATER			60
 #define	MAX_NUBS_IN_WATER	80
 
+#define	MAX_SCREEN_DROPS	100
+#define	MAX_GROUND_DROPS	40
+#define	MAX_RIPPLES			100
+
 enum
 {
 	RAIN_MODE_OFF,
@@ -40,11 +44,8 @@ enum
 	RAIN_MODE_RAMPDOWN
 };
 
-#define	MAX_SCREEN_DROPS	100
-
 typedef struct
 {
-	Boolean		isUsed;
 	int			type;
 	OGLPoint2D	coord;
 	float		speed;
@@ -52,22 +53,18 @@ typedef struct
 }ScreenDropType;
 
 
-#define	MAX_GROUND_DROPS	40
 
 typedef struct
 {
-	Boolean		isUsed;
 	int			type;
 	OGLPoint3D	coord;
 	float		alpha;
 	float		scale;
 }GroundDropType;
 
-#define	MAX_RIPPLES	100
 
 typedef struct
 {
-	Boolean		isUsed;
 	OGLPoint3D	coord;
 	float		alpha, fadeRate;
 	float		scale,scaleSpeed;
@@ -127,34 +124,50 @@ static const float	gWaterFixedYCoord[] =
 static 	Byte	gRainMode;
 static	float	gRainRampFactor;					// basically an alpha value
 static	float	gRainScreenDropTimer, gRainGroundDropTimer;
-static	int		gNumRainScreenDrops, gNumRainGroundDrops;
 
 static	ScreenDropType	gRainScreenDrops[MAX_SCREEN_DROPS];
 static	GroundDropType	gRainGroundDrops[MAX_GROUND_DROPS];
 
-static	ObjNode		*gRainEventObj = nil;
+static	Pool			*gRainScreenDropPool = NULL;
+static	Pool			*gRainGroundDropPool = NULL;
 
 
 		/* RIPPLES */
 
-static	int			gNumRipples;
-static	ObjNode		*gRippleEventObj = nil;
-
 static	RippleType	gRippleList[MAX_RIPPLES];
+static	Pool		*gRipplePool = NULL;
 
 
 /********************** DISPOSE WATER *********************/
 
 void DisposeWater(void)
 {
+	if (gWaterListHandle)
+	{
+		DisposeHandle((Handle)gWaterListHandle);
+	}
 
-	if (!gWaterListHandle)
-		return;
-
-	DisposeHandle((Handle)gWaterListHandle);
 	gWaterListHandle = nil;
 	gWaterList = nil;
 	gNumWaterPatches = 0;
+
+	if (gRainScreenDropPool)
+	{
+		Pool_Free(gRainScreenDropPool);
+		gRainScreenDropPool = NULL;
+	}
+
+	if (gRainGroundDropPool)
+	{
+		Pool_Free(gRainGroundDropPool);
+		gRainGroundDropPool = NULL;
+	}
+
+	if (gRipplePool)
+	{
+		Pool_Free(gRipplePool);
+		gRipplePool = NULL;
+	}
 }
 
 
@@ -184,11 +197,8 @@ float					y,centerX,centerZ;
 		nubs 				= &gWaterList[f].nubList[0];				// point to nub list
 		numNubs 			= gWaterList[f].numNubs;					// get # nubs in water
 
-		if (numNubs == 1)
-			DoFatalAlert("PrimeTerrainWater: numNubs == 1");
-
-		if (numNubs > MAX_NUBS_IN_WATER)
-			DoFatalAlert("PrimeTerrainWater: numNubs > MAX_NUBS_IN_WATER");
+		GAME_ASSERT(numNubs != 1);
+		GAME_ASSERT(numNubs <= MAX_NUBS_IN_WATER);
 
 
 				/* IF FIRST AND LAST NUBS ARE SAME, THEN ELIMINATE LAST */
@@ -304,8 +314,7 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 
 		WaterDefType* water = &gWaterList[f];				// point to this water
 		uint32_t numNubs = water->numNubs;					// get # nubs in water (note:  this is the # from the file, not including the extra center point we added earlier!)
-		if (numNubs < 3)
-			DoFatalAlert("MakeWaterGeometry: numNubs < 3");
+		GAME_ASSERT(numNubs >= 3);
 		int type = water->type;								// get water type
 
 
@@ -632,17 +641,24 @@ int	i;
 
 void InitRainEffect(void)
 {
-int		i;
-
-	gRainEventObj = nil;
+//	gRainEventObj = nil;
 
 	gRainMode = RAIN_MODE_OFF;
 	gRainRampFactor = 0;
-	gNumRainScreenDrops = 0;
-	gNumRainGroundDrops = 0;
 
-	for (i = 0; i < MAX_SCREEN_DROPS; i++)
-		gRainScreenDrops[i].isUsed = false;
+	gRainScreenDropPool = Pool_New(MAX_SCREEN_DROPS);
+	gRainGroundDropPool = Pool_New(MAX_GROUND_DROPS);
+
+
+	NewObjectDefinitionType def =
+	{
+		.genre		= EVENT_GENRE,
+		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING,
+		.slot 		= SLOT_OF_DUMB+40,
+		.moveCall 	= MoveRainEffect,
+		.drawCall	= DrawRainEffect,
+	};
+	MakeNewObject(&def);
 }
 
 
@@ -666,23 +682,6 @@ void StartRainEffect(void)
 	gRainRampFactor = 0;
 	gRainScreenDropTimer = 0;
 	gRainGroundDropTimer = 0;
-
-
-		/* MAKE EVENT */
-
-	if (gRainEventObj)
-		DoFatalAlert("StartRainEffect: gRainEventObj != nil");
-
-	gNewObjectDefinition.genre		= EVENT_GENRE;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+40;
-	gNewObjectDefinition.moveCall 	= MoveRainEffect;
-	gRainEventObj = MakeNewObject(&gNewObjectDefinition);
-
-	gRainEventObj->CustomDrawFunction = DrawRainEffect;
-
-
-
 }
 
 
@@ -698,9 +697,10 @@ void StopRainEffect(void)
 
 static void MoveRainEffect(ObjNode *theNode)
 {
-int		i,j;
 float	fps = gFramesPerSecondFrac;
 Boolean	makeNewDrops = false;
+
+	(void) theNode;
 
 	switch(gRainMode)
 	{
@@ -710,8 +710,6 @@ Boolean	makeNewDrops = false;
 		case	RAIN_MODE_ON:
 				makeNewDrops = true;
 				break;
-
-			/* RAMP UP */
 
 		case	RAIN_MODE_RAMPUP:
 				gRainRampFactor += fps;
@@ -724,26 +722,22 @@ Boolean	makeNewDrops = false;
 				makeNewDrops = true;
 				break;
 
-
-			/* RAMP DOWN */
-
 		case	RAIN_MODE_RAMPDOWN:
 				gRainRampFactor -= fps;
 				if (gRainRampFactor <= 0.0f)
 				{
 					gRainRampFactor = 0.0f;
-					if (gNumRainScreenDrops <= 0)						// once all drops gone, turn off
+					if (Pool_Empty(gRainScreenDropPool))					// once all drops gone, turn off
 					{
 						gRainMode = RAIN_MODE_OFF;
-						DeleteObject(theNode);
-						gRainEventObj = nil;
+//						DeleteObject(theNode);
+//						gRainEventObj = nil;
 						return;
 					}
 				}
 				else
 					makeNewDrops = true;
 				break;
-
 	}
 
 
@@ -759,26 +753,20 @@ Boolean	makeNewDrops = false;
 		{
 			gRainScreenDropTimer += .04f;							// reset timer
 
-			for (j = 0; j < 2; j++)									// n drops per pass
+			for (int j = 0; j < 2; j++)								// n drops per pass
 			{
-				for (i = 0; i < MAX_SCREEN_DROPS; i++)					// look for a free slot
-					if (!gRainScreenDrops[i].isUsed)
-						break;
+				int i = Pool_AllocateIndex(gRainScreenDropPool);	// look for a free slot
 
-				if (i < MAX_SCREEN_DROPS)								// see if got one
-				{
-					gRainScreenDrops[i].isUsed = true;
+				if (i < 0)											// see if out of memory
+					break;
 
-					gRainScreenDrops[i].type = 0;
+				gRainScreenDrops[i].type = 0;
 
-					gRainScreenDrops[i].coord.x = -50.0f + RandomFloat() * 700.0f;
-					gRainScreenDrops[i].coord.y = -30;
+				gRainScreenDrops[i].coord.x = -50.0f + RandomFloat() * 700.0f;
+				gRainScreenDrops[i].coord.y = -30;
 
-					gRainScreenDrops[i].size = 7.0f + RandomFloat() * 7.0f;
-					gRainScreenDrops[i].speed = 1500.0f + RandomFloat() * 400.0f;
-
-					gNumRainScreenDrops++;
-				}
+				gRainScreenDrops[i].size = 7.0f + RandomFloat() * 7.0f;
+				gRainScreenDrops[i].speed = 1500.0f + RandomFloat() * 400.0f;
 			}
 		}
 
@@ -803,27 +791,21 @@ Boolean	makeNewDrops = false;
 			centerZ = gGameView->cameraPlacement.cameraLocation.z + v.y * 1000.0f;
 
 
-			for (j = 0; j < 4; j++)									// n drops per pass
+			for (int j = 0; j < 4; j++)									// n drops per pass
 			{
-				for (i = 0; i < MAX_GROUND_DROPS; i++)					// look for a free slot
-					if (!gRainGroundDrops[i].isUsed)
-						break;
+				int i = Pool_AllocateIndex(gRainGroundDropPool);		// look for a free slot
 
-				if (i < MAX_GROUND_DROPS)								// see if got one
-				{
-					gRainGroundDrops[i].isUsed = true;
+				if (i < 0)												// see if out of memory
+					break;
 
-					gRainGroundDrops[i].type = 0;
+				gRainGroundDrops[i].type = 0;
 
-					gRainGroundDrops[i].coord.x = centerX + RandomFloat2() * 900.0f;
-					gRainGroundDrops[i].coord.z = centerZ + RandomFloat2() * 900.0f;
-					gRainGroundDrops[i].coord.y = GetTerrainY(gRainGroundDrops[i].coord.x, gRainGroundDrops[i].coord.z);
+				gRainGroundDrops[i].coord.x = centerX + RandomFloat2() * 900.0f;
+				gRainGroundDrops[i].coord.z = centerZ + RandomFloat2() * 900.0f;
+				gRainGroundDrops[i].coord.y = GetTerrainY(gRainGroundDrops[i].coord.x, gRainGroundDrops[i].coord.z);
 
-					gRainGroundDrops[i].alpha = .99;
-					gRainGroundDrops[i].scale = .3f;
-
-					gNumRainGroundDrops++;
-				}
+				gRainGroundDrops[i].alpha = .99;
+				gRainGroundDrops[i].scale = .3f;
 			}
 		}
 
@@ -833,14 +815,15 @@ Boolean	makeNewDrops = false;
 			/* MOVE SCREEN DROPS */
 			/*********************/
 
-	for (i = 0; i < MAX_SCREEN_DROPS; i++)
+	for (int i = Pool_First(gRainScreenDropPool), next; i >= 0; i = next)
 	{
+		next = Pool_Next(gRainScreenDropPool, i);					// get next index now so we can release the current one in this loop
+
 		gRainScreenDrops[i].coord.y += gRainScreenDrops[i].speed * fps;
 
 		if (gRainScreenDrops[i].coord.y > 480.0f)					// see if gone
 		{
-			gRainScreenDrops[i].isUsed = false;
-			gNumRainScreenDrops--;
+			Pool_ReleaseIndex(gRainScreenDropPool, i);
 		}
 	}
 
@@ -848,18 +831,18 @@ Boolean	makeNewDrops = false;
 			/* MOVE GROUND DROPS */
 			/*********************/
 
-	for (i = 0; i < MAX_GROUND_DROPS; i++)
+	for (int i = Pool_First(gRainGroundDropPool), next; i >= 0; i = next)
 	{
+		next = Pool_Next(gRainGroundDropPool, i);					// get next index now so we can release the current one in this loop
+
 		gRainGroundDrops[i].scale += fps * 10.0f;
 		gRainGroundDrops[i].alpha -= fps * 6.0f;
 
 		if (gRainGroundDrops[i].alpha <= 0.0f)					// see if gone
 		{
-			gRainGroundDrops[i].isUsed = false;
-			gNumRainGroundDrops--;
+			Pool_ReleaseIndex(gRainGroundDropPool, i);
 		}
 	}
-
 }
 
 
@@ -875,16 +858,18 @@ OGLMatrix4x4	m;
 	if (gRainMode == RAIN_MODE_OFF)
 		return;
 
+	if (Pool_Empty(gRainGroundDropPool) && Pool_Empty(gRainScreenDropPool))
+		return;
+
 	OGL_PushState();
 
 			/*********************/
 			/* DRAW GROUND DROPS */
 			/*********************/
 
-	for (int i = 0; i < MAX_GROUND_DROPS; i++)
+	for (int i = Pool_First(gRainGroundDropPool); i >= 0; i = Pool_Next(gRainGroundDropPool, i))
 	{
-		if (!gRainGroundDrops[i].isUsed)
-			continue;
+		GAME_DEBUGASSERT(Pool_IsUsed(gRainGroundDropPool, i));
 
 		size = gRainGroundDrops[i].scale;
 		gGlobalTransparency = gRainGroundDrops[i].alpha;
@@ -898,7 +883,6 @@ OGLMatrix4x4	m;
 		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_WaterSpat]);
 
 		glPopMatrix();
-
 	}
 
 
@@ -911,10 +895,9 @@ OGLMatrix4x4	m;
 
 	gGlobalTransparency = gRainRampFactor * .99f;
 
-	for (int i = 0; i < MAX_SCREEN_DROPS; i++)
+	for (int i = Pool_First(gRainScreenDropPool); i >= 0; i = Pool_Next(gRainScreenDropPool, i))
 	{
-		if (!gRainScreenDrops[i].isUsed)
-			continue;
+		GAME_DEBUGASSERT(Pool_IsUsed(gRainScreenDropPool, i));
 
 		size = gRainScreenDrops[i].size;
 		x = gRainScreenDrops[i].coord.x;
@@ -937,11 +920,22 @@ OGLMatrix4x4	m;
 
 static void InitRipples(void)
 {
-	gNumRipples = 0;
-	gRippleEventObj = nil;
+		/* MAKE RIPPLE POOL */
 
-	for (int i = 0; i < MAX_RIPPLES; i++)
-		gRippleList[i].isUsed = false;
+	GAME_ASSERT(!gRipplePool);
+	gRipplePool = Pool_New(MAX_RIPPLES);
+
+		/* CREATE RIPPLE EVENT OBJECT */
+
+	NewObjectDefinitionType def =
+	{
+		.genre		= EVENT_GENRE,
+		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_GLOW | STATUS_BIT_NOFOG,
+		.slot 		= SLOT_OF_DUMB+1,
+		.moveCall 	= MoveRippleEvent,
+		.drawCall	= DrawRipples,
+	};
+	MakeNewObject(&def);
 }
 
 
@@ -949,45 +943,27 @@ static void InitRipples(void)
 
 void CreateNewRipple(float x, float z, float baseScale, float scaleSpeed, float fadeRate)
 {
-float	y2,y;
-int		i;
+			/* SCAN FOR FREE RIPPLE SLOT */
+
+	int i = Pool_AllocateIndex(gRipplePool);
+	if (i < 0)
+		return;
+
 
 			/* GET Y COORD FOR WATER */
 
+
+	float	y2,y;
 	if (!GetWaterY(x, z, &y2))
 		return;													// bail if not actually on water
 
 	y = y2+.5f;													// raise ripple off water
 
-		/* CREATE RIPPLE EVENT OBJECT */
-
-	if (gRippleEventObj == nil)
-	{
-		gNewObjectDefinition.genre		= EVENT_GENRE;
-		gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_GLOW | STATUS_BIT_NOFOG;
-		gNewObjectDefinition.slot 		= SLOT_OF_DUMB+1;
-		gNewObjectDefinition.moveCall 	= MoveRippleEvent;
-		gRippleEventObj = MakeNewObject(&gNewObjectDefinition);
-
-		gRippleEventObj->CustomDrawFunction = DrawRipples;
-	}
 
 		/**********************/
 		/* ADD TO RIPPLE LIST */
 		/**********************/
 
-		/* SCAN FOR FREE RIPPLE SLOT */
-
-	for (i = 0; i < MAX_RIPPLES; i++)
-	{
-		if (!gRippleList[i].isUsed)
-			goto got_it;
-	}
-	return;												// no free slots
-
-got_it:
-
-	gRippleList[i].isUsed = true;
 	gRippleList[i].coord.x = x;
 	gRippleList[i].coord.y = y;
 	gRippleList[i].coord.z = z;
@@ -996,8 +972,6 @@ got_it:
 	gRippleList[i].scaleSpeed = scaleSpeed;
 	gRippleList[i].alpha = .999f - (RandomFloat() * .2f);
 	gRippleList[i].fadeRate = fadeRate;
-
-	gNumRipples++;
 }
 
 
@@ -1005,29 +979,34 @@ got_it:
 
 static void MoveRippleEvent(ObjNode *theNode)
 {
-int		i;
 float	fps = gFramesPerSecondFrac;
 
-	for (i = 0; i < MAX_RIPPLES; i++)
+	(void) theNode;
+
+	if (Pool_Empty(gRipplePool))
 	{
-		if (!gRippleList[i].isUsed)									// see if this ripple slot active
-			continue;
+		return;
+	}
+
+	for (int i = Pool_First(gRipplePool), next; i >= 0; i = next)
+	{
+		next = Pool_Next(gRipplePool, i);						// get next index now so we can release the current one in this loop
+
+		GAME_DEBUGASSERT(Pool_IsUsed(gRipplePool, i));
 
 		gRippleList[i].scale += fps * gRippleList[i].scaleSpeed;
 		gRippleList[i].alpha -= fps * gRippleList[i].fadeRate;
 		if (gRippleList[i].alpha <= 0.0f)							// see if done
 		{
-			gRippleList[i].isUsed = false;							// kill this slot
-			gNumRipples--;
+			Pool_ReleaseIndex(gRipplePool, i);
 		}
 	}
 
-	if (gNumRipples <= 0)											// see if all done
-	{
-		DeleteObject(theNode);
-		gRippleEventObj = nil;
-	}
-
+//	if (gNumRipples <= 0)											// see if all done
+//	{
+//		DeleteObject(theNode);
+//		gRippleEventObj = nil;
+//	}
 }
 
 
@@ -1035,10 +1014,13 @@ float	fps = gFramesPerSecondFrac;
 
 static void DrawRipples(ObjNode *theNode)
 {
-int			i;
 float		s,x,y,z;
 
 	(void) theNode;
+
+	if (Pool_Empty(gRipplePool))
+		return;
+
 
 		/* ACTIVATE MATERIAL */
 
@@ -1047,10 +1029,9 @@ float		s,x,y,z;
 
 		/* DRAW EACH RIPPLE */
 
-	for (i = 0; i < MAX_RIPPLES; i++)
+	for (int i = Pool_First(gRipplePool); i >= 0; i = Pool_Next(gRipplePool, i))
 	{
-		if (!gRippleList[i].isUsed)									// see if this ripple slot active
-			continue;
+		GAME_DEBUGASSERT(Pool_IsUsed(gRipplePool, i));
 
 		x = gRippleList[i].coord.x;									// get coord
 		y = gRippleList[i].coord.y;
@@ -1070,11 +1051,3 @@ float		s,x,y,z;
 	glColor4f(1,1,1,1);
 	gGlobalTransparency = 1.0f;
 }
-
-
-
-
-
-
-
-

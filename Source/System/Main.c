@@ -869,7 +869,6 @@ OGLSetupInputType	viewDef;
 
 	InitEnemyManager();
 	InitEffects();
-	InitSparkles();
 	InitItemsManager();
 	InitDialogManager();
 
@@ -953,11 +952,10 @@ static void CleanupLevel(void)
  	EmptySplineObjectList();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeWater();
 	DisposeTerrain();
-	DeleteAllParticleGroups();
-	DeleteAllConfettiGroups();
 	DisposeInfobar();
-	DisposeParticleSystem();
+	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeSpriteGroup(SPRITE_GROUP_INFOBAR);
 
@@ -1007,7 +1005,9 @@ unsigned long	someLong;
 	LoadSpriteGroupFromSeries(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "SphereMap");
 	LoadSpriteGroupFromSeries(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "Global");
 	LoadSpriteAtlas(ATLAS_GROUP_FONT1, ":Sprites:Font:font", kAtlasLoadFont);
+	
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
+//	BlendASprite(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_Splash);
 
 #if !SKIPFLUFF
 		/* SHOW TITLES */

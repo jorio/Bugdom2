@@ -24,6 +24,7 @@ static void DisposeSkeletonDefinitionMemory(SkeletonDefType *skeleton);
 /*    CONSTANTS             */
 /****************************/
 
+#define MAX_SKELETON_OBJS	250
 
 /*********************/
 /*    VARIABLES      */
@@ -34,6 +35,8 @@ static SkeletonDefType		*gLoadedSkeletonsList[MAX_SKELETON_TYPES];
 static short	    gNumDecomposedTriMeshesInSkeleton[MAX_SKELETON_TYPES];
 MOVertexArrayData	**gLocalTriMeshesOfSkelType = nil;
 
+static SkeletonObjDataType	gSkeletonObjDataMemory[MAX_SKELETON_OBJS];
+static Pool					*gSkeletonObjDataPool = NULL;
 
 /**************** INIT SKELETON MANAGER *********************/
 
@@ -49,8 +52,18 @@ short	i;
 		/* ALLOCATE LOCAL TRIMESHES FOR ALL SKELETON TYPES */
 
 	Alloc_2d_array(MOVertexArrayData, gLocalTriMeshesOfSkelType, MAX_SKELETON_TYPES, MAX_DECOMPOSED_TRIMESHES);
+
+	gSkeletonObjDataPool = Pool_New(MAX_SKELETON_OBJS);
 }
 
+void DisposeSkeletonManager(void)
+{
+	if (gSkeletonObjDataPool)
+	{
+		Pool_Free(gSkeletonObjDataPool);
+		gSkeletonObjDataPool = NULL;
+	}
+}
 
 /******************** LOAD A SKELETON ****************************/
 
@@ -183,30 +196,24 @@ long	numAnims,numJoints;
 				/* ALLOC ANIM EVENTS LISTS */
 				/***************************/
 
-	skeleton->NumAnimEvents = (Byte *)AllocPtr(sizeof(Byte)*numAnims);		// array which holds # events for each anim
-	if (skeleton->NumAnimEvents == nil)
-		DoFatalAlert("Not enough memory to alloc NumAnimEvents");
+	skeleton->NumAnimEvents = (Byte *) AllocPtrClear(sizeof(Byte)*numAnims);		// array which holds # events for each anim
+	GAME_ASSERT(skeleton->NumAnimEvents);
 
 	Alloc_2d_array(AnimEventType, skeleton->AnimEventsList, numAnims, MAX_ANIM_EVENTS);
 
 			/* ALLOC BONE INFO */
 
-	skeleton->Bones = (BoneDefinitionType *)AllocPtr(sizeof(BoneDefinitionType)*numJoints);
-	if (skeleton->Bones == nil)
-		DoFatalAlert("Not enough memory to alloc Bones");
+	skeleton->Bones = (BoneDefinitionType *) AllocPtrClear(sizeof(BoneDefinitionType)*numJoints);
+	GAME_ASSERT(skeleton->Bones);
 
 
 		/* ALLOC DECOMPOSED DATA */
 
-	skeleton->decomposedPointList = (DecomposedPointType *)AllocPtr(sizeof(DecomposedPointType)*MAX_DECOMPOSED_POINTS);
-	if (skeleton->decomposedPointList == nil)
-		DoFatalAlert("Not enough memory to alloc decomposedPointList");
+	skeleton->decomposedPointList = (DecomposedPointType *) AllocPtrClear(sizeof(DecomposedPointType)*MAX_DECOMPOSED_POINTS);
+	GAME_ASSERT(skeleton->decomposedPointList);
 
-	skeleton->decomposedNormalsList = (OGLVector3D *)AllocPtr(sizeof(OGLVector3D)*MAX_DECOMPOSED_NORMALS);
-	if (skeleton->decomposedNormalsList == nil)
-		DoFatalAlert("Not enough memory to alloc decomposedNormalsList");
-
-
+	skeleton->decomposedNormalsList = (OGLVector3D *) AllocPtrClear(sizeof(OGLVector3D)*MAX_DECOMPOSED_NORMALS);
+	GAME_ASSERT(skeleton->decomposedNormalsList);
 }
 
 
@@ -301,9 +308,11 @@ int					i;
 
 			/* ALLOC MEMORY FOR NEW SKELETON OBJECT DATA STRUCTURE */
 
-	skeletonData = (SkeletonObjDataType *)AllocPtrClear(sizeof(SkeletonObjDataType));
-	if (skeletonData == nil)
-		DoFatalAlert("MakeNewSkeletonBaseData: Cannot alloc new SkeletonObjDataType");
+//	skeletonData = (SkeletonObjDataType *) AllocPtrClear(sizeof(SkeletonObjDataType));
+	int pooledIndex = Pool_AllocateIndex(gSkeletonObjDataPool);
+	GAME_ASSERT(pooledIndex >= 0);
+	skeletonData = &gSkeletonObjDataMemory[pooledIndex];
+	GAME_ASSERT(skeletonData);
 
 
 			/* INIT NEW SKELETON */
@@ -332,7 +341,14 @@ void FreeSkeletonBaseData(SkeletonObjDataType *data)
 
 			/* FREE THE SKELETON DATA */
 
-	SafeDisposePtr((Ptr)data);
+//	SafeDisposePtr((Ptr)data);
+	if (!data)
+		return;
+	int pooledIndex = (int) (data - &gSkeletonObjDataMemory[0]);
+	GAME_ASSERT(pooledIndex >= 0);
+	GAME_ASSERT(pooledIndex < MAX_SKELETON_OBJS);
+	GAME_ASSERT(Pool_IsUsed(gSkeletonObjDataPool, pooledIndex));
+	Pool_ReleaseIndex(gSkeletonObjDataPool, pooledIndex);
 }
 
 

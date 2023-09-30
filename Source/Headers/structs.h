@@ -358,6 +358,11 @@ struct ObjNode
 			/* SPRITE INFO */
 
 	MOSpriteObject		*SpriteMO;				// ref to sprite meta object for sprite genre.
+
+
+			/* POOL INDEX */
+
+	int					pooledIndex;
 };
 typedef struct ObjNode ObjNode;
 

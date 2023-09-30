@@ -628,7 +628,7 @@ do_anaglyph:
 		OGL_DrawInt(gFramesPerSecond+.5f, 100,y);
 		y += 15;
 
-		OGL_DrawString("#tri:", 20,y);
+		OGL_DrawString("tris:", 20,y);
 		OGL_DrawInt(gPolysThisFrame, 100,y);
 		y += 15;
 
@@ -681,7 +681,6 @@ do_anaglyph:
 		OGL_DrawString("#sparkles:", 20,y);
 		OGL_DrawInt(gNumSparkles, 100,y);
 		y += 15;
-#endif
 
 
 		if (gPlayerInfo.objNode)
@@ -694,7 +693,6 @@ do_anaglyph:
 			y += 15;
 		}
 
-#if 0
 		OGL_DrawString("#H2O:", 20,y);
 		OGL_DrawInt(gNumWaterDrawn, 100,y);
 		y += 15;
@@ -704,7 +702,11 @@ do_anaglyph:
 		y += 15;
 #endif
 
-		OGL_DrawString("#pointers:", 20,y);
+		OGL_DrawString("objs:", 20,y);
+		OGL_DrawInt(gNumObjectNodes, 100,y);
+		y += 15;
+
+		OGL_DrawString("ptrs:", 20,y);
 		OGL_DrawInt(gNumPointers, 100,y);
 		y += 15;
 	}
