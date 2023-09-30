@@ -38,6 +38,7 @@ typedef struct
 
 //==============================================================
 
+Boolean IsTunnelLevel(void);
 
 void InitArea_Tunnels(void);
 void PlayArea_Tunnel(void);

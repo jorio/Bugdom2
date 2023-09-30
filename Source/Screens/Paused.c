@@ -80,7 +80,8 @@ void DoPaused(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		KeepTerrainAlive();
+		if (!IsTunnelLevel())
+			KeepTerrainAlive();
 		OGL_DrawScene(DrawPaused);
 	}
 	
@@ -101,7 +102,7 @@ static float	dotAlpha = 1.0f;
 
 			/* DRAW THE BACKGROUND */
 
-	if (gLevelNum == LEVEL_NUM_PLUMBING || gLevelNum == LEVEL_NUM_GUTTER)
+	if (IsTunnelLevel())
 	{
 		DrawTunnel();
 	}
@@ -229,7 +230,10 @@ Boolean	continueGame = false;
 					break;
 
 			case	1:								// SETTINGS
-					DoSettingsOverlay(KeepTerrainAlive, DrawObjects);
+					if (IsTunnelLevel())
+						DoSettingsOverlay(NULL, DrawTunnel);
+					else
+						DoSettingsOverlay(KeepTerrainAlive, DrawObjects);
 					break;
 
 			case	2:								// EXIT

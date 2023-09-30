@@ -75,6 +75,13 @@ float				gPlayerTunnelIndex;
 static OGLPoint3D	gPreviousSprayCoord;
 
 
+/******************** ARE WE PLAYING A TUNNEL LEVEL? *********************/
+
+Boolean IsTunnelLevel(void)
+{
+	return gLevelNum == LEVEL_NUM_PLUMBING || gLevelNum == LEVEL_NUM_GUTTER;
+}
+
 /******************** INIT AREA:  TUNNELS ***************************/
 
 void InitArea_Tunnels(void)
