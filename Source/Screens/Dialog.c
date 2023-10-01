@@ -169,10 +169,9 @@ static	int		gDialogMode;
 static	float	gMessageReplayVoiceDelay[MAX_DIALOG_MESSAGES];
 
 
-static	int			gCurrentDialogMessageNum;
-static	char const *gCurrentDialogString;
+static	int			gCurrentDialogMessageNum = -1;
+static	LocStrID	gCurrentDialogKey = STR_NULL;
 static	int			gCurrentDialogIconGroup,gCurrentDialogIconFrame;
-static	int			gNumLinesInCurrentDialog = 0;						// when 0, indicates no message active
 short				gDialogSoundChannel;
 int					gDialogSoundEffect;
 static	OGLPoint3D	gDialogSoundWhere;
@@ -187,9 +186,7 @@ static	OGLPoint3D	gNextMessageWhere;
 
 void InitDialogManager(void)
 {
-int		i;
-
-	gNumLinesInCurrentDialog = 0;
+	gCurrentDialogKey		= STR_NULL;
 	gDialogAlpha			= 0;
 	gNextMessageNum = gCurrentDialogMessageNum = -1;
 	gNextMessagePriority = 100;
@@ -198,7 +195,7 @@ int		i;
 
 	gCurrentDialogIconGroup = gCurrentDialogIconFrame = -1;
 
-	for (i = 0; i < MAX_DIALOG_MESSAGES; i++)
+	for (int i = 0; i < MAX_DIALOG_MESSAGES; i++)
 		gMessageReplayVoiceDelay[i] = 0;
 }
 
@@ -218,7 +215,7 @@ void DoDialogMessage(int messNum, int priority, float duration, OGLPoint3D *from
 
 			/* SEE IF THIS MESSAGE HAS HIGHER PRIORITY */
 
-	if (gNumLinesInCurrentDialog == 0)								// if no dialog currently, then just do it
+	if (gCurrentDialogKey == STR_NULL)							// if no dialog currently, then just do it
 	{
 		CreateDialogMessage(messNum, priority, duration, fromWhere);
 		return;
@@ -246,25 +243,12 @@ void DoDialogMessage(int messNum, int priority, float duration, OGLPoint3D *from
 
 static void CreateDialogMessage(int messNum, int priority, float duration, OGLPoint3D *fromWhere)
 {
-int		i;
 int		effect;
 
 	gCurrentDialogIconGroup = gMessageIcon[messNum][0];								// get sprite group
 	gCurrentDialogIconFrame = gMessageIcon[messNum][1];								// get sprite frame
 
-	gCurrentDialogString = Localize(messNum);										// get ptr to string
-
-				/* SEE HOW MANY LINES OF TEXT */
-
-	i = 0;
-	gNumLinesInCurrentDialog = 1;
-	while (gCurrentDialogString[i] != 0x00)
-	{
-		if (gCurrentDialogString[i] == '\n')					// look for line feed
-			gNumLinesInCurrentDialog++;
-		i++;
-	}
-
+	gCurrentDialogKey = messNum;
 	gCurrentDialogMessageNum = messNum;
 	gCurrentDialogMessagePriority = priority;
 	gMessageDuration = duration;
@@ -323,7 +307,7 @@ void DrawDialogMessage(float x, float y)
 		}
 	}
 
-	if (gNumLinesInCurrentDialog == 0)
+	if (gCurrentDialogKey == STR_NULL)
 		return;
 
 	SetColor4f(1,1,1,1);
@@ -349,8 +333,7 @@ void DrawDialogMessage(float x, float y)
 				{
 					gDialogAlpha = 0.0f;
 					gDialogMode = DIALOG_MODE_NONE;
-					gNumLinesInCurrentDialog = 0;
-					gCurrentDialogString = NULL;
+					gCurrentDialogKey = STR_NULL;
 					gCurrentDialogMessagePriority = 100;
 					gCurrentDialogMessageNum = -1;
 					if (gNextMessageNum != -1)
@@ -410,7 +393,7 @@ void DrawDialogMessage(float x, float y)
 
 	x += 80;
 	y += 29;
-	GameFont_DrawString(gCurrentDialogString, x, y, .24f, kTextMeshAlignLeft | kTextMeshAlignMiddle);
+	GameFont_DrawString(Localize(gCurrentDialogKey), x, y, .24f, kTextMeshAlignLeft | kTextMeshAlignMiddle);
 
 	gGlobalColorFilter.r = 1.0f;
 	gGlobalColorFilter.g = 1.0f;
