@@ -141,7 +141,7 @@ static float	dotAlpha = 1.0f;
 
 
 	leftX = x + 25.0f;
-	y += 13;
+	y += 16;
 
 	for (int j = 0; j < 3; j++)											// 3 lines of text
 	{
