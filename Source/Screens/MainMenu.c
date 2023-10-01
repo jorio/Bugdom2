@@ -61,7 +61,6 @@ enum
 	MAINMENU_SObjType_HelpIcon,
 	MAINMENU_SObjType_QuitIcon,
 
-	MAINMENU_SObjType_Credits,
 	MAINMENU_SObjType_COUNT,
 };
 
@@ -670,44 +669,80 @@ static void MoveMenuLogo(ObjNode *theNode)
 
 static void DoCredits(void)
 {
-ObjNode	*newObj, *pane;
+	static const char* credits[][2] =
+	{
+		{"Programming:", "Brian Greenstone"},
+		{"Art:", "Duncan Knarr"},
+		{"Music:", "Aleksander Dimitrijevic"},
+		{"Animation:", "Peter Greenstone"},
+		{"Modern version:", "Iliyas Jorio"},
+	};
 
-	pane = MakeDarkenPane();
+	const float LH = 30;
+	const float X2 = 300;
 
-			/* MAKE CREDITS SPRITE */
+	ObjNode* pane = MakeDarkenPane();
+	ObjNode* creditObjs[20] = {NULL};
+	int n = 0;
 
-	gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= MAINMENU_SObjType_Credits;
-	gNewObjectDefinition.coord.x 	= 640/2;
-	gNewObjectDefinition.coord.y 	= 480/2;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= SPRITE_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveCredits;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 	    = 500;
-	newObj = MakeSpriteObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.coord = {640/2, 100, 0},
+		.slot = SPRITE_SLOT,
+		.scale = 0.5f,
+		.group = ATLAS_GROUP_FONT1,
+	};
 
-	newObj->ColorFilter.a = 0;						// dim out
-	newObj->Mode = 0;								// fade-in mode
+	creditObjs[n++] = TextMesh_New("Bugdom 2 Credits", kTextMeshAlignCenter, &def);
+	def.coord.y += LH * 2;
+	def.scale = 0.33f;
+
+	for (int i = 0; i < (int)SDL_arraysize(credits); i++)
+	{
+		def.coord.x = X2-30;
+		ObjNode* role = TextMesh_New(credits[i][0], kTextMeshAlignRight, &def);
+		role->ColorFilter = (OGLColorRGBA) {1,0.8f,0.2f,1};
+		def.coord.x = X2;
+		ObjNode* name = TextMesh_New(credits[i][1], kTextMeshAlignLeft, &def);
+		def.coord.y += LH;
+		creditObjs[n++] = role;
+		creditObjs[n++] = name;
+	}
+
+	def.coord.y += LH * 1.5f;
+	def.coord.x = 640/2;
+	creditObjs[n++] = TextMesh_New("pangeasoft.net/bug2", kTextMeshAlignCenter, &def);
+	def.coord.y += LH;
+	creditObjs[n++] = TextMesh_New("jorio.itch.io/bugdom2", kTextMeshAlignCenter, &def);
+
+	//-----------------------------
+
+	GAME_ASSERT(n <= (int) SDL_arraysize(creditObjs));
+
+	for (int i = 0; i < n; i++)
+	{
+		creditObjs[i]->MoveCall = MoveCredits;
+		creditObjs[i]->ColorFilter.a = 0;
+		creditObjs[i]->Mode = 0;
+	}
+
 
 	UpdateInput();
 	while(!UserWantsOut())
 	{
 		CalcFramesPerSecond();
 		UpdateInput();
-
-				/* MOVE */
-
 		MoveObjects();
-
-				/* DRAW */
-
 		OGL_DrawScene(DrawMainMenuCallback);
 	}
 
-	newObj->Mode = 1;								// fade out mode
+			/* FADE OUT EVERYTHING */
+
 	pane->Mode = 1;
+	for (int i = 0; i < n; i++)
+	{
+		creditObjs[i]->Mode = 1;
+	}
 }
 
 
@@ -878,11 +913,13 @@ ObjNode *MakeDarkenPane(void)
 
 static void MoveDarkenPane(ObjNode *theNode)
 {
+	const float targetOpacity = .75f;
+
 	if (theNode->Mode == 0)
 	{
 		theNode->ColorFilter.a += gFramesPerSecondFrac * 3.0f;
-		if (theNode->ColorFilter.a > .6f)
-			theNode->ColorFilter.a = .6f;
+		if (theNode->ColorFilter.a > targetOpacity)
+			theNode->ColorFilter.a = targetOpacity;
 	}
 	else
 	{
