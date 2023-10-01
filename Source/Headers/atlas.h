@@ -9,13 +9,6 @@ enum
 	MAX_ATLASES
 };
 
-// A "codepoint page" is a block of 256 codepoints. For Western European
-// languages, we only need codepoint page 0, which covers Unicode blocks
-// "Basic Latin" and "Latin-1 Supplement".
-#define MAX_CODEPOINT_PAGES 64
-
-#define MAX_KERNPAIRS		256
-
 enum
 {
 	kTextMeshAlignCenter				= 0,		// default if horizontal alignment not set
@@ -54,7 +47,7 @@ typedef struct
 	float v2;
 
 	uint16_t	kernTableOffset;
-	int8_t		numKernPairs;
+	uint16_t	numKernPairs;
 } AtlasGlyph;
 
 typedef struct Atlas
@@ -68,7 +61,7 @@ typedef struct Atlas
 	AtlasGlyph** glyphPages;
 
 	uint16_t* kernPairs;
-	uint8_t* kernTracking;
+	float* kernTracking;
 
 	bool isASCIIFont;
 	bool isASCIIFontUpperCaseOnly;

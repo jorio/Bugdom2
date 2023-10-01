@@ -1,6 +1,6 @@
 // SPRITE ATLAS / TEXT MESHES
-// (C) 2022 Iliyas Jorio
-// This file is part of Cro-Mag Rally. https://github.com/jorio/cromagrally
+// (C) 2023 Iliyas Jorio
+// This file is part of Bugdom 2. https://github.com/jorio/bugdom2
 
 /****************************/
 /*    EXTERNALS             */
@@ -21,6 +21,15 @@
 #define MAX_IMMEDIATEMODE_QUADS		1024
 
 #define SUBSCRIPT_SCALE				0.8f
+
+// A "codepoint page" is a block of 256 codepoints.
+// Interesting unicode codepoint ranges are:
+// $0000-00FF - basic latin + latin-1 supplement
+// $2000-206F - general punctuation
+// $2190-21FF - arrows
+// $2300-23FF - miscellaneous technical
+// $2460-24FF - enclosed alphanumerics
+#define MAX_CODEPOINT_PAGES (0x2500 >> 8)
 
 enum
 {
@@ -131,9 +140,7 @@ static void ParseAtlasMetrics(Atlas* atlas, const char* data, int imageWidth, in
 
 	for (int i = 0; i < nGlyphs; i++)
 	{
-		AtlasGlyph newGlyph;
-		SDL_memset(&newGlyph, 0, sizeof(newGlyph));
-
+		AtlasGlyph newGlyph = {0};
 		uint32_t codepoint = 0;
 		float x, y;
 
@@ -161,6 +168,7 @@ static void ParseAtlasMetrics(Atlas* atlas, const char* data, int imageWidth, in
 		Atlas_SetGlyph(atlas, codepoint, &newGlyph);
 	}
 
+#if 0	// ChalkboardSE has good enough looking numbers
 	// Force monospaced numbers
 	if (atlas->isASCIIFont)
 	{
@@ -172,61 +180,64 @@ static void ParseAtlasMetrics(Atlas* atlas, const char* data, int imageWidth, in
 			asciiPage[c].xadv = referenceNumber.xadv;
 		}
 	}
-}
+#endif
 
-/***************************************************************/
-/*                 PARSE KERNING TABLE                         */
-/***************************************************************/
-
-static void SkipWhitespace(const char** data)
-{
-	while (**data && strchr("\t\r\n ", **data))
+	// Try to parse kern pairs
+	if (atlas->isASCIIFont)
 	{
-		(*data)++;
-	}
-}
+		int kernTableOffset = 0;
+		int nPairs = 0;
 
-static void ParseKerningFile(Atlas* atlas, const char* data)
-{
-	int kernTableOffset = 0;
+		nArgs = SDL_sscanf(data, "%d", &nPairs);
+		if (nArgs != 1)
+			return;
 
-	while (*data)
-	{
-		uint32_t codepoint1 = ReadNextCodepointFromUTF8(&data);
-		GAME_ASSERT(codepoint1);
-		
-		uint32_t codepoint2 = ReadNextCodepointFromUTF8(&data);
-		GAME_ASSERT(codepoint2);
+		GAME_ASSERT(nPairs < 65535);		// kernTableOffset is a 16-bit int
+		ParseAtlasMetrics_SkipLine(&data);
 
-		SkipWhitespace(&data);
-		GAME_ASSERT(*data);
+		GAME_ASSERT(!atlas->kernPairs);		// must not be allocated yet
+		GAME_ASSERT(!atlas->kernTracking);	// must not be allocated yet
+		atlas->kernPairs = AllocPtrClear(sizeof(atlas->kernPairs[0]) * nPairs);
+		atlas->kernTracking = AllocPtrClear(sizeof(atlas->kernTracking[0]) * nPairs);
 
-		int tracking = 0;
-		int scannedChars = 0;
-		int scannedTokens = SDL_sscanf(data, "%d%n", &tracking, &scannedChars);
-		GAME_ASSERT(scannedTokens == 1);
-		data += scannedChars;
-
-		AtlasGlyph* g = (AtlasGlyph*) Atlas_GetGlyph(atlas, codepoint1);
-
-		if (g)
+		for (int i = 0; i < nPairs; i++)
 		{
+			int codepoint1 = 0;
+			int codepoint2 = 0;
+			float tracking = 0;
+
+			nArgs = SDL_sscanf(data, "%d %d %f", &codepoint1, &codepoint2, &tracking);
+			GAME_ASSERT(nArgs == 3);
+			ParseAtlasMetrics_SkipLine(&data);
+
+			GAME_ASSERT(codepoint1 != 0);
+			GAME_ASSERT(codepoint2 != 0);
+			if (codepoint1 > 65535 || codepoint2 > 65535)		// skip funny chars
+				continue;
+
+			AtlasGlyph* g = (AtlasGlyph*) Atlas_GetGlyph(atlas, codepoint1);
+			if (!g)
+				continue;
+
 			if (g->numKernPairs == 0)
 			{
 				GAME_ASSERT(g->kernTableOffset == 0);
 				g->kernTableOffset = kernTableOffset;
 			}
+			else
+			{
+				int lastKernBuddy = atlas->kernPairs[g->kernTableOffset + g->numKernPairs - 1];
+				GAME_ASSERT_MESSAGE(codepoint2 > lastKernBuddy, "kern data not sorted");
+			}
 
-			GAME_ASSERT_MESSAGE(g->numKernPairs == kernTableOffset - g->kernTableOffset, "kern pair blocks aren't contiguous!");
+			GAME_ASSERT_MESSAGE(g->numKernPairs == kernTableOffset - g->kernTableOffset, "kern pair blocks aren't contiguous");
 
 			atlas->kernPairs[kernTableOffset] = codepoint2;
 			atlas->kernTracking[kernTableOffset] = tracking;
 			kernTableOffset++;
-			GAME_ASSERT(kernTableOffset <= MAX_KERNPAIRS);
+			GAME_ASSERT(kernTableOffset < 65535);
 			g->numKernPairs++;
 		}
-
-		SkipWhitespace(&data);
 	}
 }
 
@@ -289,17 +300,11 @@ Atlas* Atlas_Load(const char* fontName, int flags)
 
 		atlas->maxPages = MAX_CODEPOINT_PAGES;
 		atlas->glyphPages = AllocPtrClear(sizeof(AtlasGlyph*) * atlas->maxPages);
-
-		atlas->kernPairs = AllocPtrClear(sizeof(atlas->kernPairs[0]) * MAX_KERNPAIRS);
-		atlas->kernTracking = AllocPtrClear(sizeof(atlas->kernTracking[0]) * MAX_KERNPAIRS);
 	}
 	else
 	{
 		atlas->maxPages = 1;
 		atlas->glyphPages = AllocPtrClear(sizeof(AtlasGlyph*) * atlas->maxPages);
-
-		atlas->kernPairs = nil;
-		atlas->kernTracking = nil;
 	}
 
 	SDL_snprintf(atlas->name, sizeof(atlas->name), "%s", fontName);
@@ -319,23 +324,21 @@ Atlas* Atlas_Load(const char* fontName, int flags)
 
 	{
 		// Create font material
-		GLuint textureName = 0;
-
 		SDL_snprintf(pathBuf, sizeof(pathBuf), "%s.tga", fontName);
-		textureName = OGL_TextureMap_LoadTGA(pathBuf, &atlas->textureWidth, &atlas->textureHeight);
+		GLuint textureName = OGL_TextureMap_LoadTGA(pathBuf, &atlas->textureWidth, &atlas->textureHeight);
 
 		GAME_ASSERT(atlas->textureWidth != 0);
 		GAME_ASSERT(atlas->textureHeight != 0);
-
 		GAME_ASSERT_MESSAGE(!atlas->material, "atlas material already created");
-		MOMaterialData matData;
-		SDL_memset(&matData, 0, sizeof(matData));
-		matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND | BG3D_MATERIALFLAG_TEXTURED | BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V;
-		matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};
-		matData.numMipmaps		= 1;
-		matData.width			= atlas->textureWidth;
-		matData.height			= atlas->textureHeight;
-		matData.textureName[0]	= textureName;
+		MOMaterialData matData =
+		{
+			.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND | BG3D_MATERIALFLAG_TEXTURED | BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V,
+			.diffuseColor	= {1, 1, 1, 1},
+			.numMipmaps		= 1,
+			.width			= atlas->textureWidth,
+			.height			= atlas->textureHeight,
+			.textureName[0]	= textureName,
+		};
 		atlas->material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 	}
 
@@ -366,26 +369,6 @@ Atlas* Atlas_Load(const char* fontName, int flags)
 			.yoff = 0,
 		};
 		Atlas_SetGlyph(atlas, 1, &newGlyph);
-	}
-
-	if (flags & kAtlasLoadFont)
-	{
-		SDL_snprintf(pathBuf, sizeof(pathBuf), "%s.kerning.txt", fontName);
-
-		// Parse kerning table
-		char* data = LoadTextFile(pathBuf, NULL);
-
-		if (data != NULL)
-		{
-			ParseKerningFile(atlas, data);
-			SafeDisposePtr(data);
-		}
-		else
-		{
-#if _DEBUG
-			SDL_Log("Kerning not available for this font: %s\n", pathBuf);
-#endif
-		}
 	}
 
 	return atlas;
@@ -429,23 +412,52 @@ void Atlas_Dispose(Atlas* atlas)
 
 static float Kern(const Atlas* font, const AtlasGlyph* glyph, const char* utftext, int flags)
 {
+	// Early out if no kerning data for this glyph
 	if (!glyph || !glyph->numKernPairs)
-		return 1;
+	{
+		return 0;
+	}
 
+	// Get next codepoint from text
 	uint32_t buddy = ReadNextCodepointFromUTF8(&utftext);
 
+	// Uppercase if needed
 	if (font->isASCIIFontUpperCaseOnly || (flags & (kTextMeshSmallCaps | kTextMeshAllCaps)))
 	{
 		buddy = ToUpperUnicode(buddy);
 	}
 
-	for (int i = glyph->kernTableOffset; i < glyph->kernTableOffset + glyph->numKernPairs; i++)
+	// Kerning table bounds
+	int lo = glyph->kernTableOffset;
+	int hi = glyph->kernTableOffset + glyph->numKernPairs - 1;
+	const uint16_t* buddyList = font->kernPairs;
+
+	// Early out if buddy not in range for which we have kerning data
+	if (buddy < buddyList[lo] || buddy > buddyList[hi])
 	{
-		if (font->kernPairs[i] == buddy)
-			return font->kernTracking[i] * .01f;
+		return 0;
 	}
 
-	return 1;
+	// Binary search buddy in kerning table
+	while (lo <= hi)
+	{
+		int i = (lo+hi) >> 1;
+		if (buddyList[i] < buddy)
+		{
+			lo = i + 1;
+		}
+		else if (buddyList[i] > buddy)
+		{
+			hi = i - 1;
+		}
+		else
+		{
+			return font->kernTracking[i];
+		}
+	}
+
+	// Default kerning data for this buddy
+	return 0;
 }
 
 static void ComputeMetrics(const Atlas* atlas, const char* text, int flags, TextMetrics* m)
@@ -526,7 +538,7 @@ static void ComputeMetrics(const Atlas* atlas, const char* text, int flags, Text
 			glyphHeight = glyph->yadv;
 		}
 
-		m->lineWidths[currentLine] += glyphScale * (glyph->xadv * kernFactor);
+		m->lineWidths[currentLine] += glyphScale * (glyph->xadv + kernFactor);
 		m->lineHeights[currentLine] = SDL_max(m->lineHeights[currentLine], glyphHeight);
 
 		if (glyph->w > 0)		// zero-width glyphs don't produce a quad (e.g. space)
@@ -689,7 +701,7 @@ static void PrepVertices(
 		float xadv = g->xadv;
 		if (atlas->isASCIIFont)
 		{
-			xadv *= Kern(atlas, g, utftext, flags);
+			xadv += Kern(atlas, g, utftext, flags);
 		}
 
 		x += glyphScale * xadv;
