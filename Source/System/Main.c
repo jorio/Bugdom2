@@ -343,6 +343,13 @@ static void PlayArea_Terrain(void)
 			gPlayerInfo.glidePower = 1.0;
 			if (gPlayerInfo.lives < 3)
 				gPlayerInfo.lives = 3;
+			gPlayerInfo.hasMap = true;
+		}
+
+		if (IsKeyActive(SDL_SCANCODE_F) && IsKeyActive(SDL_SCANCODE_E) && IsKeyActive(SDL_SCANCODE_N) && IsKeyHeld(SDL_SCANCODE_C))
+		{
+			gNumFences = -gNumFences;					// toggle fences
+			InvalidateAllInputs();
 		}
 
 				/* SEE IF LEVEL IS COMPLETED */
