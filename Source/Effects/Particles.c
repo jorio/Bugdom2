@@ -126,12 +126,12 @@ void InitParticleSystem(void)
 		for (int j = 0, k = 0; j < (MAX_PARTICLES*2); j+=2, k+=4)
 		{
 			vertexArrayData.triangles[j].vertexIndices[0] = k;				// triangle A
-			vertexArrayData.triangles[j].vertexIndices[1] = k+1;
-			vertexArrayData.triangles[j].vertexIndices[2] = k+2;
+			vertexArrayData.triangles[j].vertexIndices[1] = k+2;
+			vertexArrayData.triangles[j].vertexIndices[2] = k+1;
 
 			vertexArrayData.triangles[j+1].vertexIndices[0] = k;			// triangle B
-			vertexArrayData.triangles[j+1].vertexIndices[1] = k+2;
-			vertexArrayData.triangles[j+1].vertexIndices[2] = k+3;
+			vertexArrayData.triangles[j+1].vertexIndices[1] = k+3;
+			vertexArrayData.triangles[j+1].vertexIndices[2] = k+2;
 		}
 
 
@@ -151,7 +151,7 @@ void InitParticleSystem(void)
 		//
 
 	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT, DrawParticleGroup, MoveParticleGroups);
-	driver->StatusBits |= STATUS_BIT_DOUBLESIDED|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES|STATUS_BIT_NOFOG;
+	driver->StatusBits |= STATUS_BIT_NOLIGHTING | STATUS_BIT_NOZWRITES | STATUS_BIT_NOFOG;
 }
 
 
@@ -846,78 +846,6 @@ NewParticleDefType		newParticleDef;
 	}
 }
 
-/****************** MAKE STEAM ************************/
-
-void MakeSteam(ObjNode *blob, float x, float y, float z)
-{
-int		i;
-float	fps = gFramesPerSecondFrac;
-long	particleGroup,magicNum;
-NewParticleGroupDefType	groupDef;
-NewParticleDefType	newParticleDef;
-OGLVector3D			d;
-OGLPoint3D			p;
-
-	if (gFramesPerSecond < 15.0f)
-		return;
-
-	blob->ParticleTimer -= fps;
-	if (blob->ParticleTimer <= 0.0f)
-	{
-		blob->ParticleTimer += 0.02f;
-
-
-		particleGroup 	= blob->ParticleGroup;
-		magicNum 		= blob->ParticleMagicNum;
-
-		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
-		{
-			blob->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-
-			groupDef.magicNum				= magicNum;
-			groupDef.type					= PARTICLE_TYPE_GRAVITOIDS;
-			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
-			groupDef.gravity				= 0;
-			groupDef.magnetism				= 90000;
-			groupDef.baseScale				= 15;
-			groupDef.decayRate				= -.5;
-			groupDef.fadeRate				= .4;
-			groupDef.particleTextureNum		= PARTICLE_SObjType_GreySmoke;
-			groupDef.srcBlend				= GL_SRC_ALPHA;
-			groupDef.dstBlend				= GL_ONE_MINUS_SRC_ALPHA;
-			blob->ParticleGroup = particleGroup = NewParticleGroup(&groupDef);
-		}
-
-		if (particleGroup != -1)
-		{
-			for (i = 0; i < 2; i++)
-			{
-				p.x = x + RandomFloat2() * (20.0f);
-				p.y = y + RandomFloat2() * (20.0f);
-				p.z = z + RandomFloat2() * (20.0f);
-
-				d.x = RandomFloat2() * 190.0f;
-				d.y = 150.0f + RandomFloat() * 190.0f;
-				d.z = RandomFloat2() * 190.0f;
-
-				newParticleDef.groupNum		= particleGroup;
-				newParticleDef.where		= &p;
-				newParticleDef.delta		= &d;
-				newParticleDef.scale		= RandomFloat() + 1.0f;
-				newParticleDef.rotZ			= RandomFloat()*PI2;
-				newParticleDef.rotDZ		= 0;
-				newParticleDef.alpha		= .5;
-				if (AddParticleToGroup(&newParticleDef))
-				{
-					blob->ParticleGroup = -1;
-					break;
-				}
-			}
-		}
-	}
-}
-
-
 #pragma mark -
 
 /********************* MAKE SPLASH ***********************/
@@ -982,79 +910,7 @@ float	volume;
 }
 
 
-/***************** SPRAY WATER *************************/
-
-void SprayWater(ObjNode *theNode, float x, float y, float z)
-{
-float	fps = gFramesPerSecondFrac;
-long	particleGroup, magicNum;
-
-	theNode->ParticleTimer += fps;				// see if time to spew water
-	if (theNode->ParticleTimer > 0.02f)
-	{
-		theNode->ParticleTimer += .02f;
-
-		particleGroup 	= theNode->ParticleGroup;
-		magicNum 		= theNode->ParticleMagicNum;
-
-		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
-		{
-			theNode->SmokeParticleMagic = magicNum = MyRandomLong();			// generate a random magic num
-
-			gNewParticleGroupDef.magicNum				= magicNum;
-			gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
-			gNewParticleGroupDef.flags					= 0;
-			gNewParticleGroupDef.gravity				= 1400;
-			gNewParticleGroupDef.magnetism				= 0;
-			gNewParticleGroupDef.baseScale				= 35;
-			gNewParticleGroupDef.decayRate				=  -1.7f;
-			gNewParticleGroupDef.fadeRate				= 1.0;
-			gNewParticleGroupDef.particleTextureNum		= PARTICLE_SObjType_Splash;
-			gNewParticleGroupDef.srcBlend				= GL_SRC_ALPHA;
-			gNewParticleGroupDef.dstBlend				= GL_ONE;
-			theNode->SmokeParticleGroup = particleGroup = NewParticleGroup(&gNewParticleGroupDef);
-		}
-
-
-					/* ADD PARTICLE TO GROUP */
-
-		if (particleGroup != -1)
-		{
-			OGLPoint3D	pt;
-			OGLVector3D delta;
-			NewParticleDefType		newParticleDef;
-
-			FastNormalizeVector(gDelta.x, 0, gDelta.z, &delta);			// calc spray delta shooting out of butt
-			delta.x *= -300.0f;
-			delta.z *= -300.0f;
-
-			delta.x += (RandomFloat()-.5f) * 50.0f;						// spray delta
-			delta.z += (RandomFloat()-.5f) * 50.0f;
-			delta.y = 500.0f + RandomFloat() * 100.0f;
-
-			pt.x = x + (RandomFloat()-.5f) * 80.0f;			// random noise to coord
-			pt.y = y;
-			pt.z = z + (RandomFloat()-.5f) * 80.0f;
-
-
-			newParticleDef.groupNum		= particleGroup;
-			newParticleDef.where		= &pt;
-			newParticleDef.delta		= &delta;
-			newParticleDef.scale		= RandomFloat() + 1.0f;
-			newParticleDef.rotZ			= 0;
-			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA;
-			AddParticleToGroup(&newParticleDef);
-		}
-	}
-}
-
-
-
-
-
 #pragma mark -
-
 
 
 /****************** BURN FIRE ************************/
@@ -1375,19 +1231,6 @@ OGLVector3D	aim;
 
 
 #pragma mark -
-
-/******************** ADD SMOKER ****************************/
-
-Boolean AddSmoker(TerrainItemEntryType *itemPtr, float  x, float z)
-{
-ObjNode	*newObj;
-
-	newObj = MakeSmoker(x,z, itemPtr->parm[0]);
-	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
-
-	return(true);
-}
-
 
 /****************** MAKE SMOKER **********************/
 

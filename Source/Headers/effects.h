@@ -168,7 +168,6 @@ void MakeSparkExplosion(float x, float y, float z, float force, float scale, sho
 
 void MakeSplash(float x, float y, float z, float scale);
 
-void SprayWater(ObjNode *theNode, float x, float y, float z);
 void BurnFire(ObjNode *theNode, float x, float y, float z, Boolean doSmoke, short particleType, float scale, uint32_t moreFlags);
 
 
@@ -176,8 +175,6 @@ void MakeFireExplosion(OGLPoint3D *where);
 
 void MakeSplatter(OGLPoint3D *where, short modelObjType, float scale);
 
-void MakeSteam(ObjNode *blob, float x, float y, float z);
-Boolean AddSmoker(TerrainItemEntryType *itemPtr, float  x, float z);
 ObjNode *MakeSmoker(float  x, float z, int kind);
 
 Boolean AddBubbler(TerrainItemEntryType *itemPtr, float  x, float z);

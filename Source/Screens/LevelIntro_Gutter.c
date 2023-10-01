@@ -60,7 +60,6 @@ static void SetupLevelIntroScreen(void)
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
-ObjNode	*newObj;
 
 	InitEffects();
 
@@ -128,36 +127,31 @@ ObjNode	*newObj;
 				/* MAKE PINECONE */
 				/*****************/
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GUTTER_ObjType_PineCone;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 200;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
-	gNewObjectDefinition.slot 		= 100;
-	gNewObjectDefinition.moveCall 	= MoveIntroPinecone;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 1.5f;
-	gPinecone = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type		= GUTTER_ObjType_PineCone,
+		.coord		= {0,200,0},
+		.flags		= STATUS_BIT_NOTEXTUREWRAP,
+		.slot		= 100,
+		.moveCall	= MoveIntroPinecone,
+		.scale		= 1.5f,
+	};
+	gPinecone = MakeNewDisplayGroupObject(&def);
 
 
 			/* CYC */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GUTTER_ObjType_Cyc;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView.yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	newObj->CustomDrawFunction = DrawCyclorama;
-
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= GUTTER_ObjType_Cyc,
+		.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
+		.slot 		= TERRAIN_SLOT+1,
+		.scale 		= gGameView.yon * .995f / 100.0f,
+		.drawCall	= DrawCyclorama,
+	};
+	MakeNewDisplayGroupObject(&def);
 }
 
 
@@ -243,15 +237,16 @@ float	fps = gFramesPerSecondFrac;
 
 				/* LEVEL NAME TEXT */
 
-		gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-		gNewObjectDefinition.type 		= LEVELINTRO_ObjType_GutterText;
-		gNewObjectDefinition.scale 		= .3;
-		gNewObjectDefinition.coord		= gCoord;
-		gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOTEXTUREWRAP;
-		gNewObjectDefinition.slot 		= 700;
-		gNewObjectDefinition.moveCall 	= nil;
-		gNewObjectDefinition.rot 		= 0;
-		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		NewObjectDefinitionType def =
+		{
+			.group		= MODEL_GROUP_LEVELINTRO,
+			.type 		= LEVELINTRO_ObjType_GutterText,
+			.scale 		= .3f,
+			.coord		= gCoord,
+			.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOTEXTUREWRAP,
+			.slot 		= 700,
+		};
+		newObj = MakeNewDisplayGroupObject(&def);
 
 		TurnObjectTowardTarget(newObj, &gCoord, gGameView.cameraPlacement.cameraLocation.x, gGameView.cameraPlacement.cameraLocation.z, 2000, false);
 		newObj->Rot.y -= 2.0;

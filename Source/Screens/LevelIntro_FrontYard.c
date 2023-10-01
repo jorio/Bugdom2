@@ -75,6 +75,7 @@ void DoLevelIntroScreen_FrontYard(void)
 
 static void SetupLevelIntroScreen(void)
 {
+NewObjectDefinitionType def;
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 static const OGLVector3D	fillDirection1 = { -.7, -.5, -1.0 };
@@ -155,69 +156,60 @@ int		i;
 
 				/* GROUND */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level1Ground;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 		= 2;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 3.0f;
-	MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type		= LEVELINTRO_ObjType_Level1Ground,
+		.flags		= STATUS_BIT_DONTCULL,
+		.slot		= 2,
+		.scale		= 3.0f,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 			/* WIDESCREEN FILL LEFT */
 
-	gNewObjectDefinition.coord.x 	= -2250;
-	gNewObjectDefinition.coord.y	= -20;
-	MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def.coord.x		= -2250;
+	def.coord.y		= -20;
+	MakeNewDisplayGroupObject(&def);
 
 			/* WIDESCREEN FILL RIGHT */
 
-	gNewObjectDefinition.coord.x 	= 2250;
-	gNewObjectDefinition.coord.y	= -20;
-	MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def.coord.x		= 2250;
+	def.coord.y		= -20;
+	MakeNewDisplayGroupObject(&def);
 
 			/* CYC */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GARDEN_ObjType_Cyclorama;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= gGameView.yon * .995f / 100.0f;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	newObj->CustomDrawFunction = DrawCyclorama;
-
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELSPECIFIC,
+		.type		= GARDEN_ObjType_Cyclorama,
+		.flags		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
+		.slot		= TERRAIN_SLOT+1,					// draw after terrain for better performance since terrain blocks much of the pixels
+		.scale		= gGameView.yon * .995f / 100.0f,
+		.drawCall	= DrawCyclorama,
+	};
+	newObj = MakeNewDisplayGroupObject(&def);
 	newObj->TargetOff.y = -300.0f;
 
 
 			/* SPRINKLER */
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= GARDEN_ObjType_SprinklerBase;
-	gNewObjectDefinition.scale 		= 2.5;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= 300;
-	gNewObjectDefinition.moveCall 	= MoveLevelIntroSprinklerHead;
-	gNewObjectDefinition.rot 		= 0;
-	base = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
+	def = (NewObjectDefinitionType)
+	{
+		.group 		= MODEL_GROUP_LEVELSPECIFIC,
+		.type 		= GARDEN_ObjType_SprinklerBase,
+		.scale 		= 2.5f,
+		.slot 		= 300,
+		.moveCall 	= MoveLevelIntroSprinklerHead,
+	};
+	base = MakeNewDisplayGroupObject(&def);
 	base->Timer = 1.0;			// set delay till pop-up
 
 
-	gNewObjectDefinition.type 		= GARDEN_ObjType_SprinklerPost;
-	gNewObjectDefinition.moveCall 	= nil;
-	head = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def.type 		= GARDEN_ObjType_SprinklerPost;
+	def.moveCall 	= nil;
+	head = MakeNewDisplayGroupObject(&def);
 
 	base->ChainNode = head;
 
@@ -227,34 +219,35 @@ int		i;
 
 			/* LEVEL NAME TEXT */
 
-	gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_Level1Text;
-	gNewObjectDefinition.scale 		= 1.7;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 490;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOTEXTUREWRAP;
-	gNewObjectDefinition.slot 		= 70;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	def = (NewObjectDefinitionType)
+	{
+		.group		= MODEL_GROUP_LEVELINTRO,
+		.type 		= LEVELINTRO_ObjType_Level1Text,
+		.scale 		= 1.7f,
+		.coord		= {0,490,0},
+		.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOTEXTUREWRAP,
+		.slot 		= 70,
+	};
+	MakeNewDisplayGroupObject(&def);
 
 
 			/* MUD SPLOTCHES */
 
 	for (i = 0; i < 100; i++)
 	{
-		gNewObjectDefinition.group		= MODEL_GROUP_LEVELINTRO;
-		gNewObjectDefinition.type 		= LEVELINTRO_ObjType_MudSplotch;
-		gNewObjectDefinition.coord.x 	= RandomFloat2() * 400.0f;
-		gNewObjectDefinition.coord.y 	= 500.0f + RandomFloat2() * 50.0f;
-		gNewObjectDefinition.coord.z 	= 0;
-		gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOZBUFFER;
-		gNewObjectDefinition.slot 		= 90;
-		gNewObjectDefinition.moveCall 	= MoveMud;
-		gNewObjectDefinition.rot 		= 0;
-		gNewObjectDefinition.scale 		= 1.0f + RandomFloat() * .5f;
-		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		def = (NewObjectDefinitionType)
+		{
+			.group		= MODEL_GROUP_LEVELINTRO,
+			.type 		= LEVELINTRO_ObjType_MudSplotch,
+			.coord.x 	= RandomFloat2() * 400.0f,
+			.coord.y 	= 500.0f + RandomFloat2() * 50.0f,
+			.coord.z 	= 0,
+			.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOZBUFFER,
+			.slot 		= 90,
+			.moveCall 	= MoveMud,
+			.scale 		= 1.0f + RandomFloat() * .5f,
+		};
+		newObj = MakeNewDisplayGroupObject(&def);
 
 		newObj->ColorFilter.a = 1.5;
 		newObj->SpecialF[0] = RandomFloat2() * .9f;		// target Delta Rot Z
@@ -379,15 +372,16 @@ float	fps = gFramesPerSecondFrac;
 
 		if (spray == nil)
 		{
-			gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
-			gNewObjectDefinition.type 		= GARDEN_ObjType_SprinklerSpray;
-			gNewObjectDefinition.coord	 	= head->Coord;
-			gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
-			gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-			gNewObjectDefinition.moveCall 	= nil;
-			gNewObjectDefinition.rot 		= 0;
-			gNewObjectDefinition.scale 		= head->Scale.x;
-			spray = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+			NewObjectDefinitionType def =
+			{
+				.group		= MODEL_GROUP_LEVELSPECIFIC,
+				.type		= GARDEN_ObjType_SprinklerSpray,
+				.coord		= head->Coord,
+				.flags		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING,
+				.slot		= SLOT_OF_DUMB,
+				.scale		= head->Scale.x,
+			};
+			spray = MakeNewDisplayGroupObject(&def);
 
 			head->ChainNode = spray;
 		}

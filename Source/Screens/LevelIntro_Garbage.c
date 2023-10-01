@@ -173,9 +173,9 @@ int			i,n;
 	{
 		.group		= MODEL_GROUP_LEVELINTRO,
 		.type 		= LEVELINTRO_ObjType_GarbageText,
-		.scale 		= 1.0,
+		.scale 		= 1.0f,
 		.coord		= {0,350,0},
-		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL,
+		.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL,
 		.slot 		= 70,
 		.moveCall 	= MoveGarbageTitle,
 	};

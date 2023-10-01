@@ -205,7 +205,7 @@ int		i,x,z;
 		.type 		= LEVELINTRO_ObjType_Level2Text,
 		.scale 		= 5.0,
 		.coord		= {0, 260, -1000},
-		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP,
+		.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP,
 		.slot 		= 50,
 	};
 	MakeNewDisplayGroupObject(&def);

@@ -318,7 +318,7 @@ ObjNode	*grate = pipe->ChainNode;
 							.coord.x 	= pipe->Coord.x,
 							.coord.y 	= pipe->Coord.y + 650.0f,
 							.coord.z 	= pipe->Coord.z,
-							.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL |
+							.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL |
 											STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_GLOW | STATUS_BIT_NOZBUFFER,
 							.slot 		= SLOT_OF_DUMB,
 							.moveCall 	= MoveSewerText,

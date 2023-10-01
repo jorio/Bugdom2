@@ -860,8 +860,7 @@ ObjNode *MakeDarkenPane(void)
 	NewObjectDefinitionType def =
 	{
 		.genre		= CUSTOM_GENRE,
-		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG
-					| STATUS_BIT_NOTEXTUREWRAP| STATUS_BIT_DOUBLESIDED,
+		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP,
 		.slot		= SLOT_OF_DUMB+100,
 		.moveCall	= MoveDarkenPane,
 		.drawCall	= DrawDarkenPane,

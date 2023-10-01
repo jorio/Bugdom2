@@ -181,7 +181,6 @@ void PrimeTerrainWater(void)
 {
 int						numNubs;
 OGLPoint2D				*nubs;
-ObjNode					*obj;
 float					y,centerX,centerZ;
 
 	InitRipples();
@@ -291,15 +290,18 @@ float					y,centerX,centerZ;
 		/* CREATE DUMMY CUSTOM OBJECT TO CAUSE WATER DRAWING AT THE DESIRED TIME */
 		/*************************************************************************/
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= WATER_SLOT;
-	if (gLevelNum == LEVEL_NUM_PARK)						// in park, need to do water *after* particles so that bubbles are seen
-		gNewObjectDefinition.slot += 2;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED|STATUS_BIT_NOLIGHTING|STATUS_BIT_DONTCULL;
+	NewObjectDefinitionType def =
+	{
+		.genre		= CUSTOM_GENRE,
+		.slot 		= WATER_SLOT,
+		.drawCall 	= DrawWater,
+		.flags 		= STATUS_BIT_NOLIGHTING | STATUS_BIT_DONTCULL,
+	};
 
-	obj = MakeNewObject(&gNewObjectDefinition);
-	obj->CustomDrawFunction = DrawWater;
+	if (gLevelNum == LEVEL_NUM_PARK)						// in park, need to do water *after* particles so that bubbles are seen
+		def.slot += 2;
+
+	MakeNewObject(&def);
 }
 
 
@@ -339,11 +341,11 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		for (int i = 0; i < gWaterTriMeshData[f].numTriangles; i++)
 		{
 			gWaterTriangles[f][i].vertexIndices[0] = numNubs;							// vertex 0 is always the radial center that we appended to the end of the list
-			gWaterTriangles[f][i].vertexIndices[1] = i + 0;
-			gWaterTriangles[f][i].vertexIndices[2] = i + 1;
+			gWaterTriangles[f][i].vertexIndices[2] = i + 0;
+			gWaterTriangles[f][i].vertexIndices[1] = i + 1;
 
-			if (gWaterTriangles[f][i].vertexIndices[2] == numNubs)						// check for wrap back
-				 gWaterTriangles[f][i].vertexIndices[2] = 0;
+			if (gWaterTriangles[f][i].vertexIndices[1] == numNubs)						// check for wrap back
+				 gWaterTriangles[f][i].vertexIndices[1] = 0;
 		}
 
 
@@ -938,8 +940,8 @@ static void InitRipples(void)
 	NewObjectDefinitionType def =
 	{
 		.genre		= EVENT_GENRE,
-		.flags 		= STATUS_BIT_DOUBLESIDED | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_GLOW | STATUS_BIT_NOFOG,
-		.slot 		= SLOT_OF_DUMB+1,
+		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_GLOW | STATUS_BIT_NOFOG,
+		.slot		= SLOT_OF_DUMB+1,
 		.moveCall 	= MoveRippleEvent,
 		.drawCall	= DrawRipples,
 	};
@@ -1049,10 +1051,10 @@ float		s,x,y,z;
 		glColor4f(1,1,1,gRippleList[i].alpha);						// get/set alpha
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,0);	glVertex3f(x - s, y, z - s);
-		glTexCoord2f(1,0);	glVertex3f(x + s, y, z - s);
-		glTexCoord2f(1,1);	glVertex3f(x + s, y, z + s);
 		glTexCoord2f(0,1);	glVertex3f(x - s, y, z + s);
+		glTexCoord2f(1,1);	glVertex3f(x + s, y, z + s);
+		glTexCoord2f(1,0);	glVertex3f(x + s, y, z - s);
+		glTexCoord2f(0,0);	glVertex3f(x - s, y, z - s);
 		glEnd();
 	}
 

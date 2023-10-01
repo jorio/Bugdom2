@@ -209,7 +209,7 @@ ObjNode	*newObj, *prop, *band;
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 	gNewObjectDefinition.type 		= LEVELINTRO_ObjType_PlaneBanner;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_DOUBLESIDED;
+	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.scale 		= 2.0;
 	gNewObjectDefinition.rot 		= -PI/2;
