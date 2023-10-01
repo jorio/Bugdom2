@@ -10,8 +10,13 @@
 #define __LITTLE_ENDIAN__ 1
 #endif
 
-#define APPSTORE	0
-#define SKIPFLUFF	1
+#define APPSTORE			0
+#define SKIPFLUFF			0
+#define	DEFAULT_FPS			10
+#define	MAX_FPS				300
+#define	COOK_GPU			0
+#define	USE_MALLOC			1
+#define ALLOW_GL_LIGHT_MODEL_TWO_SIDE	1
 
 #include "version.h"
 #include "globals.h"

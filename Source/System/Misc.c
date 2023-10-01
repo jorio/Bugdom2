@@ -18,10 +18,6 @@
 /*    CONSTANTS             */
 /****************************/
 
-#define	DEFAULT_FPS			10
-#define	MAX_FPS				300
-
-#define	USE_MALLOC		1
 
 
 
@@ -370,6 +366,7 @@ wait:
 		{
 			fps = DEFAULT_FPS;
 		}
+#if !COOK_GPU
 		else if (fps > MAX_FPS)					// limit to avoid issue
 		{
 			if (fps - MAX_FPS > 1000)			// try to sneak in some sleep if we have 1 ms to spare
@@ -378,6 +375,7 @@ wait:
 			}
 			goto wait;
 		}
+#endif
 	}
 
 #if _DEBUG

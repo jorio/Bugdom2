@@ -486,7 +486,9 @@ float			cameraX, cameraZ;
 			if (!noCullFaces)
 			{
 				glDisable(GL_CULL_FACE);
+#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
 				glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+#endif
 				noCullFaces = true;
 			}
 		}
@@ -495,7 +497,9 @@ float			cameraX, cameraZ;
 		{
 			noCullFaces = false;
 			glEnable(GL_CULL_FACE);
+#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
 			glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+#endif
 		}
 
 
@@ -799,7 +803,9 @@ next:
 	if (noCullFaces)
 	{
 		glEnable(GL_CULL_FACE);
+#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+#endif
 	}
 
 	if (texWrap)

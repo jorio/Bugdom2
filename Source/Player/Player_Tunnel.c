@@ -414,7 +414,9 @@ int			i,t;
 	if (gLevelNum == LEVEL_NUM_GUTTER)											// use double-sided shading	if gutter
 	{
 		glDisable(GL_CULL_FACE);
+#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+#endif
 	}
 
 	for (i = 0; i < gNumTunnelSections; i++)
@@ -424,7 +426,9 @@ int			i,t;
 			MO_DrawObject(gTunnelSectionObjects[i]);
 		}
 	}
+#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+#endif
 
 
 
