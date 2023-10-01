@@ -1270,7 +1270,6 @@ OGLLightDefType	*lights;
 			/* INIT PROJECTION MATRIX */
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 
 			/* SETUP FOR ANAGLYPH STEREO 3D CAMERA */
 
@@ -1293,7 +1292,9 @@ OGLLightDefType	*lights;
 			right =   gCurrentAspectRatio * wd2 - 0.5 * gAnaglyphEyeSeparation * ndfl;
 		}
 
+		glLoadIdentity();
 		glFrustum(left, right, -wd2, wd2, gGameView.hither, gGameView.yon);
+		glGetFloatv(GL_PROJECTION_MATRIX, (GLfloat*) &gViewToFrustumMatrix.value[0]);
 	}
 
 			/* SETUP STANDARD PERSPECTIVE CAMERA */
@@ -1306,7 +1307,6 @@ OGLLightDefType	*lights;
 				gGameView.hither,
 				gGameView.yon);
 
-		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(gViewToFrustumMatrix.value);
 	}
 
@@ -1314,6 +1314,7 @@ OGLLightDefType	*lights;
 
 			/* INIT MODELVIEW MATRIX */
 
+	glMatrixMode(GL_MODELVIEW);
 
 	OGL_SetGluLookAtMatrix(
 			&gWorldToViewMatrix,		// modelview
@@ -1321,7 +1322,6 @@ OGLLightDefType	*lights;
 			&gGameView.cameraPlacement.pointOfInterest,
 			&gGameView.cameraPlacement.upVector);
 
-	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(gWorldToViewMatrix.value);
 
 		/* UPDATE LIGHT POSITIONS */
@@ -1341,8 +1341,6 @@ OGLLightDefType	*lights;
 
 			/* GET VARIOUS CAMERA MATRICES */
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, gWorldToViewMatrix.value);
-	glGetFloatv(GL_PROJECTION_MATRIX, gViewToFrustumMatrix.value);
 	OGLMatrix4x4_Multiply(&gWorldToViewMatrix, &gViewToFrustumMatrix, &gWorldToFrustumMatrix);
 
 	OGLMatrix4x4_GetFrustumToWindow(&gFrustumToWindowMatrix);
