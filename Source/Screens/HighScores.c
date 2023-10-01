@@ -376,12 +376,13 @@ char	s[33];
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
 	y = 120;
+	cursorX = 150.0f;
+	cursorY = y;
 	for (int i = 0; i < NUM_SCORES; i++)
 	{
 		if (i == gNewScoreSlot)								// see if cursor will go on this line
 		{
 			cursorY = y;
-			cursorX = 150.0f;
 
 			// calc cursor position
 			for (int j = 0; j < gCursorIndex && gHighScores[i].name[j]; j++)

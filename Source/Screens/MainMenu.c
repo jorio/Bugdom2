@@ -906,7 +906,7 @@ static void DrawDarkenPane(ObjNode *theNode)
 	SetInfobarSpriteState();
 
 	glDisable(GL_TEXTURE_2D);
-	SetColor4fv((GLfloat *)&theNode->ColorFilter);
+	SetColor4fv(&theNode->ColorFilter.r);
 	glEnable(GL_BLEND);
 
 	glBegin(GL_QUADS);

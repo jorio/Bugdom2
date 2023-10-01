@@ -329,20 +329,14 @@ static void OGL_SetStyles(OGLSetupInputType *setupDefPtr)
 {
 OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
 
-
 	glEnable(GL_CULL_FACE);									// activate culling
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);									// CCW is front face
 
-	// glEnable(GL_DITHER);
-
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		// set default blend func
 	glDisable(GL_BLEND);									// but turn it off by default
 
-	// glHint(GL_TRANSFORM_HINT_APPLE, GL_FASTEST);
 	glDisable(GL_RESCALE_NORMAL);
-
-    glHint(GL_FOG_HINT, GL_NICEST);		// pixel accurate fog?
 
 
 
@@ -362,7 +356,7 @@ OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
 		glFogf(GL_FOG_DENSITY, styleDefPtr->fogDensity);
 		glFogf(GL_FOG_START, styleDefPtr->fogStart);
 		glFogf(GL_FOG_END, styleDefPtr->fogEnd);
-		glFogfv(GL_FOG_COLOR, (float *)&setupDefPtr->view.clearColor);
+		glFogfv(GL_FOG_COLOR, &setupDefPtr->view.clearColor.r);
 		glEnable(GL_FOG);
 	}
 	else
@@ -1347,8 +1341,8 @@ OGLLightDefType	*lights;
 
 			/* GET VARIOUS CAMERA MATRICES */
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat *)&gWorldToViewMatrix);
-	glGetFloatv(GL_PROJECTION_MATRIX, (GLfloat *)&gViewToFrustumMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, gWorldToViewMatrix.value);
+	glGetFloatv(GL_PROJECTION_MATRIX, gViewToFrustumMatrix.value);
 	OGLMatrix4x4_Multiply(&gWorldToViewMatrix, &gViewToFrustumMatrix, &gWorldToFrustumMatrix);
 
 	OGLMatrix4x4_GetFrustumToWindow(&gFrustumToWindowMatrix);

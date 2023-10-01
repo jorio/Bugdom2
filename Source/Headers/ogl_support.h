@@ -10,31 +10,31 @@
 
 #define	USE_GL_COLOR_MATERIAL	1
 
-#define	SetColor4fv(colorVV) 													\
-{																				\
-	if (USE_GL_COLOR_MATERIAL)													\
-	{																			\
-		glColor4fv((GLfloat *)colorVV);		/* set current diffuse color */		\
-	}																			\
-	else																		\
-	{																			\
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *)colorVV);	\
-	}																			\
+static inline void SetColor4fv(GLfloat* color)
+{
+	if (USE_GL_COLOR_MATERIAL)
+	{
+		glColor4fv(color);				// set current diffuse color
+	}
+	else
+	{
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+	}
 }
 
-#define	SetColor4f(r, g, b, a)													\
-{																				\
-	if (USE_GL_COLOR_MATERIAL)													\
-	{																			\
-		glColor4f(r, g, b, a);													\
-		glEnable(GL_COLOR_MATERIAL);											\
-	}																			\
-	else																		\
-	{																			\
-		GLfloat	c[4];															\
-		c[0] = r;	c[1] = g; c[2] = b; c[3] = a;								\
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c);				\
-	}																			\
+static inline void SetColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+{
+	if (USE_GL_COLOR_MATERIAL)
+	{
+		glColor4f(r, g, b, a);
+		glEnable(GL_COLOR_MATERIAL);
+	}
+	else
+	{
+		GLfloat	c[4];
+		c[0] = r;	c[1] = g; c[2] = b; c[3] = a;
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c);
+	}
 }
 
 
@@ -124,9 +124,6 @@ typedef struct
 typedef union
 {
 	GLfloat	value[16];
-	#if defined(__ppc__)
-	vector float v[4];
-	#endif
 }OGLMatrix4x4;
 
 typedef struct

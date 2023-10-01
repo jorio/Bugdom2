@@ -3,7 +3,6 @@
 // This file is part of Nanosaur 2. https://github.com/jorio/nanosaur2
 
 #include "game.h"
-#include <string.h>
 #include <SDL.h>
 
 #define CSV_PATH ":System:strings.csv"
@@ -97,7 +96,7 @@ int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const
 	char* buf = buf0;
 	const char* localizedString = Localize(stringID);
 
-	const char* placeholder = strchr(localizedString, '#');
+	const char* placeholder = SDL_strchr(localizedString, '#');
 
 	if (!placeholder)
 	{
@@ -148,7 +147,7 @@ bool IsNativeEnglishSystem(void)
 
 	if (NULL != localeList
 		&& 0 != localeList[0].language
-		&& (0 != strncmp(localeList[0].language, kLanguageCodesISO639_1[LANGUAGE_ENGLISH], 2)))
+		&& (0 != SDL_strncmp(localeList[0].language, kLanguageCodesISO639_1[LANGUAGE_ENGLISH], 2)))
 	{
 		prefersEnglish = false;
 	}
@@ -174,7 +173,7 @@ GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 	{
 		for (int i = 0; i < NUM_LANGUAGES; i++)
 		{
-			if (0 == strncmp(locale->language, kLanguageCodesISO639_1[i], 2))
+			if (0 == SDL_strncmp(locale->language, kLanguageCodesISO639_1[i], 2))
 			{
 				languageID = i;
 				goto foundLocale;

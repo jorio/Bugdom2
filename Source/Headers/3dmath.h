@@ -83,8 +83,6 @@ void OGLMatrix4x4_SetTranslate(OGLMatrix4x4 *m, float x, float y, float z);
 void OGLMatrix4x4_SetIdentity(OGLMatrix4x4 *m);
 void OGLMatrix3x3_SetTranslate(OGLMatrix3x3 *m, float x, float y);
 
-void OGLPoint3D_To4DTransformArray(const OGLPoint3D *inVertex, const OGLMatrix4x4  *matrix,
-									OGLPoint4D *outVertex,  long numVertices);
 void OGLPoint3D_TransformArray(const OGLPoint3D *inVertex, const OGLMatrix4x4  *matrix,
 									OGLPoint3D *outVertex,  long numVertices);
 void OGLPoint2D_TransformArray(const OGLPoint2D *inVertex, const OGLMatrix3x3  *matrix,
@@ -164,7 +162,7 @@ static inline void FastNormalizeVector(float vx, float vy, float vz, OGLVector3D
 {
 float	temp;
 
-	if ((fabs(vx) <= EPS) && (fabs(vy) <= EPS) && (fabs(vz) <= EPS))		// check for zero length vectors
+	if ((fabsf(vx) <= EPS) && (fabsf(vy) <= EPS) && (fabsf(vz) <= EPS))		// check for zero length vectors
 	{
 		outV->x = outV->y = outV->z = 0;
 		return;
@@ -174,19 +172,16 @@ float	temp;
 	temp += vy * vy;
 	temp += vz * vz;
 
-#if defined (__ppc__)
-{
+#if 0 //defined (__ppc__)
 	float	isqrt, temp1, temp2;
-
 	isqrt = __frsqrte (temp);					// isqrt = first approximation of 1/sqrt()
 	temp1 = temp * (float)(-.5);				// temp1 = -a / 2
 	temp2 = isqrt * isqrt;						// temp2 = sqrt^2
 	temp1 *= isqrt;								// temp1 = -a * sqrt / 2
 	isqrt *= (float)(3.0/2.0);					// isqrt = 3 * sqrt / 2
 	temp = isqrt + temp1 * temp2;				// isqrt = (3 * sqrt - a * sqrt^3) / 2
-}
 #else
-	temp = 1.0 / sqrt(temp);
+	temp = 1.0f / sqrtf(temp);
 #endif
 
 	outV->x = vx * temp;						// return results
@@ -204,7 +199,7 @@ static inline void FastNormalizeVector2D(float vx, float vy, OGLVector2D *outV, 
 {
 	if (errCheck)
 	{
-		if ((fabs(vx) <= EPS) && (fabs(vy) <= EPS))			// check for zero length vectors
+		if ((fabsf(vx) <= EPS) && (fabsf(vy) <= EPS))			// check for zero length vectors
 		{
 			outV->x = outV->y = 0;
 			return;
@@ -218,19 +213,16 @@ float	temp;
 	temp = vx * vx;
 	temp += vy * vy;
 
-#if defined (__ppc__)
-{
-float	isqrt, temp1, temp2;
-
+#if 0 // defined (__ppc__)
+	float	isqrt, temp1, temp2;
 	isqrt = __frsqrte (temp);					// isqrt = first approximation of 1/sqrt()
 	temp1 = temp * (float)(-.5);				// temp1 = -a / 2
 	temp2 = isqrt * isqrt;						// temp2 = sqrt^2
 	temp1 *= isqrt;								// temp1 = -a * sqrt / 2
 	isqrt *= (float)(3.0/2.0);					// isqrt = 3 * sqrt / 2
 	temp = isqrt + temp1 * temp2;				// isqrt = (3 * sqrt - a * sqrt^3) / 2
-}
 #else
-	temp = 1.0 / sqrt(temp);
+	temp = 1.0f / sqrtf(temp);
 #endif
 
 	outV->x = vx * temp;						// return results

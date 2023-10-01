@@ -934,7 +934,8 @@ ObjNode 	*part;
 	{
 		part->Rot.y = theNode->Rot.y + part->HoldRot.y;		// match y rotation
 
-		OGLPoint3D_Transform((OGLPoint3D *)&part->HoldOffset, &theNode->BaseTransformMatrix, &part->Coord);
+		OGLPoint3D holdOffset = {part->HoldOffset.x, part->HoldOffset.y, part->HoldOffset.z};
+		OGLPoint3D_Transform(&holdOffset, &theNode->BaseTransformMatrix, &part->Coord);
 		UpdateObjectTransforms(part);
 
 		part = part->ChainNode;

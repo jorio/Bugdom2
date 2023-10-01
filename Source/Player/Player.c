@@ -660,7 +660,7 @@ static void DrawWingLayers(ObjNode *eventObj)
 			/* DRAW RIGHT WING */
 
 		glPushMatrix();
-		glMultMatrixf((GLfloat *)&gPlayerInfo.wingLayerMatrix[i][0]);
+		glMultMatrixf(gPlayerInfo.wingLayerMatrix[i][0].value);
 		gGlobalTransparency = gPlayerInfo.wingLayerAlpha[i][0];
 		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_RightWing]);
 		glPopMatrix();
@@ -668,7 +668,7 @@ static void DrawWingLayers(ObjNode *eventObj)
 			/* DRAW RIGHT WING */
 
 		glPushMatrix();
-		glMultMatrixf((GLfloat *)&gPlayerInfo.wingLayerMatrix[i][1]);
+		glMultMatrixf(gPlayerInfo.wingLayerMatrix[i][1].value);
 		gGlobalTransparency = gPlayerInfo.wingLayerAlpha[i][1];
 		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_LeftWing]);
 		glPopMatrix();

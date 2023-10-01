@@ -428,7 +428,7 @@ static void DrawShards(ObjNode* theNode)
 				/* SET MATRIX */
 
 		glPushMatrix();
-		glMultMatrixf((GLfloat *)&gShards[i].matrix);
+		glMultMatrixf(gShards[i].matrix.value);
 
 
 				/* DRAW THE TRIANGLE */

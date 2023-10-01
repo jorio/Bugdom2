@@ -884,9 +884,9 @@ OGLMatrix4x4	m;
 
 		glPushMatrix();
 		OGLMatrix4x4_SetTranslate(&m, gRainGroundDrops[i].coord.x, gRainGroundDrops[i].coord.y, gRainGroundDrops[i].coord.z);
-		glMultMatrixf((GLfloat *)&m);
+		glMultMatrixf(m.value);
 		OGLMatrix4x4_SetScale(&m, size, size, size);
-		glMultMatrixf((GLfloat *)&m);
+		glMultMatrixf(m.value);
 
 		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_WaterSpat]);
 
