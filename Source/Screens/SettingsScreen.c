@@ -348,17 +348,17 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 
-	/*
 	{
 		.type = kMenuItem_Cycler,
-		.text= STR_UI_CENTERING,
+		.text= STR_UI_SPACING,
 		.cycler =
 		{
 			.valuePtr = &gGamePrefs.uiCentering,
 			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
+			.choices = {STR_UI_SPREAD, STR_UI_CENTERED},
 		},
 	},
+/*
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_UI_SCALE,
@@ -380,7 +380,7 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 */
-	
+
 	{ .type = kMenuItem_Spacer },
 
 	{
