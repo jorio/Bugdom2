@@ -1,7 +1,8 @@
 /****************************/
 /*   	SPARKLE.C  			*/
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -16,6 +17,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
+static void MoveSparkles(ObjNode* theNode);
 static void DrawSparkles(ObjNode* theNode);
 
 
@@ -41,7 +43,11 @@ void InitSparkles(void)
 
 	gSparklePool = Pool_New(MAX_SPARKLES);
 
-	MakeNewDriverObject(PARTICLE_SLOT-1, DrawSparkles, NULL);
+	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT - 1, DrawSparkles, MoveSparkles);
+	driver->StatusBits |= STATUS_BIT_GLOW;
+	driver->StatusBits |= STATUS_BIT_NOZWRITES;
+	driver->StatusBits |= STATUS_BIT_NOLIGHTING;
+	driver->StatusBits |= STATUS_BIT_NOFOG;
 }
 
 /*************************** DISPOSE SPARKLES *******************************/
@@ -86,6 +92,22 @@ void DeleteSparkle(int i)
 }
 
 
+/*************************** MOVE SPARKLES ******************************/
+
+static void MoveSparkles(ObjNode* theNode)
+{
+			/* SKIP DRAW CALL IF NO SPARKLES ACTIVE */
+
+	if (Pool_Empty(gSparklePool))
+	{
+		theNode->StatusBits |= STATUS_BIT_HIDDEN;
+	}
+	else
+	{
+		theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
+}
+
 /*************************** DRAW SPARKLES ******************************/
 
 static void DrawSparkles(ObjNode* theNode)
@@ -110,13 +132,13 @@ OGLPoint3D					*cameraLocation;
 
 	OGL_PushState();
 
-	OGL_DisableLighting();									// deactivate lighting
+//	OGL_DisableLighting();									// deactivate lighting
 	glDisable(GL_NORMALIZE);								// disable vector normalizing since scale == 1
-	glDisable(GL_CULL_FACE);								// deactivate culling
-	glDisable(GL_FOG);										// deactivate fog
-	glDepthMask(GL_FALSE);									// no z-writes
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		// set blending mode
+//	glDisable(GL_CULL_FACE);								// deactivate culling
+//	glDisable(GL_FOG);										// deactivate fog
+//	glDepthMask(GL_FALSE);									// no z-writes
+//	glEnable(GL_BLEND);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		// set blending mode
 
 
 			/*********************/

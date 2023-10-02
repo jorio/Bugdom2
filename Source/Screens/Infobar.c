@@ -155,7 +155,8 @@ void InitInfobar(void)
 	gFishAlpha = gFoodAlpha = 1.0f;
 	gShowFish = gShowFood = true;
 	
-	MakeNewDriverObject(INFOBAR_SLOT, DrawInfobar, NULL);
+	ObjNode* driver = MakeNewDriverObject(INFOBAR_SLOT, DrawInfobar, NULL);
+	driver->StatusBits |= STATUS_BIT_NOFOG;
 }
 
 
@@ -265,8 +266,8 @@ static void DrawInfobar(ObjNode* theNode)
 
 	OGL_PushState();
 
-	if (gGameView.useFog)
-		glDisable(GL_FOG);
+	//if (gGameView.useFog)
+	//	glDisable(GL_FOG);
 
 	SetInfobarSpriteState();
 
@@ -331,8 +332,8 @@ static void DrawInfobar(ObjNode* theNode)
 
 	OGL_PopState();
 	gGlobalMaterialFlags = 0;
-	if (gGameView.useFog)
-		glEnable(GL_FOG);
+	//if (gGameView.useFog)
+	//	glEnable(GL_FOG);
 }
 
 #pragma mark -

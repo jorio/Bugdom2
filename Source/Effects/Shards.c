@@ -1,7 +1,8 @@
 /****************************/
 /*   	SHARDS.C		    */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -65,7 +66,9 @@ void InitShardSystem(void)
 	GAME_ASSERT(!gShardPool);
 	gShardPool = Pool_New(MAX_SHARDS);
 
-	MakeNewDriverObject(PARTICLE_SLOT-1, DrawShards, MoveShards);
+	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT-1, DrawShards, MoveShards);
+	driver->StatusBits |= STATUS_BIT_NOLIGHTING;
+	driver->StatusBits |= STATUS_BIT_DOUBLESIDED;
 }
 
 /*********************** DISPOSE SHARD SYSTEM ***********************/
@@ -385,6 +388,18 @@ del:
 
 		gShards[i].matrix = fm;
 	}
+
+
+		/* SKIP DRAW CALL IF NO SHARDS ACTIVE */
+
+	if (Pool_Empty(gShardPool))
+	{
+		theNode->StatusBits |= STATUS_BIT_HIDDEN;
+	}
+	else
+	{
+		theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
 }
 
 
@@ -399,8 +414,8 @@ static void DrawShards(ObjNode* theNode)
 
 			/* SET STATE */
 
-	glDisable(GL_CULL_FACE);
-	OGL_DisableLighting();
+//	glDisable(GL_CULL_FACE);
+//	OGL_DisableLighting();
 
 	for (int i = Pool_First(gShardPool); i >= 0; i = Pool_Next(gShardPool, i))
 	{
@@ -447,7 +462,7 @@ static void DrawShards(ObjNode* theNode)
 	gGlobalColorFilter.g =
 	gGlobalColorFilter.b =
 	gGlobalTransparency = 1;
-	glEnable(GL_CULL_FACE);
-	OGL_EnableLighting();
+//	glEnable(GL_CULL_FACE);
+//	OGL_EnableLighting();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

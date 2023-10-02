@@ -323,6 +323,8 @@ static void DrawLevelIntroSubtitle(ObjNode* objNode)
 	gGlobalTransparency = SDL_min(1, 2 * objNode->Timer);
 	GameFont_DrawString(Localize(STR_LEVEL1 + gLevelNum), 320, 400, 0.6f, kTextMeshAlignCenter);
 	OGL_PopState();
+
+	gGlobalTransparency = 1;		// restore this
 }
 
 /*********************** DO LEVEL INTRO ***************************/

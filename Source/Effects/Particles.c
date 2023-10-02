@@ -1,7 +1,8 @@
 /****************************/
 /*   	PARTICLES.C		    */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -297,8 +298,6 @@ float		decayRate,magnetism,fadeRate;
 OGLPoint3D	*coord;
 OGLVector3D	*delta;
 
-	(void) theNode;
-
 	for (int g = Pool_First(gParticleGroupPool), nextG = -1;
 		 g >= 0;
 		 g = nextG)
@@ -497,6 +496,18 @@ deleteParticle:
 			Pool_ReleaseIndex(gParticleGroupPool, g);
 		}
 	}
+
+
+		/* SKIP DRAW CALL IF NO PARTICLE GROUPS ACTIVE */
+
+	if (Pool_Empty(gParticleGroupPool))
+	{
+		theNode->StatusBits |= STATUS_BIT_HIDDEN;
+	}
+	else
+	{
+		theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
 }
 
 
@@ -668,8 +679,6 @@ OGLBoundingBox	bbox;
 			/* RESTORE MODES */
 
 	OGL_PopState();
-	SetColor4f(1,1,1,1);										// reset this
-
 }
 
 
