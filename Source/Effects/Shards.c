@@ -147,8 +147,7 @@ MOVertexArrayData	*vaData;
 
 	switch(objHead->type)
 	{
-		case	MO_TYPE_GEOMETRY:
-				GAME_ASSERT(objHead->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+		case	MO_TYPE_VERTEXARRAY:
 				vaData = &((MOVertexArrayObject *)obj)->objectData;
 				ExplodeVertexArray(vaData, nil);
 				break;

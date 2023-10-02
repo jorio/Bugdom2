@@ -21,9 +21,8 @@ extern PFNGLCLIENTACTIVETEXTUREARBPROC gGlClientActiveTextureProc;
 /*    PROTOTYPES            */
 /****************************/
 
-static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, intptr_t subType);
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type);
 static void SetMetaObjectToGroup(MOGroupObject *groupObj);
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, intptr_t subType, void *data);
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
@@ -74,18 +73,17 @@ void MO_InitHandler(void)
 /****************** MO: CREATE NEW OBJECT OF TYPE ****************/
 //
 // INPUT:	type = type of mo to create
-//			subType = subtype to create (optional)
 //			data = pointer to any data needed to create the mo (optional)
 //
 
 
-MetaObjectPtr	MO_CreateNewObjectOfType(uint32_t type, intptr_t subType, void *data)
+MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, void *data)
 {
 MetaObjectPtr	mo;
 
 			/* ALLOCATE EMPTY OBJECT */
 
-	mo = AllocateEmptyMetaObject(type, subType);
+	mo = AllocateEmptyMetaObject(type);
 	if (mo == nil)
 		return(nil);
 
@@ -98,8 +96,8 @@ MetaObjectPtr	mo;
 				SetMetaObjectToGroup(mo);
 				break;
 
-		case	MO_TYPE_GEOMETRY:
-				SetMetaObjectToGeometry(mo, subType, data);
+		case	MO_TYPE_VERTEXARRAY:
+				SetMetaObjectToVertexArrayGeometry(mo, data);
 				break;
 
 		case	MO_TYPE_MATERIAL:
@@ -127,7 +125,7 @@ MetaObjectPtr	mo;
 // allocates an empty meta object and connects it to the linked list
 //
 
-static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, intptr_t subType)
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type)
 {
 MetaObjectHeader	*mo;
 int					size = 0;
@@ -140,8 +138,7 @@ int					size = 0;
 				size = sizeof(MOGroupObject);
 				break;
 
-		case	MO_TYPE_GEOMETRY:
-				GAME_ASSERT(subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+		case	MO_TYPE_VERTEXARRAY:
 				size = sizeof(MOVertexArrayObject);
 				break;
 
@@ -172,7 +169,6 @@ int					size = 0;
 
 	mo->cookie 		= MO_COOKIE;
 	mo->type 		= type;
-	mo->subType 	= subType;
 	mo->data 		= nil;
 	mo->nextNode 	= nil;
 	mo->refCount	= 1;							// initial reference count is always 1
@@ -218,18 +214,6 @@ static void SetMetaObjectToGroup(MOGroupObject *groupObj)
 			/* INIT THE DATA */
 
 	groupObj->objectData.numObjectsInGroup = 0;
-}
-
-
-/***************** SET META OBJECT TO GEOMETRY ********************/
-//
-// INPUT:	mo = meta object which has already been allocated and added to linked list.
-//
-
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, intptr_t subType, void *data)
-{
-	GAME_ASSERT(subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
-	SetMetaObjectToVertexArrayGeometry(mo, data);
 }
 
 
@@ -360,13 +344,12 @@ int	i;
 
 			/* VERIFY COOKIE */
 
-	if ((group->objectHeader.cookie != MO_COOKIE) || (((MetaObjectHeader *)newObject)->cookie != MO_COOKIE))
-		DoFatalAlert("MO_AppendToGroup: cookie is invalid!");
+	GAME_ASSERT(group->objectHeader.cookie == MO_COOKIE);
+	GAME_ASSERT(((MetaObjectHeader *)newObject)->cookie == MO_COOKIE);
 
 
 	i = group->objectData.numObjectsInGroup++;		// get index into group list
-	if (i >= MO_MAX_ITEMS_IN_GROUP)
-		DoFatalAlert("MO_AppendToGroup: too many objects in group!");
+	GAME_ASSERT(i < MO_MAX_ITEMS_IN_GROUP);
 
 	MO_GetNewReference(newObject);					// get new reference to object
 	group->objectData.groupContents[i] = newObject;	// save object reference in group
@@ -383,13 +366,12 @@ int	i,j;
 
 			/* VERIFY COOKIE */
 
-	if ((group->objectHeader.cookie != MO_COOKIE) || (((MetaObjectHeader *)newObject)->cookie != MO_COOKIE))
-		DoFatalAlert("MO_AttachToGroupStart: cookie is invalid!");
+	GAME_ASSERT(group->objectHeader.cookie == MO_COOKIE);
+	GAME_ASSERT(((MetaObjectHeader *)newObject)->cookie == MO_COOKIE);
 
 
 	i = group->objectData.numObjectsInGroup++;		// get index into group list
-	if (i >= MO_MAX_ITEMS_IN_GROUP)
-		DoFatalAlert("MO_AttachToGroupStart: too many objects in group!");
+	GAME_ASSERT(i < MO_MAX_ITEMS_IN_GROUP);
 
 	MO_GetNewReference(newObject);					// get new reference to object
 
@@ -414,29 +396,18 @@ int	i,j;
 void MO_DrawObject(const MetaObjectPtr object)
 {
 MetaObjectHeader	*objHead = object;
-MOVertexArrayObject	*vObj;
 
 			/* VERIFY COOKIE */
 
-	if (objHead->cookie != MO_COOKIE)
-		DoFatalAlert("MO_DrawObject: cookie is invalid!");
+	GAME_ASSERT(objHead->cookie == MO_COOKIE);
 
 
 			/* HANDLE TYPE */
 
 	switch(objHead->type)
 	{
-		case	MO_TYPE_GEOMETRY:
-				switch(objHead->subType)
-				{
-					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-							vObj = object;
-							MO_DrawGeometry_VertexArray(&vObj->objectData);
-							break;
-
-					default:
-						DoFatalAlert("MO_DrawObject: unknown sub-type!");
-				}
+		case	MO_TYPE_VERTEXARRAY:
+				MO_DrawGeometry_VertexArray(&((MOVertexArrayObject*)object)->objectData);
 				break;
 
 		case	MO_TYPE_MATERIAL:
@@ -469,8 +440,7 @@ int	numChildren,i;
 
 				/* VERIFY OBJECT TYPE */
 
-	if (object->objectHeader.type != MO_TYPE_GROUP)
-		DoFatalAlert("MO_DrawGroup: this isnt a group!");
+	GAME_ASSERT(object->objectHeader.type == MO_TYPE_GROUP);
 
 
 			/*************************************/
@@ -560,8 +530,7 @@ Boolean		needNormals;
 			glDisableClientState(GL_COLOR_ARRAY);				// no color data at all, so disable
 	}
 
-	if (OGL_CheckError())
-		DoFatalAlert("MO_DrawGeometry_VertexArray: color!");
+	OGL_CheckError();
 
 
 
@@ -637,8 +606,7 @@ use_current:
 					uint16_t	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
 					uint16_t	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
 
-					if (envMapNum >= gNumSpritesInGroupList[SPRITE_GROUP_SPHEREMAPS])
-						DoFatalAlert("MO_DrawGeometry_VertexArray: illegal envMapNum");
+					GAME_ASSERT(envMapNum < gNumSpritesInGroupList[SPRITE_GROUP_SPHEREMAPS]);
 
 					multiTexture = true;
 
@@ -708,8 +676,7 @@ use_current:
 
 				useTexture = true;
 
-				if (OGL_CheckError())
-					DoFatalAlert("MO_DrawGeometry_VertexArray: uv!");
+				OGL_CheckError();
 			}
 		}
 	}
@@ -722,8 +689,7 @@ use_current:
 	if (!useTexture)
 	{
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		if (OGL_CheckError())
-			DoFatalAlert("MO_DrawGeometry_VertexArray: glDisableClientState(GL_TEXTURE_COORD_ARRAY)!");
+		OGL_CheckError();
 	}
 
 go_here:
@@ -778,8 +744,7 @@ go_here:
 	else
 		glDisableClientState(GL_NORMAL_ARRAY);			// disable normal arrays
 
-	if (OGL_CheckError())
-		DoFatalAlert("MO_DrawGeometry_VertexArray: normals!");
+	OGL_CheckError();
 
 
 			/***********/
@@ -788,9 +753,7 @@ go_here:
 
 //	glLockArraysEXT(0, data->numPoints);
 	glDrawElements(GL_TRIANGLES,data->numTriangles*3,GL_UNSIGNED_INT,&data->triangles[0]);
-
-	if (OGL_CheckError())
-		DoFatalAlert("MO_DrawGeometry_VertexArray: glDrawElements");
+	OGL_CheckError();
 //	glUnlockArraysEXT();
 
 	gPolysThisFrame += data->numPoints;					// inc poly counter
@@ -833,8 +796,7 @@ uint32_t				matFlags;
 
 	matData = &matObj->objectData;									// point to material data
 
-	if (matObj->objectHeader.cookie != MO_COOKIE)					// verify cookie
-		DoFatalAlert("MO_DrawMaterial: bad cookie!");
+	GAME_ASSERT(matObj->objectHeader.cookie == MO_COOKIE);			// verify cookie
 
 
 				/****************************/
@@ -953,10 +915,7 @@ const OGLMatrix4x4		*m;
 				/* MULTIPLY CURRENT MATRIX BY THIS */
 
 	glMultMatrixf((GLfloat *)m);
-
-	if (OGL_CheckError())
-		DoFatalAlert("MO_DrawMatrix: glMultMatrixf!");
-
+	OGL_CheckError();
 }
 
 /************************ MO: DRAW SPRITE **************************/
@@ -1042,13 +1001,9 @@ MetaObjectHeader *h = mo;
 void MO_DisposeObjectReference(MetaObjectPtr obj)
 {
 MetaObjectHeader	*header = obj;
-MOVertexArrayObject	*vObj;
 
-	if (obj == nil)
-		DoFatalAlert("MO_DisposeObjectReference: obj == nil");
-
-	if (header->cookie != MO_COOKIE)					// verify cookie
-		DoFatalAlert("MO_DisposeObjectReference: bad cookie!");
+	GAME_ASSERT(obj);
+	GAME_ASSERT(header->cookie == MO_COOKIE);
 
 
 			/**************************************/
@@ -1057,8 +1012,7 @@ MOVertexArrayObject	*vObj;
 
 	header->refCount--;									// dec ref count
 
-	if (header->refCount < 0)							// see if over did it
-		DoFatalAlert("MO_DisposeObjectReference: refcount < 0!");
+	GAME_ASSERT(header->refCount >= 0);					// see if over did it
 
 	if (header->refCount == 0)							// see if we can DELETE this node
 	{
@@ -1070,10 +1024,8 @@ MOVertexArrayObject	*vObj;
 					MO_DisposeObject_Group(obj);
 					break;
 
-			case	MO_TYPE_GEOMETRY:
-					GAME_ASSERT(header->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
-					vObj = obj;
-					MO_DeleteObjectInfo_Geometry_VertexArray(&vObj->objectData);
+			case	MO_TYPE_VERTEXARRAY:
+					MO_DeleteObjectInfo_Geometry_VertexArray(&((MOVertexArrayObject*)obj)->objectData);
 					break;
 
 			case	MO_TYPE_MATERIAL:
@@ -1108,8 +1060,7 @@ MetaObjectHeader	*prev,*next;
 
 			/* VERIFY COOKIE */
 
-	if (header->cookie != MO_COOKIE)
-		DoFatalAlert("MO_DetachFromLinkedList: cookie is invalid!");
+	GAME_ASSERT(header->cookie == MO_COOKIE);
 
 
 	prev = header->prevNode;
@@ -1144,19 +1095,14 @@ MetaObjectHeader	*prev,*next;
 
 	gNumMetaObjects--;
 
-	if (gNumMetaObjects < 0)
-		DoFatalAlert("MO_DetachFromLinkedList: counter mismatch");
+	GAME_ASSERT(gNumMetaObjects >= 0);			// counter mismatch?
 
-	if (gNumMetaObjects == 0)
+	if (gNumMetaObjects == 0)					// all gone
 	{
-		if (prev || next)							// if all gone, then prev & next should be nil
-			DoFatalAlert("MO_DetachFromLinkedList: prev/next should be nil!");
-
-		if (gFirstMetaObject != nil)
-			DoFatalAlert("MO_DetachFromLinkedList: gFirstMetaObject should be nil!");
-
-		if (gLastMetaObject != nil)
-			DoFatalAlert("MO_DetachFromLinkedList: gLastMetaObject should be nil!");
+		GAME_ASSERT(!prev);
+		GAME_ASSERT(!next);
+		GAME_ASSERT(!gFirstMetaObject);
+		GAME_ASSERT(!gLastMetaObject);
 	}
 }
 
@@ -1304,8 +1250,7 @@ int	i,n,s;
 	if (inData->points)
 	{
 		outData->points = AllocPtr(s);
-		if (outData->points == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->points);
 		BlockMove(inData->points, outData->points, s);
 	}
 	else
@@ -1319,8 +1264,7 @@ int	i,n,s;
 	if (inData->normals)
 	{
 		outData->normals = AllocPtr(s);
-		if (outData->normals == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->normals);
 		BlockMove(inData->normals, outData->normals, s);
 	}
 	else
@@ -1334,8 +1278,7 @@ int	i,n,s;
 	if (inData->uvs[0])
 	{
 		outData->uvs[0] = AllocPtr(s);
-		if (outData->uvs[0] == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->uvs[0]);
 		BlockMove(inData->uvs[0], outData->uvs[0], s);
 	}
 	else
@@ -1349,8 +1292,7 @@ int	i,n,s;
 	if (inData->colorsByte)
 	{
 		outData->colorsByte = AllocPtr(s);
-		if (outData->colorsByte == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->colorsByte);
 		BlockMove(inData->colorsByte, outData->colorsByte, s);
 	}
 	else
@@ -1364,8 +1306,7 @@ int	i,n,s;
 	if (inData->colorsFloat)
 	{
 		outData->colorsFloat = AllocPtr(s);
-		if (outData->colorsFloat == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->colorsFloat);
 		BlockMove(inData->colorsFloat, outData->colorsFloat, s);
 	}
 	else
@@ -1380,8 +1321,7 @@ int	i,n,s;
 	if (inData->triangles)
 	{
 		outData->triangles = AllocPtr(s);
-		if (outData->triangles == nil)
-			DoFatalAlert("MO_DuplicateVertexArrayData: AllocPtr failed!");
+		GAME_ASSERT(outData->triangles);
 		BlockMove(inData->triangles, outData->triangles, s);
 	}
 	else
@@ -1430,89 +1370,76 @@ float				x,y,z;
 
 			/* VERIFY COOKIE */
 
-	if (objHead->cookie != MO_COOKIE)
-		DoFatalAlert("MO_CalcBoundingBox_Recurse: cookie is invalid!");
+	GAME_ASSERT(objHead->cookie == MO_COOKIE);
 
 
 	switch(objHead->type)
 	{
 			/* CALC BBOX OF GEOMETRY */
 
-		case	MO_TYPE_GEOMETRY:
-				switch(objHead->subType)
+		case	MO_TYPE_VERTEXARRAY:
+				vObj = object;
+				geoData = &vObj->objectData;
+				numPoints = geoData->numPoints;
+
+					/* TRANSFORM POINTS */
+
+				if (m)
 				{
-					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-							vObj = object;
-							geoData = &vObj->objectData;
-							numPoints = geoData->numPoints;
+					static OGLPoint3D tpoints[1000];
 
-								/* TRANSFORM POINTS */
+					GAME_ASSERT(numPoints <= 1000);					// make sure not overflowing buffer
 
-							if (m)
-							{
-								static OGLPoint3D tpoints[1000];
+					OGLPoint3D_TransformArray(geoData->points, m, tpoints, numPoints);
+					for (i = 0; i < numPoints; i++)
+					{
+						x = tpoints[i].x;
+						y = tpoints[i].y;
+						z = tpoints[i].z;
 
-								if (numPoints > 1000)					// make sure not overflowing buffer
-								{
-									DoFatalAlert("MO_CalcBoundingBox_Recurse: buffer overflow!");
-									return;
-								}
+						if (x < bBox->min.x)
+							bBox->min.x = x;
+						if (x > bBox->max.x)
+							bBox->max.x = x;
 
-								OGLPoint3D_TransformArray(geoData->points, m, tpoints, numPoints);
-								for (i = 0; i < numPoints; i++)
-								{
-									x = tpoints[i].x;
-									y = tpoints[i].y;
-									z = tpoints[i].z;
+						if (y < bBox->min.y)
+							bBox->min.y = y;
+						if (y > bBox->max.y)
+							bBox->max.y = y;
 
-									if (x < bBox->min.x)
-										bBox->min.x = x;
-									if (x > bBox->max.x)
-										bBox->max.x = x;
+						if (z < bBox->min.z)
+							bBox->min.z = z;
+						if (z > bBox->max.z)
+							bBox->max.z = z;
+					}
 
-									if (y < bBox->min.y)
-										bBox->min.y = y;
-									if (y > bBox->max.y)
-										bBox->max.y = y;
+				}
 
-									if (z < bBox->min.z)
-										bBox->min.z = z;
-									if (z > bBox->max.z)
-										bBox->max.z = z;
-								}
+					/* NO TRANSFORM, USE RAW DATA */
 
-							}
+				else
+				{
+					for (i = 0; i < numPoints; i++)
+					{
+						x = geoData->points[i].x;
+						y = geoData->points[i].y;
+						z = geoData->points[i].z;
 
-								/* NO TRANSFORM, USE RAW DATA */
+						if (x < bBox->min.x)
+							bBox->min.x = x;
+						if (x > bBox->max.x)
+							bBox->max.x = x;
 
-							else
-							{
-								for (i = 0; i < numPoints; i++)
-								{
-									x = geoData->points[i].x;
-									y = geoData->points[i].y;
-									z = geoData->points[i].z;
+						if (y < bBox->min.y)
+							bBox->min.y = y;
+						if (y > bBox->max.y)
+							bBox->max.y = y;
 
-									if (x < bBox->min.x)
-										bBox->min.x = x;
-									if (x > bBox->max.x)
-										bBox->max.x = x;
-
-									if (y < bBox->min.y)
-										bBox->min.y = y;
-									if (y > bBox->max.y)
-										bBox->max.y = y;
-
-									if (z < bBox->min.z)
-										bBox->min.z = z;
-									if (z > bBox->max.z)
-										bBox->max.z = z;
-								}
-							}
-							break;
-
-					default:
-						DoFatalAlert("MO_CalcBoundingBox_Recurse: unknown sub-type!");
+						if (z < bBox->min.z)
+							bBox->min.z = z;
+						if (z > bBox->max.z)
+							bBox->max.z = z;
+					}
 				}
 				break;
 
@@ -1553,8 +1480,7 @@ MOVertexArrayObject	*mo;
 	{
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
 
-		if (geometryNum >= groupObj->objectData.numObjectsInGroup)					// make sure # is valid
-			DoFatalAlert("MO_Geometry_OffserUVs: geometryNum out of range");
+		GAME_ASSERT(geometryNum < groupObj->objectData.numObjectsInGroup);			// make sure # is valid
 
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
 
@@ -1591,15 +1517,14 @@ MOGroupObject		*group;
 
 			/* VERIFY COOKIE */
 
-	if (objHead->cookie != MO_COOKIE)
-		DoFatalAlert("MO_Group_OffsetUVs: cookie is invalid!");
+	GAME_ASSERT(objHead->cookie == MO_COOKIE);
 
 
 			/* HANDLE IT */
 
 	switch(objHead->type)
 	{
-		case	MO_TYPE_GEOMETRY:
+		case	MO_TYPE_VERTEXARRAY:
 				MO_VertexArray_OffsetUVs(object, du, dv);
 				break;
 
@@ -1613,7 +1538,7 @@ MOGroupObject		*group;
 				{
 					switch(data->groupContents[i]->type)
 					{
-						case	MO_TYPE_GEOMETRY:
+						case	MO_TYPE_VERTEXARRAY:
 								MO_VertexArray_OffsetUVs(data->groupContents[i], du, dv);
 								break;
 
@@ -1643,16 +1568,10 @@ int					numPoints,i;
 OGLTextureCoord		*uvPtr;
 MOVertexArrayObject	*vObj;
 
-			/* VERIFY COOKIE */
-
-	if (objHead->cookie != MO_COOKIE)
-		DoFatalAlert("MO_VertexArray_OffsetUVs: cookie is invalid!");
-
-
 		/* MAKE SURE IT IS A VERTEX ARRAY */
 
-	if ((objHead->type != MO_TYPE_GEOMETRY) || (objHead->subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-		DoFatalAlert("MO_VertexArray_OffsetUVs: object is not a Vertex Array!");
+	GAME_ASSERT(objHead->cookie == MO_COOKIE);
+	GAME_ASSERT(objHead->type == MO_TYPE_VERTEXARRAY);
 
 	vObj = object;
 	data = &vObj->objectData;						// point to data
@@ -1710,20 +1629,9 @@ MOMaterialObject	*obj;
 
 	/* CREATE NEW MATERIAL OBJECT */
 
-	obj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &data);
+	obj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &data);
 
 
 	return(obj);
 
 }
-
-
-
-
-
-
-
-
-
-
-

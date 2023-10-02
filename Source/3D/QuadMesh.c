@@ -66,8 +66,7 @@ MOVertexArrayData* GetQuadMeshWithin(ObjNode* theNode)
 	MOVertexArrayObject*	vertexObject		= metaObject;
 	MOVertexArrayData*		mesh				= &vertexObject->objectData;
 
-	GAME_ASSERT(metaObjectHeader->type == MO_TYPE_GEOMETRY);
-	GAME_ASSERT(metaObjectHeader->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+	GAME_ASSERT(metaObjectHeader->type == MO_TYPE_VERTEXARRAY);
 
 	return mesh;
 }
@@ -84,7 +83,7 @@ ObjNode* MakeQuadMeshObject(NewObjectDefinitionType* newObjDef, int quadCapacity
 			.numMipmaps			= 0,
 			.diffuseColor		= (OGLColorRGBA) {1, 1, 1, 1},
 		};
-		material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
+		material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &matData);
 		ownMaterial = true;
 	}
 
@@ -102,7 +101,7 @@ ObjNode* MakeQuadMeshObject(NewObjectDefinitionType* newObjDef, int quadCapacity
 		.materials		= {material},
 	};
 	ReallocateQuadMesh(&mesh, quadCapacity);
-	MetaObjectPtr meshMO = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &mesh);
+	MetaObjectPtr meshMO = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &mesh);
 
 	// Attach color mesh
 	CreateBaseGroup(textNode);

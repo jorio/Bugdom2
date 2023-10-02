@@ -1096,7 +1096,7 @@ OSErr					iErr;
 		};
 
 
-		gSuperTileTextureObjects[unique] = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
+		gSuperTileTextureObjects[unique] = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &matData);		// create the new object
 	}
 
 			/* CLOSE THE FILE AND CLEAN UP */
@@ -1516,7 +1516,7 @@ MOVertexArrayData		data;
 		data.numMaterials 	= 1;
 		data.materials[0] = gTunnelTextureObj;					// assign illegal ref (made legal below)
 
-		gTunnelSectionObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &data);	// make metaobject
+		gTunnelSectionObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &data);	// make metaobject
 
 
 
@@ -1565,7 +1565,7 @@ MOVertexArrayData		data;
 		data.materials[0] = nil;
 
 
-		gTunnelSectionWaterObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &data);	// make metaobject
+		gTunnelSectionWaterObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &data);	// make metaobject
 	}
 }
 

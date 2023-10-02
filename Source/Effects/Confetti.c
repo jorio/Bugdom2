@@ -99,7 +99,7 @@ void InitConfettiManager(void)
 
 		GAME_ASSERT(gConfettiGroups[g].geometryObj == NULL);
 
-		gConfettiGroups[g].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
+		gConfettiGroups[g].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &vertexArrayData);
 	}
 
 

@@ -339,7 +339,7 @@ Atlas* Atlas_Load(const char* fontName, int flags)
 			.height			= atlas->textureHeight,
 			.textureName[0]	= textureName,
 		};
-		atlas->material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
+		atlas->material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &matData);
 	}
 
 	if (!(flags & kAtlasLoadAsSingleSprite))

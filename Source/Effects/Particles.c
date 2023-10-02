@@ -139,7 +139,7 @@ void InitParticleSystem(void)
 
 		GAME_ASSERT(gParticleGroups[g].geometryObj == NULL);
 
-		gParticleGroups[g].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
+		gParticleGroups[g].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &vertexArrayData);
 	}
 
 

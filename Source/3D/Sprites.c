@@ -131,7 +131,7 @@ static SpriteType LoadSpriteFromTGA(const char* path)
 		.width = matData.width,
 		.height = matData.height,
 		.aspectRatio = (float)matData.height / (float)matData.height,
-		.materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData),
+		.materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &matData),
 	};
 }
 
@@ -207,7 +207,7 @@ MOSpriteSetupData	spriteData;
 	spriteData.type 		= newObjDef->type;								// set group subtype
 //	spriteData.drawCentered = drawCentered;
 
-	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, 0, &spriteData);
+	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, &spriteData);
 	GAME_ASSERT(spriteMO);
 
 

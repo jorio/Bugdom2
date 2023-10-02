@@ -298,7 +298,7 @@ uint32_t			flags;
 
 	/* CREATE NEW MATERIAL OBJECT */
 
-	gBG3D_CurrentMaterialObj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &data);
+	gBG3D_CurrentMaterialObj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, &data);
 
 
 	/* ADD THIS MATERIAL TO THE FILE CONTAINER */
@@ -434,7 +434,7 @@ MOGroupObject	*newGroup;
 
 			/* CREATE NEW GROUP OBJECT */
 
-	newGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
+	newGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, NULL);
 	GAME_ASSERT(newGroup);
 
 
@@ -562,7 +562,7 @@ MOVertexArrayData vertexArrayData;
 
 		/* CREATE THE NEW GEO OBJECT */
 
-	gBG3D_CurrentGeometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
+	gBG3D_CurrentGeometryObj = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &vertexArrayData);
 
 	return(gBG3D_CurrentGeometryObj);
 }
@@ -776,7 +776,7 @@ MOGroupObject	*rootGroup;
 
 			/* CREATE NEW GROUP OBJECT */
 
-	rootGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
+	rootGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, NULL);
 	GAME_ASSERT(rootGroup);
 
 	gBG3D_CurrentContainer->root 	= rootGroup;		// root is an empty group
@@ -968,7 +968,7 @@ MOMaterialObject	*mat;
 			{
 				mo = (MOVertexArrayObject *)groupObj->objectData.groupContents[i];
 
-				GAME_ASSERT(mo->objectHeader.type == MO_TYPE_GEOMETRY && mo->objectHeader.subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+				GAME_ASSERT(mo->objectHeader.type == MO_TYPE_VERTEXARRAY);
 
 				va = &mo->objectData;								// point to vertex array data
 				GAME_ASSERT(va->numMaterials > 0);					// make sure there are materials
@@ -1054,7 +1054,7 @@ MOVertexArrayData	*va;
 MOMaterialObject	*mat;
 
 
-	GAME_ASSERT(mo->objectHeader.type == MO_TYPE_GEOMETRY && mo->objectHeader.subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+	GAME_ASSERT(mo->objectHeader.type == MO_TYPE_VERTEXARRAY);
 
 	va = &mo->objectData;														// point to vertex array data
 

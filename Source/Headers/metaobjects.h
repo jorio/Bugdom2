@@ -15,18 +15,11 @@
 		/* OBJECT TYPES */
 enum
 {
-	MO_TYPE_GROUP		= 	'grup',
-	MO_TYPE_GEOMETRY	=	'geom',
+	MO_TYPE_GROUP		=	'grup',
+	MO_TYPE_VERTEXARRAY	=	'vary',
 	MO_TYPE_MATERIAL	=	'matl',
 	MO_TYPE_MATRIX		=	'mtrx',
 	MO_TYPE_SPRITE		=	'sprt'
-};
-
-	/* OBJECT SUBTYPES */
-
-enum
-{
-	MO_GEOMETRY_SUBTYPE_VERTEXARRAY	=	'vary'
 };
 
 
@@ -38,9 +31,8 @@ enum
 struct MetaObjectHeader
 {
 	uint32_t	cookie;						// this value should always == MO_COOKIE
-	long		refCount;					// # times this is referenced
 	uint32_t	type;						// object type
-	intptr_t	subType;					// object sub-type
+	long		refCount;					// # times this is referenced
 	void		*data;						// pointer to meta object's specific data
 
 	struct MetaObjectHeader *parentGroup;			// illegal reference to parent group, or nil if no parent
@@ -202,7 +194,7 @@ typedef struct
 //-----------------------------
 
 void MO_InitHandler(void);
-MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, intptr_t subType, void *data);
+MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, void *data);
 MetaObjectPtr MO_GetNewReference(MetaObjectPtr mo);
 void MO_AppendToGroup(MOGroupObject *group, MetaObjectPtr newObject);
 void MO_AttachToGroupStart(MOGroupObject *group, MetaObjectPtr newObject);

@@ -285,7 +285,7 @@ MOMatrixObject			*transObject;
 
 				/* CREATE THE BASE GROUP OBJECT */
 
-	theNode->BaseGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
+	theNode->BaseGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, NULL);
 	if (theNode->BaseGroup == nil)
 		DoFatalAlert("CreateBaseGroup: MO_CreateNewObjectOfType failed!");
 
@@ -316,7 +316,7 @@ MOMatrixObject			*transObject;
 
 					/* CREATE A MATRIX XFORM */
 
-	transObject = MO_CreateNewObjectOfType(MO_TYPE_MATRIX, 0, &theNode->BaseTransformMatrix);	// make matrix xform object
+	transObject = MO_CreateNewObjectOfType(MO_TYPE_MATRIX, &theNode->BaseTransformMatrix);	// make matrix xform object
 	if (transObject == nil)
 		DoFatalAlert("CreateBaseGroup: MO_CreateNewObjectOfType/Matrix Failed!");
 

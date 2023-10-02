@@ -89,12 +89,9 @@ MetaObjectHeader	*head;
 
 				/* SEE IF FOUND GEOMETRY */
 
-	if (head->type == MO_TYPE_GEOMETRY)
+	if (head->type == MO_TYPE_VERTEXARRAY)
 	{
-		if (head->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY)
-			DecomposeVertexArrayGeometry(inObj);
-		else
-			DoFatalAlert("DecompRefMo_Recurse: unknown geometry subtype");
+		DecomposeVertexArrayGeometry(inObj);
 	}
 	else
 
