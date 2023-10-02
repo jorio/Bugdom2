@@ -829,8 +829,7 @@ OSErr					iErr;
 		FileFenceDefType *inData;
 
 		gFenceList = (FenceDefType *)AllocPtrClear(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
-		if (gFenceList == nil)
-			DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
+		GAME_ASSERT(gFenceList);
 
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
 

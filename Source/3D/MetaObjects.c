@@ -1,7 +1,8 @@
 /****************************/
 /*   METAOBJECTS.C		    */
-/* (c)2000 Pangea Software  */
 /*   By Brian Greenstone    */
+/* (c)2000 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -719,6 +720,7 @@ go_here:
 
 #if 0
 			/* SHOW VERTEX NORMALS */
+		if (gDebugMode == 2)
 		{
 			int	i;
 
@@ -985,6 +987,8 @@ MetaObjectPtr MO_GetNewReference(MetaObjectPtr mo)
 {
 MetaObjectHeader *h = mo;
 
+	GAME_DEBUGASSERT(h->cookie == MO_COOKIE);
+
 	h->refCount++;
 
 	return(mo);
@@ -1223,7 +1227,7 @@ MOMaterialData		*data = &obj->objectData;
 
 /******************** MO_DUPLICATE VERTEX ARRAY DATA *********************/
 
-void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *outData)
+void MO_DuplicateVertexArrayData(const MOVertexArrayData *inData, MOVertexArrayData *outData)
 {
 int	i,n,s;
 			/***********************************/
@@ -1287,7 +1291,7 @@ int	i,n,s;
 
 			/* COLORS BYTE */
 
-	s = n * sizeof(OGLColorRGBA_Byte);
+	s = n * sizeof(inData->colorsByte[0]);
 
 	if (inData->colorsByte)
 	{
@@ -1301,7 +1305,7 @@ int	i,n,s;
 
 			/* COLORS FLOAT */
 
-	s = n * sizeof(OGLColorRGBA);
+	s = n * sizeof(inData->colorsFloat[0]);
 
 	if (inData->colorsFloat)
 	{
@@ -1316,7 +1320,7 @@ int	i,n,s;
 			/* TRIANGLES */
 
 	n = outData->numTriangles = inData->numTriangles;
-	s = n * sizeof(GLint) * 3;
+	s = n * sizeof(inData->triangles[0]);
 
 	if (inData->triangles)
 	{
@@ -1589,6 +1593,22 @@ MOVertexArrayObject	*vObj;
 	{
 		uvPtr[i].u += du;
 		uvPtr[i].v += dv;
+	}
+}
+
+
+
+/****************** FLIP FACE WINDING **************************/
+
+void FlipFaceWinding(const MOTriangleIndecies* src, MOTriangleIndecies* dst, int numTriangles)
+{
+	// Wind all triangles in opposite direction
+	for (int t = 0; t < numTriangles; t++)
+	{
+		MOTriangleIndecies triangleCopy = src[t];
+		dst[t].vertexIndices[2] = triangleCopy.vertexIndices[0];
+		dst[t].vertexIndices[1] = triangleCopy.vertexIndices[1];
+		dst[t].vertexIndices[0] = triangleCopy.vertexIndices[2];
 	}
 }
 

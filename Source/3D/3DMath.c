@@ -1908,7 +1908,7 @@ float length, oneOverLength;
 			 (vector3D->y * vector3D->y) +
 			 (vector3D->z * vector3D->z);
 
-	length = sqrt(length);
+	length = sqrtf(length);
 
      //  Check for zero-length vector
 
@@ -1937,7 +1937,7 @@ float length, oneOverLength;
 
 	length = (vector2D->x * vector2D->x) + (vector2D->y * vector2D->y);
 
-	length = sqrt(length);
+	length = sqrtf(length);
 
      //  Check for zero-length vector
 

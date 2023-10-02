@@ -204,7 +204,7 @@ void MO_DrawObject(const MetaObjectPtr object);
 void MO_DrawMaterial(MOMaterialObject *matObj);
 void MO_DrawMatrix(const MOMatrixObject *matObj);
 void MO_DisposeObjectReference(MetaObjectPtr obj);
-void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *outData);
+void MO_DuplicateVertexArrayData(const MOVertexArrayData *inData, MOVertexArrayData *outData);
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox, OGLMatrix4x4 *m);
 
@@ -213,3 +213,5 @@ void MO_VertexArray_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Object_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Geometry_OffserUVs(short group, short type, short geometryNum, float du, float dv);
 MOMaterialObject *MO_CreateTextureObjectFromBuffer(int width, int height, Ptr buffer);
+
+void FlipFaceWinding(const MOTriangleIndecies* src, MOTriangleIndecies* dst, int numTriangles);

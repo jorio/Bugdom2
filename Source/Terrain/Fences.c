@@ -62,106 +62,110 @@ int				gNumFencesDrawn = 0;
 FenceDefType	*gFenceList = nil;
 
 
-static const short			gFenceTexture[NUM_FENCE_TYPES][2] =
+static const short gFenceTexture[NUM_FENCE_TYPES][2] =
 {
-	SPRITE_GROUP_GLOBAL,		GLOBAL_SObjType_Fence_Grass,		// grass
-	SPRITE_GROUP_LEVELSPECIFIC,	GARDEN_SObjType_Fence_Edging,		// lawn edging
-	SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogHair,		// dog hair
-	SPRITE_GROUP_GLOBAL,		GLOBAL_SObjType_Fence_Brick,		// brick wall
-	SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogCollar,		// dog collar
-	SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogHairDense,	// dog hair dense
-	SPRITE_GROUP_LEVELSPECIFIC,	PLAYROOM_SObjType_Fence_Cards,		// card
-	SPRITE_GROUP_LEVELSPECIFIC,	PLAYROOM_SObjType_Fence_Blocks,		// block
-	SPRITE_GROUP_LEVELSPECIFIC,	BALSA_SObjType_Fence_Balsa,			// balsa
-	SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Cloth,		// cloth
-	SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Books,		// books
-	SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Computer,		// computer
-	SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_ShoeBox,		// shoebox
-	SPRITE_GROUP_LEVELSPECIFIC,	PARK_SObjType_WaterGrassFence,		// water grass
-	SPRITE_GROUP_LEVELSPECIFIC,	GARBAGE_SObjType_Fence_GarbageCan,	// garbage can
-	SPRITE_GROUP_LEVELSPECIFIC,	GARBAGE_SObjType_Fence_Box,			// box
+	[FENCE_TYPE_GRASS]			= { SPRITE_GROUP_GLOBAL,		GLOBAL_SObjType_Fence_Grass },
+	[FENCE_TYPE_LAWNEDGING]		= { SPRITE_GROUP_LEVELSPECIFIC,	GARDEN_SObjType_Fence_Edging },
+	[FENCE_TYPE_DOGHAIR]		= { SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogHair },
+	[FENCE_TYPE_BRICKWALL]		= { SPRITE_GROUP_GLOBAL,		GLOBAL_SObjType_Fence_Brick },
+	[FENCE_TYPE_DOGCOLLAR]		= { SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogCollar },
+	[FENCE_TYPE_DOGHAIRDENSE]	= { SPRITE_GROUP_LEVELSPECIFIC,	FIDO_SObjType_Fence_DogHairDense },
+	[FENCE_TYPE_CARD]			= { SPRITE_GROUP_LEVELSPECIFIC,	PLAYROOM_SObjType_Fence_Cards },
+	[FENCE_TYPE_BLOCK]			= { SPRITE_GROUP_LEVELSPECIFIC,	PLAYROOM_SObjType_Fence_Blocks },
+	[FENCE_TYPE_BALSA]			= { SPRITE_GROUP_LEVELSPECIFIC,	BALSA_SObjType_Fence_Balsa },
+	[FENCE_TYPE_CLOTH]			= { SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Cloth },
+	[FENCE_TYPE_BOOKS]			= { SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Books },
+	[FENCE_TYPE_COMPUTER]		= { SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_Computer },
+	[FENCE_TYPE_SHOEBOX]		= { SPRITE_GROUP_LEVELSPECIFIC,	CLOSET_SObjType_Fence_ShoeBox },
+	[FENCE_TYPE_WATERGRASS]		= { SPRITE_GROUP_LEVELSPECIFIC,	PARK_SObjType_WaterGrassFence },
+	[FENCE_TYPE_GARBAGECAN]		= { SPRITE_GROUP_LEVELSPECIFIC,	GARBAGE_SObjType_Fence_GarbageCan },
+	[FENCE_TYPE_BOXFENCE]		= { SPRITE_GROUP_LEVELSPECIFIC,	GARBAGE_SObjType_Fence_Box },
 };
 
 
-static const float			gFenceHeight[] =
+static const float gFenceHeight[NUM_FENCE_TYPES] =
 {
-	1100,					// grass
-	300,					// lawn edging
-	600,					// dog hair
-	1300,					// brick wall
-	600,					// dog collar
-	700,					// dog hair dense
-	550,					// card
-	800,					// block
-	3800,					// balsa
-	1800,					// cloth
-	1100,					// books
-	800,					// computer
-	1000,					// shoebox
-	1700,					// water grass
-	1700,					// garbage can
-	800,					// box
+	[FENCE_TYPE_GRASS]			= 1100,
+	[FENCE_TYPE_LAWNEDGING]		= 300,
+	[FENCE_TYPE_DOGHAIR]		= 600,
+	[FENCE_TYPE_BRICKWALL]		= 1300,
+	[FENCE_TYPE_DOGCOLLAR]		= 600,
+	[FENCE_TYPE_DOGHAIRDENSE]	= 700,
+	[FENCE_TYPE_CARD]			= 550,
+	[FENCE_TYPE_BLOCK]			= 800,
+	[FENCE_TYPE_BALSA]			= 3800,
+	[FENCE_TYPE_CLOTH]			= 1800,
+	[FENCE_TYPE_BOOKS]			= 1100,
+	[FENCE_TYPE_COMPUTER]		= 800,
+	[FENCE_TYPE_SHOEBOX]		= 1000,
+	[FENCE_TYPE_WATERGRASS]		= 1700,
+	[FENCE_TYPE_GARBAGECAN]		= 1700,
+	[FENCE_TYPE_BOXFENCE]		= 800,
 };
 
-static const float			gFenceSink[] =
+static const float gFenceSink[NUM_FENCE_TYPES] =
 {
-	FENCE_SINK_FACTOR,					// grass
-	FENCE_SINK_FACTOR,					// lawn edging
-	FENCE_SINK_FACTOR/2,				// dog hair
-	FENCE_SINK_FACTOR,					// brick wall
-	FENCE_SINK_FACTOR/2,				// dog collar
-	FENCE_SINK_FACTOR/2,				// dog hair dense
-	0,									// card
-	0,									// block
-	FENCE_SINK_FACTOR*3,				// balsa
-	-650,								// cloth
-	FENCE_SINK_FACTOR/2,				// books
-	FENCE_SINK_FACTOR/2,				// computer
-	FENCE_SINK_FACTOR,					// shoebox
-	FENCE_SINK_FACTOR,					// water grass
-	FENCE_SINK_FACTOR,					// garbage can
-	FENCE_SINK_FACTOR,					// box
+	[FENCE_TYPE_GRASS]			= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_LAWNEDGING]		= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_DOGHAIR]		= FENCE_SINK_FACTOR/2,
+	[FENCE_TYPE_BRICKWALL]		= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_DOGCOLLAR]		= FENCE_SINK_FACTOR/2,
+	[FENCE_TYPE_DOGHAIRDENSE]	= FENCE_SINK_FACTOR/2,
+	[FENCE_TYPE_CARD]			= 0,
+	[FENCE_TYPE_BLOCK]			= 0,
+	[FENCE_TYPE_BALSA]			= FENCE_SINK_FACTOR*3,
+	[FENCE_TYPE_CLOTH]			= -650,
+	[FENCE_TYPE_BOOKS]			= FENCE_SINK_FACTOR/2,
+	[FENCE_TYPE_COMPUTER]		= FENCE_SINK_FACTOR/2,
+	[FENCE_TYPE_SHOEBOX]		= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_WATERGRASS]		= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_GARBAGECAN]		= FENCE_SINK_FACTOR,
+	[FENCE_TYPE_BOXFENCE]		= FENCE_SINK_FACTOR,
 };
 
-static const Boolean			gFenceIsLit[] =
+static const Boolean gFenceIsLit[NUM_FENCE_TYPES] =
 {
-	false,					// grass
-	false,					// lawn edging
-	true,					// dog hair
-	false,					// brick wall
-	true,					// dog collar
-	true,					// dog hair dense
-	true,					// card
-	true,					// block
-	false,					// tall fence
-	true,					// cloth
-	true,					// books
-	true,					// computer
-	true,					// shoebox
-	false,					// water grass
-	false,					// garbage can
-	false,					// box
+	[FENCE_TYPE_GRASS]			= false,
+	[FENCE_TYPE_LAWNEDGING]		= false,
+	[FENCE_TYPE_DOGHAIR]		= true,
+	[FENCE_TYPE_BRICKWALL]		= false,
+	[FENCE_TYPE_DOGCOLLAR]		= true,
+	[FENCE_TYPE_DOGHAIRDENSE]	= true,
+	[FENCE_TYPE_CARD]			= true,
+	[FENCE_TYPE_BLOCK]			= true,
+	[FENCE_TYPE_BALSA]			= false,
+	[FENCE_TYPE_CLOTH]			= true,
+	[FENCE_TYPE_BOOKS]			= true,
+	[FENCE_TYPE_COMPUTER]		= true,
+	[FENCE_TYPE_SHOEBOX]		= true,
+	[FENCE_TYPE_WATERGRASS]		= false,
+	[FENCE_TYPE_GARBAGECAN]		= false,
+	[FENCE_TYPE_BOXFENCE]		= false,
 };
 
 static MOMaterialObject			*gFenceMaterials[MAX_FENCES];				// illegal refs to material for each fence in terrain
 
-static MOVertexArrayData		gFenceTriMeshData[MAX_FENCES];
+static MOVertexArrayData		gFenceMeshes[MAX_FENCES];
+
 static MOTriangleIndecies		gFenceTriangles[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 static OGLPoint3D				gFencePoints[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 static OGLTextureCoord			gFenceUVs[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
 static OGLColorRGBA_Byte		gFenceColors[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
+static OGLVector3D				gFenceNormals[MAX_FENCES][MAX_NUBS_IN_FENCE*2];
+
+static MOVertexArrayData		gBackFenceMeshes[MAX_FENCES];
+static MOTriangleIndecies		gBackFenceTriangles[MAX_FENCES][MAX_NUBS_IN_FENCE * 2];
+static OGLVector3D				gBackFenceNormals[MAX_FENCES][MAX_NUBS_IN_FENCE * 2];
 
 
 /********************** DISPOSE FENCES *********************/
 
 void DisposeFences(void)
 {
-int		i;
-
 	if (!gFenceList)
 		return;
 
-	for (i = 0; i < gNumFences; i++)
+	for (int i = 0; i < gNumFences; i++)
 	{
 		if (gFenceList[i].sectionVectors)
 			SafeDisposePtr((Ptr)gFenceList[i].sectionVectors);			// nuke section vectors
@@ -190,22 +194,21 @@ int		i;
 
 void PrimeFences(void)
 {
-long					f,i,numNubs,type, group, sprite;
+long					numNubs,type, group, sprite;
 FenceDefType			*fence;
 OGLPoint3D				*nubs;
 ObjNode					*obj;
 float					sink;
 
 
-	if (gNumFences > MAX_FENCES)
-		DoFatalAlert("PrimeFences: gNumFences > MAX_FENCES");
+	GAME_ASSERT(gNumFences <= MAX_FENCES);
 
 
 			/******************************/
 			/* ADJUST TO GAME COORDINATES */
 			/******************************/
 
-	for (f = 0; f < gNumFences; f++)
+	for (int f = 0; f < gNumFences; f++)
 	{
 		fence 				= &gFenceList[f];					// point to this fence
 		nubs 				= fence->nubList;					// point to nub list
@@ -215,18 +218,13 @@ float					sink;
 		group = gFenceTexture[type][0];							// get sprite info
 		sprite = gFenceTexture[type][1];						// get sprite info
 
-		if (sprite > gNumSpritesInGroupList[group])
-			DoFatalAlert("PrimeFences: illegal fence sprite");
-
-		if (numNubs == 1)
-			DoFatalAlert("PrimeFences: numNubs == 1");
-
-		if (numNubs > MAX_NUBS_IN_FENCE)
-			DoFatalAlert("PrimeFences: numNubs > MAX_NUBS_IN_FENCE");
+		GAME_ASSERT(sprite <= gNumSpritesInGroupList[group]);
+		GAME_ASSERT(numNubs != 1);
+		GAME_ASSERT(numNubs <= MAX_NUBS_IN_FENCE);
 
 		sink = gFenceSink[type];								// get fence sink factor
 
-		for (i = 0; i < numNubs; i++)							// adjust nubs
+		for (int i = 0; i < numNubs; i++)						// adjust nubs
 		{
 			nubs[i].x *= gMapToUnitValue;
 			nubs[i].z *= gMapToUnitValue;
@@ -236,10 +234,9 @@ float					sink;
 		/* CALCULATE VECTOR FOR EACH SECTION */
 
 		fence->sectionVectors = (OGLVector2D *)AllocPtr(sizeof(OGLVector2D) * (numNubs-1));		// alloc array to hold vectors
-		if (fence->sectionVectors == nil)
-			DoFatalAlert("PrimeFences: AllocPtr failed!");
+		GAME_ASSERT(fence->sectionVectors);
 
-		for (i = 0; i < (numNubs-1); i++)
+		for (int i = 0; i < (numNubs-1); i++)
 		{
 			fence->sectionVectors[i].x = nubs[i+1].x - nubs[i].x;
 			fence->sectionVectors[i].y = nubs[i+1].z - nubs[i].z;
@@ -251,18 +248,15 @@ float					sink;
 		/* CALCULATE NORMALS FOR EACH SECTION */
 
 		fence->sectionNormals = (OGLVector2D *)AllocPtr(sizeof(OGLVector2D) * (numNubs-1));		// alloc array to hold vectors
-		if (fence->sectionNormals == nil)
-			DoFatalAlert("PrimeFences: AllocPtr failed!");
+		GAME_ASSERT(fence->sectionNormals);
 
-		for (i = 0; i < (numNubs-1); i++)
+		for (int i = 0; i < (numNubs-1); i++)
 		{
-			OGLVector3D	v;
+			float x = fence->sectionVectors[i].x;				// get section vector (as calculated above)
+			float z = fence->sectionVectors[i].y;
 
-			v.x = fence->sectionVectors[i].x;					// get section vector (as calculated above)
-			v.z = fence->sectionVectors[i].y;
-
-			fence->sectionNormals[i].x = -v.z;					//  reduced cross product to get perpendicular normal
-			fence->sectionNormals[i].y = v.x;
+			fence->sectionNormals[i].x = -z;					//  reduced cross product to get perpendicular normal
+			fence->sectionNormals[i].y = x;
 			OGLVector2D_Normalize(&fence->sectionNormals[i], &fence->sectionNormals[i]);
 		}
 
@@ -281,13 +275,12 @@ float					sink;
 		// The fences need to be drawn after the Cyc object, but before any sprite or font objects.
 		//
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= FENCE_SLOT;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DOUBLESIDED|STATUS_BIT_NOLIGHTING;
-
-	obj = MakeNewObject(&gNewObjectDefinition);
-	obj->CustomDrawFunction = DrawFences;
+	obj = MakeNewDriverObject(FENCE_SLOT, DrawFences, NULL);
+	obj->StatusBits |= STATUS_BIT_NOLIGHTING;
+	// Do NOT set STATUS_BIT_DOUBLESIDED -- DrawFences will decide whether to do backface culling or not.
+	// STATUS_BIT_DOUBLESIDED will cause the object task loop to enable GL_LIGHT_MODEL_TWO_SIDE,
+	// which massively tanks performance with large meshes on modern GPUs!
+	// As a workaround, we submit back and front meshes separately.
 }
 
 
@@ -329,16 +322,18 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 					/* SET VERTEX ARRAY HEADER */
 					/***************************/
 
-		gFenceTriMeshData[f].numMaterials		 		= -1;			// we submit these manually
-		gFenceTriMeshData[f].materials[0]				= nil;
-		gFenceTriMeshData[f].points 					= &gFencePoints[f][0];
-		gFenceTriMeshData[f].triangles					= &gFenceTriangles[f][0];
-		gFenceTriMeshData[f].uvs[0]						= &gFenceUVs[f][0];
-		gFenceTriMeshData[f].normals					= nil;
-		gFenceTriMeshData[f].colorsByte					= &gFenceColors[f][0];
-		gFenceTriMeshData[f].colorsFloat				= nil;
-		gFenceTriMeshData[f].numPoints					= numNubs * 2;				// 2 vertices per nub
-		gFenceTriMeshData[f].numTriangles				= (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
+		MOVertexArrayData* mesh = &gFenceMeshes[f];
+
+		mesh->numMaterials			= -1;			// we submit these manually
+		mesh->materials[0]			= nil;
+		mesh->points 				= gFencePoints[f];
+		mesh->triangles				= gFenceTriangles[f];
+		mesh->uvs[0]				= gFenceUVs[f];
+		mesh->normals				= nil;
+		mesh->colorsByte			= gFenceColors[f];
+		mesh->colorsFloat			= nil;
+		mesh->numPoints				= numNubs * 2;				// 2 vertices per nub
+		mesh->numTriangles			= (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
 
 
 				/* BUILD TRIANGLE INFO */
@@ -352,7 +347,6 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 			gFenceTriangles[f][j+1].vertexIndices[0] = 3 + j;
 			gFenceTriangles[f][j+1].vertexIndices[1] = 0 + j;
 			gFenceTriangles[f][j+1].vertexIndices[2] = 2 + j;
-
 		}
 
 				/* INIT VERTEX COLORS */
@@ -423,6 +417,60 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		fence->bBox.min.z = minZ;
 		fence->bBox.max.z = maxZ;
 		fence->bBox.isEmpty = false;
+
+
+
+				/**************************************************************/
+				/* BUILD VERTEX NORMALS + BACKFACES IF FENCE REQUIRES GOURAUD */
+				/**************************************************************/
+
+		if (gFenceIsLit[type])
+		{
+					/* COMPUTE VERTEX NORMALS FOR FRONTFACES */
+
+			mesh->normals = gFenceNormals[f];	// grab buffer
+			
+			SDL_memset(mesh->normals, 0, mesh->numPoints * sizeof(mesh->normals[0]));		// zero out all normals
+
+			for (int i = 0, j = 0; i < numNubs - 1; i++, j += 2)
+			{
+//				float faceNormalX = nubs[i+1].z - nubs[i].z;			// compute face normal
+//				float faceNormalZ = nubs[i+1].x - nubs[i].x;
+				float faceNormalX = fence->sectionNormals[i].x;			// grab face normal
+				float faceNormalZ = fence->sectionNormals[i].y;
+
+				for (int k = 0; k < 4; k++)								// add to normal of all 4 vertices making up the face
+				{
+					mesh->normals[j+k].x += faceNormalX;
+					mesh->normals[j+k].z += faceNormalZ;
+				}
+			}
+
+			for (int j = 0; j < mesh->numPoints; j++)					// normalize vertex normals to unit length
+			{
+				OGLVector3D_Normalize(&mesh->normals[j], &mesh->normals[j]);
+			}
+
+					/* MAKE BACKFACE MESH */
+
+			MOVertexArrayData* backMesh = &gBackFenceMeshes[f];
+			*backMesh = *mesh;								// copy most things from front mesh
+			backMesh->triangles = gBackFenceTriangles[f];	// grab own triangle buffer
+			backMesh->normals = gBackFenceNormals[f];		// grab own normal buffer
+
+			// Wind all faces in opposite direction
+			FlipFaceWinding(mesh->triangles, backMesh->triangles, mesh->numTriangles);
+
+			// Flip all normals
+			for (int j = 0; j < mesh->numPoints; j++)
+			{
+				OGLVector3D normal = gFenceNormals[f][j];
+				normal.x = -normal.x;
+				normal.y = -normal.y;
+				normal.z = -normal.z;
+				gBackFenceMeshes[f].normals[j] = normal;
+			}
+		}
 	}
 }
 
@@ -438,6 +486,9 @@ float			cameraX, cameraZ;
 
 	(void) theNode;
 
+	GLboolean hadCullFace = 0 == (theNode->StatusBits & STATUS_BIT_DOUBLESIDED);
+	GLboolean hasCullFace = hadCullFace;
+	GAME_DEBUGASSERT(hadCullFace == glIsEnabled(GL_CULL_FACE));		// this must match the driver's status bits
 
 			/* GET CAMERA COORDS */
 
@@ -467,9 +518,23 @@ float			cameraX, cameraZ;
 					/* CHECK LIGHTING */
 
 			if (gFenceIsLit[type])
+			{
 				OGL_EnableLighting();
+				if (!hasCullFace)
+				{
+					glEnable(GL_CULL_FACE);
+					hasCullFace = true;
+				}
+			}
 			else
+			{
 				OGL_DisableLighting();
+				if (hasCullFace)
+				{
+					glDisable(GL_CULL_FACE);
+					hasCullFace = false;
+				}
+			}
 
 				/* SUBMIT GEOMETRY */
 
@@ -484,6 +549,18 @@ float			cameraX, cameraZ;
 	}
 
 	gGlobalMaterialFlags = 0;
+
+	if (hasCullFace != hadCullFace)
+	{
+		if (hadCullFace)
+		{
+			glEnable(GL_CULL_FACE);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
+		}
+	}
 }
 
 
@@ -605,7 +682,15 @@ Boolean					overrideAlphaFunc = false;
 
 			/* SUBMIT GEO */
 
-	MO_DrawGeometry_VertexArray(&gFenceTriMeshData[f]);
+	MO_DrawGeometry_VertexArray(&gFenceMeshes[f]);
+
+
+			/* SUBMIT BACKFACES SEPARATELY IF LIT */
+
+	if (gFenceIsLit[fence->type])
+	{
+		MO_DrawGeometry_VertexArray(&gBackFenceMeshes[f]);
+	}
 }
 
 
