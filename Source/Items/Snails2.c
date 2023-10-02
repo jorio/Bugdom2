@@ -242,7 +242,7 @@ float			x,z,splineIndex,x2,z2,y;
 	gTotalRedClovers = 0;
 
 	splineIndex = 0;
-	GetCoordOnSplineFromIndex(&(*gSplineList)[splineNum], 0, &x, &z);	// get y coord @ start
+	GetCoordOnSplineFromIndex(&gSplineList[splineNum], 0, &x, &z);	// get y coord @ start
 	y = GetTerrainY(x,z) + 2200.0f;
 
 			/* ADD MULTIPLE HANGARS ON THE SPLINE */
@@ -252,8 +252,8 @@ float			x,z,splineIndex,x2,z2,y;
 
 				/* GET SPLINE INFO */
 
-		GetCoordOnSplineFromIndex(&(*gSplineList)[splineNum], splineIndex, &x, &z);
-		GetCoordOnSplineFromIndex(&(*gSplineList)[splineNum], splineIndex+1, &x2, &z2);
+		GetCoordOnSplineFromIndex(&gSplineList[splineNum], splineIndex, &x, &z);
+		GetCoordOnSplineFromIndex(&gSplineList[splineNum], splineIndex+1, &x2, &z2);
 
 
 					/***************/
@@ -318,7 +318,7 @@ float			x,z,splineIndex,x2,z2,y;
 
 		y -= 100.0f;
 		splineIndex += 370.0f;
-		if (splineIndex >= (*gSplineList)[splineNum].numPoints)			// see if past end
+		if (splineIndex >= gSplineList[splineNum].numPoints)			// see if past end
 			break;
 	}
 

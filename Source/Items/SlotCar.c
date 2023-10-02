@@ -90,9 +90,11 @@ int				carNum;
 
 	carNum = itemPtr->parm[0];
 
+	GAME_ASSERT(carNum == 0 || carNum == 1);
+
 			/* GET SPLINE INFO */
 
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);		// cars always start @ spline index == 0
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);		// cars always start @ spline index == 0
 
 				/************/
 				/* MAKE CAR */
@@ -446,16 +448,16 @@ OGLVector2D	pinAim;
 
 				/* CALC AIM VECTOR OF CURRENT LOCATION ON TRACK */
 
-			GetCoordOnSpline(&(*gSplineList)[splineNum], car->SplinePlacement, &x1, &z1);			// get current coord
-			GetNextCoordOnSpline(&(*gSplineList)[splineNum], car->SplinePlacement, &x2, &z2);		// get next coord
+			GetCoordOnSpline(&gSplineList[splineNum], car->SplinePlacement, &x1, &z1);			// get current coord
+			GetNextCoordOnSpline(&gSplineList[splineNum], car->SplinePlacement, &x2, &z2);		// get next coord
 			trackAim.x = x2 - x1;																	// calc normalized aim vector
 			trackAim.y = z2 - z1;
 			FastNormalizeVector2D(trackAim.x, trackAim.y, &trackAim, true);
 
 					/* CALC AIM VECTOR AHEAD */
 
-			GetCoordOnSpline2(&(*gSplineList)[splineNum], car->SplinePlacement, 300, &x1, &z1);
-			GetCoordOnSpline2(&(*gSplineList)[splineNum], car->SplinePlacement, 305, &x2, &z2);
+			GetCoordOnSpline2(&gSplineList[splineNum], car->SplinePlacement, 300, &x1, &z1);
+			GetCoordOnSpline2(&gSplineList[splineNum], car->SplinePlacement, 305, &x2, &z2);
 			curve.x = x2 - x1;																	// calc normalized aim vector
 			curve.y = z2 - z1;
 			FastNormalizeVector2D(curve.x, curve.y, &curve, true);
@@ -565,8 +567,8 @@ OGLVector2D	pinAim;
 
 		/* CALC TRUE AIM VECTOR OF CURRENT LOCATION ON TRACK */
 
-	GetCoordOnSpline(&(*gSplineList)[splineNum], car->SplinePlacement, &x1, &z1);			// get current coord
-	GetCoordOnSpline2(&(*gSplineList)[splineNum], car->SplinePlacement, 5, &x2, &z2);		// get next coord
+	GetCoordOnSpline(&gSplineList[splineNum], car->SplinePlacement, &x1, &z1);			// get current coord
+	GetCoordOnSpline2(&gSplineList[splineNum], car->SplinePlacement, 5, &x2, &z2);		// get next coord
 	trackAim.x = x2 - x1;																	// calc normalized aim vector
 	trackAim.y = z2 - z1;
 	FastNormalizeVector2D(trackAim.x, trackAim.y, &trackAim, true);

@@ -28,7 +28,7 @@ static Boolean NilAdd(TerrainItemEntryType *itemPtr,float x, float z);
 /**********************/
 
 int						gNumTerrainItems;
-TerrainItemEntryType 	**gMasterItemList = nil;
+TerrainItemEntryType 	*gMasterItemList = NULL;
 
 float					**gMapYCoords = nil;			// 2D array of map vertex y coords
 float					**gMapYCoordsOriginal = nil;	// copy of gMapYCoords data as it was when file was loaded
@@ -146,7 +146,6 @@ static Boolean (*gTerrainItemAddRoutines[MAX_ITEM_NUM+1])(TerrainItemEntryType *
 
 void BuildTerrainItemList(void)
 {
-TerrainItemEntryType	**tempItemList;
 TerrainItemEntryType	*srcList,*newList;
 int						row,col,i;
 int						itemX, itemZ;
@@ -162,15 +161,9 @@ int						total;
 
 			/* ALLOC MEMORY FOR NEW LIST */
 
-	tempItemList = (TerrainItemEntryType **)AllocHandle(sizeof(TerrainItemEntryType) * gNumTerrainItems);
-	if (tempItemList == nil)
-		DoFatalAlert("BuildTerrainItemList: AllocPtr failed!");
-
-	HLock((Handle)gMasterItemList);
-	HLock((Handle)tempItemList);
-
-	srcList = *gMasterItemList;
-	newList = *tempItemList;
+	srcList = gMasterItemList;
+	newList = (TerrainItemEntryType*) AllocPtrClear(sizeof(TerrainItemEntryType) * gNumTerrainItems);
+	GAME_ASSERT(newList);
 
 
 			/************************/
@@ -216,8 +209,8 @@ int						total;
 
 		/* NUKE THE ORIGINAL ITEM LIST AND REASSIGN TO THE NEW SORTED LIST */
 
-	DisposeHandle((Handle)gMasterItemList);						// nuke old list
-	gMasterItemList = tempItemList;								// reassign
+	SafeDisposePtr((Ptr) gMasterItemList);						// nuke old list
+	gMasterItemList = newList;									// reassign
 
 
 
@@ -235,7 +228,7 @@ int						total;
 
 void FindPlayerStartCoordItems(void)
 {
-	const TerrainItemEntryType* itemPtr = *gMasterItemList;					// get pointer to data inside the LOCKED handle
+	const TerrainItemEntryType* itemPtr = gMasterItemList;					// get pointer to data inside the LOCKED handle
 
 				/* SCAN FOR "START COORD" ITEM */
 
@@ -243,14 +236,9 @@ void FindPlayerStartCoordItems(void)
 	{
 		if (itemPtr[i].type == MAP_ITEM_MYSTARTCOORD)						// see if it's a MyStartCoord item
 		{
-
-					/* CHECK FOR BIT INFO */
-
-
 			gPlayerInfo.coord.x = gPlayerInfo.startX = itemPtr[i].x;
 			gPlayerInfo.coord.z = gPlayerInfo.startZ = itemPtr[i].y;
 			gPlayerInfo.startRotY = (float)itemPtr[i].parm[0] * (PI2/8.0f);	// calc starting rotation aim
-
 			return;
 		}
 	}
@@ -275,7 +263,7 @@ Boolean			flag;
 		return;
 
 	startIndex = gSuperTileItemIndexGrid[row][col].itemIndex;	// get starting index into item list
-	itemPtr = &(*gMasterItemList)[startIndex];					// get pointer to 1st item on this supertile
+	itemPtr = &gMasterItemList[startIndex];					// get pointer to 1st item on this supertile
 
 
 			/*****************************/
@@ -604,7 +592,7 @@ float				shadeFactor;
 	{
 			/* SEE WHICH THINGS WE SUPPORT & GET PARMS */
 
-		switch((*gMasterItemList)[i].type)
+		switch(gMasterItemList[i].type)
 		{
 			case	2:						// sprinkler head
 					height = 50;
@@ -647,7 +635,7 @@ float				shadeFactor;
 					break;
 
 			case	64:						// tall book stack
-					if ((*gMasterItemList)[i].parm[0] == 2)	// only shadow tall stack
+					if (gMasterItemList[i].parm[0] == 2)	// only shadow tall stack
 						height = 500;
 					else
 						continue;
@@ -659,8 +647,8 @@ float				shadeFactor;
 
 			/* CALCULATE LINE TO DRAW SHADOW ALONG */
 
-		from.x = (*gMasterItemList)[i].x;
-		from.y = (*gMasterItemList)[i].y;
+		from.x = gMasterItemList[i].x;
+		from.y = gMasterItemList[i].y;
 
 		to.x = from.x + lightVector.x * (height * dot);
 		to.y = from.y + lightVector.y * (height * dot);

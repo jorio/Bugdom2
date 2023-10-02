@@ -78,8 +78,7 @@ typedef struct
 
 int				gNumWaterPatches = 0;
 int				gNumWaterDrawn;
-WaterDefType	**gWaterListHandle = nil;
-WaterDefType	*gWaterList;
+WaterDefType	*gWaterList = NULL;
 
 static float					gWaterInitY[MAX_WATER];
 
@@ -142,13 +141,12 @@ static	Pool		*gRipplePool = NULL;
 
 void DisposeWater(void)
 {
-	if (gWaterListHandle)
+	if (gWaterList)
 	{
-		DisposeHandle((Handle)gWaterListHandle);
+		SafeDisposePtr((Ptr) gWaterList);
 	}
 
-	gWaterListHandle = nil;
-	gWaterList = nil;
+	gWaterList = NULL;
 	gNumWaterPatches = 0;
 
 	if (gRainScreenDropPool)

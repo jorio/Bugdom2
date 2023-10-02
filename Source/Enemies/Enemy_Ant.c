@@ -550,7 +550,7 @@ int				foodType = itemPtr->parm[0];
 			/* GET SPLINE INFO */
 
 	placement = itemPtr->placement;
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 				/* MAKE ANT */

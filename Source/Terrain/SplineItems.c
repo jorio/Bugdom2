@@ -29,7 +29,7 @@ static Boolean NilPrime(int splineNum, SplineItemType *itemPtr);
 /*     VARIABLES      */
 /**********************/
 
-SplineDefType	**gSplineList = nil;
+SplineDefType	*gSplineList = NULL;
 int				gNumSplines = 0;
 
 static int		gNumSplineObjects = 0;
@@ -125,24 +125,14 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(int, SplineItemType *
 
 void PrimeSplines(void)
 {
-long			type;
-SplineItemType 	*itemPtr;
-SplineDefType	*spline;
-Boolean			flag;
-SplinePointType	*points;
-
-
 			/* ADJUST SPLINE TO GAME COORDINATES */
 
 	for (int s = 0; s < gNumSplines; s++)
 	{
-		spline = &(*gSplineList)[s];							// point to this spline
-		points = (*spline->pointList);							// point to points list
-
-		for (int i = 0; i < spline->numPoints; i++)
+		for (int i = 0; i < gSplineList[s].numPoints; i++)
 		{
-			points[i].x *= gMapToUnitValue;
-			points[i].z *= gMapToUnitValue;
+			gSplineList[s].pointList[i].x *= gMapToUnitValue;
+			gSplineList[s].pointList[i].z *= gMapToUnitValue;
 		}
 	}
 
@@ -153,20 +143,19 @@ SplinePointType	*points;
 
 	for (int s = 0; s < gNumSplines; s++)
 	{
-		spline = &(*gSplineList)[s];							// point to this spline
+		SplineDefType* spline = &gSplineList[s];						// point to this spline
 
 				/* SCAN ALL ITEMS ON THIS SPLINE */
 
-		HLockHi((Handle)spline->itemList);						// make sure this is permanently locked down
 		for (int i = 0; i < spline->numItems; i++)
 		{
-			itemPtr = &(*spline->itemList)[i];					// point to this item
-			type = itemPtr->type;								// get item type
+			SplineItemType* itemPtr = &spline->itemList[i];				// point to this item
+			int type = itemPtr->type;									// get item type
 			GAME_ASSERT(type <= MAX_SPLINE_ITEM_NUM);
 
-			flag = gSplineItemPrimeRoutines[type](s,itemPtr); 	// call item's Prime routine
+			Boolean flag = gSplineItemPrimeRoutines[type](s,itemPtr); 	// call item's Prime routine
 			if (flag)
-				itemPtr->flags |= ITEM_FLAGS_INUSE;				// set in-use flag
+				itemPtr->flags |= ITEM_FLAGS_INUSE;						// set in-use flag
 		}
 	}
 }
@@ -201,7 +190,7 @@ float			ratio,oneMinusRatio;
 	if (i2 >= numPointsInSpline)								// make sure not go too far
 		i2 = numPointsInSpline-1;
 
-	points = *splinePtr->pointList;								// point to point list
+	points = splinePtr->pointList;								// point to point list
 
 
 			/* INTERPOLATE */
@@ -350,7 +339,7 @@ void SetSplineAim(ObjNode *theNode)
 {
 float	x,z;
 
-	GetCoordOnSpline2(&(*gSplineList)[theNode->SplineNum], theNode->SplinePlacement, 3, &x, &z);			// get coord of next point on spline
+	GetCoordOnSpline2(&gSplineList[theNode->SplineNum], theNode->SplinePlacement, 3, &x, &z);			// get coord of next point on spline
 	theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->Coord.x, theNode->Coord.z,x,z);	// calc y rot aim
 
 
@@ -438,7 +427,7 @@ SplineDefType	*splinePtr;
 	if (placement >= 1.0f)
 		placement = .999f;
 
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
+	splinePtr = &gSplineList[theNode->SplineNum];			// point to the spline
 
 	GetCoordOnSpline(splinePtr, placement, &theNode->Coord.x, &theNode->Coord.z);		// get coord
 
@@ -462,7 +451,7 @@ SplineDefType	*splinePtr;
 	if (placement >= 1.0f)
 		placement = .999f;
 
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
+	splinePtr = &gSplineList[theNode->SplineNum];			// point to the spline
 
 	GetCoordOnSpline(splinePtr, placement, x, z);		// get coord
 }
@@ -483,7 +472,7 @@ float			numPointsInSpline;
 
 	speed *= gFramesPerSecondFrac;
 
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
+	splinePtr = &gSplineList[theNode->SplineNum];			// point to the spline
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 
 	theNode->SplinePlacement += speed / numPointsInSpline;
@@ -510,7 +499,7 @@ float			numPointsInSpline;
 
 	speed *= gFramesPerSecondFrac;
 
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
+	splinePtr = &gSplineList[theNode->SplineNum];			// point to the spline
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 
 			/* GOING BACKWARD */

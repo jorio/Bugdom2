@@ -753,7 +753,7 @@ float			x,z,placement;
 			/* GET SPLINE INFO */
 
 	placement = itemPtr->placement;
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 				/* MAKE FLEA */
@@ -1137,16 +1137,11 @@ static Boolean SeeIfFleaAttack(ObjNode *theNode, float angleToTarget, float dist
 
 void CountFleas(void)
 {
-int						i;
-TerrainItemEntryType 	*itemPtr;
-
 	gTotalFleas = 0;
 
-	itemPtr = *gMasterItemList; 											// get pointer to data inside the LOCKED handle
-
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
-		if (itemPtr[i].type == MAP_ITEM_FLEA)						// see if it's a Squish Berry item
+		if (gMasterItemList[i].type == MAP_ITEM_FLEA)
 			gTotalFleas++;
 	}
 

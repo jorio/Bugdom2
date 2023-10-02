@@ -609,9 +609,9 @@ SplinePointType	*points;
 
 
 	splineNum = gMothPaths[pathNum];						// get spline #
-	splinePtr = &(*gSplineList)[splineNum];					// point to the spline
+	splinePtr = &gSplineList[splineNum];					// point to the spline
 	numPointsInSpline = splinePtr->numPoints;				// get # points in the spline
-	points = *splinePtr->pointList;							// point to point list
+	points = splinePtr->pointList;							// point to point list
 
 			/* SCAN POINTS ON SPLINE FOR CLOSEST */
 

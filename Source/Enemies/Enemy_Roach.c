@@ -677,7 +677,7 @@ float			x,z,placement;
 			/* GET SPLINE INFO */
 
 	placement = itemPtr->placement;
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 				/* MAKE ROACH */

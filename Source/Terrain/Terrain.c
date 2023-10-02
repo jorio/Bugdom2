@@ -275,7 +275,7 @@ int	i;
 
 	if (gMasterItemList)
 	{
-		DisposeHandle((Handle)gMasterItemList);
+		SafeDisposePtr((Ptr) gMasterItemList);
 		gMasterItemList = nil;
 	}
 
@@ -303,22 +303,22 @@ int	i;
 	{
 		for (i = 0; i < gNumSplines; i++)
 		{
-			DisposeHandle((Handle)(*gSplineList)[i].pointList);		// nuke point list
-			DisposeHandle((Handle)(*gSplineList)[i].itemList);		// nuke item list
+//			SafeDisposePtr((Ptr) gSplineList[i].nubList);		// nuke nub list
+			SafeDisposePtr((Ptr) gSplineList[i].pointList);		// nuke point list
+			SafeDisposePtr((Ptr) gSplineList[i].itemList);		// nuke item list
 		}
-		DisposeHandle((Handle)gSplineList);
+		SafeDisposePtr((Ptr) gSplineList);
 		gSplineList = nil;
 	}
 
 				/* NUKE WATER PATCH */
 
-	if (gWaterListHandle)
+	if (gWaterList)
 	{
-		DisposeHandle((Handle)gWaterListHandle);
-		gWaterListHandle = nil;
+		SafeDisposePtr((Ptr) gWaterList);
+		gWaterList = NULL;
 	}
 
-	gWaterList = nil;
 	gNumWaterPatches = 0;
 	gNumSuperTilesDeep = gNumSuperTilesWide = 0;
 

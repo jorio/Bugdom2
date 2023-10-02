@@ -642,7 +642,7 @@ float			x,z,placement;
 			/* GET SPLINE INFO */
 
 	placement = itemPtr->placement;
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 				/* MAKE TICK */
@@ -804,20 +804,14 @@ static void KillTick(ObjNode *enemy)
 
 void CountTicks(void)
 {
-int						i;
-TerrainItemEntryType 	*itemPtr;
-
 	gNumKilledTicks = 0;
 	gTotalTicks = 0;
 
-	itemPtr = *gMasterItemList; 											// get pointer to data inside the LOCKED handle
-
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
-		if (itemPtr[i].type == MAP_ITEM_TICK)
+		if (gMasterItemList[i].type == MAP_ITEM_TICK)
 			gTotalTicks++;
 	}
-
 }
 
 

@@ -618,20 +618,14 @@ float	y;
 
 void CountAntHills(void)
 {
-int						i;
-TerrainItemEntryType 	*itemPtr;
-
 	gNumAntHillsDestroyed = 0;
 	gNumAntHills = 0;
 
-	itemPtr = *gMasterItemList; 											// get pointer to data inside the LOCKED handle
-
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
-		if (itemPtr[i].type == MAP_ITEM_ANTHILL)
+		if (gMasterItemList[i].type == MAP_ITEM_ANTHILL)
 			gNumAntHills++;
 	}
-
 }
 
 

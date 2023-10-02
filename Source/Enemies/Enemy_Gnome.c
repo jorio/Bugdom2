@@ -420,7 +420,7 @@ float			x,z,placement;
 
 	placement = itemPtr->placement;
 
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 			/* MAKE GNOME */

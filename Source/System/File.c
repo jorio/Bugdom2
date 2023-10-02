@@ -601,7 +601,6 @@ OSErr					iErr;
 	GAME_ASSERT(!gMasterItemList);
 	GAME_ASSERT(!gSplineList);
 	GAME_ASSERT(!gFenceList);
-	GAME_ASSERT(!gWaterListHandle);
 	GAME_ASSERT(!gWaterList);
 
 
@@ -709,27 +708,27 @@ OSErr					iErr;
 	GAME_ASSERT(hand);
 
 	{
-		TerrainItemEntryType   *rezItems;
+		const TerrainItemEntryType* rezItems = (TerrainItemEntryType*)*hand;
 
-		DetachResource(hand);							// lets keep this data around
-		HLockHi(hand);									// LOCK this one because we have the lookup table into this
-		gMasterItemList = (TerrainItemEntryType **)hand;
-		rezItems = (TerrainItemEntryType *)*hand;
+		gMasterItemList = AllocPtrClear(gNumTerrainItems * sizeof(TerrainItemEntryType));
 
 				/* CONVERT COORDINATES */
 
 		for (int i = 0; i < gNumTerrainItems; i++)
 		{
-			(*gMasterItemList)[i].x = SwizzleULong(&rezItems[i].x) * gMapToUnitValue;								// convert coordinates
-			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * gMapToUnitValue;
+			gMasterItemList[i].x = SwizzleULong(&rezItems[i].x) * gMapToUnitValue;								// convert coordinates
+			gMasterItemList[i].y = SwizzleULong(&rezItems[i].y) * gMapToUnitValue;
 
-			(*gMasterItemList)[i].type = SwizzleUShort(&rezItems[i].type);
-			(*gMasterItemList)[i].parm[0] = rezItems[i].parm[0];
-			(*gMasterItemList)[i].parm[1] = rezItems[i].parm[1];
-			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];
-			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];
-			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);
+			gMasterItemList[i].type = SwizzleUShort(&rezItems[i].type);
+			gMasterItemList[i].parm[0] = rezItems[i].parm[0];
+			gMasterItemList[i].parm[1] = rezItems[i].parm[1];
+			gMasterItemList[i].parm[2] = rezItems[i].parm[2];
+			gMasterItemList[i].parm[3] = rezItems[i].parm[3];
+			gMasterItemList[i].flags = SwizzleUShort(&rezItems[i].flags);
 		}
+
+		ReleaseResource(hand);
+		hand = NULL;
 	}
 
 
@@ -745,18 +744,18 @@ OSErr					iErr;
 	{
 		File_SplineDefType	*splinePtr = (File_SplineDefType *)*hand;
 
-		gSplineList = (SplineDefType**) NewHandleClear(sizeof(SplineDefType) * gNumSplines);		// allocate memory for spline data
+		gSplineList = (SplineDefType*) AllocPtrClear(sizeof(SplineDefType) * gNumSplines);		// allocate memory for spline data
 
 		for (int i = 0; i < gNumSplines; i++)
 		{
-			(*gSplineList)[i].numNubs = SwizzleShort(&splinePtr[i].numNubs);
-			(*gSplineList)[i].numPoints = SwizzleLong(&splinePtr[i].numPoints);
-			(*gSplineList)[i].numItems = SwizzleShort(&splinePtr[i].numItems);
+			gSplineList[i].numNubs		= SwizzleShort(&splinePtr[i].numNubs);
+			gSplineList[i].numPoints	= SwizzleLong(&splinePtr[i].numPoints);
+			gSplineList[i].numItems		= SwizzleShort(&splinePtr[i].numItems);
 
-			(*gSplineList)[i].bBox.top = SwizzleShort(&splinePtr[i].bBox.top);
-			(*gSplineList)[i].bBox.bottom = SwizzleShort(&splinePtr[i].bBox.bottom);
-			(*gSplineList)[i].bBox.left = SwizzleShort(&splinePtr[i].bBox.left);
-			(*gSplineList)[i].bBox.right = SwizzleShort(&splinePtr[i].bBox.right);
+			gSplineList[i].bBox.top		= SwizzleShort(&splinePtr[i].bBox.top);
+			gSplineList[i].bBox.bottom	= SwizzleShort(&splinePtr[i].bBox.bottom);
+			gSplineList[i].bBox.left	= SwizzleShort(&splinePtr[i].bBox.left);
+			gSplineList[i].bBox.right	= SwizzleShort(&splinePtr[i].bBox.right);
 		}
 
 		ReleaseResource(hand);																// nuke the rez
@@ -772,22 +771,22 @@ OSErr					iErr;
 
 	for (int i = 0; i < gNumSplines; i++)
 	{
-		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
+		SplineDefType	*spline = &gSplineList[i];									// point to Nth spline
 
 		hand = GetResource('SpPt',1000+i);
 		GAME_ASSERT(hand);
 
-		SplinePointType	*ptList = (SplinePointType *)*hand;
+		const SplinePointType *ptList = (SplinePointType *)*hand;
 
-		DetachResource(hand);
-		HLockHi(hand);
-		(*gSplineList)[i].pointList = (SplinePointType **)hand;
+		gSplineList[i].pointList = AllocPtrClear(spline->numPoints * sizeof(spline->pointList[0]));
 
 		for (int j = 0; j < spline->numPoints; j++)			// swizzle
 		{
-			(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
-			(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
+			spline->pointList[j].x = SwizzleFloat(&ptList[j].x);
+			spline->pointList[j].z = SwizzleFloat(&ptList[j].z);
 		}
+
+		ReleaseResource(hand);
 	}
 
 
@@ -795,23 +794,27 @@ OSErr					iErr;
 
 	for (int i = 0; i < gNumSplines; i++)
 	{
-		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
+		SplineDefType	*spline = &gSplineList[i];									// point to Nth spline
 
 		hand = GetResource('SpIt',1000+i);
 		GAME_ASSERT(hand);
 
-		SplineItemType	*itemList = (SplineItemType *)*hand;
+		const SplineItemType *rezItems = (SplineItemType *)*hand;
 
-		DetachResource(hand);
-		HLockHi(hand);
-		(*gSplineList)[i].itemList = (SplineItemType **)hand;
+		gSplineList[i].itemList = AllocPtrClear(spline->numItems * sizeof(spline->itemList[0]));
 
 		for (int j = 0; j < spline->numItems; j++)			// swizzle
 		{
-			(*spline->itemList)[j].placement = SwizzleFloat(&itemList[j].placement);
-			(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
-			(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
+			spline->itemList[j].placement	= SwizzleFloat(&rezItems[j].placement);
+			spline->itemList[j].type		= SwizzleUShort(&rezItems[j].type);
+			spline->itemList[j].flags		= SwizzleUShort(&rezItems[j].flags);
+			spline->itemList[j].parm[0]		= rezItems[j].parm[0];
+			spline->itemList[j].parm[1]		= rezItems[j].parm[1];
+			spline->itemList[j].parm[2]		= rezItems[j].parm[2];
+			spline->itemList[j].parm[3]		= rezItems[j].parm[3];
 		}
+
+		ReleaseResource(hand);
 	}
 
 			/****************************/
@@ -878,37 +881,36 @@ OSErr					iErr;
 	hand = GetResource('Liqd',1000);
 	if (hand)
 	{
-		DetachResource(hand);
-		HLockHi(hand);
-		gWaterListHandle = (WaterDefType **)hand;
-		gWaterList = *gWaterListHandle;
+		const WaterDefType* rezWaterList = *(WaterDefType **)hand;
+		gWaterList = AllocPtrClear(gNumWaterPatches * sizeof(gWaterList[0]));
 
 		for (int i = 0; i < gNumWaterPatches; i++)						// swizzle
 		{
-			gWaterList[i].type = SwizzleUShort(&gWaterList[i].type);
-			gWaterList[i].flags = SwizzleULong(&gWaterList[i].flags);
-			gWaterList[i].height = SwizzleLong(&gWaterList[i].height);
-			gWaterList[i].numNubs = SwizzleShort(&gWaterList[i].numNubs);
+			gWaterList[i].type			= SwizzleUShort(&rezWaterList[i].type);
+			gWaterList[i].flags			= SwizzleULong(&rezWaterList[i].flags);
+			gWaterList[i].height		= SwizzleLong(&rezWaterList[i].height);
+			gWaterList[i].numNubs		= SwizzleShort(&rezWaterList[i].numNubs);
 
-			gWaterList[i].hotSpotX = SwizzleFloat(&gWaterList[i].hotSpotX);
-			gWaterList[i].hotSpotZ = SwizzleFloat(&gWaterList[i].hotSpotZ);
+			gWaterList[i].hotSpotX		= SwizzleFloat(&rezWaterList[i].hotSpotX);
+			gWaterList[i].hotSpotZ		= SwizzleFloat(&rezWaterList[i].hotSpotZ);
 
-			gWaterList[i].bBox.top = SwizzleShort(&gWaterList[i].bBox.top);
-			gWaterList[i].bBox.bottom = SwizzleShort(&gWaterList[i].bBox.bottom);
-			gWaterList[i].bBox.left = SwizzleShort(&gWaterList[i].bBox.left);
-			gWaterList[i].bBox.right = SwizzleShort(&gWaterList[i].bBox.right);
+			gWaterList[i].bBox.top		= SwizzleShort(&rezWaterList[i].bBox.top);
+			gWaterList[i].bBox.bottom	= SwizzleShort(&rezWaterList[i].bBox.bottom);
+			gWaterList[i].bBox.left		= SwizzleShort(&rezWaterList[i].bBox.left);
+			gWaterList[i].bBox.right	= SwizzleShort(&rezWaterList[i].bBox.right);
 
 			for (int j = 0; j < gWaterList[i].numNubs; j++)
 			{
-				gWaterList[i].nubList[j].x = SwizzleFloat(&gWaterList[i].nubList[j].x);
-				gWaterList[i].nubList[j].y = SwizzleFloat(&gWaterList[i].nubList[j].y);
+				gWaterList[i].nubList[j].x = SwizzleFloat(&rezWaterList[i].nubList[j].x);
+				gWaterList[i].nubList[j].y = SwizzleFloat(&rezWaterList[i].nubList[j].y);
 			}
 		}
+
+		ReleaseResource(hand);
 	}
 	else
 	{
 		gNumWaterPatches = 0;
-		gWaterListHandle = NULL;
 		gWaterList = NULL;
 	}
 

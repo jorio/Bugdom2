@@ -3,17 +3,12 @@
 //
 
 void	DoAlert(const char* fmt, ...);
-SDL_NORETURN void	DoFatalAlert(const char* fmt, ...);
-extern unsigned char	*NumToHex(unsigned short);
-extern unsigned char	*NumToHex2(unsigned long, short);
-extern unsigned char	*NumToDec(unsigned long);
-SDL_NORETURN	void CleanQuit(void);
+SDL_NORETURN void DoFatalAlert(const char* fmt, ...);
+SDL_NORETURN void CleanQuit(void);
 extern	void SetMyRandomSeed(unsigned long seed);
 uint32_t MyRandomLong(void);
-extern	Handle	AllocHandle(long size);
-extern	void *AllocPtr(long size);
+void *AllocPtr(long size);
 void *AllocPtrClear(long size);
-extern	void DrawCString(char *string);
 extern	void InitMyRandomSeed(void);
 extern	float RandomFloat(void);
 uint16_t	RandomRange(unsigned short min, unsigned short max);

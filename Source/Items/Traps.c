@@ -695,22 +695,17 @@ float				dist;
 
 void CountMice(void)
 {
-int						i;
-TerrainItemEntryType 	*itemPtr;
-
 	gNumDrowningMiceRescued = gNumDrowingMiceToRescue = gNumMice = 0;
 
-
-	itemPtr = *gMasterItemList; 											// get pointer to data inside the LOCKED handle
-
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
-		if (itemPtr[i].type == MAP_ITEM_MOUSETRAP)							// is mouse trap?
+		const TerrainItemEntryType* item = &gMasterItemList[i];
+		if (item->type == MAP_ITEM_MOUSETRAP)						// is mouse trap?
 		{
-			if (!(itemPtr[i].parm[3] & 1))									// is not primed?
+			if (!(item->parm[3] & 1))								// is not primed?
 			{
 				gNumMice++;
-				if (itemPtr[i].parm[3] & (1<<1))							// is drowning?
+				if (item->parm[3] & (1<<1))							// is drowning?
 					gNumDrowingMiceToRescue++;
 			}
 		}
@@ -1244,7 +1239,7 @@ float			x,z,placement;
 			/* GET SPLINE INFO */
 
 	placement = itemPtr->placement;
-	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
+	GetCoordOnSpline(&gSplineList[splineNum], placement, &x, &z);
 
 
 				/****************/

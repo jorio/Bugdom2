@@ -216,31 +216,6 @@ void InitMyRandomSeed(void)
 
 #pragma mark -
 
-/****************** ALLOC HANDLE ********************/
-
-Handle	AllocHandle(long size)
-{
-Handle	hand;
-OSErr	err;
-
-	hand = NewHandle(size);							// alloc in APPL
-	if (hand == nil)
-	{
-		DoAlert("AllocHandle: using temp mem");
-		hand = TempNewHandle(size,&err);			// try TEMP mem
-		if (hand == nil)
-		{
-			DoAlert("AllocHandle: failed!");
-			return(nil);
-		}
-		else
-			return(hand);
-	}
-	return(hand);
-
-}
-
-
 
 /****************** ALLOC PTR ********************/
 
@@ -252,12 +227,11 @@ uint32_t	*cookiePtr;
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
 #if USE_MALLOC
-	pr = malloc(size);
+	pr = SDL_malloc(size);
 #else
 	pr = NewPtr(size);
 #endif
-	if (pr == nil)
-		DoFatalAlert("AllocPtr: NewPtr failed");
+	GAME_ASSERT(pr);
 
 	cookiePtr = (uint32_t *)pr;
 
@@ -284,13 +258,12 @@ uint32_t	*cookiePtr;
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
 #if USE_MALLOC
-	pr = calloc(1, size);
+	pr = SDL_calloc(1, size);
 #else
 	pr = NewPtrClear(size);						// alloc in Application
 #endif
 
-	if (pr == nil)
-		DoFatalAlert("AllocPtr: NewPtr failed");
+	GAME_ASSERT(pr);
 
 	cookiePtr = (uint32_t *)pr;
 
@@ -318,13 +291,12 @@ Ptr		p = ptr;
 
 	cookiePtr = (uint32_t *)p;
 
-	if (*cookiePtr != 'FACE')
-		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
+	GAME_ASSERT(*cookiePtr == 'FACE');
 
 	*cookiePtr = 0;
 
 #if USE_MALLOC
-	free(p);
+	SDL_free(p);
 #else
 	DisposePtr(p);
 #endif

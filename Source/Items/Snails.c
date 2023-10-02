@@ -1593,21 +1593,14 @@ float			speed;
 
 void CountSquishBerries(void)
 {
-int						i;
-TerrainItemEntryType 	*itemPtr;
-
 	gNumSquishBerries = 0;
 	gNumBerriesSquished = 0;
 
-
-	itemPtr = *gMasterItemList; 											// get pointer to data inside the LOCKED handle
-
-	for (i= 0; i < gNumTerrainItems; i++)
+	for (int i = 0; i < gNumTerrainItems; i++)
 	{
-		if (itemPtr[i].type == MAP_ITEM_SQUISHBERRY)						// see if it's a Squish Berry item
+		if (gMasterItemList[i].type == MAP_ITEM_SQUISHBERRY)
 			gNumSquishBerries++;
 	}
-
 }
 
 
