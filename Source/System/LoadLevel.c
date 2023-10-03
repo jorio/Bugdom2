@@ -755,7 +755,7 @@ static void LoadLevelArt_Balsa(void)
 
 void LoadLevelArt_Tunnel(void)
 {
-FSSpec	spec, bg3dSpec;
+FSSpec	spec;
 
 				/* LOAD AUDIO */
 
@@ -800,10 +800,11 @@ FSSpec	spec, bg3dSpec;
 
 	if (gLevelNum == LEVEL_NUM_PLUMBING)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level4_Plumbing.bg3d", &bg3dSpec);
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Plumbing.tun", &spec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level4_Plumbing.bg3d", &spec);
+		ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
-		LoadTunnel(&spec, &bg3dSpec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Plumbing.tun", &spec);
+		LoadTunnel(&spec);
 
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, PLUMBING_ObjType_Nail,
 										-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
@@ -813,15 +814,14 @@ FSSpec	spec, bg3dSpec;
 
 	else
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level7_Gutter.bg3d", &bg3dSpec);
+		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level7_Gutter.bg3d", &spec);
+		ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
+
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Tunnels:Gutter.tun", &spec);
-		LoadTunnel(&spec, &bg3dSpec);
+		LoadTunnel(&spec);
 
 //		SetSphereMapInfoOnMaterialObject(gTunnelTextureObj,	MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkYosemite);
-
 	}
-
-
 }
 
 

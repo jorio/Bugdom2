@@ -106,7 +106,7 @@ Boolean SaveGame(int slot);
 Boolean LoadSavedGameStruct(int slot, SaveGameType* outSaveData); 
 Boolean LoadSavedGame(int slot);
 
-void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec);
+void LoadTunnel(FSSpec *inSpec);
 
 void LoadLevelArt_Explore(void);
 void LoadLevelArt_Tunnel(void);

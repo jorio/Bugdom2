@@ -4,7 +4,9 @@
 
 #pragma once
 
-#define	MAX_TUNNEL_SECTIONS		200
+// Plumbing level has 126 tunnel sections
+// Gutter level has 137 tunnel sections
+#define	MAX_TUNNEL_SECTIONS		140
 
 
 typedef struct

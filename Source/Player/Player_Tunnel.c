@@ -16,6 +16,7 @@
 /*     PROTOTYPES     */
 /**********************/
 
+static void MakeTunnelBackfaceMesh(void);
 static void MovePlayer_TunnelFallOff(ObjNode *player);
 static void MovePlayer_Tunnel(ObjNode *player);
 static void DoTunnelSpin(ObjNode *player);
@@ -58,11 +59,12 @@ int		gNumTunnelSections = 0;
 
 TunnelSplinePointType	*gTunnelSplinePoints = nil;
 
-MOVertexArrayObject	*gTunnelSectionMeshes[MAX_TUNNEL_SECTIONS];
-MOVertexArrayObject	*gTunnelSectionWaterObjects[MAX_TUNNEL_SECTIONS];
+MOVertexArrayObject	*gTunnelSectionMeshes[MAX_TUNNEL_SECTIONS] = {NULL};
+MOVertexArrayData	gTunnelSectionBackMeshes[MAX_TUNNEL_SECTIONS] = {0};
+MOVertexArrayObject	*gTunnelSectionWaterObjects[MAX_TUNNEL_SECTIONS] = {NULL};
 
 MOMaterialObject	*gTunnelTextureObj = nil;
-static	float		gTunnelWaterAnimIndex;
+static	float		gTunnelWaterAnimIndex = 0;
 
 float	gTunnelWaterTextureScroll = 0;
 
@@ -81,6 +83,7 @@ Boolean IsTunnelLevel(void)
 {
 	return gLevelNum == LEVEL_NUM_PLUMBING || gLevelNum == LEVEL_NUM_GUTTER;
 }
+
 
 /******************** INIT AREA:  TUNNELS ***************************/
 
@@ -206,10 +209,44 @@ OGLSetupInputType	viewDef;
 				DoDialogMessage(DIALOG_MESSAGE_PLUMBINGINTRO, 1, 6.0, nil);
 				break;
 
-
+		case	LEVEL_NUM_GUTTER:
+				MakeTunnelBackfaceMesh();
+				break;
 	}
  }
 
+
+/********************** MAKE TUNNEL BACKFACE MESH ************************/
+// The original game used GL_LIGHT_MODEL_TWO_SIDE, but this performs poorly on modern GeForce cards.
+// So just make a backface mesh.
+
+static void MakeTunnelBackfaceMesh(void)
+{
+	for (int i = 0; i < gNumTunnelSections; i++)
+	{
+		const MOVertexArrayData* frontMesh = &gTunnelSectionMeshes[i]->objectData;
+
+		MOVertexArrayData* backMesh = &gTunnelSectionBackMeshes[i];
+
+		*backMesh = *frontMesh;	// copy most things from front mesh
+
+		// grab own buffers
+		backMesh->triangles = AllocPtrClear(backMesh->numTriangles * sizeof(backMesh->triangles[0]));
+		backMesh->normals   = AllocPtrClear(backMesh->numPoints    * sizeof(backMesh->normals[0]));
+
+		FlipFaceWinding(frontMesh->triangles, backMesh->triangles, backMesh->numTriangles);
+
+		// Flip all normals
+		for (int j = 0; j < backMesh->numPoints; j++)
+		{
+			OGLVector3D normal = frontMesh->normals[j];
+			normal.x = -normal.x;
+			normal.y = -normal.y;
+			normal.z = -normal.z;
+			backMesh->normals[j] = normal;
+		}
+	}
+}
 
 
 /********************** DISPOSE TUNNEL DATA ************************/
@@ -227,6 +264,18 @@ int		i;
 
 		MO_DisposeObjectReference(gTunnelSectionWaterObjects[i]);
 		gTunnelSectionWaterObjects[i] = nil;
+
+		if (gTunnelSectionBackMeshes[i].triangles)
+		{
+			SafeDisposePtr((Ptr) gTunnelSectionBackMeshes[i].triangles);
+			gTunnelSectionBackMeshes[i].triangles = NULL;
+		}
+
+		if (gTunnelSectionBackMeshes[i].normals)
+		{
+			SafeDisposePtr((Ptr) gTunnelSectionBackMeshes[i].normals);
+			gTunnelSectionBackMeshes[i].normals = NULL;
+		}
 	}
 	gNumTunnelSections = 0;
 
@@ -258,7 +307,7 @@ int		i;
 	if (gTunnelItemList)
 	{
 		SafeDisposePtr(gTunnelItemList);
-		gTunnelItemList = nil;
+		gTunnelItemList = NULL;
 		gNumTunnelItems = 0;
 	}
 }
@@ -402,33 +451,28 @@ void PlayArea_Tunnel(void)
 
 void DrawTunnel(void)
 {
-int			i,t;
+	const Boolean isGutterLevel = gLevelNum == LEVEL_NUM_GUTTER;
 
 	OGL_PushState();
+	glEnable(GL_CULL_FACE);
 
 
 			/**************************/
 			/* DRAW GEOMETRY SECTIONS */
 			/**************************/
 
-	if (gLevelNum == LEVEL_NUM_GUTTER)											// use double-sided shading	if gutter
+	for (int i = 0; i < gNumTunnelSections; i++)
 	{
-		glDisable(GL_CULL_FACE);
-#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-#endif
-	}
+		if (!OGL_IsBBoxVisible(&gTunnelSectionMeshes[i]->objectData.bBox, nil))
+			continue;
 
-	for (i = 0; i < gNumTunnelSections; i++)
-	{
-		if (OGL_IsBBoxVisible(&gTunnelSectionMeshes[i]->objectData.bBox, nil))
+		MO_DrawObject(gTunnelSectionMeshes[i]);
+
+		if (isGutterLevel)
 		{
-			MO_DrawObject(gTunnelSectionMeshes[i]);
+			MO_DrawGeometry_VertexArray(&gTunnelSectionBackMeshes[i]);
 		}
 	}
-#if ALLOW_GL_LIGHT_MODEL_TWO_SIDE
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-#endif
 
 
 
@@ -452,10 +496,10 @@ int			i,t;
 			/* INC WATER TEXTURE INDEX */
 
 
-	if (gLevelNum == LEVEL_NUM_PLUMBING)
+	if (!isGutterLevel)
 	{
 		gTunnelWaterAnimIndex += gFramesPerSecondFrac * 10.0f;
-		t = gTunnelWaterAnimIndex;
+		int t = gTunnelWaterAnimIndex;
 		if (t > 5)
 		{
 			gTunnelWaterAnimIndex = 0;
@@ -468,12 +512,11 @@ int			i,t;
 	else
 	{
 		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][GUTTER_SObjType_Water0].materialObject);
-
 	}
 
 			/* DRAW SECTIONS */
 
-	for (i = gNumTunnelSections-1; i >= 0 ; i--)						// draw these in reverse order to help overlapping transparencies be in the correct order
+	for (int i = gNumTunnelSections-1; i >= 0 ; i--)					// draw these in reverse order to help overlapping transparencies be in the correct order
 	{
 		if (OGL_IsBBoxVisible(&gTunnelSectionWaterObjects[i]->objectData.bBox, nil))
 		{

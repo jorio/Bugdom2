@@ -1290,13 +1290,11 @@ Boolean LoadSavedGame(int slot)
 
 /************************* LOAD TUNNEL ***************************/
 
-void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec)
+void LoadTunnel(FSSpec *inSpec)
 {
 OSErr					iErr;
 short					fRefNum;
 long					size;
-int32_t					w, h;
-Ptr						buffer;
 MOVertexArrayData		data;
 
 				/* OPEN THE DATA FORK */
@@ -1333,8 +1331,6 @@ MOVertexArrayData		data;
 
 		int aliasSize = FSReadBELong(fRefNum);
 		SetFPos(fRefNum, fsFromMark, aliasSize);
-
-		ImportBG3D(bg3dSpec, MODEL_GROUP_LEVELSPECIFIC);
 	}
 
 
@@ -1351,23 +1347,25 @@ MOVertexArrayData		data;
 
 		/* READ TUNNEL TEXTURE */
 
-	w = FSReadBELong(fRefNum);											// read this texture's dimensions
-	h = FSReadBELong(fRefNum);
-	size = w * h * 4;													// read the pixel buffer
-	buffer = AllocPtr(size);
-	FSRead(fRefNum, &size, buffer);
+	{
+		int w = FSReadBELong(fRefNum);										// read this texture's dimensions
+		int h = FSReadBELong(fRefNum);
+		size = w * h * 4;													// read the pixel buffer
+		Ptr buffer = AllocPtrClear(size);
+		FSRead(fRefNum, &size, buffer);
+		gTunnelTextureObj = MO_CreateTextureObjectFromBuffer(w, h, buffer);	// create material object from buffer
+		SafeDisposePtr(buffer);
+	}
 
-	gTunnelTextureObj = MO_CreateTextureObjectFromBuffer(w, h, buffer);	// create material object from buffer
 
+		/* SKIP WATER TEXTURE */
 
-		/* READ WATER TEXTURE */
-
-	w = FSReadBELong(fRefNum);											// read this texture's dimensions
-	h = FSReadBELong(fRefNum);
-
-	size = w * h * 4;													// read the pixel buffer
-
-	SetFPos(fRefNum, fsFromMark, size);								// skip water texture
+	{
+		int w = FSReadBELong(fRefNum);											// read this texture's dimensions
+		int h = FSReadBELong(fRefNum);
+		size = w * h * 4;
+		SetFPos(fRefNum, fsFromMark, size);
+	}
 
 			/**************/
 			/* READ ITEMS */
@@ -1375,12 +1373,11 @@ MOVertexArrayData		data;
 
 	if (gNumTunnelItems > 0)
 	{
-		if (gTunnelItemList)											// free any old item list
-			SafeDisposePtr(gTunnelItemList);
-
 		size = sizeof(TunnelItemDefType) * gNumTunnelItems;
-		gTunnelItemList = AllocPtr(size);								// alloc a new list
-		FSRead(fRefNum, &size, (Ptr) gTunnelItemList);					// read data into it
+		GAME_ASSERT(!gTunnelItemList);
+		gTunnelItemList = AllocPtrClear(size);							// alloc a new list
+		iErr = FSRead(fRefNum, &size, (Ptr) gTunnelItemList);			// read data into it
+		GAME_ASSERT(!iErr);
 
 		for (int i = 0; i < gNumTunnelItems; i++)
 		{
@@ -1403,8 +1400,10 @@ MOVertexArrayData		data;
 		/**********************/
 
 	size = sizeof(TunnelSplinePointType) * gNumTunnelSplinePoints;
-	gTunnelSplinePoints = AllocPtr(size);								// alloc a new list
-	FSRead(fRefNum, &size, (Ptr) gTunnelSplinePoints);					// read data into it
+	GAME_ASSERT(!gTunnelSplinePoints);
+	gTunnelSplinePoints = AllocPtrClear(size);							// alloc a new list
+	iErr = FSRead(fRefNum, &size, (Ptr) gTunnelSplinePoints);			// read data into it
+	GAME_ASSERT(!iErr);
 
 	for (int i = 0; i < gNumTunnelSplinePoints; i++)
 	{
