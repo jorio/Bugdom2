@@ -115,8 +115,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.language				= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.version				= CURRENT_PREFS_VERS;
 	gGamePrefs.kiddieMode			= false;
-	gGamePrefs.anaglyph				= false;
-	gGamePrefs.anaglyphColor		= false;
+	gGamePrefs.anaglyph				= ANAGLYPH_OFF;
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;

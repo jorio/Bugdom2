@@ -261,7 +261,7 @@ void OGL_InitDrawContext(OGLViewDefType *viewDefPtr)
 
 	if (gGamePrefs.anaglyph)
 	{
-		if (gGamePrefs.anaglyphColor)
+		if (gGamePrefs.anaglyphColor == ANAGLYPH_COLOR)
 		{
 			uint32_t	r,g,b;
 
@@ -489,7 +489,7 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 	{
 		if (gGamePrefs.anaglyph)
 		{
-			if (gGamePrefs.anaglyphColor)
+			if (gGamePrefs.anaglyph == ANAGLYPH_COLOR)
 				glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Green/Blue channels
 			else
 				glColorMask(GL_TRUE, GL_FALSE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Blue channels
@@ -527,7 +527,7 @@ do_anaglyph:
 		}
 		else
 		{
-			if (gGamePrefs.anaglyphColor)
+			if (gGamePrefs.anaglyph == ANAGLYPH_COLOR)
 				glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 			else
 				glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
@@ -729,7 +729,7 @@ GLuint	textureName;
 
 	if (gGamePrefs.anaglyph)
 	{
-		if (gGamePrefs.anaglyphColor)
+		if (gGamePrefs.anaglyph == ANAGLYPH_COLOR)
 			ConvertTextureToColorAnaglyph(imageMemory, width, height, srcFormat, dataType);
 		else
 			ConvertTextureToGrey(imageMemory, width, height, srcFormat, dataType);

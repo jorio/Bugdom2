@@ -58,9 +58,7 @@ typedef struct
 
 	Byte	language;
 	Boolean	kiddieMode;
-	Boolean	anaglyph;
-	Boolean	anaglyphColor;
-	
+	Byte	anaglyph;
 	Boolean	music;
 
 	Byte	monitorNum;
@@ -75,7 +73,12 @@ typedef struct
 	InputBinding	bindings[NUM_CONTROL_NEEDS];
 }PrefsType;
 
-
+enum
+{
+	ANAGLYPH_OFF,
+	ANAGLYPH_COLOR,
+	ANAGLYPH_MONO,
+};
 
 		/* SAVE GAME */
 

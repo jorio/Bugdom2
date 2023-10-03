@@ -381,6 +381,9 @@ OK,,,,,,
 On,Oui,Ein,Sí,Sì,På,
 Off,Non,Aus,No,No,Av,
 Settings,Préférences,Einstellungen,Preferencias,Impostazioni,Inställningar,Instellingen
+Difficulty,Difficulté,Schwierigkeit,Dificultad,Difficoltà,Svårighet,Moeilijkheid
+Normal,Normale,Normal,Normal,Normale,Normal,Normaal
+Kiddie Mode,Mode Gamin,Kindermodus,Mono Niños,Modalità bambino,Barnläge,Kindermodus
 Music,Musique,Musik,Música,Musica,Musik,Muziek
 Language,Langue,Sprache,Idioma,Lingua,Språk,Taal
 Status bar spacing,Barre d’état,Statuszeile,Barra de estado,Estensione HUD,Statusfält,Statusbalk
@@ -389,13 +392,22 @@ Centered,Centrée,Zentriert,Centrada,Centrato,Centrerat,Gecentreerd
 Monitor,Écran,,,Schermo preferito,,
 Monitor,Écran,,,Schermo,,
 Fullscreen,Plein écran,Vollbild,Pantalla completa,Schermo intero,Fullskärm,Volledig scherm
-The new antialiasing settings will take,Le nouveau niveau d’anticrénelage sera,,,Il nuovo livello di antialiasing avrà,,
-effect when you restart the game.,effectif après un redémarrage du jeu.,,,effetto quanto riavvierai il gioco.,,
+"The new antialiasing settings will take
+effect when you restart the game.","Le nouveau niveau d’anticrénelage sera
+effectif après un redémarrage du jeu.",,,"Il nuovo livello di antialiasing avrà
+effetto quanto riavvierai il gioco.",,
 V-Sync,,,,,,
 Antialiasing,Anticrénelage,Antialiasing,Antialiasing,Antialiasing,Kantutjämning,
 MSAA 2x,,,,,,
 MSAA 4x,,,,,,
 MSAA 8x,,,,,,
+Anaglyph 3D,3D Anaglyphe,,,3D anaglifo,,
+Color,Couleur,,,Colore,,
+Monochrome,Monochrome,,,Monocromatico,,
+"Colors will be recalibrated for the new anaglyph 3D mode
+when you start a new level.","Les couleurs seront recalibrées pour le nouveau mode de
+3D anaglyphe lorsque tu commenceras un nouveau niveau.",,,"Hai modificato la modalità anaglifica 3D. I colori
+verranno ricalibrati quando inizierai un nuovo livello.",,
 ---,,,,,,
 Press!,Appuie!,Drück!,,Premi!,Tryck!,Druk!
 Click!,Clique!,,,Fai click!,,

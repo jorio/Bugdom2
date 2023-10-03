@@ -313,6 +313,16 @@ static const MenuItem gSettingsMenu[] =
 
 	{
 		.type = kMenuItem_Cycler,
+		.text = STR_DIFFICULTY,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.kiddieMode,
+			.numChoices = 2,
+			.choices = {STR_DIFFICULTY_NORMAL, STR_DIFFICULTY_EASY},
+		},
+	},
+	{
+		.type = kMenuItem_Cycler,
 		.text = STR_MUSIC,
 		.cycler =
 		{
@@ -320,31 +330,6 @@ static const MenuItem gSettingsMenu[] =
 			.valuePtr = &gGamePrefs.music,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
-		},
-	},
-
-//	{
-//		.type = kMenuItem_Cycler,
-//		.text = STR_AUTO_ALIGN_CAMERA,
-//		.cycler =
-//		{
-//			.valuePtr = &gGamePrefs.autoAlignCamera,
-//			.numChoices = 2,
-//			.choices = {STR_OFF, STR_ON},
-//		},
-//	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_LANGUAGE,
-		.cycler =
-		{
-			.callback = cb_SetLanguage,
-			.valuePtr = &gGamePrefs.language,
-			.numChoices = NUM_LANGUAGES,
-			.generateChoiceString = GenerateCurrentLanguageName,
 		},
 	},
 
@@ -407,18 +392,6 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_PREFERRED_DISPLAY,
-		.cycler =
-		{
-			.callback = SetFullscreenModeFromPrefs,
-			.valuePtr = &gGamePrefs.monitorNum,
-			.generateNumChoices = GenerateNumDisplays,
-			.generateChoiceString = GenerateDisplayName,
-		},
-	},
-
 #if !(__APPLE__ && __x86_64__)		// On macOS, don't expose AA to old machines
 	{
 		.type = kMenuItem_Cycler,
@@ -432,22 +405,46 @@ static const MenuItem gSettingsMenu[] =
 	},
 #endif
 
-	/*
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_PREFERRED_DISPLAY,
+		.cycler =
+		{
+			.callback = SetFullscreenModeFromPrefs,
+			.valuePtr = &gGamePrefs.monitorNum,
+			.generateNumChoices = GenerateNumDisplays,
+			.generateChoiceString = GenerateDisplayName,
+		},
+	},
+
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_ANAGLYPH,
 		.cycler =
 		{
 			.callback = cb_ChangeAnaglyphMode,
-			.valuePtr = &gGamePrefs.anaglyphMode,
+			.valuePtr = &gGamePrefs.anaglyph,
 			.numChoices = 3,
-			.choices = {STR_OFF, STR_ON_COLOR, STR_ON_MONOCHROME},
+			.choices = {STR_OFF, STR_ANAGLYPH_COLOR, STR_ANAGLYPH_MONOCHROME},
 		},
 	},
-	 */
 
 	{ .type = kMenuItem_Spacer },
 
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_LANGUAGE,
+		.cycler =
+		{
+			.callback = cb_SetLanguage,
+			.valuePtr = &gGamePrefs.language,
+			.numChoices = NUM_LANGUAGES,
+			.generateChoiceString = GenerateCurrentLanguageName,
+		},
+	},
+
+
+	{ .type = kMenuItem_Spacer },
 	{
 		.type = kMenuItem_Action,
 		.text = STR_BACK,
@@ -459,23 +456,23 @@ static const MenuItem gSettingsMenu[] =
 
 static const MenuItem kAntialiasingWarning[] =
 {
-	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING_1 },
-	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING_2 },
+	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Spacer },
 	{ .type = kMenuItem_Spacer },
 	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
 	{ .type = kMenuItem_END_SENTINEL },
 };
 
-//static const MenuItem kAnaglyphWarning[] =
-//{
-//	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_1 },
-//	{ .type = kMenuItem_Spacer },
-//	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_2 },
-//	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_3 },
-//	{ .type = kMenuItem_Spacer },
-//	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
-//	{ .type = kMenuItem_END_SENTINEL },
-//};
+static const MenuItem kAnaglyphWarning[] =
+{
+	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
+	{ .type = kMenuItem_END_SENTINEL },
+};
 
 #pragma mark -
 
@@ -507,8 +504,8 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 	}
 
 	// If user changed anaglyph setting, show warning
-//	if (gPreviousPrefs.anaglyphMode != gGamePrefs.anaglyphMode)
-//	{
-//		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
-//	}
+	if (gPreviousPrefs.anaglyph != gGamePrefs.anaglyph)
+	{
+		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
+	}
 }
