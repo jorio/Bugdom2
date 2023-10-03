@@ -17,7 +17,7 @@
 #define	MAX_FPS				300
 #define	COOK_GPU			0
 #define	USE_MALLOC			1
-#define ALLOW_GL_LIGHT_MODEL_TWO_SIDE	1		// extremely expensive on some modern GPU drivers!
+#define ALLOW_GL_LIGHT_MODEL_TWO_SIDE	0		// extremely expensive on some modern GPU drivers!
 
 #include "version.h"
 #include "globals.h"
