@@ -419,7 +419,7 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 
-#if !(__APPLE__)
+#if !(__APPLE__ && __x86_64__)		// On macOS, don't expose AA to old machines
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_ANTIALIASING,
