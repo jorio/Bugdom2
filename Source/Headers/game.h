@@ -12,6 +12,7 @@
 
 #define APPSTORE			0
 #define SKIPFLUFF			0
+#define	TWEAKED_CAM			1		// more pleasant camera turning with twin-stick controls; also disables cam locking near CTYPE_LOOKAT objects
 #define	DEFAULT_FPS			10
 #define	MAX_FPS				300
 #define	COOK_GPU			0

@@ -415,8 +415,6 @@ float		myX,myY,myZ,delta;
 ObjNode		*playerObj = gPlayerInfo.objNode;
 SkeletonObjDataType	*skeleton;
 float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPointOfInterestY;
-ObjNode		*lookAtObj;
-OGLMatrix3x3	m;
 Boolean			snapTo = false;
 
 	if (!playerObj)
@@ -502,11 +500,12 @@ Boolean			snapTo = false;
 	}
 
 
-
+#if !TWEAKED_CAM
 		/*******************************************/
 		/* SEE IF THERE'S A LOOKAT OBJECT IN RANGE */
 		/*******************************************/
 
+	ObjNode *lookAtObj = NULL;
 	if ((gPlayerInfo.objNode->Delta.x == 0.0f) && (gPlayerInfo.objNode->Delta.z == 0.0f))		// only do auto-lookat if player isn't being controlled
 	{
 		lookAtObj = FindClosestCType(&gPlayerInfo.coord, CTYPE_LOOKAT, false);			// find closest "lookat" object if any
@@ -536,6 +535,7 @@ Boolean			snapTo = false;
 					if (OGLVector2D_Cross(&camToLook, &camToPlayer) < 0.0f)					// calc cross prod to determine which way to swing the camera
 						angle = -angle;
 
+					OGLMatrix3x3 m;
 					OGLMatrix3x3_SetRotate(&m, angle);										// rot it
 					OGLVector2D_Transform(&pToC, &m, &pToC);
 				}
@@ -544,8 +544,7 @@ Boolean			snapTo = false;
 				lookAtObj = nil;
 		}
 	}
-	else
-		lookAtObj = nil;
+#endif
 
 
 			/**********************/
@@ -607,7 +606,7 @@ Boolean			snapTo = false;
 	else
 	{
 
-
+#if !TWEAKED_CAM
 				/* ROTATE BY USER ROT */
 
 		if (lookAtObj == nil)
@@ -615,11 +614,13 @@ Boolean			snapTo = false;
 			float cameraDelta = GetNeedAnalogSteering(kNeed_CameraLeft, kNeed_CameraRight);
 			if (cameraDelta != 0)
 			{
+				OGLMatrix3x3 m;
 				OGLMatrix3x3_SetRotate(&m, fps * 6.0f * cameraDelta);
 				OGLVector2D_Transform(&pToC, &m, &pToC);
 				snapTo = true;
 			}
 		}
+#endif
 
 		dist = gCameraDistFromMe;
 		fromAcc = gCameraFromAccel;
@@ -739,6 +740,21 @@ got_target:
 				from.y = waterY;
 		}
 	}
+
+
+#if TWEAKED_CAM
+				/* ROTATE BY USER ROT */
+
+	float cameraDelta = GetNeedAnalogSteering(kNeed_CameraLeft, kNeed_CameraRight);
+	if (cameraDelta != 0)
+	{
+		float r = -cameraDelta * fps * 2.5f;
+
+		OGLMatrix4x4 m4;
+		OGLMatrix4x4_SetRotateAboutPoint(&m4, &to, 0, r, 0);
+		OGLPoint3D_Transform(&from, &m4, &from);
+	}
+#endif
 
 
 				/**********************/
