@@ -60,40 +60,69 @@ void InitConfettiManager(void)
 
 			/* SET THE DATA */
 
+		int maxPoints = MAX_CONFETTIS * 4 * 2;
+		int maxFaces = MAX_CONFETTIS * 2 * 2;
+
 		MOVertexArrayData vertexArrayData =
 		{
 			.numMaterials 	= 0,
 			.numPoints		= 0,
 			.numTriangles	= 0,
-			.points 		= (OGLPoint3D *) AllocPtrClear(sizeof(OGLPoint3D) * MAX_CONFETTIS * 4),
-			.normals 		= nil,
-			.uvs[0]	 		= (OGLTextureCoord *) AllocPtrClear(sizeof(OGLTextureCoord) * MAX_CONFETTIS * 4),
-			.colorsByte 	= (OGLColorRGBA_Byte *) AllocPtrClear(sizeof(OGLColorRGBA_Byte) * MAX_CONFETTIS * 4),
-			.colorsFloat	= nil,
-			.triangles		= (MOTriangleIndecies *) AllocPtrClear(sizeof(MOTriangleIndecies) * MAX_CONFETTIS * 2),
+			.points 		= (OGLPoint3D *) AllocPtrClear(sizeof(OGLPoint3D) * maxPoints),
+			.normals 		= (OGLVector3D *) AllocPtrClear(sizeof(OGLVector3D) * maxPoints),
+			.uvs[0]	 		= (OGLTextureCoord *) AllocPtrClear(sizeof(OGLTextureCoord) * maxPoints),
+			.colorsByte 	= (OGLColorRGBA_Byte *) AllocPtrClear(sizeof(OGLColorRGBA_Byte) * maxPoints),
+			.triangles		= (MOTriangleIndecies *) AllocPtrClear(sizeof(MOTriangleIndecies) * maxFaces),
 		};
 
 			/* INIT UV ARRAYS */
 
-		for (int j = 0; j < (MAX_CONFETTIS*4); j+=4)
+		for (int p = 0; p < maxPoints; )
 		{
-			vertexArrayData.uvs[0][j+0] = (OGLTextureCoord) {0,1};			// upper left
-			vertexArrayData.uvs[0][j+1] = (OGLTextureCoord) {0,0};			// lower left
-			vertexArrayData.uvs[0][j+2] = (OGLTextureCoord) {1,0};			// lower right
-			vertexArrayData.uvs[0][j+3] = (OGLTextureCoord) {1,1};			// upper right
+			// frontface
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {0,1};			// upper left
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {0,0};			// lower left
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {1,0};			// lower right
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {1,1};			// upper right
+
+			// backface
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {0,1};			// upper left
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {0,0};			// lower left
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {1,0};			// lower right
+			vertexArrayData.uvs[0][p++] = (OGLTextureCoord) {1,1};			// upper right
+
+			GAME_ASSERT(p <= maxPoints);
 		}
 
 			/* INIT TRIANGLE ARRAYS */
 
-		for (int j = 0, k = 0; j < (MAX_CONFETTIS*2); j+=2, k+=4)
+		for (int t = 0, p = 0; t < maxFaces; )
 		{
-			vertexArrayData.triangles[j].vertexIndices[0] = k;				// triangle A
-			vertexArrayData.triangles[j].vertexIndices[1] = k+1;
-			vertexArrayData.triangles[j].vertexIndices[2] = k+2;
+			// frontface
+			vertexArrayData.triangles[t].vertexIndices[0] = p+0;			// triangle A
+			vertexArrayData.triangles[t].vertexIndices[1] = p+1;
+			vertexArrayData.triangles[t].vertexIndices[2] = p+2;
+			t++;
 
-			vertexArrayData.triangles[j+1].vertexIndices[0] = k;			// triangle B
-			vertexArrayData.triangles[j+1].vertexIndices[1] = k+2;
-			vertexArrayData.triangles[j+1].vertexIndices[2] = k+3;
+			vertexArrayData.triangles[t].vertexIndices[0] = p+0;			// triangle B
+			vertexArrayData.triangles[t].vertexIndices[1] = p+2;
+			vertexArrayData.triangles[t].vertexIndices[2] = p+3;
+			t++;
+
+			// backface
+			vertexArrayData.triangles[t].vertexIndices[0] = p+4;			// backface triangle A
+			vertexArrayData.triangles[t].vertexIndices[1] = p+5;
+			vertexArrayData.triangles[t].vertexIndices[2] = p+6;
+			t++;
+
+			vertexArrayData.triangles[t].vertexIndices[0] = p+4;			// backface triangle B
+			vertexArrayData.triangles[t].vertexIndices[1] = p+6;
+			vertexArrayData.triangles[t].vertexIndices[2] = p+7;
+			t++;
+
+			p += 8;
+			GAME_ASSERT(t <= maxFaces);
+			GAME_ASSERT(p <= maxPoints);
 		}
 
 			/* CREATE NEW GEOMETRY OBJECT */
@@ -111,8 +140,7 @@ void InitConfettiManager(void)
 		// The confettis need to be drawn after the fences object, but before any sprite or font objects.
 		//
 
-	ObjNode* driver = MakeNewDriverObject(CONFETTI_SLOT, DrawConfettiGroups, MoveConfettiGroups);
-	driver->StatusBits |= STATUS_BIT_DOUBLESIDED;
+	MakeNewDriverObject(CONFETTI_SLOT, DrawConfettiGroups, MoveConfettiGroups);
 }
 
 
@@ -390,10 +418,9 @@ deleteConfetti:
 
 static void DrawConfettiGroups(ObjNode *theNode)
 {
-float				scale,baseScale;
+float				baseScale;
 OGLColorRGBA_Byte	*vertexColors;
 MOVertexArrayData	*geoData;
-OGLPoint3D		v[4];
 OGLBoundingBox	bbox;
 
 	(void) theNode;
@@ -403,11 +430,6 @@ OGLBoundingBox	bbox;
 	if (Pool_Empty(gConfettiGroupPool))
 		return;
 
-
-	v[0].z = 												// init z's to 0
-	v[1].z =
-	v[2].z =
-	v[3].z = 0;
 
 				/* SETUP ENVIRONTMENT */
 
@@ -446,20 +468,26 @@ OGLBoundingBox	bbox;
 
 						/* SET VERTEX COORDS */
 
-			scale = confettiGroup->scale[p] * baseScale;
+			float s = confettiGroup->scale[p] * baseScale;
 
-			v[0].x = -scale;
-			v[0].y = scale;
+			OGLPoint3D vFront[4] =
+			{
+				{ s,  s, 0},
+				{ s, -s, 0},
+				{-s, -s, 0},
+				{-s,  s, 0},
+			};
 
-			v[1].x = -scale;
-			v[1].y = -scale;
+			OGLPoint3D vBack[4] =
+			{
+				{-s,  s, 0},
+				{-s, -s, 0},
+				{ s, -s, 0},
+				{ s,  s, 0},
+			};
 
-			v[2].x = scale;
-			v[2].y = -scale;
-
-			v[3].x = scale;
-			v[3].y = scale;
-
+			int pointOffset = n*8;
+			int triOffset = n*4;
 
 				/* TRANSFORM THIS CONFETTI'S VERTICES & ADD TO TRIMESH */
 
@@ -467,14 +495,29 @@ OGLBoundingBox	bbox;
 			m.value[M03] = confettiGroup->coord[p].x;								// set translate
 			m.value[M13] = confettiGroup->coord[p].y;
 			m.value[M23] = confettiGroup->coord[p].z;
-			OGLPoint3D_TransformArray(&v[0], &m, &geoData->points[n*4], 4);				// transform
+			OGLPoint3D_TransformArray(vFront, &m, &geoData->points[pointOffset], 4);				// transform
+			OGLPoint3D_TransformArray(vBack, &m, &geoData->points[pointOffset+4], 4);				// transform
 
+			for (int t = triOffset+0; t < triOffset+4; t++)
+			{
+				int v0 = (int) geoData->triangles[t].vertexIndices[0];
+				int v1 = (int) geoData->triangles[t].vertexIndices[1];
+				int v2 = (int) geoData->triangles[t].vertexIndices[2];
+				OGLVector3D normal;
+				CalcFaceNormal(&geoData->points[v0], &geoData->points[v1], &geoData->points[v2], &normal);
+				geoData->normals[v0] = normal;
+				geoData->normals[v1] = normal;
+				geoData->normals[v2] = normal;
+				GAME_ASSERT(v0 >= pointOffset && v0 < pointOffset+8);
+				GAME_ASSERT(v1 >= pointOffset && v1 < pointOffset+8);
+				GAME_ASSERT(v2 >= pointOffset && v2 < pointOffset+8);
+			}
 
 						/* UPDATE BBOX */
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)		// only look at 4 first vertices in confetti (i.e. front face)
 			{
-				int j = n*4+i;
+				int j = pointOffset+i;
 
 				if (geoData->points[j].x < minX) minX = geoData->points[j].x;
 				if (geoData->points[j].x > maxX) maxX = geoData->points[j].x;
@@ -486,8 +529,7 @@ OGLBoundingBox	bbox;
 
 				/* UPDATE COLOR/TRANSPARENCY */
 
-			int temp = n*4;
-			for (int i = temp; i < (temp+4); i++)
+			for (int i = pointOffset; i < pointOffset+8; i++)
 			{
 				vertexColors[i].r =
 				vertexColors[i].g =
@@ -500,8 +542,8 @@ OGLBoundingBox	bbox;
 
 			/* UPDATE FINAL VALUES */
 
-		geoData->numTriangles = n*2;
-		geoData->numPoints = n*4;
+		geoData->numTriangles = n*4;
+		geoData->numPoints = n*8;
 
 		if (geoData->numPoints < 20)						// if small then just skip cull test
 			goto drawme;
