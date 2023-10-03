@@ -64,9 +64,16 @@ void DoLegalScreen(void)
 		.scale = 640,
 		.slot = SPRITE_SLOT,
 	};
-	
-	ObjNode* theNode = MakeSpriteObject(&def);
-	GAME_ASSERT(theNode);
+	ObjNode* imageNode = MakeSpriteObject(&def);
+	GAME_ASSERT(imageNode);
+
+	def.scale = 0.18f;
+	def.coord.y = 470;
+	def.group = ATLAS_GROUP_FONT1;
+	ObjNode* widescreenText = TextMesh_New(
+		"© 2002 Pangea Software, Inc. All rights reserved. Bugdom is a registered trademark of Pangea Software, Inc.",
+		kTextMeshAlignBottom, &def);
+	widescreenText->ColorFilter = (OGLColorRGBA) {.48f, .2f, .15f, 1};
 
 
 		/***********/
@@ -83,6 +90,20 @@ void DoLegalScreen(void)
 	while(!UserWantsOut())
 	{
 		CalcFramesPerSecond();
+
+		imageNode->Coord = (OGLPoint3D) {320,240,0};
+		imageNode->Scale = (OGLVector3D) {640,640,0};
+		if (gCurrentAspectRatio > 1.59f)
+		{
+			imageNode->Scale.x *= 1.33f;
+			imageNode->Scale.y *= 1.33f;
+			imageNode->Coord.y += 20;
+			widescreenText->StatusBits &= ~STATUS_BIT_HIDDEN;
+		}
+		else
+			widescreenText->StatusBits |= STATUS_BIT_HIDDEN;
+		UpdateObjectTransforms(imageNode);
+
 		MoveObjects();
 		OGL_DrawScene(DrawObjects);
 
