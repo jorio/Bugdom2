@@ -49,7 +49,7 @@ typedef	void * MetaObjectPtr;
 		/* GROUP OBJECT */
 		/****************/
 
-#define	MO_MAX_ITEMS_IN_GROUP	70
+#define	MO_MAX_ITEMS_IN_GROUP	40
 
 typedef struct
 {
