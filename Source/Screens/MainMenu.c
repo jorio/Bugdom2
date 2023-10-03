@@ -687,7 +687,7 @@ static void DoCredits(void)
 
 	NewObjectDefinitionType def =
 	{
-		.coord = {640/2, 100, 0},
+		.coord = {640/2, 80, 0},
 		.slot = SPRITE_SLOT,
 		.scale = 0.5f,
 		.group = ATLAS_GROUP_FONT1,
@@ -711,9 +711,28 @@ static void DoCredits(void)
 
 	def.coord.y += LH * 1.5f;
 	def.coord.x = 640/2;
-	creditObjs[n++] = TextMesh_New("pangeasoft.net/bug2", kTextMeshAlignCenter, &def);
+	creditObjs[n] = TextMesh_New("pangeasoft.net/bug2", kTextMeshAlignCenter, &def);
+	creditObjs[n]->ColorFilter = (OGLColorRGBA){ .4, .8, 1, 1 };
 	def.coord.y += LH;
-	creditObjs[n++] = TextMesh_New("jorio.itch.io/bugdom2", kTextMeshAlignCenter, &def);
+	n++;
+	creditObjs[n] = TextMesh_New("jorio.itch.io/bugdom2", kTextMeshAlignCenter, &def);
+	creditObjs[n]->ColorFilter = (OGLColorRGBA){ .4, .8, 1, 1 };
+	n++;
+
+	char systemInfo[512];
+	SDL_snprintf(systemInfo, sizeof(systemInfo), "%s v%s - %s (%s)\nOpenGL %s (%s)",
+		PROJECT_NAME,
+		PROJECT_VERSION,
+		SDL_GetRevision(),
+		SDL_GetCurrentVideoDriver(),
+		(const char*)glGetString(GL_VERSION),
+		(const char*)glGetString(GL_RENDERER));
+	
+	def.scale = .2f;
+	def.coord.y = 475;
+	creditObjs[n] = TextMesh_New(systemInfo, kTextMeshAlignCenter | kTextMeshAlignBottom, &def);
+	creditObjs[n]->ColorFilter = (OGLColorRGBA){ .5,.5,.5, 1 };
+	n++;
 
 	//-----------------------------
 

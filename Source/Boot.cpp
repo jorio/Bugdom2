@@ -122,7 +122,7 @@ retryVideo:
 	GetDefaultWindowSize(display, &initialWidth, &initialHeight);
 
 	gSDLWindow = SDL_CreateWindow(
-			PROJECT_FULL_NAME " " PROJECT_VERSION,
+			PROJECT_FULL_NAME " (" PROJECT_VERSION ")",
 			SDL_WINDOWPOS_UNDEFINED_DISPLAY(display),
 			SDL_WINDOWPOS_UNDEFINED_DISPLAY(display),
 			initialWidth,
