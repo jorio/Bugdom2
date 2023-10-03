@@ -249,7 +249,7 @@ Boolean	continueGame = false;
 			/*****************************/
 
 	else
-	if (IsNeedDown(kNeed_UIPause))
+	if (IsNeedDown(kNeed_UIPause) || IsNeedDown(kNeed_UIBack))
 	{
 		continueGame = true;
 	}
