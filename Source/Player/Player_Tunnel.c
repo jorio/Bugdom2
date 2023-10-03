@@ -58,7 +58,7 @@ int		gNumTunnelSections = 0;
 
 TunnelSplinePointType	*gTunnelSplinePoints = nil;
 
-MOVertexArrayObject	*gTunnelSectionObjects[MAX_TUNNEL_SECTIONS];
+MOVertexArrayObject	*gTunnelSectionMeshes[MAX_TUNNEL_SECTIONS];
 MOVertexArrayObject	*gTunnelSectionWaterObjects[MAX_TUNNEL_SECTIONS];
 
 MOMaterialObject	*gTunnelTextureObj = nil;
@@ -222,8 +222,8 @@ int		i;
 
 	for (i = 0; i < gNumTunnelSections; i++)
 	{
-		MO_DisposeObjectReference(gTunnelSectionObjects[i]);
-		gTunnelSectionObjects[i] = nil;
+		MO_DisposeObjectReference(gTunnelSectionMeshes[i]);
+		gTunnelSectionMeshes[i] = nil;
 
 		MO_DisposeObjectReference(gTunnelSectionWaterObjects[i]);
 		gTunnelSectionWaterObjects[i] = nil;
@@ -421,9 +421,9 @@ int			i,t;
 
 	for (i = 0; i < gNumTunnelSections; i++)
 	{
-		if (OGL_IsBBoxVisible(&gTunnelSectionObjects[i]->objectData.bBox, nil))
+		if (OGL_IsBBoxVisible(&gTunnelSectionMeshes[i]->objectData.bBox, nil))
 		{
-			MO_DrawObject(gTunnelSectionObjects[i]);
+			MO_DrawObject(gTunnelSectionMeshes[i]);
 		}
 	}
 #if ALLOW_GL_LIGHT_MODEL_TWO_SIDE

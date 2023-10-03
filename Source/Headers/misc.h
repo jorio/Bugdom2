@@ -29,6 +29,13 @@ void SwizzlePoint3D(OGLPoint3D *pt);
 void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
 
+uint8_t FSReadByte(short refNum);
+int16_t FSReadBEShort(short refNum);
+uint16_t FSReadBEUShort(short refNum);
+int32_t FSReadBELong(short refNum);
+uint32_t FSReadBEULong(short refNum);
+float FSReadBEFloat(short refNum);
+
 #define SQUARED(x) ((x)*(x))
 
 static inline int PositiveModulo(int value, unsigned int m)

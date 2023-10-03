@@ -633,7 +633,58 @@ float	f, p, q, t;
 
 
 
+/************************ READ INTEGER THEN BYTESWAP ********************/
 
+uint8_t FSReadByte(short refNum)
+{
+	uint8_t result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return result;
+}
 
+int16_t FSReadBEShort(short refNum)
+{
+	int16_t result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return SwizzleShort(&result);
+}
 
+uint16_t FSReadBEUShort(short refNum)
+{
+	uint16_t result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return SwizzleUShort(&result);
+}
 
+int32_t FSReadBELong(short refNum)
+{
+	int32_t result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return SwizzleLong(&result);
+}
+
+uint32_t FSReadBEULong(short refNum)
+{
+	uint32_t result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return SwizzleULong(&result);
+}
+
+float FSReadBEFloat(short refNum)
+{
+	float result = 0;
+	long count = sizeof(result);
+	OSErr err = FSRead(refNum, &count, (Ptr)&result);
+	GAME_ASSERT(err == noErr);
+	return SwizzleFloat(&result);
+}

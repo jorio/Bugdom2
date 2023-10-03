@@ -178,21 +178,13 @@ OSErr			err;
 
 static void ParseBG3DFile(short refNum)
 {
-uint32_t		tag;
-long			count;
-OSErr			err;
-Boolean			done = false;
-MetaObjectPtr 	newObj;
+	MetaObjectPtr newObj = NULL;
 
-	do
+	while (1)
 	{
 			/* READ A TAG */
 
-		count = sizeof(tag);
-		err = FSRead(refNum, &count, (Ptr) &tag);
-		GAME_ASSERT(!err);
-
-		tag = SwizzleULong(&tag);
+		uint32_t tag = FSReadBEULong(refNum);
 
 
 			/* HANDLE THE TAG */
@@ -253,13 +245,12 @@ MetaObjectPtr 	newObj;
 					break;
 
 			case	BG3D_TAGTYPE_ENDFILE:
-					done = true;
-					break;
+					return;
 
 			default:
 					DoFatalAlert("ParseBG3DFile: unrecognized tag 0x%08x", tag);
 		}
-	}while(!done);
+	}
 }
 
 
@@ -270,31 +261,22 @@ MetaObjectPtr 	newObj;
 
 static void ReadMaterialFlags(short refNum)
 {
-long				count;
-OSErr				err;
-MOMaterialData		data;
-uint32_t			flags;
-
 			/* READ FLAGS */
 
-	count = sizeof(flags);
-	err = FSRead(refNum, &count, (Ptr) &flags);
-	GAME_ASSERT(!err);
-
-	flags = SwizzleULong(&flags);
+	uint32_t flags = FSReadBEULong(refNum);
 
 
 		/* INIT NEW MATERIAL DATA */
 
-	data.flags 					= flags;
-	data.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE;
-	data.multiTextureCombine	= MULTI_TEXTURE_COMBINE_MODULATE;
-	data.envMapNum			= 0;
-	data.diffuseColor.r			= 1;
-	data.diffuseColor.g			= 1;
-	data.diffuseColor.b			= 1;
-	data.diffuseColor.a			= 1;
-	data.numMipmaps				= 0;				// there are currently 0 textures assigned to this material
+	MOMaterialData data =
+	{
+		.flags 					= flags,
+		.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE,
+		.multiTextureCombine	= MULTI_TEXTURE_COMBINE_MODULATE,
+		.envMapNum				= 0,
+		.diffuseColor			= {1, 1, 1, 1},
+		.numMipmaps				= 0,				// there are currently 0 textures assigned to this material
+	};
 
 	/* CREATE NEW MATERIAL OBJECT */
 
@@ -314,8 +296,6 @@ uint32_t			flags;
 
 static void ReadMaterialDiffuseColor(short refNum)
 {
-long			count;
-OSErr			err;
 GLfloat			color[4];
 MOMaterialData	*data;
 
@@ -324,14 +304,10 @@ MOMaterialData	*data;
 
 			/* READ COLOR VALUE */
 
-	count = sizeof(GLfloat) * 4;
-	err = FSRead(refNum, &count, (Ptr) color);
-	GAME_ASSERT(!err);
-
-	color[0] = SwizzleFloat(&color[0]);
-	color[1] = SwizzleFloat(&color[1]);
-	color[2] = SwizzleFloat(&color[2]);
-	color[3] = SwizzleFloat(&color[3]);
+	color[0] = FSReadBEFloat(refNum);
+	color[1] = FSReadBEFloat(refNum);
+	color[2] = FSReadBEFloat(refNum);
+	color[3] = FSReadBEFloat(refNum);
 
 
 		/* ASSIGN COLOR TO CURRENT MATERIAL */
@@ -354,9 +330,9 @@ MOMaterialData	*data;
 static void ReadMaterialTextureMap(short refNum)
 {
 BG3DTextureHeader	textureHeader;
-long		count,i;
 void		*texturePixels;
 MOMaterialData	*data;
+OSErr			err;
 
 			/* GET PTR TO CURRENT MATERIAL */
 
@@ -369,14 +345,13 @@ MOMaterialData	*data;
 			/* READ TEXTURE HEADER */
 			/***********************/
 
-	count = sizeof(BG3DTextureHeader);
-	FSRead(refNum, &count, (Ptr) &textureHeader);		// read header
+	textureHeader.width				= FSReadBEULong(refNum);
+	textureHeader.height			= FSReadBEULong(refNum);
+	textureHeader.srcPixelFormat	= FSReadBELong(refNum);
+	textureHeader.dstPixelFormat	= FSReadBELong(refNum);
+	textureHeader.bufferSize		= FSReadBEULong(refNum);
 
-	textureHeader.width			= SwizzleULong(&textureHeader.width);
-	textureHeader.height		= SwizzleULong(&textureHeader.height);
-	textureHeader.srcPixelFormat = SwizzleLong(&textureHeader.srcPixelFormat);
-	textureHeader.dstPixelFormat = SwizzleLong(&textureHeader.dstPixelFormat);
-	textureHeader.bufferSize	= SwizzleULong(&textureHeader.bufferSize);
+	SetFPos(refNum, fsFromMark, sizeof(textureHeader.reserved));		// skip padding
 
 
 			/* COPY BASIC INFO */
@@ -396,12 +371,13 @@ MOMaterialData	*data;
 		/* READ THE TEXTURE PIXELS */
 		/***************************/
 
-	count = textureHeader.bufferSize;			// get size of buffer to load
+	long count = textureHeader.bufferSize;		// get size of buffer to load
 
-	texturePixels = AllocPtr(count);			// alloc memory for buffer
+	texturePixels = AllocPtrClear(count);		// alloc memory for buffer
 	GAME_ASSERT(texturePixels);
 
-	FSRead(refNum, &count, texturePixels);		// read pixel data
+	err = FSRead(refNum, &count, texturePixels);	// read pixel data
+	GAME_ASSERT(!err);
 
 
 			/* SWIZZLE */
@@ -409,7 +385,7 @@ MOMaterialData	*data;
 	if (textureHeader.srcPixelFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 	{
 		uint16_t *pix = texturePixels;
-		for (i = 0; i < (count/2); i++)
+		for (int i = 0; i < (count/2); i++)
 		{
 			pix[i] = SwizzleUShort(&pix[i]);
 		}
@@ -417,9 +393,9 @@ MOMaterialData	*data;
 
 		/* ASSIGN PIXELS TO CURRENT MATERIAL */
 
-	i = data->numMipmaps++;						// increment the mipmap count
-	data->texturePixels[i] = texturePixels;		// set ptr to pixelmap
-
+	int mipmapNum = data->numMipmaps++;					// increment the mipmap count
+	GAME_ASSERT(mipmapNum < MO_MAX_MIPMAPS);
+	data->texturePixels[mipmapNum] = texturePixels;		// set ptr to pixelmap
 }
 
 
@@ -485,21 +461,18 @@ static void EndGroup(void)
 static MetaObjectPtr ReadNewGeometry(short refNum)
 {
 BG3DGeometryHeader	geoHeader;
-long				count;
 MetaObjectPtr		newObj;
 
 			/* READ GEOMETRY HEADER */
 
-	count = sizeof(BG3DGeometryHeader);
-	FSRead(refNum, &count, (Ptr) &geoHeader);		// read header
-
-	geoHeader.type = SwizzleULong(&geoHeader.type);
-	geoHeader.numMaterials = SwizzleULong(&geoHeader.numMaterials);
-	geoHeader.layerMaterialNum[0] = SwizzleULong(&geoHeader.layerMaterialNum[0]);
-	geoHeader.layerMaterialNum[1] = SwizzleULong(&geoHeader.layerMaterialNum[1]);
-	geoHeader.flags = SwizzleULong(&geoHeader.flags);
-	geoHeader.numPoints = SwizzleULong(&geoHeader.numPoints);
-	geoHeader.numTriangles = SwizzleULong(&geoHeader.numTriangles);
+	geoHeader.type					= FSReadBEULong(refNum);
+	geoHeader.numMaterials			= FSReadBEULong(refNum);
+	for (int i = 0; i < MAX_MULTITEXTURE_LAYERS; i++)
+		geoHeader.layerMaterialNum[i] = FSReadBEULong(refNum);
+	geoHeader.flags					= FSReadBEULong(refNum);
+	geoHeader.numPoints				= FSReadBEULong(refNum);
+	geoHeader.numTriangles			= FSReadBEULong(refNum);
+	SetFPos(refNum, fsFromMark, sizeof(geoHeader.reserved));
 
 
 		/******************************/
@@ -583,18 +556,15 @@ OGLPoint3D			*pointList;
 	numPoints = data->numPoints;									// get # points to expect to read
 
 	count = sizeof(OGLPoint3D) * numPoints;							// calc size of data to read
-	pointList = AllocPtr(count);									// alloc buffer to hold points
+	pointList = AllocPtrClear(count);								// alloc buffer to hold points
 	GAME_ASSERT(pointList);
 
-	FSRead(refNum, &count, (Ptr) pointList);						// read the data
-
-	for (int i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)
 	{
-		pointList[i].x = SwizzleFloat(&pointList[i].x);
-		pointList[i].y = SwizzleFloat(&pointList[i].y);
-		pointList[i].z = SwizzleFloat(&pointList[i].z);
+		pointList[i].x = FSReadBEFloat(refNum);
+		pointList[i].y = FSReadBEFloat(refNum);
+		pointList[i].z = FSReadBEFloat(refNum);
 	}
-
 
 	data->points = pointList;										// assign point array to geometry header
 }
@@ -613,16 +583,14 @@ OGLVector3D			*normalList;
 	numPoints = data->numPoints;									// get # normals to expect to read
 
 	count = sizeof(OGLVector3D) * numPoints;						// calc size of data to read
-	normalList = AllocPtr(count);									// alloc buffer to hold normals
+	normalList = AllocPtrClear(count);								// alloc buffer to hold normals
 	GAME_ASSERT(normalList);
 
-	FSRead(refNum, &count, (Ptr) normalList);						// read the data
-
-	for (int i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)
 	{
-		normalList[i].x = SwizzleFloat(&normalList[i].x);
-		normalList[i].y = SwizzleFloat(&normalList[i].y);
-		normalList[i].z = SwizzleFloat(&normalList[i].z);
+		normalList[i].x = FSReadBEFloat(refNum);
+		normalList[i].y = FSReadBEFloat(refNum);
+		normalList[i].z = FSReadBEFloat(refNum);
 	}
 
 	data->normals = normalList;										// assign normal array to geometry header
@@ -642,18 +610,16 @@ OGLTextureCoord		*uvList;
 	numPoints = data->numPoints;									// get # uv's to expect to read
 
 	count = sizeof(OGLTextureCoord) * numPoints;					// calc size of data to read
-	uvList = AllocPtr(count);										// alloc buffer to hold uv's
+	uvList = AllocPtrClear(count);									// alloc buffer to hold uv's
 	GAME_ASSERT(uvList);
 
-	FSRead(refNum, &count, (Ptr) uvList);							// read the data
-
-	for (int i = 0; i < numPoints; i++)						// swizzle
+	for (int i = 0; i < numPoints; i++)
 	{
-		uvList[i].u = SwizzleFloat(&uvList[i].u);
-		uvList[i].v = SwizzleFloat(&uvList[i].v);
+		uvList[i].u = FSReadBEFloat(refNum);
+		uvList[i].v = FSReadBEFloat(refNum);
 	}
 
-	data->uvs[0] = uvList;												// assign uv array to geometry header
+	data->uvs[0] = uvList;											// assign uv array to geometry header
 }
 
 
@@ -671,7 +637,7 @@ OGLColorRGBA		*colorsF;
 	numPoints = data->numPoints;									// get # colors to expect to read
 
 	count = sizeof(OGLColorRGBA_Byte) * numPoints;					// calc size of data to read
-	colorList = AllocPtr(count);									// alloc buffer to hold data
+	colorList = AllocPtrClear(count);								// alloc buffer to hold data
 	GAME_ASSERT(colorList);
 
 	FSRead(refNum, &count, (Ptr) colorList);						// read the data
@@ -684,7 +650,7 @@ OGLColorRGBA		*colorsF;
 		// it is faster to render with Bytes if no lighting, but faster with floats if doing lights
 		//
 
-	colorsF = AllocPtr(sizeof(OGLColorRGBA) * numPoints);
+	colorsF = AllocPtrClear(sizeof(OGLColorRGBA) * numPoints);
 	GAME_ASSERT(colorsF);
 
 	data->colorsFloat = colorsF;									// assign color array to geometry header
@@ -713,16 +679,14 @@ MOTriangleIndecies	*triList;
 	numTriangles = data->numTriangles;								// get # triangles expect to read
 
 	count = sizeof(MOTriangleIndecies) * numTriangles;				// calc size of data to read
-	triList = AllocPtr(count);										// alloc buffer to hold data
+	triList = AllocPtrClear(count);									// alloc buffer to hold data
 	GAME_ASSERT(triList);
 
-	FSRead(refNum, &count, (Ptr) triList);							// read the data
-
-	for (int i = 0; i < numTriangles; i++)							//	swizzle
+	for (int i = 0; i < numTriangles; i++)
 	{
-		triList[i].vertexIndices[0] = SwizzleULong(&triList[i].vertexIndices[0]);
-		triList[i].vertexIndices[1] = SwizzleULong(&triList[i].vertexIndices[1]);
-		triList[i].vertexIndices[2] = SwizzleULong(&triList[i].vertexIndices[2]);
+		triList[i].vertexIndices[0] = FSReadBEULong(refNum);
+		triList[i].vertexIndices[1] = FSReadBEULong(refNum);
+		triList[i].vertexIndices[2] = FSReadBEULong(refNum);
 	}
 
 	data->triangles = triList;										// assign triangle array to geometry header
@@ -733,23 +697,21 @@ MOTriangleIndecies	*triList;
 
 static void ReadBoundingBox(short refNum)
 {
-long				count;
 MOVertexArrayData	*data;
 
 	data = &gBG3D_CurrentGeometryObj->objectData;					// point to geometry data
 
-	count = sizeof(OGLBoundingBox);									// calc size of data to read
+	data->bBox.min.x = FSReadBEFloat(refNum);
+	data->bBox.min.y = FSReadBEFloat(refNum);
+	data->bBox.min.z = FSReadBEFloat(refNum);
 
-	FSRead(refNum, &count, (Ptr) &data->bBox);						// read the bbox data directly into geometry header
+	data->bBox.max.x = FSReadBEFloat(refNum);
+	data->bBox.max.y = FSReadBEFloat(refNum);
+	data->bBox.max.z = FSReadBEFloat(refNum);
 
-	data->bBox.min.x = SwizzleFloat(&data->bBox.min.x);
-	data->bBox.min.y = SwizzleFloat(&data->bBox.min.y);
-	data->bBox.min.z = SwizzleFloat(&data->bBox.min.z);
+	data->bBox.isEmpty = FSReadByte(refNum);
 
-	data->bBox.max.x = SwizzleFloat(&data->bBox.max.x);
-	data->bBox.max.y = SwizzleFloat(&data->bBox.max.y);
-	data->bBox.max.z = SwizzleFloat(&data->bBox.max.z);
-
+	SetFPos(refNum, fsFromMark, 3);		// padding
 }
 
 

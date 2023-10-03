@@ -108,7 +108,7 @@ extern	MOMaterialObject		*gMostRecentMaterial;
 extern	MOMaterialObject		*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	MOMaterialObject		*gTunnelTextureObj;
 extern	MOVertexArrayData		**gLocalTriMeshesOfSkelType;
-extern	MOVertexArrayObject		*gTunnelSectionObjects[];
+extern	MOVertexArrayObject		*gTunnelSectionMeshes[];
 extern	MOVertexArrayObject		*gTunnelSectionWaterObjects[];
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	NewConfettiGroupDefType	gNewConfettiGroupDef;

@@ -22,9 +22,6 @@ static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, 
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr);
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 
-static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum);
-
-
 static Ptr TileImage(Ptr imageBank, int col, int row);
 
 static inline void Blit16(
@@ -1295,92 +1292,57 @@ Boolean LoadSavedGame(int slot)
 
 void LoadTunnel(FSSpec *inSpec, FSSpec *bg3dSpec)
 {
-OSErr		iErr;
-short		fRefNum;
+OSErr					iErr;
+short					fRefNum;
+long					size;
+int32_t					w, h;
+Ptr						buffer;
+MOVertexArrayData		data;
 
 				/* OPEN THE DATA FORK */
 
 	iErr = FSpOpenDF(inSpec, fsRdPerm, &fRefNum);
-	if (iErr)
-		DoFatalAlert("LoadTunnel: FSpOpenDF failed!");
+	GAME_ASSERT(!iErr);
 
-
-
-			/* READ DATA FROM FILE */
-
-	ReadDataFromTunnelFile(inSpec, bg3dSpec, fRefNum);
-
-	FSClose(fRefNum);
-
-
-}
-
-
-/************** READ DATA FROM TUNNEL FILE *****************/
-
-static void ReadDataFromTunnelFile(FSSpec *tunnelSpec, FSSpec *bg3dSpec, short fRefNum)
-{
-TunnelFileHeaderType	header;
-OSErr					iErr;
-long					size;
-int32_t					w,h;
-Ptr						buffer;
-int32_t					aliasSize;
-int						i, j;
-MOVertexArrayData		data;
-
-	(void) tunnelSpec;
 
 			/***************/
 			/* READ HEADER */
 			/***************/
+	
+	int numNubs = 0;
+	{
+		TunnelFileHeaderType header = { 0 };
+		size = sizeof(header);
+		iErr = FSRead(fRefNum, &size, (Ptr) &header);
+		GAME_ASSERT(!iErr);
+		GAME_ASSERT(size == sizeof(header));
 
-	size = sizeof(header);
-	iErr = FSRead(fRefNum, &size, (Ptr) &header);
-	GAME_ASSERT(!iErr);
-	GAME_ASSERT(size == sizeof(header));
+//		gTunnelIsFullPipe 			= header.fullPipe;
+		numNubs						= SwizzleLong(&header.numNubs);
+		gNumTunnelItems				= SwizzleLong(&header.numItems);
+		gNumTunnelSplinePoints		= SwizzleLong(&header.numSplinePoints);
+		gNumTunnelSections			= SwizzleLong(&header.numSections);
 
-	header.numNubs			= SwizzleLong(&header.numNubs);
+		GAME_ASSERT(gNumTunnelSections <= MAX_TUNNEL_SECTIONS);
 
-
-			/* EXTRACT HEADER DATA */
-
-//	gTunnelIsFullPipe 			= header.fullPipe;
-	gNumTunnelItems				= SwizzleLong(&header.numItems);
-	gNumTunnelSplinePoints		= SwizzleLong(&header.numSplinePoints);
-	gNumTunnelSections			= SwizzleLong(&header.numSections);
-
-	GAME_ASSERT(gNumTunnelSections <= MAX_TUNNEL_SECTIONS);
-
-
-			/****************************/
-			/* READ ALIAS TO BG3D FILE */
-			/****************************/
-
-			/* READ THE SIZE OF THE ALIAS DATA */
-
-	size = sizeof(aliasSize);
-	FSRead(fRefNum, &size, (Ptr) &aliasSize);
-	aliasSize = SwizzleLong(&aliasSize);
-
-
-				/* SKIP ALIAS */
+				/* SKIP ALIAS TO BG3D FILE */
 				//
 				// Swizzling an Alias would be too difficult, so for verison 3.0 I've removed this
 				// and will now manually deal with the path to the BG3D file.
 				//
 
-	SetFPos(fRefNum, fsFromMark, aliasSize);
+		int aliasSize = FSReadBELong(fRefNum);
+		SetFPos(fRefNum, fsFromMark, aliasSize);
 
-	ImportBG3D(bg3dSpec, MODEL_GROUP_LEVELSPECIFIC);
-
+		ImportBG3D(bg3dSpec, MODEL_GROUP_LEVELSPECIFIC);
+	}
 
 
 			/*************/
 			/* SKIP NUBS */
 			/*************/
 
-	SetFPos(fRefNum, fsFromMark, sizeof(TunnelSplineNubType) * header.numNubs);
+	SetFPos(fRefNum, fsFromMark, sizeof(TunnelSplineNubType) * numNubs);
 
 
 			/*****************/
@@ -1389,12 +1351,8 @@ MOVertexArrayData		data;
 
 		/* READ TUNNEL TEXTURE */
 
-	size = sizeof(int32_t);												// read this texture's dimensions
-	FSRead(fRefNum, &size, (Ptr) &w);
-	w = SwizzleLong(&w);
-	FSRead(fRefNum, &size, (Ptr) &h);
-	h = SwizzleLong(&h);
-
+	w = FSReadBELong(fRefNum);											// read this texture's dimensions
+	h = FSReadBELong(fRefNum);
 	size = w * h * 4;													// read the pixel buffer
 	buffer = AllocPtr(size);
 	FSRead(fRefNum, &size, buffer);
@@ -1404,11 +1362,8 @@ MOVertexArrayData		data;
 
 		/* READ WATER TEXTURE */
 
-	size = sizeof(int32_t);												// read this texture's dimensions
-	FSRead(fRefNum, &size, (Ptr) &w);
-	w = SwizzleLong(&w);
-	FSRead(fRefNum, &size, (Ptr) &h);
-	h = SwizzleLong(&h);
+	w = FSReadBELong(fRefNum);											// read this texture's dimensions
+	h = FSReadBELong(fRefNum);
 
 	size = w * h * 4;													// read the pixel buffer
 
@@ -1427,18 +1382,18 @@ MOVertexArrayData		data;
 		gTunnelItemList = AllocPtr(size);								// alloc a new list
 		FSRead(fRefNum, &size, (Ptr) gTunnelItemList);					// read data into it
 
-		for (i = 0; i < gNumTunnelItems; i++)
+		for (int i = 0; i < gNumTunnelItems; i++)
 		{
-			gTunnelItemList[i].type	=	SwizzleLong(&gTunnelItemList[i].type);
+			gTunnelItemList[i].type			=	SwizzleLong(&gTunnelItemList[i].type);
 			gTunnelItemList[i].splineIndex	=	SwizzleLong(&gTunnelItemList[i].splineIndex);
 			gTunnelItemList[i].sectionNum	=	SwizzleLong(&gTunnelItemList[i].sectionNum);
 			gTunnelItemList[i].scale		=	SwizzleFloat(&gTunnelItemList[i].scale);
 			SwizzleVector3D(&gTunnelItemList[i].rot);
 			SwizzleVector3D(&gTunnelItemList[i].positionOffset);
-			gTunnelItemList[i].flags	=	SwizzleULong(&gTunnelItemList[i].flags);
-			gTunnelItemList[i].parms[0]	=	SwizzleULong(&gTunnelItemList[i].parms[0]);
-			gTunnelItemList[i].parms[1]	=	SwizzleULong(&gTunnelItemList[i].parms[1]);
-			gTunnelItemList[i].parms[2]	=	SwizzleULong(&gTunnelItemList[i].parms[2]);
+			gTunnelItemList[i].flags		=	SwizzleULong(&gTunnelItemList[i].flags);
+			gTunnelItemList[i].parms[0]		=	SwizzleULong(&gTunnelItemList[i].parms[0]);
+			gTunnelItemList[i].parms[1]		=	SwizzleULong(&gTunnelItemList[i].parms[1]);
+			gTunnelItemList[i].parms[2]		=	SwizzleULong(&gTunnelItemList[i].parms[2]);
 		}
 	}
 
@@ -1451,7 +1406,7 @@ MOVertexArrayData		data;
 	gTunnelSplinePoints = AllocPtr(size);								// alloc a new list
 	FSRead(fRefNum, &size, (Ptr) gTunnelSplinePoints);					// read data into it
 
-	for (i = 0; i < gNumTunnelSplinePoints; i++)
+	for (int i = 0; i < gNumTunnelSplinePoints; i++)
 	{
 		SwizzlePoint3D(&gTunnelSplinePoints[i].point);
 		SwizzleVector3D(&gTunnelSplinePoints[i].up);
@@ -1466,7 +1421,7 @@ MOVertexArrayData		data;
 	data.colorsByte 	= nil;
 	data.colorsFloat 	= nil;
 
-	for (j = 0; j < gNumTunnelSections; j++)
+	for (int j = 0; j < gNumTunnelSections; j++)
 	{
 
 				/* READ TUNNEL GEOMETRY FOR THIS SECTION */
@@ -1476,48 +1431,43 @@ MOVertexArrayData		data;
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
-		size = sizeof(int32_t);									// read # vertices
-		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numPoints);
-		data.numPoints = SwizzleLong(&data.numPoints);
-		size = sizeof(int32_t);									// read # triangles
-		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numTriangles);
-		data.numTriangles = SwizzleLong(&data.numTriangles);
+		data.numPoints = FSReadBELong(fRefNum);					// read # vertices
+		data.numTriangles = FSReadBELong(fRefNum);				// read # triangles
 
 		size = sizeof(OGLPoint3D) * data.numPoints;
-		data.points = AllocPtr(size);							// alloc coord list
+		data.points = AllocPtrClear(size);						// alloc coord list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.points);		// read points coords
-		for (i = 0; i < data.numPoints; i++)
+		for (int i = 0; i < data.numPoints; i++)
 			SwizzlePoint3D(&data.points[i]);
 
 		size = sizeof(OGLVector3D) * data.numPoints;
-		data.normals = AllocPtr(size);							// alloc normals list
+		data.normals = AllocPtrClear(size);						// alloc normals list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.normals);		// read normals
-		for (i = 0; i < data.numPoints; i++)
+		for (int i = 0; i < data.numPoints; i++)
 			SwizzleVector3D(&data.normals[i]);
 
 		size = sizeof(OGLTextureCoord) * data.numPoints;
-		data.uvs[0] = AllocPtr(size);							// alloc uvs list
+		data.uvs[0] = AllocPtrClear(size);						// alloc uvs list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.uvs[0]);		// read uvs
-		for (i = 0; i < data.numPoints; i++)
+		for (int i = 0; i < data.numPoints; i++)
 			SwizzleUV(&data.uvs[0][i]);
 
 		size = sizeof(MOTriangleIndecies) * data.numTriangles;
-		data.triangles = AllocPtr(size);						// alloc triangle list
+		data.triangles = AllocPtrClear(size);					// alloc triangle list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.triangles);	// read triangles
-		for (i = 0; i < data.numTriangles; i++)
+		for (int i = 0; i < data.numTriangles; i++)
 		{
 			data.triangles[i].vertexIndices[0] = SwizzleULong(&data.triangles[i].vertexIndices[0]);
 			data.triangles[i].vertexIndices[1] = SwizzleULong(&data.triangles[i].vertexIndices[1]);
 			data.triangles[i].vertexIndices[2] = SwizzleULong(&data.triangles[i].vertexIndices[2]);
 		}
 
-		if (iErr)
-			DoFatalAlert("ReadDataFromTunnelFile: FSRead failed!");
+		GAME_ASSERT(!iErr);
 
 		data.numMaterials 	= 1;
 		data.materials[0] = gTunnelTextureObj;					// assign illegal ref (made legal below)
 
-		gTunnelSectionObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &data);	// make metaobject
+		gTunnelSectionMeshes[j] = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &data);	// make metaobject
 
 
 
@@ -1528,32 +1478,27 @@ MOVertexArrayData		data;
 		SwizzlePoint3D(&data.bBox.min);
 		SwizzlePoint3D(&data.bBox.max);
 
-		size = sizeof(int32_t);									// read # vertices
-		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numPoints);
-		data.numPoints = SwizzleLong(&data.numPoints);
-
-		size = sizeof(int32_t);									// read # triangles
-		iErr |= FSRead(fRefNum, &size, (Ptr) &data.numTriangles);
-		data.numTriangles = SwizzleLong(&data.numTriangles);
+		data.numPoints = FSReadBELong(fRefNum);					// read # vertices
+		data.numTriangles = FSReadBELong(fRefNum);				// read # triangles
 
 		size = sizeof(OGLPoint3D) * data.numPoints;
-		data.points = AllocPtr(size);							// alloc coord list
-		iErr |= FSRead(fRefNum, &size, (Ptr) data.points);			// read points coords
-		for (i = 0; i < data.numPoints; i++)
+		data.points = AllocPtrClear(size);						// alloc coord list
+		iErr |= FSRead(fRefNum, &size, (Ptr) data.points);		// read points coords
+		for (int i = 0; i < data.numPoints; i++)
 			SwizzlePoint3D(&data.points[i]);
 
 		data.normals = nil;										// no normals on H2O
 
 		size = sizeof(OGLTextureCoord) * data.numPoints;
-		data.uvs[0] = AllocPtr(size);							// alloc uvs list
+		data.uvs[0] = AllocPtrClear(size);						// alloc uvs list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.uvs[0]);		// read uvs
-		for (i = 0; i < data.numPoints; i++)
+		for (int i = 0; i < data.numPoints; i++)
 			SwizzleUV(&data.uvs[0][i]);
 
 		size = sizeof(MOTriangleIndecies) * data.numTriangles;
-		data.triangles = AllocPtr(size);						// alloc triangle list
+		data.triangles = AllocPtrClear(size);					// alloc triangle list
 		iErr |= FSRead(fRefNum, &size, (Ptr) data.triangles);	// read triangles
-		for (i = 0; i < data.numTriangles; i++)
+		for (int i = 0; i < data.numTriangles; i++)
 		{
 			data.triangles[i].vertexIndices[0] = SwizzleULong(&data.triangles[i].vertexIndices[0]);
 			data.triangles[i].vertexIndices[1] = SwizzleULong(&data.triangles[i].vertexIndices[1]);
@@ -1565,9 +1510,10 @@ MOVertexArrayData		data;
 		data.numMaterials = -1;
 		data.materials[0] = nil;
 
-
 		gTunnelSectionWaterObjects[j] = MO_CreateNewObjectOfType(MO_TYPE_VERTEXARRAY, &data);	// make metaobject
 	}
+
+	FSClose(fRefNum);
 }
 
 
