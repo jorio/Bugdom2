@@ -54,7 +54,7 @@ enum
 /*    VARIABLES            */
 /***************************/
 
-static Str32	gHighScoresFileName = ":" PROJECT_NAME ":HighScores4";
+static const char*	gHighScoresFileName = ":" PROJECT_NAME ":HighScores4";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -220,7 +220,7 @@ ObjNode				*newObj;
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:highscores.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:HighScores.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES);
 
 

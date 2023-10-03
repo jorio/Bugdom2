@@ -220,7 +220,7 @@ ObjNode	*newObj;
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:bonus.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Bonus.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_BONUS);
 
 	LoadFoliage();
@@ -244,7 +244,7 @@ ObjNode	*newObj;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":audio:Bonus.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_BONUS);
 
 

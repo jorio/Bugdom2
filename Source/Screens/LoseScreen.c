@@ -144,7 +144,7 @@ int			i;
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:losescreen.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LoseScreen.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_LOSESCREEN);
 
 	LoadFoliage();
@@ -163,7 +163,7 @@ int			i;
 
 				/* LOAD AUDIO */
 
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":audio:Bonus.sounds", &spec);
+//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
 //	LoadSoundBank(&spec, SOUND_BANK_LOSE);
 
 

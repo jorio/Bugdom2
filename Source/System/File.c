@@ -18,7 +18,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType);
+static void ReadDataFromSkeletonResourceFork(SkeletonDefType *skeleton, FSSpec *bg3dSpec, int skeletonType);
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr);
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 
@@ -122,71 +122,73 @@ float	g3DTileSize, g3DMinY, g3DMaxY;
 
 SkeletonDefType *LoadSkeletonFile(short skeletonType)
 {
-QDErr		iErr;
 short		fRefNum;
-FSSpec		fsSpec;
+FSSpec		skeletonSpec, bg3dSpec;
 SkeletonDefType	*skeleton;
-const Str63	fileNames[MAX_SKELETON_TYPES] =
+char		path[64];
+const char*	fileNames[MAX_SKELETON_TYPES][2] =
 {
-	":Skeletons:Skip_Explore.skeleton",
-	":Skeletons:Skip_Tunnel.skeleton",
-	":Skeletons:Skip_Title.skeleton",
-	":Skeletons:Snail.skeleton",
-	":Skeletons:Gnome.skeleton",
-	":Skeletons:HouseFly.skeleton",
-	":Skeletons:EvilPlant.skeleton",
-	":Skeletons:Chipmunk.skeleton",
-	":Skeletons:SnakeHead.skeleton",
-	":Skeletons:BuddyBug.skeleton",
-	":Skeletons:Checkpoint.skeleton",
-	":Skeletons:Flea.skeleton",
-	":Skeletons:Tick.skeleton",
-	":Skeletons:MouseTrap.skeleton",
-	":Skeletons:Mouse.skeleton",
-	":Skeletons:Soldier.skeleton",
-	":Skeletons:OttoToy.skeleton",
-	":Skeletons:BumbleBee.skeleton",
-	":Skeletons:HoboBag.skeleton",
-	":Skeletons:DragonFly.skeleton",
-	":Skeletons:Frog.skeleton",
-	":Skeletons:Moth.skeleton",
-	":Skeletons:ComputerBug.skeleton",
-	":Skeletons:Roach.skeleton",
-	":Skeletons:Ant.skeleton",
-	":Skeletons:Fish.skeleton",
+	[SKELETON_TYPE_SKIP_EXPLORE]	= {"Skip_Explore", "Grasshopper"},
+	[SKELETON_TYPE_SKIP_TUNNEL]		= {"Skip_Tunnel", "Grasshopper"},
+	[SKELETON_TYPE_SKIP_TITLE]		= {"Skip_Title", "Grasshopper"},
+	[SKELETON_TYPE_SNAIL]			= {"Snail"},
+	[SKELETON_TYPE_GNOME]			= {"Gnome"},
+	[SKELETON_TYPE_HOUSEFLY]		= {"HouseFly"},
+	[SKELETON_TYPE_EVILPLANT]		= {"EvilPlant"},
+	[SKELETON_TYPE_CHIPMUNK]		= {"Chipmunk"},
+	[SKELETON_TYPE_SNAKEHEAD]		= {"SnakeHead"},
+	[SKELETON_TYPE_BUDDYBUG]		= {"BuddyBug"},
+	[SKELETON_TYPE_CHECKPOINT]		= {"Checkpoint"},
+	[SKELETON_TYPE_FLEA]			= {"Flea"},
+	[SKELETON_TYPE_TICK]			= {"Tick"},
+	[SKELETON_TYPE_MOUSETRAP]		= {"MouseTrap"},
+	[SKELETON_TYPE_MOUSE]			= {"Mouse"},
+	[SKELETON_TYPE_TOYSOLDIER]		= {"Soldier"},
+	[SKELETON_TYPE_OTTO]			= {"OttoToy"},
+	[SKELETON_TYPE_BUMBLEBEE]		= {"BumbleBee"},
+	[SKELETON_TYPE_HOBOBAG]			= {"HoboBag"},
+	[SKELETON_TYPE_DRAGONFLY]		= {"DragonFly"},
+	[SKELETON_TYPE_FROG]			= {"Frog"},
+	[SKELETON_TYPE_MOTH]			= {"Moth"},
+	[SKELETON_TYPE_COMPUTERBUG]		= {"ComputerBug"},
+	[SKELETON_TYPE_ROACH]			= {"Roach"},
+	[SKELETON_TYPE_ANT]				= {"Ant"},
+	[SKELETON_TYPE_FISH]			= {"Fish"},
 };
 
+	GAME_ASSERT(skeletonType >= 0);
+	GAME_ASSERT(skeletonType < MAX_SKELETON_TYPES);
 
-	if (skeletonType < MAX_SKELETON_TYPES)
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, fileNames[skeletonType], &fsSpec);
-	else
-		DoFatalAlert("LoadSkeleton: Unknown skeletonType!");
+	const char* skeletonName = fileNames[skeletonType][0];
+	const char* bg3dName = fileNames[skeletonType][1];
 
+	if (!bg3dName)
+		bg3dName = skeletonName;
+
+	SDL_snprintf(path, sizeof(path), ":Skeletons:%s.skeleton", skeletonName);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &skeletonSpec);
+
+	SDL_snprintf(path, sizeof(path), ":Skeletons:%s.bg3d", bg3dName);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &bg3dSpec);
 
 			/* OPEN THE FILE'S REZ FORK */
 
-	fRefNum = FSpOpenResFile(&fsSpec,fsRdPerm);
-	if (fRefNum == -1)
-	{
-		iErr = ResError();
-		DoFatalAlert("Error %d opening Skel Rez file", iErr);
-	}
+	fRefNum = FSpOpenResFile(&skeletonSpec, fsRdPerm);
+	GAME_ASSERT(fRefNum >= 0);
 
 	UseResFile(fRefNum);
-	if (ResError())
-		DoFatalAlert("Error using Rez file!");
+	GAME_ASSERT(!ResError());
 
 
 			/* ALLOC MEMORY FOR SKELETON INFO STRUCTURE */
 
 	skeleton = (SkeletonDefType *)AllocPtr(sizeof(SkeletonDefType));
-	if (skeleton == nil)
-		DoFatalAlert("Cannot alloc SkeletonInfoType");
+	GAME_ASSERT(skeleton);
 
 
 			/* READ SKELETON RESOURCES */
 
-	ReadDataFromSkeletonFile(skeleton, &fsSpec, skeletonType);
+	ReadDataFromSkeletonResourceFork(skeleton, &bg3dSpec, skeletonType);
 	PrimeBoneData(skeleton);
 
 			/* CLOSE REZ FILE */
@@ -202,19 +204,14 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 // Current rez file is set to the file.
 //
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType)
+static void ReadDataFromSkeletonResourceFork(SkeletonDefType *skeleton, FSSpec *bg3dSpec, int skeletonType)
 {
 Handle				hand;
-int					i,k,j;
 long				numJoints,numAnims,numKeyframes;
 AnimEventType		*animEventPtr;
 JointKeyframeType	*keyFramePtr;
 SkeletonFile_Header_Type	*headerPtr;
 short				version;
-AliasHandle				alias;
-OSErr					iErr;
-FSSpec					target;
-Boolean					wasChanged;
 OGLPoint3D				*pointPtr;
 SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
@@ -224,19 +221,16 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/************************/
 
 	hand = GetResource('Hedr',1000);
-	if (hand == nil)
-		DoFatalAlert("ReadDataFromSkeletonFile: Error reading header resource!");
+	GAME_ASSERT(hand);
 	headerPtr = (SkeletonFile_Header_Type *)*hand;
 	version = SwizzleShort(&headerPtr->version);
-	if (version != SKELETON_FILE_VERS_NUM)
-		DoFatalAlert("Skeleton file has wrong version #");
+	GAME_ASSERT(version == SKELETON_FILE_VERS_NUM);
 
 	numAnims = skeleton->NumAnims = SwizzleShort(&headerPtr->numAnims);			// get # anims in skeleton
 	numJoints = skeleton->NumBones = SwizzleShort(&headerPtr->numJoints);		// get # joints in skeleton
 	ReleaseResource(hand);
 
-	if (numJoints > MAX_JOINTS)										// check for overload
-		DoFatalAlert("ReadDataFromSkeletonFile: numJoints > MAX_JOINTS");
+	GAME_ASSERT(numJoints <= MAX_JOINTS);										// check for overload
 
 
 				/*************************************/
@@ -251,18 +245,19 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		/* 	LOAD THE REFERENCE GEOMETRY */
 		/********************************/
 
-	alias = (AliasHandle)GetResource(rAliasType,1000);				// alias to geometry BG3D file
-	if (alias != nil)
+#if 0
 	{
+		AliasHandle alias = (AliasHandle)GetResource(rAliasType,1000);				// alias to geometry BG3D file
+		GAME_ASSERT(alias);
+		FSSpec target;
 		iErr = ResolveAlias(fsSpec, alias, &target, &wasChanged);	// try to resolve alias
-		if (!iErr)
-			LoadBonesReferenceModel(&target,skeleton, skeletonType);
-		else
-			DoFatalAlert("ReadDataFromSkeletonFile: Cannot find Skeleton's BG3D file!");
+		GAME_ASSERT(!iErr);
+		LoadBonesReferenceModel(&target,skeleton, skeletonType);
 		ReleaseResource((Handle)alias);
 	}
-	else
-		DoFatalAlert("ReadDataFromSkeletonFile: file is missing the Alias resource");
+#else
+	LoadBonesReferenceModel(bg3dSpec, skeleton, skeletonType);
+#endif
 
 
 
@@ -270,7 +265,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		/*  READ BONE DEFINITION RESOURCES */
 		/***********************************/
 
-	for (i=0; i < numJoints; i++)
+	for (int i = 0; i < numJoints; i++)
 	{
 		File_BoneDefinitionType	*bonePtr;
 		uint16_t					*indexPtr;
@@ -278,9 +273,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ BONE DATA */
 
 		hand = GetResource('Bone',1000+i);
-		if (hand == nil)
-			DoFatalAlert("Error reading Bone resource!");
-		HLock(hand);
+		GAME_ASSERT(hand);
 		bonePtr = (File_BoneDefinitionType *)*hand;
 
 			/* COPY BONE DATA INTO ARRAY */
@@ -306,14 +299,12 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ POINT INDEX ARRAY */
 
 		hand = GetResource('BonP',1000+i);
-		if (hand == nil)
-			DoFatalAlert("Error reading BonP resource!");
-		HLock(hand);
+		GAME_ASSERT(hand);
 		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY POINT INDEX ARRAY INTO BONE STRUCT */
 
-		for (j=0; j < skeleton->Bones[i].numPointsAttachedToBone; j++)
+		for (int j = 0; j < skeleton->Bones[i].numPointsAttachedToBone; j++)
 			skeleton->Bones[i].pointList[j] = SwizzleUShort(&indexPtr[j]);
 		ReleaseResource(hand);
 
@@ -321,17 +312,14 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ NORMAL INDEX ARRAY */
 
 		hand = GetResource('BonN',1000+i);
-		if (hand == nil)
-			DoFatalAlert("Error reading BonN resource!");
-		HLock(hand);
+		GAME_ASSERT(hand);
 		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY NORMAL INDEX ARRAY INTO BONE STRUCT */
 
-		for (j=0; j < skeleton->Bones[i].numNormalsAttachedToBone; j++)
+		for (int j = 0; j < skeleton->Bones[i].numNormalsAttachedToBone; j++)
 			skeleton->Bones[i].normalList[j] = SwizzleUShort(&indexPtr[j]);
 		ReleaseResource(hand);
-
 	}
 
 
@@ -345,19 +333,16 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 	hand = GetResource('RelP', 1000);
 	GAME_ASSERT(hand);
-	HLock(hand);
 	pointPtr = (OGLPoint3D *)*hand;
 
-	i = (int) (GetHandleSize(hand) / (Size) sizeof(OGLPoint3D));
-	if (i != skeleton->numDecomposedPoints)
-		DoFatalAlert("# of points in Reference Model has changed!");
-	else
-		for (i = 0; i < skeleton->numDecomposedPoints; i++)
-		{
-			skeleton->decomposedPointList[i].boneRelPoint.x = SwizzleFloat(&pointPtr[i].x);
-			skeleton->decomposedPointList[i].boneRelPoint.y = SwizzleFloat(&pointPtr[i].y);
-			skeleton->decomposedPointList[i].boneRelPoint.z = SwizzleFloat(&pointPtr[i].z);
-		}
+	int numPointsFound = (int) (GetHandleSize(hand) / (Size) sizeof(OGLPoint3D));
+	GAME_ASSERT_MESSAGE(numPointsFound == skeleton->numDecomposedPoints, "# of points in Reference Model has changed!");
+	for (int i = 0; i < skeleton->numDecomposedPoints; i++)
+	{
+		skeleton->decomposedPointList[i].boneRelPoint.x = SwizzleFloat(&pointPtr[i].x);
+		skeleton->decomposedPointList[i].boneRelPoint.y = SwizzleFloat(&pointPtr[i].y);
+		skeleton->decomposedPointList[i].boneRelPoint.z = SwizzleFloat(&pointPtr[i].z);
+	}
 
 	ReleaseResource(hand);
 
@@ -366,14 +351,12 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ ANIM INFO   */
 			/*********************/
 
-	for (i=0; i < numAnims; i++)
+	for (int i = 0; i < numAnims; i++)
 	{
 				/* READ ANIM HEADER */
 
 		hand = GetResource('AnHd',1000+i);
-		if (hand == nil)
-			DoFatalAlert("Error getting anim header resource");
-		HLock(hand);
+		GAME_ASSERT(hand);
 		animHeaderPtr = (SkeletonFile_AnimHeader_Type *)*hand;
 
 		skeleton->NumAnimEvents[i] = SwizzleShort(&animHeaderPtr->numAnimEvents);			// copy # anim events in anim
@@ -382,10 +365,9 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ ANIM-EVENT DATA */
 
 		hand = GetResource('Evnt',1000+i);
-		if (hand == nil)
-			DoFatalAlert("Error reading anim-event data resource!");
+		GAME_ASSERT(hand);
 		animEventPtr = (AnimEventType *)*hand;
-		for (j=0;  j < skeleton->NumAnimEvents[i]; j++)
+		for (int j = 0; j < skeleton->NumAnimEvents[i]; j++)
 		{
 			skeleton->AnimEventsList[i][j] = *animEventPtr++;							// copy whole thing
 			skeleton->AnimEventsList[i][j].time = SwizzleShort(&skeleton->AnimEventsList[i][j].time);	// then swizzle the 16-bit short value
@@ -396,38 +378,35 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			/* READ # KEYFRAMES PER JOINT IN EACH ANIM */
 
 		hand = GetResource('NumK',1000+i);									// read array of #'s for this anim
-		if (hand == nil)
-			DoFatalAlert("Error reading # keyframes/joint resource!");
-		for (j=0; j < numJoints; j++)
+		GAME_ASSERT(hand);
+		for (int j = 0; j < numJoints; j++)
 			skeleton->JointKeyframes[j].numKeyFrames[i] = (*hand)[j];
 		ReleaseResource(hand);
 	}
 
 
-	for (j=0; j < numJoints; j++)
+	for (int j = 0; j < numJoints; j++)
 	{
 				/* ALLOC 2D ARRAY FOR KEYFRAMES */
 
 		Alloc_2d_array(JointKeyframeType,skeleton->JointKeyframes[j].keyFrames,	numAnims,MAX_KEYFRAMES);
 
-		if ((skeleton->JointKeyframes[j].keyFrames == nil) || (skeleton->JointKeyframes[j].keyFrames[0] == nil))
-			DoFatalAlert("ReadDataFromSkeletonFile: Error allocating Keyframe Array.");
+		GAME_ASSERT(skeleton->JointKeyframes[j].keyFrames);
+		GAME_ASSERT(skeleton->JointKeyframes[j].keyFrames[0]);
 
 					/* READ THIS JOINT'S KF'S FOR EACH ANIM */
 
-		for (i=0; i < numAnims; i++)
+		for (int i = 0; i < numAnims; i++)
 		{
 			numKeyframes = skeleton->JointKeyframes[j].numKeyFrames[i];					// get actual # of keyframes for this joint
-			if (numKeyframes > MAX_KEYFRAMES)
-				DoFatalAlert("Error: numKeyframes > MAX_KEYFRAMES");
+			GAME_ASSERT(numKeyframes <= MAX_KEYFRAMES);
 
 					/* READ A JOINT KEYFRAME */
 
 			hand = GetResource('KeyF',1000+(i*100)+j);
-			if (hand == nil)
-				DoFatalAlert("Error reading joint keyframes resource!");
+			GAME_ASSERT(hand);
 			keyFramePtr = (JointKeyframeType *)*hand;
-			for (k = 0; k < numKeyframes; k++)												// copy this joint's keyframes for this anim
+			for (int k = 0; k < numKeyframes; k++)										// copy this joint's keyframes for this anim
 			{
 				skeleton->JointKeyframes[j].keyFrames[i][k].tick				= SwizzleLong(&keyFramePtr->tick);
 				skeleton->JointKeyframes[j].keyFrames[i][k].accelerationMode	= SwizzleLong(&keyFramePtr->accelerationMode);

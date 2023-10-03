@@ -145,7 +145,7 @@ ObjNode	*newObj;
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:winscreen.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:WinScreen.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_WINSCREEN);
 
 

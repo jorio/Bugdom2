@@ -107,7 +107,7 @@ int			i,n;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":audio:Title.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Title.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_TITLE);
 
 
@@ -119,7 +119,7 @@ int			i,n;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Level10_Park.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 

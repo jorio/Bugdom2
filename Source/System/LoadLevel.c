@@ -43,13 +43,13 @@ void LoadLevelArt_Explore(void)
 {
 FSSpec	spec;
 
-const Str63	terrainFiles[NUM_LEVELS] =
+const char*	terrainFiles[NUM_LEVELS] =
 {
 	":Terrain:Level1_Garden.ter",
 	":Terrain:Level2_SideWalk.ter",
 	":Terrain:Level3_DogHair.ter",
 	"",
-	":Terrain:Level5_PlayRoom.ter",
+	":Terrain:Level5_Playroom.ter",
 
 	":Terrain:Level6_Closet.ter",
 	"",
@@ -58,7 +58,7 @@ const Str63	terrainFiles[NUM_LEVELS] =
 	":Terrain:Level10_Park.ter",
 };
 
- const Str63	levelModelFiles[NUM_LEVELS] =
+const char*	levelModelFiles[NUM_LEVELS] =
 {
 	":Models:Level1_Garden.bg3d",
 	":Models:Level2_Sidewalk.bg3d",
@@ -102,7 +102,7 @@ const int levelSpriteCount[NUM_LEVELS] =
 };
 
 
- const Str63	levelSoundFiles[NUM_LEVELS] =
+const char*	levelSoundFiles[NUM_LEVELS] =
 {
 	":Audio:Garden.sounds",
 	":Audio:Garden.sounds",
@@ -133,7 +133,7 @@ const int levelSpriteCount[NUM_LEVELS] =
 
 			/* LOAD GLOBAL BG3D GEOMETRY */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:Global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 	if (!gSlowCPU)									// no reflection mapping when speed is a problem

@@ -57,6 +57,8 @@ set(POMME_NO_GRAPHICS true)
 set(POMME_NO_QD3D true)
 set(POMME_NO_MP3 true)
 
+add_compile_definitions(POMME_CASE_SENSITIVE_FSSPEC=1)
+
 #------------------------------------------------------------------------------
 # DEPENDENCIES
 #------------------------------------------------------------------------------
