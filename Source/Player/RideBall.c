@@ -152,11 +152,33 @@ ObjNode	*player = gPlayerInfo.objNode;
 			ball->AccelVector.y = gPlayerInfo.analogControlZ;
 			OGLVector2D_Transform(&ball->AccelVector, &m, &ball->AccelVector);				// rotate the acceleration vector
 
+
+
+			float maxBallSpeed = MAX_BALL_SPEED;
+
+					/* GAMEPAD: CAP MAX SPEED TO THUMBSTICK MAGNITUDE FOR PRECISE CONTROL */
+
+			if (!gPlayerInfo.analogIsMouse)
+			{
+				float analogMagnitude = sqrtf(SQUARED(gPlayerInfo.analogControlX) + SQUARED(gPlayerInfo.analogControlZ));
+
+				if (analogMagnitude > EPS && analogMagnitude < 1.0f - EPS)
+				{
+					// Floor speed to 0.5x so we walk a reasonable pace when gently pushing the thumbstick.
+					analogMagnitude = SDL_clamp(analogMagnitude, 0.5f, 1.0f);
+
+					// Cap max speed to analog magnitude
+					maxBallSpeed *= analogMagnitude;
+				}
+			}
+
+
 					/* ACCELERATE */
 
 			ball->Speed2D += fps * RIDE_ACCEL;
-			if (ball->Speed2D > MAX_BALL_SPEED)
-				ball->Speed2D = MAX_BALL_SPEED;
+
+			if (ball->Speed2D > maxBallSpeed)
+				ball->Speed2D = maxBallSpeed;
 		}
 
 			/* TURN  BALL TOWARD ACCEL VECTOR */

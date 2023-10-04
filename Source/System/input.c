@@ -43,19 +43,14 @@ float	mouseDX, mouseDY;
 
 	DoSDLMaintenance();
 
-
-			/****************************************/
-			/* UPDATE ALL THE NEEDS CONTROLS VALUES */
-			/****************************************/
-
-
 			/****************************/
 			/* SET PLAYER AXIS CONTROLS */
 			/****************************/
 
 			/* FIRST CHECK ANALOG AXES */
 
-	gPlayerInfo.analogControlX = GetNeedAnalogSteering(kNeed_TurnLeft_Key, kNeed_TurnRight_Key);
+	gPlayerInfo.analogIsMouse = false;
+	gPlayerInfo.analogControlX = GetNeedAnalogSteering(kNeed_TurnLeft, kNeed_TurnRight);
 	gPlayerInfo.analogControlZ = GetNeedAnalogSteering(kNeed_Forward, kNeed_Backward);
 
 
@@ -76,7 +71,10 @@ float	mouseDX, mouseDY;
 		mouseDX = -1.0f;
 
 	if (fabs(mouseDX) > fabs(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
+	{
 		gPlayerInfo.analogControlX = mouseDX;
+		gPlayerInfo.analogIsMouse = true;
+	}
 
 
 	if (mouseDY > 1.0f)											// keep y values pinned
@@ -86,7 +84,10 @@ float	mouseDX, mouseDY;
 		mouseDY = -1.0f;
 
 	if (fabs(mouseDY) > fabs(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
+	{
 		gPlayerInfo.analogControlZ = mouseDY;
+		gPlayerInfo.analogIsMouse = true;
+	}
 }
 
 

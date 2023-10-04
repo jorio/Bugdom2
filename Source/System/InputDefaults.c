@@ -32,13 +32,13 @@ const InputBinding kDefaultInputBindings[NUM_CONTROL_NEEDS] =
 		.pad = { CAPLUS(LEFTY), CB(DPAD_DOWN) },
 	},
 
-	[kNeed_TurnLeft_Key] =
+	[kNeed_TurnLeft] =
 	{
 		.key = { SDL_SCANCODE_LEFT, SDL_SCANCODE_A },
 		.pad = { CAMINUS(LEFTX), CB(DPAD_LEFT) },
 	},
 
-	[kNeed_TurnRight_Key] =
+	[kNeed_TurnRight] =
 	{
 		.key = { SDL_SCANCODE_RIGHT, SDL_SCANCODE_D },
 		.pad = { CAPLUS(LEFTX), CB(DPAD_RIGHT) },

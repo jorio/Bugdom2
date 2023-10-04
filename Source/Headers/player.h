@@ -182,7 +182,9 @@ typedef struct
 
 			/* CONTROL INFO */
 
-	float				analogControlX,analogControlZ;
+	float				analogControlX;
+	float				analogControlZ;
+	Boolean				analogIsMouse;
 
 	float				tunnelAngle;
 	float				tunnelDeltaRot;

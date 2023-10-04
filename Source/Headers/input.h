@@ -9,8 +9,8 @@
 
 enum
 {
-	kNeed_TurnLeft_Key	= 0,
-	kNeed_TurnRight_Key,
+	kNeed_TurnLeft,
+	kNeed_TurnRight,
 	kNeed_Forward,
 	kNeed_Backward,
 	kNeed_Kick,

@@ -1162,6 +1162,24 @@ const float fps = gFramesPerSecondFrac;
 				gTargetMaxSpeed = PLAYER_NORMAL_MAX_SPEED;
 	}
 
+
+			/* GAMEPAD: CAP MAX SPEED TO THUMBSTICK MAGNITUDE FOR PRECISE CONTROL */
+
+	if (!gPlayerInfo.analogIsMouse)
+	{
+		float analogMagnitude = sqrtf(SQUARED(gPlayerInfo.analogControlX) + SQUARED(gPlayerInfo.analogControlZ));
+
+		if (analogMagnitude > EPS && analogMagnitude < 1.0f - EPS)
+		{
+			// Floor speed to 0.5x so we walk a reasonable pace when gently pushing the thumbstick.
+			analogMagnitude = SDL_clamp(analogMagnitude, 0.5f, 1.0f);
+
+			// Cap max speed to analog magnitude
+			gTargetMaxSpeed *= analogMagnitude;
+		}
+	}
+
+
 	VectorLength2D(theNode->Speed2D, gDelta.x, gDelta.z);
 
 

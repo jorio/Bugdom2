@@ -121,8 +121,8 @@ static const MenuItem gKeybindingMenu[] =
 
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Forward },
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Backward },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnLeft_Key },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnRight_Key },
+	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnLeft },
+	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnRight },
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_AutoWalk },
 	
 	{ .type = kMenuItem_Spacer },
@@ -167,8 +167,8 @@ static const MenuItem gGamepadMenu[] =
 
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Forward },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Backward },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnLeft_Key },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnRight_Key },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnLeft },
+	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnRight },
 	
 	{.type = kMenuItem_Spacer },
 
