@@ -249,7 +249,7 @@ ObjNode	*newObj;
 	newObj->Timer = 7.0f;
 	newObj->ColorFilter.a = 0;
 
-	PlaySong(SONG_WIN, false);
+	PlaySong(EFFECT_SONG_WIN, false);
 
 }
 

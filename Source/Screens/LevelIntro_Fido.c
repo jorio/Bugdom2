@@ -114,9 +114,7 @@ static const OGLVector3D	fillDirection1 = { -1.0, -.7, -.7 };
 	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 				/* LOAD AUDIO */
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Fido.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
+	// Note: preloaded in main.c
 
 
 			/*******************/

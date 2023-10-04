@@ -144,9 +144,7 @@ int		i;
 
 
 				/* LOAD AUDIO */
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Garden.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
+	// Note: preloaded in main.c
 
 
 
@@ -268,7 +266,6 @@ static void FreeLevelIntroScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 }
 
 

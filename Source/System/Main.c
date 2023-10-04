@@ -33,6 +33,35 @@ static void UpdateParkFog(void);
 #define	NORMAL_GRAVITY	4500.0f
 
 
+static const int kLevelSongs[NUM_LEVELS] =
+{
+	EFFECT_SONG_GARDEN,				// front yard
+	EFFECT_SONG_POOL,				// back yard
+	EFFECT_SONG_FIDO,				// fido
+	EFFECT_SONG_PLUMBING,			// sewer
+	EFFECT_SONG_PLAYROOM,			// playroom
+	EFFECT_SONG_CLOSET,				// closet
+	EFFECT_SONG_PLUMBING,			// gutter
+	EFFECT_SONG_GARBAGE,			// garbage
+	EFFECT_SONG_BALSA,				// balsa
+	EFFECT_SONG_PARK,				// park
+};
+
+static const int kLevelSoundBanks[NUM_LEVELS] =
+{
+	SOUND_BANK_GARDEN,
+	SOUND_BANK_GARDEN,
+	SOUND_BANK_FIDO,
+	SOUND_BANK_PLUMBING,
+	SOUND_BANK_PLAYROOM,
+	SOUND_BANK_CLOSET,
+	SOUND_BANK_PLUMBING,
+	SOUND_BANK_GARBAGE,
+	SOUND_BANK_BALSA,
+	SOUND_BANK_PARK,
+};
+
+
 /****************************/
 /*    VARIABLES             */
 /****************************/
@@ -119,7 +148,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.monitorNum			= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
-	gGamePrefs.fullscreen			= false;
+	gGamePrefs.fullscreen			= true;
 	gGamePrefs.uiCentering			= false;
 	gGamePrefs.music				= true;
 
@@ -134,20 +163,6 @@ void InitDefaultPrefs(void)
 
 static void PlayGame(void)
 {
-const short songs[] =
-{
-	SONG_LEVEL1_GARDEN,				// front yard
-	SONG_LEVEL2_POOL,				// back yard
-	SONG_LEVEL3_FIDO,				// fido
-	SONG_LEVEL4_PLUMBING,			// sewer
-	SONG_LEVEL5_PLAYROOM,			// playroom
-	SONG_LEVEL6_CLOSET,				// closet
-	SONG_LEVEL4_PLUMBING,			// gutter
-	SONG_LEVEL8_GARBAGE,			// garbage
-	SONG_LEVEL9_BALSA,				// balsa
-	SONG_LEVEL10_PARK,				// park
-};
-
 			/***********************/
 			/* GAME INITIALIZATION */
 			/***********************/
@@ -162,7 +177,8 @@ const short songs[] =
 
 	for (; gLevelNum < NUM_LEVELS; gLevelNum++)		// assume gLevelNum was initially set from menu
 	{
-		PlaySong(songs[gLevelNum], true);
+		LoadSoundBank(kLevelSoundBanks[gLevelNum]);
+		PlaySong(kLevelSongs[gLevelNum], true);
 
 				/* DO LEVEL INTRO */
 
@@ -188,6 +204,7 @@ const short songs[] =
 		gInGameNow = false;
 		MyFlushEvents();
 		CleanupLevel();
+		DisposeSoundBank(kLevelSoundBanks[gLevelNum]);
 
 			/***************/
 			/* SEE IF LOST */
@@ -953,7 +970,6 @@ void StartLevelCompletion(float coolDownTimer)
 
 static void CleanupLevel(void)
 {
-
 	StopAllEffectChannels();
 	DisposeTunnelData();
  	EmptySplineObjectList();
@@ -967,8 +983,6 @@ static void CleanupLevel(void)
 	DisposeSpriteGroup(SPRITE_GROUP_INFOBAR);
 
 	DisposeAllBG3DContainers();
-
-	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 
 	gPlayerInfo.objNode = NULL;
 }

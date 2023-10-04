@@ -18,7 +18,7 @@
 /****************************/
 
 static short FindSilentChannel(void);
-static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, uint32_t *leftVolOut, uint32_t *rightVolOut);
+static void Calc3DEffectVolume(int effectNum, OGLPoint3D *where, float volAdjust, uint32_t *leftVolOut, uint32_t *rightVolOut);
 static void UpdateGlobalVolume(void);
 
 
@@ -27,18 +27,14 @@ static void UpdateGlobalVolume(void);
 /****************************/
 
 
-#define FloatToFixed16(a)      ((Fixed)((float)(a) * 0x000100L))		// convert float to 16bit fixed pt
-
-
 #define		MAX_CHANNELS			40
-
-#define		MAX_EFFECTS				70
 
 
 typedef struct
 {
-	Byte	bank,sound;
-	long	refDistance;
+	const char* bank;
+	const char* name;
+	int refDistance;
 }EffectType;
 
 
@@ -55,8 +51,8 @@ static OGLPoint3D			gEarCoords;										// coord of camera plus a tad to get pt
 static	OGLVector3D			gEyeVector;
 
 
-static	SndListHandle		gSndHandles[MAX_SOUND_BANKS][MAX_EFFECTS];		// handles to ALL sounds
-static  long				gSndOffsets[MAX_SOUND_BANKS][MAX_EFFECTS];
+static	SndListHandle		gSndHandles[NUM_EFFECTS];		// handles to ALL sounds
+static  long				gSndOffsets[NUM_EFFECTS];
 
 static	SndChannelPtr		gSndChannel[MAX_CHANNELS];
 ChannelInfoType				gChannelInfo[MAX_CHANNELS];
@@ -65,178 +61,205 @@ static short				gMaxChannels = 0;
 
 static short				gMostRecentChannel = -1;
 
-static short				gNumSndsInBank[MAX_SOUND_BANKS] = {0,0,0};
-
 Boolean						gAllowAudioKeys = true;
 
-short				gCurrentSong = -1;
-short				gSongChannel = -1;
+int							gCurrentSong = -1;
+short						gSongChannel = -1;
 
 
 		/*****************/
 		/* EFFECTS TABLE */
 		/*****************/
 
+static const char* kBankNames[NUM_SOUND_BANKS] =
+{
+	[SOUND_BANK_MUSIC]		= "Music",
+	[SOUND_BANK_MAIN]		= "Main",
+	[SOUND_BANK_TITLE]		= "Title",
+	[SOUND_BANK_BONUS]		= "Bonus",
+	[SOUND_BANK_GARDEN]		= "Garden",
+	[SOUND_BANK_FIDO]		= "Fido",
+	[SOUND_BANK_PLUMBING]	= "Plumbing",
+	[SOUND_BANK_PLAYROOM]	= "Playroom",
+	[SOUND_BANK_CLOSET]		= "Closet",
+	[SOUND_BANK_GARBAGE]	= "Garbage",
+	[SOUND_BANK_BALSA]		= "Balsa",
+	[SOUND_BANK_PARK]		= "Park",
+};
+
 static EffectType	gEffectsTable[] =
 {
-	SOUND_BANK_SONG,0,2000,									// EFFECT_SONG
+	[EFFECT_SONG_TITLE]				= {"Music",		"TitleSong",			2000},
+	[EFFECT_SONG_THEME]				= {"Music",		"ThemeSong",			2000},
+	[EFFECT_SONG_GARDEN]			= {"Music",		"GardenSong",			2000},
+	[EFFECT_SONG_POOL]				= {"Music",		"PoolSong",				2000},
+	[EFFECT_SONG_FIDO]				= {"Music",		"FidoSong",				2000},
+	[EFFECT_SONG_PLUMBING]			= {"Music",		"PlumbingSong",			2000},
+	[EFFECT_SONG_PLAYROOM]			= {"Music",		"PlayroomSong",			2000},
+	[EFFECT_SONG_CLOSET]			= {"Music",		"ClosetSong",			2000},
+	[EFFECT_SONG_GARBAGE]			= {"Music",		"GarbageSong",			2000},
+	[EFFECT_SONG_BALSA]				= {"Music",		"BalsaSong",			2000},
+	[EFFECT_SONG_PARK]				= {"Music",		"ParkSong",				2000},
+	[EFFECT_SONG_BONUS]				= {"Music",		"BonusSong",			2000},
+	[EFFECT_SONG_WIN]				= {"Music",		"WinSong",				2000},
+	[EFFECT_SONG_LOSE]				= {"Music",		"LoseSong",				2000},
 
-	SOUND_BANK_MAIN,SOUND_DEFAULT_CHANGESELECT,2000,		// EFFECT_CHANGESELECT
-	SOUND_BANK_MAIN,SOUND_DEFAULT_JUMP,500,					// EFFECT_JUMP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SKIPGLIDE,1000,			// EFFECT_SKIPGLIDE
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SKIPKICK,500,				// EFFECT_SKIPKICK
-	SOUND_BANK_MAIN,SOUND_DEFAULT_ACORNKICKED,300,			// EFFECT_ACORNKICKED
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SKIPLAND,300,				// EFFECT_SKIPLAND
-	SOUND_BANK_MAIN,SOUND_DEFAULT_FLYGOTKICKED,500,			// EFFECT_FLYGOTKICKED
-	SOUND_BANK_MAIN,SOUND_DEFAULT_GETPOT,500,				// EFFECT_GETPOW
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BUTTERFLYBOOM,100,		// EFFECT_BUTTERFLYBOOM
-	SOUND_BANK_MAIN,SOUND_DEFAULT_FLYWALKBUZZ,200,			// EFFECT_FLYWALKBUZZ
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SMACK,500,				// EFFECT_SMACK
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SPLASH,500,				// EFFECT_SPLASH
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BUDDYLAUNCH,700,			// EFFECT_BUDDYLAUNCH
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BUDDYBUZZ,700,			// EFFECT_BUDDYBUZZ
-	SOUND_BANK_MAIN,SOUND_DEFAULT_CHIP_CHECKPOINT,600,		// EFFECT_CHIP_CHECKPOINT
-	SOUND_BANK_MAIN,SOUND_DEFAULT_DOORCREAK,800,			// EFFECT_DOORCREAK
-	SOUND_BANK_MAIN,SOUND_DEFAULT_THROWBOTTLECAP,500,		// EFFECT_THROWBOTTLECAP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BOTTLECAPBOUNCE,10,		// EFFECT_BOTTLECAPBOUNCE
-	SOUND_BANK_MAIN,SOUND_DEFAULT_MOUSETRAP,1000,			// EFFECT_MOUSETRAP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BUDDYBOOM,300,			// EFFECT_BUDDYBOOM
-	SOUND_BANK_MAIN,SOUND_DEFAULT_CHIP_MAP4ACORN,600,		// EFFECT_CHIP_MAP4ACORN
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SHIELD,300,				// EFFECT_SHIELD
-	SOUND_BANK_MAIN,SOUND_DEFAULT_FIRECRACKER,600,			// EFFECT_FIRECRACKER
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BUMBLERUMBLE,100,			// EFFECT_BUMBLERUMBLE
-	SOUND_BANK_MAIN,SOUND_DEFAULT_CHIP_CHECKPOINTDONE,100,	// EFFECT_CHIP_CHECKPOINTDONE
-	SOUND_BANK_MAIN,SOUND_DEFAULT_CHIP_THANKS,100,			// EFFECT_CHIP_THANKS
-	SOUND_BANK_MAIN,SOUND_DEFAULT_GRENADEBOOM,500,			// EFFECT_GRENADEBOOM
-	SOUND_BANK_MAIN,SOUND_DEFAULT_PLANECRASH,6000,			// EFFECT_PLANECRASH
-	SOUND_BANK_MAIN,SOUND_DEFAULT_DRAGONFLYBUZZ,2000,		// EFFECT_DRAGONFLYBUZZ
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BOTTLECRACK,700,			// EFFECT_BOTTLECRACK
-	SOUND_BANK_MAIN,SOUND_DEFAULT_BOTTLESHATTER,700,		// EFFECT_BOTTLESHATTER
-	SOUND_BANK_MAIN,SOUND_DEFAULT_PULLTRAP,1000,			// EFFECT_PULLTRAP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_SNAPTRAP,1000,			// EFFECT_SNAPTRAP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_POPACORN,100,				// EFFECT_POPACORN
-	SOUND_BANK_MAIN,SOUND_DEFAULT_FOOTSTEP,100,				// EFFECT_FOOTSTEP
-	SOUND_BANK_MAIN,SOUND_DEFAULT_GRENADETHROW,400,			// EFFECT_GRENADETHROW
+	[EFFECT_CHANGESELECT]			= {"Main",		"ChangeSelect",			2000},
+	[EFFECT_JUMP]					= {"Main",		"Jump",					500},
+	[EFFECT_SKIPGLIDE]				= {"Main",		"SkipGlide",			1000},
+	[EFFECT_SKIPKICK]				= {"Main",		"SkipKick",				500},
+	[EFFECT_SKIPLAND]				= {"Main",		"SkipLand",				300},
+	[EFFECT_ACORNKICKED]			= {"Main",		"AcornKicked",			300},
+	[EFFECT_FLYGOTKICKED]			= {"Main",		"FlyGotKicked",			500},
+	[EFFECT_GETPOW]					= {"Main",		"GetPOW",				500},
+	[EFFECT_BUTTERFLYBOOM]			= {"Main",		"ButterflyBoom",		100},
+	[EFFECT_FLYWALKBUZZ]			= {"Main",		"FlyWalkBuzz",			200},
+	[EFFECT_SMACK]					= {"Main",		"Smack",				500},
+	[EFFECT_SPLASH]					= {"Main",		"Splash",				500},
+	[EFFECT_BUDDYLAUNCH]			= {"Main",		"BuddyLaunch",			700},
+	[EFFECT_BUDDYBUZZ]				= {"Main",		"BuddyBuzz",			700},
+	[EFFECT_DOORCREAK]				= {"Main",		"DoorCreak",			800},
+	[EFFECT_THROWBOTTLECAP]			= {"Main",		"ThrowBottleCap",		500},
+	[EFFECT_BOTTLECAPBOUNCE]		= {"Main",		"BottleCapBounce",		10},
+	[EFFECT_MOUSETRAP]				= {"Main",		"MouseTrap",			1000},
+	[EFFECT_BUDDYBOOM]				= {"Main",		"BuddyBoom",			300},
+	[EFFECT_SHIELD]					= {"Main",		"Shield",				300},
+	[EFFECT_FIRECRACKER]			= {"Main",		"Firecracker",			600},
+	[EFFECT_BUMBLERUMBLE]			= {"Main",		"BumbleRumble",			100},
+	[EFFECT_GRENADEBOOM]			= {"Main",		"GrenadeBoom",			500},
+	[EFFECT_PLANECRASH]				= {"Main",		"PlaneCrash",			6000},
+	[EFFECT_DRAGONFLYBUZZ]			= {"Main",		"DragonFlyBuzz",		2000},
+	[EFFECT_BOTTLECRACK]			= {"Main",		"BottleCrack",			700},
+	[EFFECT_BOTTLESHATTER]			= {"Main",		"BottleShatter",		700},
+	[EFFECT_PULLTRAP]				= {"Main",		"PullTrap",				1000},
+	[EFFECT_SNAPTRAP]				= {"Main",		"SnapTrap",				1000},
+	[EFFECT_POPACORN]				= {"Main",		"PopAcorn",				100},
+	[EFFECT_FOOTSTEP]				= {"Main",		"Footstep",				100},
+	[EFFECT_GRENADETHROW]			= {"Main",		"GrenadeThrow",			400},
+	[EFFECT_CHIP_CHECKPOINT]		= {"Main",		"ChipCheckpoint1",		600},
+	[EFFECT_CHIP_CHECKPOINTDONE]	= {"Main",		"ChipCheckpoint2",		100},
+	[EFFECT_CHIP_MAP4ACORN]			= {"Main",		"ChipMap1",				600},
+	[EFFECT_CHIP_THANKS]			= {"Main",		"ChipMap2",				100},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_GNOMESTEP,500,			// EFFECT_GNOMESTEP
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SPRINKLER,300,			// EFFECT_SPRINKLER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_GNOMEGOTKICKED,400,		// EFFECT_GNOMEGOTKICKED
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SQUISHBERRY,900,			// EFFECT_SQUISHBERRY
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_CHIP_STUCKMOUSE,600,		// EFFECT_CHIP_STUCKMOUSE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_EVILPLANTSHOOT,700,		// EFFECT_EVILPLANTSHOOT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FREEMICE,600,			// EFFECT_SAM_FREEMICE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FREEMICE2,600,		// EFFECT_SAM_FREEMICE2
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FINDSHELL,600,		// EFFECT_SAM_FINDSHELL
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_GOTSHELL,600,			// EFFECT_SAM_GOTSHELL
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FINDHEAD,600,			// EFFECT_SAM_FINDHEAD
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_PUTHEADON,600,		// EFFECT_SAM_PUTHEADON
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FIXEDSCARECROW,600,	// EFFECT_SAM_FIXEDSCARECROW
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_SQUASHBERRIES,600,	// EFFECT_SAM_SQUASHBERRIES
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_SQUISHMORE,600,		// EFFECT_SAM_SQUISHMORE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_SQUISHDONE,600,		// EFFECT_SAM_SQUISHDONE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_GOTMICE,600,			// EFFECT_SAM_GOTMICE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_POOLKEY,600,			// EFFECT_SAM_POOLKEY
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARDEN_SAM_FIDO,600,				// EFFECT_SAM_FIDO
+	[EFFECT_GNOMESTEP]				= {"Garden",	"GnomeStep",			500},
+	[EFFECT_GNOMEGOTKICKED]			= {"Garden",	"GnomeGotKicked",		400},
+	[EFFECT_SPRINKLER]				= {"Garden",	"Sprinkler",			300},
+	[EFFECT_SQUISHBERRY]			= {"Garden",	"SquishBerry",			900},
+	[EFFECT_EVILPLANTSHOOT]			= {"Garden",	"EvilPlantShoot",		700},
+	[EFFECT_CHIP_STUCKMOUSE]		= {"Garden",	"ChipStuckMouse",		600},
+	[EFFECT_SAM_FREEMICE]			= {"Garden",	"SamFreeMice1",			600},
+	[EFFECT_SAM_FREEMICE2]			= {"Garden",	"SamFreeMice2",			600},
+	[EFFECT_SAM_GOTMICE]			= {"Garden",	"SamFreeMice3",			600},
+	[EFFECT_SAM_FINDSHELL]			= {"Garden",	"SamFindShell1",		600},
+	[EFFECT_SAM_GOTSHELL]			= {"Garden",	"SamFindShell2",		600},
+	[EFFECT_SAM_FINDHEAD]			= {"Garden",	"SamScarecrow1",		600},
+	[EFFECT_SAM_PUTHEADON]			= {"Garden",	"SamScarecrow2",		600},
+	[EFFECT_SAM_FIXEDSCARECROW]		= {"Garden",	"SamScarecrow3",		600},
+	[EFFECT_SAM_SQUASHBERRIES]		= {"Garden",	"SamBerries1",			600},
+	[EFFECT_SAM_SQUISHMORE]			= {"Garden",	"SamBerries2",			600},
+	[EFFECT_SAM_SQUISHDONE]			= {"Garden",	"SamBerries3",			600},
+	[EFFECT_SAM_POOLKEY]			= {"Garden",	"SamPoolKey",			600},
+	[EFFECT_SAM_FIDO]				= {"Garden",	"SamFido",				600},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_GOTFLEAS,700,				// EFFECT_GOTFLEAS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_GOTTICKS,700,				// EFFECT_GOTTICKS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_HAPPYDOG,700,				// EFFECT_HAPPYDOG
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_REMEMBER,700,				// EFFECT_REMEMBERDOG
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_TICKSUCK,700,				// EFFECT_TICKSUCK
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_TICKSPIT,400,				// EFFECT_TICKSPIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_TICKSTEP,400,				// EFFECT_TICKSTEP
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_TICKDIE,500,				// EFFECT_TICKDIE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_FIDO_BONEHIT,500,				// EFFECT_BONEHIT
+	[EFFECT_GOTFLEAS]				= {"Fido",		"SamGotFleas",			700},
+	[EFFECT_GOTTICKS]				= {"Fido",		"SamGotTicks",			700},
+	[EFFECT_HAPPYDOG]				= {"Fido",		"SamHappyDog",			700},
+	[EFFECT_REMEMBERDOG]			= {"Fido",		"SamRemember",			700},
+	[EFFECT_TICKSUCK]				= {"Fido",		"TickSuck",				700},
+	[EFFECT_TICKSPIT]				= {"Fido",		"TickSpit",				400},
+	[EFFECT_TICKSTEP]				= {"Fido",		"TickStep",				400},
+	[EFFECT_TICKDIE]				= {"Fido",		"TickDie",				500},
+	[EFFECT_BONEHIT]				= {"Fido",		"BoneHit",				500},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_INTRO,700,				// EFFECT_PLUMBINGINTRO
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_SLUDGEHIT,700,			// EFFECT_SLUDGEHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_NAILHIT,700,			// EFFECT_NAILHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_WATER,1000,				// EFFECT_TUNNELWATER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_METALSCRAPE,1000,		// EFFECT_METALSCRAPE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_PINECONE,1000,			// EFFECT_HITPINECONE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLUMBING_LEAF,1000,				// EFFECT_HITLEAF
+	[EFFECT_PLUMBINGINTRO]			= {"Plumbing",	"SamSewerIntro",		700},
+	[EFFECT_TUNNELWATER]			= {"Plumbing",	"GutterWater",			1000},
+	[EFFECT_METALSCRAPE]			= {"Plumbing",	"MetalScrape",			1000},
+	[EFFECT_SLUDGEHIT]				= {"Plumbing",	"HitSludge",			700},
+	[EFFECT_NAILHIT]				= {"Plumbing",	"HitNail",				700},
+	[EFFECT_HITPINECONE]			= {"Plumbing",	"HitPineCone",			1000},
+	[EFFECT_HITLEAF]				= {"Plumbing",	"HitLeaf",				1000},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_LASERBOOM,400,			// EFFECT_LASERBOOM
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SAM_FINDMARBLE,600,		// EFFECT_SAM_FINDMARBLE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SAM_KICKMARBLE,600,		// EFFECT_SAM_KICKMARBLE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SAM_PINSDOWN,600,		// EFFECT_SAM_PINSDOWN
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_BOWLINGHIT,500,			// EFFECT_BOWLINGHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_KICKMARBLE,900,			// EFFECT_KICKMARBLE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_OTTOMOTOR,10,			// EFFECT_OTTOMOTOR
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_DORACE,610,		// EFFECT_CHIP_DORACE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_LOSTRACE,1500,		// EFFECT_CHIP_LOSTRACE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_WINNING,1500,		// EFFECT_CHIP_WINNING
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_YOUWON,1500,		// EFFECT_CHIP_YOUWON
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_SAMWINNING,1500,	// EFFECT_CHIP_SAMWINNING
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SAM_DOPUZZLE,610,		// EFFECT_SAM_DOPUZZLE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SAM_PUZZLEDONE,610,		// EFFECT_SAM_PUZZLEDONE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_OTTOSHOOT,400,			// EFFECT_OTTOSHOOT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_SLOTCAR,400,			// EFFECT_SLOTCAR
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_OTTOFALL,1000,			// EFFECT_OTTOFALL
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_READY,1500,		// EFFECT_CHIP_READY
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_SET,1500,			// EFFECT_CHIP_SET
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PLAYROOM_CHIP_GO,1500,			// EFFECT_CHIP_GO
+	[EFFECT_LASERBOOM]				= {"Playroom",	"LaserBoom",			400},
+	[EFFECT_BOWLINGHIT]				= {"Playroom",	"BowlingHit",			500},
+	[EFFECT_KICKMARBLE]				= {"Playroom",	"KickMarble",			900},
+	[EFFECT_SLOTCAR]				= {"Playroom",	"SlotCar",				400},
+	[EFFECT_OTTOMOTOR]				= {"Playroom",	"OttoMotor",			10},
+	[EFFECT_OTTOSHOOT]				= {"Playroom",	"OttoShoot",			400},
+	[EFFECT_OTTOFALL]				= {"Playroom",	"OttoFall",				1000},
+	[EFFECT_SAM_FINDMARBLE]			= {"Playroom",	"SamMarble1",			600},
+	[EFFECT_SAM_KICKMARBLE]			= {"Playroom",	"SamMarble2",			600},
+	[EFFECT_SAM_PINSDOWN]			= {"Playroom",	"SamMarble3",			600},
+	[EFFECT_SAM_DOPUZZLE]			= {"Playroom",	"SamPuzzle1",			610},
+	[EFFECT_SAM_PUZZLEDONE]			= {"Playroom",	"SamPuzzle2",			610},
+	[EFFECT_CHIP_DORACE]			= {"Playroom",	"ChipDoRace",			610},
+	[EFFECT_CHIP_READY]				= {"Playroom",	"ChipReady",			1500},
+	[EFFECT_CHIP_SET]				= {"Playroom",	"ChipSet",				1500},
+	[EFFECT_CHIP_GO]				= {"Playroom",	"ChipGo",				1500},
+	[EFFECT_CHIP_WINNING]			= {"Playroom",	"ChipWinning",			1500},
+	[EFFECT_CHIP_SAMWINNING]		= {"Playroom",	"ChipSamWinning",		1500},
+	[EFFECT_CHIP_LOSTRACE]			= {"Playroom",	"ChipLostRace",			1500},
+	[EFFECT_CHIP_YOUWON]			= {"Playroom",	"ChipYouWon",			1500},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_PROPELLER,400,				// EFFECT_PROPELLER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_HILLBOOM,4000,				// EFFECT_HILLBOOM
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_BOMBBOOM,3000,				// EFFECT_BOMBBOOM
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_PLANEHIT,1500,				// EFFECT_PLANEHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_FROGJUMP,6000,				// EFFECT_FROGJUMP
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_DIVEBOMB,6000,				// EFFECT_DIVEBOMB
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_BOMBFALL,6000,				// EFFECT_BOMBFALL
-	SOUND_BANK_LEVELSPECIFIC,SOUND_BALSA_SHOOT,2000,				// EFFECT_BALSASHOOT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_DRAGONFLYHIT,2000,				// EFFECT_DRAGONFLYHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_SAM_DESTROYHILLS,2000,			// EFFECT_SAM_DESTROYHILLS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_SAM_HILLSDESTROYED,2000,			// EFFECT_SAM_HILLSDESTROYED
-	SOUND_BANK_LEVELSPECIFIC,SOUND_SAM_HOWTOBOMB,2000,				// EFFECT_SAM_HOWTOBOMB
+	[EFFECT_PROPELLER]				= {"Balsa",		"Propeller",			400},
+	[EFFECT_HILLBOOM]				= {"Balsa",		"AntHillBoom",			4000},
+	[EFFECT_BOMBBOOM]				= {"Balsa",		"BombBoom",				3000},
+	[EFFECT_PLANEHIT]				= {"Balsa",		"PlaneHit",				1500},
+	[EFFECT_FROGJUMP]				= {"Balsa",		"FrogJump",				6000},
+	[EFFECT_DIVEBOMB]				= {"Balsa",		"DiveBomb",				6000},
+	[EFFECT_BOMBFALL]				= {"Balsa",		"BombFall",				6000},
+	[EFFECT_BALSASHOOT]				= {"Balsa",		"BalsaShoot",			2000},
+	[EFFECT_DRAGONFLYHIT]			= {"Balsa",		"DragonFlyHit",			2000},
+	[EFFECT_SAM_DESTROYHILLS]		= {"Balsa",		"SamAntHills1",			2000},
+	[EFFECT_SAM_HOWTOBOMB]			= {"Balsa",		"SamAntHills2",			2000},
+	[EFFECT_SAM_HILLSDESTROYED]		= {"Balsa",		"SamAntHills3",			2000},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SERVO,10,					// EFFECT_SERVO
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SERVO2,300,				// EFFECT_SERVO2
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_MINEBOOM,500,				// EFFECT_MINEBOOM
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_CHIPCLICK,500,			// EFFECT_CHIPCLICK
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SILICONDOOROPEN,500,		// EFFECT_SILICONDOOROPEN
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SAM_GETREDCLOVERS,2000,	// EFFECT_SAM_GETREDCLOVERS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SAM_GOTREDCLOVERS,2000,	// EFFECT_SAM_GOTREDCLOVERS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_VACUUME,1500,				// EFFECT_VACUUME
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_VACUUMECRUNCH,3000,		// EFFECT_VACUUMECRUMCH
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_MOTHFLAP,400,				// EFFECT_MOTHFLAP
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SAM_MOTHBALLS,2000,		// EFFECT_SAM_MOTHBALLS
-	SOUND_BANK_LEVELSPECIFIC,SOUND_CLOSET_SAM_COMPUTERDOOR,2000,	// EFFECT_SAM_COMPUTERDOOR
+	[EFFECT_SERVO]					= {"Closet",	"Servo1",				10},
+	[EFFECT_SERVO2]					= {"Closet",	"Servo2",				300},
+	[EFFECT_MINEBOOM]				= {"Closet",	"MineBoom",				500},
+	[EFFECT_CHIPCLICK]				= {"Closet",	"ChipClick",			500},
+	[EFFECT_SILICONDOOROPEN]		= {"Closet",	"SiliconDoorOpen",		500},
+	[EFFECT_VACUUME]				= {"Closet",	"Vacuum",				1500},
+	[EFFECT_VACUUMECRUMCH]			= {"Closet",	"VacuumCrunch",			3000},
+	[EFFECT_MOTHFLAP]				= {"Closet",	"MothFlap",				400},
+	[EFFECT_SAM_GETREDCLOVERS]		= {"Closet",	"SamRedClovers1",		2000},
+	[EFFECT_SAM_GOTREDCLOVERS]		= {"Closet",	"SamRedClovers2",		2000},
+	[EFFECT_SAM_MOTHBALLS]			= {"Closet",	"SamMoths",				2000},
+	[EFFECT_SAM_COMPUTERDOOR]		= {"Closet",	"SamComputer",			2000},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_CANOPEN,2000,			// EFFECT_CANOPEN
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_SODASPRAY,10,			// EFFECT_SODASPRAY
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_SAM_GUTTER,2000,			// EFFECT_SAM_GUTTERWATER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_SAM_FREED,2000,			// EFFECT_SAM_FREED
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_SAM_GLIDER,2000,			// EFFECT_SAM_GLIDER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_SAM_SODA,2000,			// EFFECT_SAM_SODA
-	SOUND_BANK_LEVELSPECIFIC,SOUND_GARBAGE_PROP,1000,				// EFFECT_PROP2
+	[EFFECT_CANOPEN]				= {"Garbage",	"CanOpen",				2000},
+	[EFFECT_SODASPRAY]				= {"Garbage",	"SodaSpray",			10},
+	[EFFECT_PROP2]					= {"Garbage",	"Propeller2",			1000},
+	[EFFECT_SAM_GUTTERWATER]		= {"Garbage",	"SamFlood1",			2000},
+	[EFFECT_SAM_FREED]				= {"Garbage",	"SamFlood2",			2000},
+	[EFFECT_SAM_GLIDER]				= {"Garbage",	"SamGlider",			2000},
+	[EFFECT_SAM_SODA]				= {"Garbage",	"SamSoda",				2000},
 
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_FROGJUMP,600,				// EFFECT_FROGJUMP2
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_TONGUEHIT,1000,				// EFFECT_TONGUEHIT
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_TONGUESWOOSH,500,			// EFFECT_TONGUESWOOSH
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_CATCHFISH,2000,			// EFFECT_SAM_CATCHFISH
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_ANGLER,2000,			// EFFECT_SAM_ANGLER
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_GETFOOD,2000,			// EFFECT_SAM_GETFOOD
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_GOTFOOD,2000,			// EFFECT_SAM_GOTFOOD
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_ANTBITE,200,				// EFFECT_ANTBITE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_FISHFLOP,200,				// EFFECT_FISHFLOP
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_ENTERHIVE,2000,			// EFFECT_SAM_ENTERHIVE
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_KEEPFISHING,2000,		// EFFECT_SAM_KEEPFISHING
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_MOREFOOD,2000,			// EFFECT_SAM_MOREFOOD
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_GETKINDLING,2000,		// EFFECT_SAM_GETKINDLING
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_MOREKINDLING,2000,		// EFFECT_SAM_MOREKINDLING
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_SPARK,2000,				// EFFECT_SAM_SPARK
-	SOUND_BANK_LEVELSPECIFIC,SOUND_PARK_SAM_BOTTLEKEY,2000,			// EFFECT_SAM_BOTTLEKEY
+	[EFFECT_FROGJUMP2]				= {"Park",		"FrogJump",				600},
+	[EFFECT_TONGUEHIT]				= {"Park",		"TongueHit",			1000},
+	[EFFECT_TONGUESWOOSH]			= {"Park",		"TongueSwoosh",			500},
+	[EFFECT_ANTBITE]				= {"Park",		"AntBite",				200},
+	[EFFECT_FISHFLOP]				= {"Park",		"FishFlop",				200},
+	[EFFECT_SAM_BOTTLEKEY]			= {"Park",		"SamBottleKey",			2000},
+	[EFFECT_SAM_CATCHFISH]			= {"Park",		"SamFish1",				2000},
+	[EFFECT_SAM_KEEPFISHING]		= {"Park",		"SamFish2",				2000},
+	[EFFECT_SAM_ANGLER]				= {"Park",		"SamFish3",				2000},
+	[EFFECT_SAM_GETFOOD]			= {"Park",		"SamFood1",				2000},
+	[EFFECT_SAM_MOREFOOD]			= {"Park",		"SamFood2",				2000},
+	[EFFECT_SAM_GOTFOOD]			= {"Park",		"SamFood3",				2000},
+	[EFFECT_SAM_GETKINDLING]		= {"Park",		"SamHive1",				2000},
+	[EFFECT_SAM_MOREKINDLING]		= {"Park",		"SamHive2",				2000},
+	[EFFECT_SAM_SPARK]				= {"Park",		"SamHive3",				2000},
+	[EFFECT_SAM_ENTERHIVE]			= {"Park",		"SamHive4",				2000},
 
-	SOUND_BANK_TITLE,SOUND_TITLE_LOGOBOUNCE,400,			// EFFECT_LOGOBOUNCE
-	SOUND_BANK_TITLE,SOUND_TITLE_FLYSWATTER,400,			// EFFECT_FLYSWATTER
-	SOUND_BANK_TITLE,SOUND_TITLE_LOGOVANISH,400,			// EFFECT_LOGOVANISH
-	SOUND_BANK_TITLE,SOUND_TITLE_FLYBUZZ,400,				// EFFECT_TITLEFLYBUZZ
-	SOUND_BANK_TITLE,SOUND_TITLE_SMACKDOWN,400,				// EFFECT_SMACKDOWN
-	SOUND_BANK_TITLE,SOUND_TITLE_STOMP,400,					// EFFECT_STOMP
+	[EFFECT_LOGOBOUNCE]				= {"Title",		"LogoBounce",			400},
+	[EFFECT_FLYSWATTER]				= {"Title",		"FlySwatter",			400},
+	[EFFECT_LOGOVANISH]				= {"Title",		"LogoVanish",			400},
+	[EFFECT_TITLEFLYBUZZ]			= {"Title",		"FlyBuzz",				400},
+	[EFFECT_SMACKDOWN]				= {"Title",		"SmackDown",			400},
+	[EFFECT_STOMP]					= {"Title",		"Stomp",				400},
 
-	SOUND_BANK_BONUS,SOUND_BONUS_CLOVERBONUS,400,			// EFFECT_CLOVERBONUS
-	SOUND_BANK_BONUS,SOUND_BONUS_MOUSEBONUS,400,			// EFFECT_MOUSEBONUS
+	[EFFECT_CLOVERBONUS]			= {"Bonus",		"CloverBonus",			400},
+	[EFFECT_MOUSEBONUS]				= {"Bonus",		"MouseBonus",			400},
 };
 
 
@@ -245,14 +268,14 @@ static EffectType	gEffectsTable[] =
 void InitSoundTools(void)
 {
 OSErr			iErr;
-FSSpec			spec;
 
 	gMaxChannels = 0;
 	gMostRecentChannel = -1;
 
 			/* INIT BANK INFO */
 
-	SDL_zeroa(gNumSndsInBank);
+	SDL_zeroa(gSndHandles);
+	SDL_zeroa(gSndOffsets);
 
 			/******************/
 			/* ALLOC CHANNELS */
@@ -272,8 +295,7 @@ FSSpec			spec;
 		/* LOAD DEFAULT SOUNDS */
 		/***********************/
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_MAIN);
+	LoadSoundBank(SOUND_BANK_MAIN);
 }
 
 
@@ -301,97 +323,120 @@ void ShutdownSound(void)
 
 		/* DISPOSE OF SOUND BANKS */
 
-	for (int i = 0; i < MAX_SOUND_BANKS; i++)
+	for (int i = 0; i < NUM_EFFECTS; i++)
 	{
-		if (gNumSndsInBank[i] > 0)
-			DisposeSoundBank(i);
+		DisposeSoundEffect(i);
 	}
 }
 
 #pragma mark -
 
+/******************* LOAD 1 EFFECT ************************/
+
+void LoadSoundEffect(int i)
+{
+	OSErr iErr;
+
+	GAME_ASSERT(i >= 0);
+	GAME_ASSERT(i < NUM_EFFECTS);
+
+	GAME_ASSERT(!gSndHandles[i]);
+	GAME_ASSERT(!gSndOffsets[i]);
+
+		/* LOAD SND REZ */
+
+	char path[64];
+	SDL_snprintf(path, sizeof(path), ":Audio:%s:%s.aiff", gEffectsTable[i].bank, gEffectsTable[i].name);
+
+	FSSpec aiffSpec;
+	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &aiffSpec);
+	GAME_ASSERT_MESSAGE(!iErr, path);
+
+	short fRefNum;
+	iErr = FSpOpenDF(&aiffSpec, fsRdPerm, &fRefNum);
+	GAME_ASSERT(!iErr);
+
+	gSndHandles[i] = Pomme_SndLoadFileAsResource(fRefNum);
+	GAME_ASSERT(gSndHandles[i]);
+
+		/* GET OFFSET INTO IT */
+
+	iErr = GetSoundHeaderOffset(gSndHandles[i], &gSndOffsets[i]);
+	GAME_ASSERT(!iErr);
+
+		/* PRE-DECOMPRESS IT */
+
+	Pomme_DecompressSoundResource(&gSndHandles[i], &gSndOffsets[i]);
+
+		/* CLOSE THE FILE */
+
+	FSClose(fRefNum);
+}
+
+/******************* LOAD 1 EFFECT ************************/
+
+void DisposeSoundEffect(int i)
+{
+	GAME_ASSERT(i >= 0);
+	GAME_ASSERT(i < NUM_EFFECTS);
+
+	if (gSndHandles[i])
+	{
+		DisposeHandle((Handle) gSndHandles[i]);
+		gSndHandles[i] = NULL;
+		gSndOffsets[i] = 0;
+	}
+}
+
 /******************* LOAD SOUND BANK ************************/
 
-void LoadSoundBank(FSSpec *spec, long bankNum)
+void LoadSoundBank(int bankNum)
 {
-short			srcFile1,numSoundsInBank,i;
-OSErr			iErr;
-
 	StopAllEffectChannels();
 
-	GAME_ASSERT(bankNum < MAX_SOUND_BANKS);
+	GAME_ASSERT(bankNum >= 0);
+	GAME_ASSERT(bankNum < NUM_SOUND_BANKS);
 
-			/* DISPOSE OF EXISTING BANK */
-
-	DisposeSoundBank(bankNum);
-
-
-			/* OPEN APPROPRIATE REZ FILE */
-
-	srcFile1 = FSpOpenResFile(spec, fsRdPerm);
-	if (srcFile1 == -1)
-	{
-		DoFatalAlert("LoadSoundBank: OpenResFile failed! %d", ResError());
-	}
+	const char* bankName = kBankNames[bankNum];
+	GAME_ASSERT(bankName);
 
 			/****************************/
 			/* LOAD ALL EFFECTS IN BANK */
 			/****************************/
 
-	UseResFile( srcFile1 );												// open sound resource fork
-	numSoundsInBank = Count1Resources('snd ');							// count # snd's in this bank
-	if (numSoundsInBank > MAX_EFFECTS)
-		DoFatalAlert("LoadSoundBank: numSoundsInBank > MAX_EFFECTS");
-
-	for (i=0; i < numSoundsInBank; i++)
+	for (int i = 0; i < NUM_EFFECTS; i++)
 	{
-				/* LOAD SND REZ */
+				/* SCAN FOR EFFECTS IN THIS BANK */
 
-		gSndHandles[bankNum][i] = (SndListResource **)GetResource('snd ',BASE_EFFECT_RESOURCE+i);
-		if (gSndHandles[bankNum][i] == nil)
+		if (0 == SDL_strcmp(bankName, gEffectsTable[i].bank))
 		{
-			iErr = ResError();
-			DoFatalAlert("LoadSoundBank: GetResource failed! %d", iErr);
+			LoadSoundEffect(i);
 		}
-		DetachResource((Handle)gSndHandles[bankNum][i]);				// detach resource from rez file & make a normal Handle
-
-		HNoPurge((Handle)gSndHandles[bankNum][i]);						// make non-purgeable
-		HLockHi((Handle)gSndHandles[bankNum][i]);
-
-				/* GET OFFSET INTO IT */
-
-		GetSoundHeaderOffset(gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
-
-				/* PRE-DECOMPRESS IT */
-
-		Pomme_DecompressSoundResource(&gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
 	}
-
-	CloseResFile(srcFile1);
-
-	gNumSndsInBank[bankNum] = numSoundsInBank;					// remember how many sounds we've got
 }
 
 
 /******************** DISPOSE SOUND BANK **************************/
 
-void DisposeSoundBank(short bankNum)
+void DisposeSoundBank(int bankNum)
 {
-short	i;
+	GAME_ASSERT(bankNum >= 0);
+	GAME_ASSERT(bankNum < NUM_SOUND_BANKS);
 
-
-	if (bankNum > MAX_SOUND_BANKS)
-		return;
+	const char* bankName = kBankNames[bankNum];
+	GAME_ASSERT(bankName);
 
 	StopAllEffectChannels();									// make sure all sounds are stopped before nuking any banks
 
-			/* FREE ALL SAMPLES */
+	for (int i = 0; i < NUM_EFFECTS; i++)
+	{
+			/* SCAN FOR EFFECTS IN THIS BANK */
 
-	for (i=0; i < gNumSndsInBank[bankNum]; i++)
-		DisposeHandle((Handle)gSndHandles[bankNum][i]);
-
-
-	gNumSndsInBank[bankNum] = 0;
+		if (0 == SDL_strcmp(bankName, gEffectsTable[i].bank))
+		{
+			DisposeSoundEffect(i);
+		}
+	}
 }
 
 
@@ -471,49 +516,30 @@ short		i;
 // INPUT: loopFlag = true if want song to loop
 //
 
-void PlaySong(short songNum, Boolean loopFlag)
+void PlaySong(int songEffectNum, Boolean loopFlag)
 {
 OSErr 	iErr;
-FSSpec	spec;
 int		volume;
 
-static const char* songNames[] =
+const float	volumeTweaks[] =
 {
-	":Audio:Intro.song",
-	":Audio:Theme.song",
-	":Audio:Level1_Garden.song",
-	":Audio:Level2_Pool.song",
-	":Audio:Level3_DogHouse.song",
-	":Audio:Level4_Plumbing.song",
-	":Audio:Level5_Playroom.song",
-	":Audio:Level6_Closet.song",
-	":Audio:Level8_Garbage.song",
-	":Audio:Level9_Balsa.song",
-	":Audio:Level10_Park.song",
-	":Audio:Bonus.song",
-	":Audio:Win.song",
-	":Audio:Lose.song",
+	[EFFECT_SONG_TITLE]		= 1.9,
+	[EFFECT_SONG_THEME]		= 1.8,
+	[EFFECT_SONG_GARDEN]	= 1.2,
+	[EFFECT_SONG_POOL]		= 1.8,
+	[EFFECT_SONG_FIDO]		= 1.2,
+	[EFFECT_SONG_PLUMBING]	= 1.3,
+	[EFFECT_SONG_PLAYROOM]	= 1.4,
+	[EFFECT_SONG_CLOSET]	= 1.1,
+	[EFFECT_SONG_GARBAGE]	= 1.3,
+	[EFFECT_SONG_BALSA]		= 1.4,
+	[EFFECT_SONG_PARK]		= 1.3,
+	[EFFECT_SONG_BONUS]		= 1.6,
+	[EFFECT_SONG_WIN]		= 1.3,
+	[EFFECT_SONG_LOSE]		= 1.3,
 };
 
-float	volumeTweaks[]=
-{
-	1.9,				// intro
-	1.8,				// theme
-	1.2,				// level 1 garden
-	1.8,				// level 2 pool
-	1.2,				// level 3 fido
-	1.3,				// level 4 plumbing
-	1.4,				// level 5 playroom
-	1.1,				// level 6 closet
-	1.3,				// level 8 garbage
-	1.4,				// level 9 balsa
-	1.3,				// level 10 park
-	1.6,				// bonus
-	1.3,				// win
-	1.3,				// lose
-};
-
-	if (songNum == gCurrentSong)					// see if this is already playing
+	if (songEffectNum == gCurrentSong)					// see if this is already playing
 		return;
 
 
@@ -525,9 +551,7 @@ float	volumeTweaks[]=
 			/* OPEN APPROPRIATE SND FILE */
 			/******************************/
 
-	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID,songNames[songNum], &spec);
-	GAME_ASSERT(!iErr);
-
+	LoadSoundEffect(songEffectNum);
 
 
 
@@ -535,12 +559,11 @@ float	volumeTweaks[]=
 				/* START PLAYING */
 				/*****************/
 
-	LoadSoundBank(&spec, SOUND_BANK_SONG);								// load snd resource into song bank
 
 
-	gCurrentSong 	= songNum;
-	volume = FULL_CHANNEL_VOLUME * volumeTweaks[songNum];
-	gSongChannel = PlayEffect_Parms(EFFECT_SONG, volume, volume, NORMAL_CHANNEL_RATE);
+	gCurrentSong 	= songEffectNum;
+	volume = FULL_CHANNEL_VOLUME * volumeTweaks[songEffectNum];
+	gSongChannel = PlayEffect_Parms(songEffectNum, volume, volume, NORMAL_CHANNEL_RATE);
 	if (gSongChannel < 0)
 		return;
 
@@ -573,7 +596,7 @@ void KillSong(void)
 
 	StopAChannel(&gSongChannel);
 
-	DisposeSoundBank(SOUND_BANK_SONG);
+	DisposeSoundBank(SOUND_BANK_MUSIC);
 }
 
 
@@ -602,21 +625,13 @@ void EnforceMusicPausePref(void)
 // OUTPUT: channel # used to play sound
 //
 
-short PlayEffect3D(short effectNum, OGLPoint3D *where)
+short PlayEffect3D(int effectNum, OGLPoint3D *where)
 {
 short					theChan;
-Byte					bankNum,soundNum;
-uint32_t					leftVol, rightVol;
+uint32_t				leftVol, rightVol;
 
-			/* GET BANK & SOUND #'S FROM TABLE */
-
-	bankNum 	= gEffectsTable[effectNum].bank;
-	soundNum 	= gEffectsTable[effectNum].sound;
-
-	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
-	{
-		DoAlert("Illegal sound number! %d", effectNum);
-	}
+	GAME_ASSERT(effectNum >= 0);
+	GAME_ASSERT(effectNum < NUM_EFFECTS);
 
 				/* CALC VOLUME */
 
@@ -642,21 +657,13 @@ uint32_t					leftVol, rightVol;
 // OUTPUT: channel # used to play sound
 //
 
-short PlayEffect_Parms3D(short effectNum, OGLPoint3D *where, uint32_t rateMultiplier, float volumeAdjust)
+short PlayEffect_Parms3D(int effectNum, OGLPoint3D *where, uint32_t rateMultiplier, float volumeAdjust)
 {
 short			theChan;
-Byte			bankNum,soundNum;
-uint32_t			leftVol, rightVol;
+uint32_t		leftVol, rightVol;
 
-			/* GET BANK & SOUND #'S FROM TABLE */
-
-	bankNum 	= gEffectsTable[effectNum].bank;
-	soundNum 	= gEffectsTable[effectNum].sound;
-
-	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
-	{
-		DoFatalAlert("Illegal sound number! %d", effectNum);
-	}
+	GAME_ASSERT(effectNum >= 0);
+	GAME_ASSERT(effectNum < NUM_EFFECTS);
 
 				/* CALC VOLUME */
 
@@ -681,7 +688,7 @@ uint32_t			leftVol, rightVol;
 // Returns TRUE if effectNum was a mismatch or something went wrong
 //
 
-Boolean Update3DSoundChannel(short effectNum, short *channel, OGLPoint3D *where)
+Boolean Update3DSoundChannel(int effectNum, short *channel, OGLPoint3D *where)
 {
 SCStatus		theStatus;
 uint32_t			leftVol,rightVol;
@@ -728,7 +735,7 @@ short			c;
 
 /******************** CALC 3D EFFECT VOLUME *********************/
 
-static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, uint32_t *leftVolOut, uint32_t *rightVolOut)
+static void Calc3DEffectVolume(int effectNum, OGLPoint3D *where, float volAdjust, uint32_t *leftVolOut, uint32_t *rightVolOut)
 {
 float	dist;
 float	refDist,volumeFactor;
@@ -857,7 +864,7 @@ OGLVector3D	v;
 // OUTPUT: channel # used to play sound
 //
 
-short PlayEffect(short effectNum)
+short PlayEffect(int effectNum)
 {
 	return(PlayEffect_Parms(effectNum,FULL_CHANNEL_VOLUME,FULL_CHANNEL_VOLUME,NORMAL_CHANNEL_RATE));
 
@@ -870,26 +877,17 @@ short PlayEffect(short effectNum)
 // OUTPUT: channel # used to play sound
 //
 
-short  PlayEffect_Parms(short effectNum, uint32_t leftVolume, uint32_t rightVolume, unsigned long rateMultiplier)
+short  PlayEffect_Parms(int effectNum, uint32_t leftVolume, uint32_t rightVolume, unsigned long rateMultiplier)
 {
 SndCommand 		mySndCmd;
 SndChannelPtr	chanPtr;
 short			theChan;
-Byte			bankNum,soundNum;
 OSErr			myErr;
-uint32_t			lv2,rv2;
+uint32_t		lv2,rv2;
 
-
-
-			/* GET BANK & SOUND #'S FROM TABLE */
-
-	bankNum = gEffectsTable[effectNum].bank;
-	soundNum = gEffectsTable[effectNum].sound;
-
-	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
-	{
-		DoFatalAlert("Illegal sound number! %d", effectNum);
-	}
+	GAME_ASSERT(effectNum >= 0);
+	GAME_ASSERT(effectNum < NUM_EFFECTS);
+	GAME_ASSERT_MESSAGE(gSndHandles[effectNum], "Sound effect not loaded");
 
 			/* LOOK FOR FREE CHANNEL */
 
@@ -929,7 +927,7 @@ uint32_t			lv2,rv2;
 
 	mySndCmd.cmd = bufferCmd;										// make it play
 	mySndCmd.param1 = 0;
-	mySndCmd.ptr = (Ptr)(*gSndHandles[bankNum][soundNum]) + gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
+	mySndCmd.ptr = (Ptr)(*gSndHandles[effectNum]) + gSndOffsets[effectNum];	// pointer to SoundHeader
     SndDoImmediate(chanPtr, &mySndCmd);
 	if (myErr)
 		return(-1);
@@ -960,15 +958,12 @@ uint32_t			lv2,rv2;
 
 static void UpdateGlobalVolume(void)
 {
-int		c;
-
 			/* ADJUST VOLUMES OF ALL CHANNELS REGARDLESS IF THEY ARE PLAYING OR NOT */
 
-	for (c = 0; c < gMaxChannels; c++)
+	for (int c = 0; c < gMaxChannels; c++)
 	{
 		ChangeChannelVolume(c, gChannelInfo[c].leftVolume, gChannelInfo[c].rightVolume);
 	}
-
 }
 
 /*************** CHANGE CHANNEL VOLUME **************/
@@ -1090,12 +1085,3 @@ void PauseAllChannels(Boolean pause)
 
 //	SndDoImmediate(gMusicChannel, &cmd);
 }
-
-
-
-
-
-
-
-
-

@@ -107,8 +107,7 @@ int			i,n;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Title.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_TITLE);
+	LoadSoundEffect(EFFECT_TITLEFLYBUZZ);
 
 
 			/* LOAD MODELS */
@@ -238,7 +237,7 @@ static void FreeLevelIntroScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
+	DisposeSoundEffect(EFFECT_TITLEFLYBUZZ);
 }
 
 

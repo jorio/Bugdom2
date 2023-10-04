@@ -118,7 +118,7 @@ static const OGLVector3D	fillDirection2 = { .3, .8, 1.0 };
 ObjNode	*newObj;
 int		i;
 
-	PlaySong(SONG_THEME, true);
+	PlaySong(EFFECT_SONG_THEME, true);
 
 	gLevelNum 		= -1;
 	gSelectedIcon 	= 0;
@@ -202,12 +202,6 @@ int		i;
 	LoadASkeleton(SKELETON_TYPE_GNOME);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_GNOME, 0,
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Satin);
-
-
-				/* LOAD AUDIO */
-
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
-//	LoadSoundBank(&spec, SOUND_BANK_MAINMENU);
 
 
 
@@ -327,7 +321,6 @@ static void FreeMainMenuScreen(void)
 	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_MAINMENU);
 }
 
 #pragma mark -

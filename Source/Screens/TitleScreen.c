@@ -170,8 +170,7 @@ ObjNode			*fly;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Title.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_TITLE);
+	LoadSoundBank(SOUND_BANK_TITLE);
 
 	InitEffects();
 
@@ -271,9 +270,7 @@ ObjNode			*fly;
 	}
 
 
-	PlaySong(SONG_INTRO, true);
-
-
+	PlaySong(EFFECT_SONG_TITLE, true);
 }
 
 /****************** MOVE TITLE FLIES ***********************/

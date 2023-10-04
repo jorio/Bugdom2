@@ -240,7 +240,6 @@ extern	int						gVRAMUsedThisFrame;
 extern	int16_t					**gSuperTileTextureGrid;
 extern	int32_t					gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
 extern	long					gPrefsFolderDirID;
-extern	short					gCurrentSong;
 extern	short					gDialogSoundChannel;
 extern	short					gPrefsFolderVRefNum;
 extern	uint32_t				gAutoFadeStatusBits;

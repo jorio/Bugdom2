@@ -102,33 +102,11 @@ const int levelSpriteCount[NUM_LEVELS] =
 };
 
 
-const char*	levelSoundFiles[NUM_LEVELS] =
-{
-	":Audio:Garden.sounds",
-	":Audio:Garden.sounds",
-	":Audio:Fido.sounds",
-	"",
-	":Audio:Playroom.sounds",
-
-	":Audio:Closet.sounds",
-	"",
-	":Audio:Garbage.sounds",
-	":Audio:Balsa.sounds",
-	":Audio:Park.sounds",
-};
 
 
 			/*********************/
 			/* LOAD COMMNON DATA */
 			/*********************/
-
-				/* LOAD AUDIO */
-
-	if (levelSoundFiles[gLevelNum][0] > 0)
-	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSoundFiles[gLevelNum], &spec);
-		LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
-	}
 
 
 			/* LOAD GLOBAL BG3D GEOMETRY */
@@ -756,11 +734,6 @@ static void LoadLevelArt_Balsa(void)
 void LoadLevelArt_Tunnel(void)
 {
 FSSpec	spec;
-
-				/* LOAD AUDIO */
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Plumbing.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
 
 
 			/* LOAD SPRITES */

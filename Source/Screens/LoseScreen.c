@@ -163,9 +163,6 @@ int			i;
 
 				/* LOAD AUDIO */
 
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
-//	LoadSoundBank(&spec, SOUND_BANK_LOSE);
-
 
 
 			/*******************/
@@ -259,7 +256,7 @@ int			i;
 	newObj->Timer = 3.0f;
 	newObj->ColorFilter.a = 0;
 
-	PlaySong(SONG_LOSE, false);
+	PlaySong(EFFECT_SONG_LOSE, false);
 
 }
 
@@ -275,7 +272,6 @@ static void FreeLoseScreen(void)
 	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_LOSE);
 }
 
 

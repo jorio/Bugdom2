@@ -84,8 +84,7 @@ static	int		gNumFullGoldClovers;
 
 void DoBonusScreen(void)
 {
-
-	PlaySong(SONG_BONUS, false);
+	PlaySong(EFFECT_SONG_BONUS, false);
 
 	gScore += POINTS_LEVEL;							// get level completion bonus
 
@@ -225,8 +224,7 @@ ObjNode	*newObj;
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_BONUS);
+	LoadSoundBank(SOUND_BANK_BONUS);
 
 
 

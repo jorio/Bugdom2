@@ -117,9 +117,7 @@ static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
 
 
 			/* LOAD AUDIO */
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Plumbing.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
+	// Note: preloaded in main.c
 
 
 
@@ -165,7 +163,6 @@ static void FreeLevelIntroScreen(void)
 	DisposeEffects();
 	DisposeSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC);
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 }
 
 
