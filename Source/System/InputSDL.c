@@ -35,7 +35,6 @@ typedef struct Controller
 	SDL_JoystickID			joystickInstance;
 	KeyState				needStates[NUM_CONTROL_NEEDS];
 	float					needAnalog[NUM_CONTROL_NEEDS];
-	OGLVector2D				analogSteering;
 } Controller;
 
 Boolean				gUserPrefersGamepad = false;
@@ -468,49 +467,6 @@ Boolean IsCheatKeyComboDown(void)
 {
 	return (IsKeyHeld(SDL_SCANCODE_B) && IsKeyHeld(SDL_SCANCODE_U) && IsKeyHeld(SDL_SCANCODE_G))
 		|| ((IsKeyHeld(SDL_SCANCODE_LGUI) || IsKeyHeld(SDL_SCANCODE_RGUI)) && (IsKeyHeld(SDL_SCANCODE_HELP) || IsKeyHeld(SDL_SCANCODE_INSERT)));
-}
-
-#pragma mark - Analog steering
-
-static float GetControllerAnalogSteeringAxis(SDL_GameController* sdlController, SDL_GameControllerAxis axis)
-{
-			/****************************/
-			/* SET PLAYER AXIS CONTROLS */
-			/****************************/
-
-	float steer = 0; 											// assume no control input
-
-			/* FIRST CHECK ANALOG AXES */
-
-	if (sdlController)
-	{
-		Sint16 dxRaw = SDL_GameControllerGetAxis(sdlController, axis);
-
-		steer = dxRaw / 32767.0f;
-		float steerMag = fabsf(steer);
-
-		if (steerMag < kJoystickDeadZoneFrac)
-		{
-			steer = 0;
-		}
-		else if (steer < -1.0f)
-		{
-			steer = -1.0f;
-		}
-		else if (steer > 1.0f)
-		{
-			steer = 1.0f;
-		}
-		else
-		{
-			// Avoid magnitude bump when thumbstick is pushed past dead zone:
-			// Bring magnitude from [kJoystickDeadZoneFrac, 1.0] to [0.0, 1.0].
-			float steerSign = steer < 0 ? -1.0f : 1.0f;
-			steer = steerSign * (steerMag - kJoystickDeadZoneFrac) / (1.0f - kJoystickDeadZoneFrac);
-		}
-	}
-
-	return steer;
 }
 
 #pragma mark - Controller mapping
