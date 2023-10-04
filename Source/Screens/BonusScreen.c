@@ -57,25 +57,6 @@ enum
 
 
 
-enum
-{
-	BONUS_SObjType_Score,
-	BONUS_SObjType_0,
-	BONUS_SObjType_1,
-	BONUS_SObjType_2,
-	BONUS_SObjType_3,
-	BONUS_SObjType_4,
-	BONUS_SObjType_5,
-	BONUS_SObjType_6,
-	BONUS_SObjType_7,
-	BONUS_SObjType_8,
-	BONUS_SObjType_9,
-
-	BONUS_SObjType_SaveIcon,
-	BONUS_SObjType_NoSaveIcon,
-	BONUS_SObjType_COUNT,
-};
-
 
 
 /*********************/

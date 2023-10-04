@@ -180,7 +180,7 @@ static float	dotAlpha = 1.0f;
 	glDisable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	DrawInfobarSprite2(dotX, dotY, 16, SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PausedDot);
+	DrawInfobarSprite2(dotX, dotY, 16, SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_LeafCursor);
 
 	gGlobalTransparency = 1.0f;
 

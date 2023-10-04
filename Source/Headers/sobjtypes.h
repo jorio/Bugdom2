@@ -35,6 +35,9 @@ enum
 
 	GLOBAL_SObjType_Fence_Grass,
 	GLOBAL_SObjType_Fence_Brick,
+
+	GLOBAL_SObjType_LeafCursor,
+
 	GLOBAL_SObjType_COUNT,
 };
 
@@ -116,7 +119,7 @@ enum
 	INFOBAR_SObjType_MapDot,
 
 	INFOBAR_SObjType_PausedFrame,
-	INFOBAR_SObjType_PausedDot,
+	INFOBAR_SObjType_DialogFrame,
 
 	INFOBAR_SObjType_Mouse,
 
@@ -129,12 +132,11 @@ enum
 	INFOBAR_SObjType_GoldClover3,
 	INFOBAR_SObjType_GoldClover4,
 
-	INFOBAR_SObjTypes_DialogFrame,
-	INFOBAR_SObjTypes_AcornIcon,
-	INFOBAR_SObjTypes_RedKeyIcon,
-	INFOBAR_SObjTypes_GreenKeyIcon,
-	INFOBAR_SObjTypes_BlueKeyIcon,
-	INFOBAR_SObjTypes_BeeIcon,
+	INFOBAR_SObjType_AcornIcon,
+
+	INFOBAR_SObjType_RedKeyIcon,
+	INFOBAR_SObjType_GreenKeyIcon,
+	INFOBAR_SObjType_BlueKeyIcon,
 
 	INFOBAR_SObjType_COUNT,
 };
@@ -258,9 +260,8 @@ enum
 enum
 {
 	BALSA_SObjType_AntHillIcon,
-
 	BALSA_SObjType_Fence_Balsa,
-
+	BALSA_SObjType_BeeIcon,
 	BALSA_SObjType_COUNT,
 };
 
@@ -286,4 +287,28 @@ enum
 
 
 
+/******************* BONUS/HIGH SCORES *************************/
 
+
+enum
+{
+	BONUS_SObjType_Score,
+	BONUS_SObjType_0,
+	BONUS_SObjType_1,
+	BONUS_SObjType_2,
+	BONUS_SObjType_3,
+	BONUS_SObjType_4,
+	BONUS_SObjType_5,
+	BONUS_SObjType_6,
+	BONUS_SObjType_7,
+	BONUS_SObjType_8,
+	BONUS_SObjType_9,
+
+	BONUS_SObjType_SaveIcon,
+	BONUS_SObjType_NoSaveIcon,
+
+	BONUS_SObjType_EnterNameText,
+	BONUS_SObjType_Cursor,
+
+	BONUS_SObjType_COUNT,
+};

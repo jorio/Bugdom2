@@ -37,14 +37,6 @@ enum
 };
 
 
-enum
-{
-	HIGHSCORES_SObjType_EnterNameText,
-	HIGHSCORES_SObjType_ScoreText,
-	HIGHSCORES_SObjType_Cursor,
-	HIGHSCORES_SObjType_COUNT,
-};
-
 
 #define MYSCORE_DIGIT_SPACING 	30.0f
 
@@ -215,7 +207,7 @@ ObjNode				*newObj;
 
 			/* LOAD SPRITES */
 
-	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_COUNT, "HighScores");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_COUNT, "Bonus");
 
 
 			/* LOAD MODELS */
@@ -313,7 +305,7 @@ static void DrawScoreVerbage(void)
 			/****************************/
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_ScoreText);
+	DrawInfobarSprite2(320-150, 110, 300, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_Score);
 
 
 			/**************/
@@ -360,7 +352,7 @@ char	s[33];
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_EnterNameText);
+	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_EnterNameText);
 
 
 	gGlobalTransparency = gFinalScoreAlpha;
@@ -413,7 +405,7 @@ char	s[33];
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
 		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_LEVELSPECIFIC, HIGHSCORES_SObjType_Cursor);
+		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_Cursor);
 	}
 
 
