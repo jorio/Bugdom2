@@ -478,9 +478,22 @@ long		count;
 
 			/* OVERWRITE NON-CONFIGURABLE BINDINGS */
 
-	SDL_memcpy(&gGamePrefs.bindings[NUM_REMAPPABLE_NEEDS],
-				&kDefaultInputBindings[NUM_REMAPPABLE_NEEDS],
-				sizeof(gGamePrefs.bindings[0]) * (NUM_CONTROL_NEEDS - NUM_REMAPPABLE_NEEDS));
+	for (int need = 0; need < NUM_CONTROL_NEEDS; need++)
+	{
+		if (need < NUM_REMAPPABLE_NEEDS)
+		{
+			GAME_ASSERT(MAX_USER_BINDINGS_PER_NEED <= MAX_BINDINGS_PER_NEED);
+			for (int j = MAX_USER_BINDINGS_PER_NEED; j < MAX_BINDINGS_PER_NEED; j++)
+			{
+				gGamePrefs.bindings[need].key[j] = kDefaultInputBindings[need].key[j];
+				gGamePrefs.bindings[need].pad[j] = kDefaultInputBindings[need].pad[j];
+			}
+		}
+		else
+		{
+			gGamePrefs.bindings[need] = kDefaultInputBindings[need];
+		}
+	}
 
 	return(noErr);
 
