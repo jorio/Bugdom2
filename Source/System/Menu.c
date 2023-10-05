@@ -55,7 +55,7 @@ const MenuStyle kDefaultMenuStyle =
 	.fadeInSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,
-	.titleColor			= {1.0f, 1.0f, 0.7f, 1.0f},
+	.titleColor			= {1.0f, 1.0f, 0.2f, 1.0f},
 	.inactiveColor		= {0.3f, 0.7f, 0.2f, 1.0f},
 	.inactiveColor2		= {0.2f, 0.4f, 0.8f, 0.5f},
 	.standardScale		= GS * 1.0f,
@@ -100,8 +100,12 @@ static int					gMouseHoverColumn = -1;
 static OGLColorRGBA PulsateColor(float* time)
 {
 	*time += gFramesPerSecondFrac;
-	float intensity = 0.66f + 0.33 * SDL_sinf(*time * 10.0f);
-	return (OGLColorRGBA) {1,1,1,intensity};
+	float intensity = 0.6f + 0.4f * SDL_sinf(*time * 10.0f);
+	return (OGLColorRGBA) {
+		.3f * intensity + 1.0f * (1.0f - intensity),
+		.7f * intensity + 1.0f * (1.0f - intensity),
+		.2f * intensity + 1.0f * (1.0f - intensity),
+		1};
 }
 
 static InputBinding* GetBindingAtRow(int row)
@@ -942,6 +946,96 @@ static void AwaitMouseClick(void)
 }
 
 /****************************/
+/*    CURSOR DOT            */
+/****************************/
+#pragma mark - Cursor Dot
+
+static void MoveCursorDot(ObjNode* theNode)
+{
+	static OGLPoint3D targetPoint;
+	static OGLPoint3D currentPoint;
+	static float flutter = 0;
+	static float flutterMag = 1.25f;
+	static float flutterSpeed = 3;
+	static const float trackSpeed = 8.0f;
+
+	if (gMenuRow >= 0)
+	{
+		int column = 0;
+
+		if (gMenu[gMenuRow].type == kMenuItem_KeyBinding)
+			column = 1+gKeyColumn;
+		else if (gMenu[gMenuRow].type == kMenuItem_PadBinding)
+			column = 1+gPadColumn;
+		else
+			column = 0;
+
+		targetPoint = gMenuObjects[gMenuRow][column]->Coord;
+		targetPoint.x -= 16;
+		targetPoint.y += 3;
+
+		if (!theNode->Flag[0])
+		{
+			// Initial position
+			currentPoint = targetPoint;
+			theNode->Flag[0] = true;
+		}
+		else
+		{
+			float diffX = targetPoint.x - currentPoint.x;
+			float diffY = targetPoint.y - currentPoint.y;
+
+			if (fabsf(diffX) < .5f)
+				currentPoint.x = targetPoint.x;
+			else
+				currentPoint.x += gFramesPerSecondFrac * diffX * trackSpeed;
+
+			if (fabsf(diffY) < .5f)
+			{
+				currentPoint.y = targetPoint.y;
+				theNode->Rot.y = diffY * 0;
+			}
+			else
+			{
+				currentPoint.y += gFramesPerSecondFrac * diffY * trackSpeed;
+				theNode->Rot.y = diffY * .033f;
+				theNode->Rot.y = SDL_clamp(theNode->Rot.y, -PI / 2, PI / 2);
+			}
+		}
+
+		theNode->Coord = currentPoint;
+
+		theNode->Coord.x -= 3 * fabsf(sinf(flutter * 2));
+//		theNode->Coord.x += flutterMag * sinf(-flutter);
+		theNode->Coord.y += flutterMag * cosf(-flutter);
+		theNode->Rot.y += 0.1f * sinf(-flutter);
+
+		flutter += gFramesPerSecondFrac * flutterSpeed;
+//		flutterMag = sinf(flutter * 2);
+
+		UpdateObjectTransforms(theNode);
+	}
+}
+
+static ObjNode* MakeMenuCursorDot(void)
+{
+	NewObjectDefinitionType def =
+	{
+		.genre		= SPRITE_GENRE,
+		.group		= SPRITE_GROUP_GLOBAL,
+		.type		= GLOBAL_SObjType_LeafCursor,
+		.scale		= 20,
+		.slot		= MENU_SLOT,
+		.moveCall	= MoveCursorDot,
+		.flags		= STATUS_BIT_MOVEINPAUSE,
+	};
+	ObjNode* cursorDot = MakeSpriteObject(&def);
+	cursorDot->Flag[0] = false;
+
+	return cursorDot;
+}
+
+/****************************/
 /*    PAGE LAYOUT           */
 /****************************/
 #pragma mark - Page Layout
@@ -1301,6 +1395,8 @@ int StartMenu(
 
 	ObjNode* pane = nil;
 
+	ObjNode* cursorDot = MakeMenuCursorDot();
+
 	if (gMenuStyle->darkenPane)
 	{
 		pane = MakeDarkenPane();
@@ -1385,6 +1481,12 @@ int StartMenu(
 
 		/* CLEANUP */
 
+	if (cursorDot)
+	{
+		DeleteObject(cursorDot);
+		cursorDot = NULL;
+	}
+
 	if (gMenuStyle->asyncFadeOut)
 	{
 		if (pane)
@@ -1408,7 +1510,10 @@ int StartMenu(
 		DeleteAllText();
 
 		if (pane)
+		{
 			DeleteObject(pane);
+			pane = NULL;
+		}
 	}
 
 	UpdateInput();
