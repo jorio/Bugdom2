@@ -98,7 +98,7 @@ void DoLevelIntro(void);
 
 
 
-
+int DoLevelCheatDialog(void (*drawCall)(void));
 
 void DoSettingsOverlay(void (*moveCall)(void),
 					   void (*drawCall)(void));

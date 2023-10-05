@@ -407,13 +407,26 @@ static void DoMenuControls(void)
 		switch(gSelectedIcon)
 		{
 			case	0:
-					gPlayNow = true;
-					gPlayingFromSavedGame = false;
-					gLevelNum = 0;
-					for (int i = 0; i < 10; i++)		// quick n dirty level cheat
+					if (IsKeyActive(SDL_SCANCODE_F10))
 					{
-						if (IsKeyActive(SDL_SCANCODE_1+i))
-							gLevelNum = i;
+						int pick = DoLevelCheatDialog(DrawMainMenuCallback);
+						if (pick >= 0)
+						{
+							gPlayNow = true;
+							gPlayingFromSavedGame = false;
+							gLevelNum = pick;
+						}
+					}
+					else
+					{
+						gPlayNow = true;
+						gPlayingFromSavedGame = false;
+						gLevelNum = 0;
+						for (int i = 0; i < 10; i++)		// quick n dirty level cheat
+						{
+							if (IsKeyActive(SDL_SCANCODE_1+i))
+								gLevelNum = i;
+						}
 					}
 					break;
 
