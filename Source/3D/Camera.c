@@ -1,7 +1,8 @@
 /****************************/
 /*   	CAMERA.C    	    */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -100,14 +101,15 @@ static const Byte	gFlareImageTable[]=
 
 static void DrawLensFlare(ObjNode* theNode)
 {
-short			i;
 float			x,y,dot;
 OGLPoint3D		sunScreenCoord,from;
-float			cx,cy;
-float			dx,dy,length;
 OGLVector3D		axis,lookAtVector,sunVector;
-static OGLColorRGBA	transColor = {1,1,1,1};
+OGLColorRGBA	transColor = {1,1,1,1};
 int				px,py,pw,ph;
+
+static Boolean	sunBlocked = false;
+static float	sunFade = 1;
+const  float	sunFadeSpeed = 8;
 
 	(void) theNode;
 
@@ -116,19 +118,6 @@ int				px,py,pw,ph;
 
 	if (gSlowCPU)					// no lens flares if slow
 		return;
-
-
-			/************/
-			/* SET TAGS */
-			/************/
-
-	OGL_PushState();
-
-	OGL_DisableLighting();												// Turn OFF lighting
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	SetColor4f(1,1,1,1);										// full white & alpha to start with
 
 
 			/* CALC SUN COORD */
@@ -154,10 +143,10 @@ int				px,py,pw,ph;
 
 	dot = OGLVector3D_Dot(&lookAtVector, &sunVector);
 	if (dot >= 0.0f)
-		goto bye;
+		return;
 
-	dot = acos(dot) * -2.0f;				// get angle & modify it
-	transColor.a = cos(dot);				// get cos of modified angle
+	dot = acosf(dot) * -2.0f;				// get angle & modify it
+	transColor.a = cosf(dot);				// get cos of modified angle
 
 
 			/* CALC SCREEN COORDINATE OF LIGHT */
@@ -169,45 +158,73 @@ int				px,py,pw,ph;
 				/* SEE IF SUN IS BLOCKED */
 				/*************************/
 
-#if 0
-	x2 = sunScreenCoord.x;
-	y2 = sunScreenCoord.y;
+#if 1
+	int x2 = (int) sunScreenCoord.x;
+	int y2 = (int) sunScreenCoord.y;
 
-	if ((x2 >= 0.0f) && (x2 < gGameWindowWidth) &&			// see if center is in window
-		(y2 >= 0.0f) && (y2 < gGameWindowHeight))
+	if ((x2 >= 0) && (x2 < gGameWindowWidth) &&			// see if center is in window
+		(y2 >= 0) && (y2 < gGameWindowHeight))
 	{
-		GLfloat	zbuffer;
+				/* SEE IF CENTER IS BLOCKED */
 
-					/* SEE IF CENTER IS BLOCKED */
+		if ((gGameFrameNum % 8) == 0)		// this is super expensive, so don't update gSunBlocked too often
+		{
+			y2 = gGameWindowHeight - y2;					// flip y since 0,0 is bottom left
+			GLfloat	zbuffer;								// read z-buffer to see if flare is blocked
+			glReadPixels(x2, y2, 1,1, GL_DEPTH_COMPONENT, GL_FLOAT, &zbuffer);
+			sunBlocked = (zbuffer < .998f);
+		}
+	}
+	else
+	{
+		sunBlocked = false;
+	}
 
-		y2 = gGameWindowHeight - y2;											// flip y since 0,0 is bottom left
-
-		glReadPixels(x2, y2, 1,1, GL_DEPTH_COMPONENT, GL_FLOAT, &zbuffer);		// read z-buffer to see if flare is blocked
-
-//		gScratchF = zbuffer;	//---------
-		if (zbuffer < .998f)
-			goto bye;
+	if (sunBlocked)
+	{
+		sunFade -= sunFadeSpeed * gFramesPerSecondFrac;
+		if (sunFade <= 0)
+		{
+			sunFade = 0;
+			return;
+		}
+	}
+	else
+	{
+		sunFade += sunFadeSpeed * gFramesPerSecondFrac;
+		sunFade = SDL_min(1.0f, sunFade);
 	}
 #endif
 
 			/* CALC CENTER OF VIEWPORT */
 
 	OGL_GetCurrentViewport(&px, &py, &pw, &ph);
-	cx = pw/2 + px;
-	cy = ph/2 + py;
+	float cx = pw/2 + px;
+	float cy = ph/2 + py;
 
 
 			/* CALC VECTOR FROM CENTER TO LIGHT */
 
-	dx = sunScreenCoord.x - cx;
-	dy = sunScreenCoord.y - cy;
-	length = sqrt(dx*dx + dy*dy);
+	float dx = sunScreenCoord.x - cx;
+	float dy = sunScreenCoord.y - cy;
+	float length = sqrtf(dx*dx + dy*dy);
 	FastNormalizeVector(dx, dy, 0, &axis);
 
 
 			/***************/
 			/* DRAW FLARES */
 			/***************/
+
+			/* SET TAGS */
+
+	OGL_PushState();
+
+	OGL_DisableLighting();												// Turn OFF lighting
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_TEXTURE_2D);
+	SetColor4f(1,1,1,1);										// full white & alpha to start with
 
 			/* INIT MATRICES */
 
@@ -217,14 +234,16 @@ int				px,py,pw,ph;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	for (i = 0; i < NUM_FLARES; i++)
+	for (int i = 0; i < NUM_FLARES; i++)
 	{
 		float	sx,sy,o,fx,fy;
 
 		if (i == 0)
-			gGlobalTransparency = .99;		// sun is always full brightness (leave @ < 1 to ensure GL_BLEND)
+			gGlobalTransparency = .99f;		// sun is always full brightness (leave @ < 1 to ensure GL_BLEND)
 		else
 			gGlobalTransparency = transColor.a;
+
+		gGlobalTransparency *= sunFade;
 
 		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gFlareImageTable[i]].materialObject);		// activate material
 
@@ -258,10 +277,8 @@ int				px,py,pw,ph;
 
 			/* RESTORE MODES */
 
-bye:
-	gGlobalTransparency = 1.0f;
 	OGL_PopState();
-
+	gGlobalTransparency = 1.0f;
 }
 
 
