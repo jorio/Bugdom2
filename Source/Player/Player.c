@@ -590,15 +590,18 @@ void StartPlayerGliding(ObjNode *player)
 			/* CREATE WING BLUR SPRITE */
 			/***************************/
 
-	gNewObjectDefinition.group		= MODEL_GROUP_GLOBAL;
-	gNewObjectDefinition.type 		= GLOBAL_ObjType_WingBlur1;
-	gNewObjectDefinition.coord		= gCoord;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_DOUBLESIDED;
-	gNewObjectDefinition.slot 		= WATER_SLOT+21;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= player->Scale.x * .9f;
-	gPlayerInfo.blurSprite = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.group		= MODEL_GROUP_GLOBAL,
+		.type 		= GLOBAL_ObjType_WingBlur1,
+		.coord		= gCoord,
+		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_DOUBLESIDED,
+		.slot 		= PLAYERWING_SLOT+1,
+		.moveCall 	= nil,
+		.rot 		= 0,
+		.scale 		= player->Scale.x * .9f,
+	};
+	gPlayerInfo.blurSprite = MakeNewDisplayGroupObject(&def);
 
 
 			/********************/
@@ -607,14 +610,10 @@ void StartPlayerGliding(ObjNode *player)
 
 			/* CREATE EVENT OBJECT TO DRAW THEM */
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|
-									STATUS_BIT_DOUBLESIDED|STATUS_BIT_ROTZXY|STATUS_BIT_NOZWRITES;
-	gNewObjectDefinition.slot 		= WATER_SLOT+20;
-	gNewObjectDefinition.moveCall 	= nil;
-	gPlayerInfo.wingLayerDrawObject = MakeNewObject(&gNewObjectDefinition);
-
-	gPlayerInfo.wingLayerDrawObject->CustomDrawFunction = DrawWingLayers;
+	gPlayerInfo.wingLayerDrawObject = MakeNewDriverObject(PLAYERWING_SLOT, DrawWingLayers, NULL);
+	gPlayerInfo.wingLayerDrawObject->StatusBits =
+		STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG
+		| STATUS_BIT_DOUBLESIDED | STATUS_BIT_ROTZXY | STATUS_BIT_NOZWRITES;
 
 
 			/* START EFFECT */

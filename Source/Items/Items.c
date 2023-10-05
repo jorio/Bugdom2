@@ -96,7 +96,7 @@ ObjNode	*newObj;
 				gNewObjectDefinition.coord.y = 0;
 				gNewObjectDefinition.coord.z = 0;
 				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOFOG;	// playroom cyc has lighting
-				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;						// draw after terrain for better performance since terrain blocks much of the pixels
+				gNewObjectDefinition.slot 	= CYC_SLOT;
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
 				gNewObjectDefinition.scale 	= gGameView.yon * .995f / 100.0f;
@@ -120,7 +120,7 @@ ObjNode	*newObj;
 				gNewObjectDefinition.coord.y = 0;
 				gNewObjectDefinition.coord.z = 0;
 				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING;	// park cyc has fog
-				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;						// draw after terrain for better performance since terrain blocks much of the pixels
+				gNewObjectDefinition.slot 	= CYC_SLOT;
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
 				gNewObjectDefinition.scale 	= gGameView.yon * .995f / 100.0f;
@@ -138,7 +138,7 @@ regular:
 				gNewObjectDefinition.coord.y = 0;
 				gNewObjectDefinition.coord.z = 0;
 				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
-				gNewObjectDefinition.slot 	= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
+				gNewObjectDefinition.slot 	= CYC_SLOT;
 				gNewObjectDefinition.moveCall = nil;
 				gNewObjectDefinition.rot 	= 0;
 				gNewObjectDefinition.scale 	= gGameView.yon * .995f / 100.0f;

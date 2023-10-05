@@ -198,7 +198,7 @@ int			i;
 	gNewObjectDefinition.coord.y 	= 0;
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
+	gNewObjectDefinition.slot 		= CYC_SLOT;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= gGameView.yon * .99f / 100.0f;

@@ -159,7 +159,7 @@ int		i,x,z;
 		.type 		= GARDEN_ObjType_Cyclorama,
 		.coord		= {0,0,0},
 		.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
-		.slot 		= TERRAIN_SLOT+1,					// draw after terrain for better performance since terrain blocks much of the pixels
+		.slot 		= CYC_SLOT,
 		.scale 		= gGameView.yon * .995f / 100.0f,
 		.drawCall	= DrawCyclorama,
 	};

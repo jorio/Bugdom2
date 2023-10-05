@@ -43,7 +43,7 @@ void InitSparkles(void)
 
 	gSparklePool = Pool_New(MAX_SPARKLES);
 
-	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT - 1, DrawSparkles, MoveSparkles);
+	ObjNode* driver = MakeNewDriverObject(SPARKLES_SLOT, DrawSparkles, MoveSparkles);
 	driver->StatusBits |= STATUS_BIT_GLOW;
 	driver->StatusBits |= STATUS_BIT_NOZWRITES;
 	driver->StatusBits |= STATUS_BIT_NOLIGHTING;

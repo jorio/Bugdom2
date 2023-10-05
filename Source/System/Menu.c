@@ -950,19 +950,21 @@ static void AwaitMouseClick(void)
 static ObjNode* MakeMenuDarkenPane(void)
 {
 	ObjNode* pane;
+	
+	NewObjectDefinitionType def =
+	{
+		.genre = CUSTOM_GENRE,
+		.flags = STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP |
+						STATUS_BIT_KEEPBACKFACES | STATUS_BIT_MOVEINPAUSE,
+		.slot = MENU_SLOT - 1,
+		.scale = 1;
+		.moveCall = MoveDarkenPane,
+		.drawCall = DrawDarkenPane,
+	};
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.flags		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_KEEPBACKFACES|STATUS_BIT_MOVEINPAUSE;
-	gNewObjectDefinition.slot		= MENU_SLOT-1;
-	gNewObjectDefinition.scale		= 1;
-	gNewObjectDefinition.moveCall 	= nil;
-
-	pane = MakeNewObject(&gNewObjectDefinition);
-	pane->CustomDrawFunction = DrawDarkenPane;
+	pane = MakeNewObject(&def);
 	pane->ColorFilter = (OGLColorRGBA) {0, 0, 0, 0};
 	pane->Scale.y = gMenuStyle->darkenPaneScaleY;
-	pane->MoveCall = MoveDarkenPane;
 
 	return pane;
 }
@@ -1119,10 +1121,10 @@ static void LayOutMenu(const MenuItem* menu)
 
 	DeleteAllText();
 
-	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	SDL_zero(gNewObjectDefinition);
 	gNewObjectDefinition.group		= ATLAS_GROUP_FONT1;
 	gNewObjectDefinition.scale		= gMenuStyle->standardScale;
-	gNewObjectDefinition.slot		= INFOBAR_SLOT + 100;//MENU_SLOT;
+	gNewObjectDefinition.slot		= MENU_SLOT;
 
 	float totalHeight = 0;
 	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)

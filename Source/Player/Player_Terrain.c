@@ -117,18 +117,20 @@ ObjNode	*newObj;
 		/* MAKE  SKELETON BODY */
 		/*****************************/
 
-	gNewObjectDefinition.type 		= SKELETON_TYPE_SKIP_EXPLORE;
-	gNewObjectDefinition.animNum	= PLAYER_ANIM_STAND;
-	gNewObjectDefinition.coord.x 	= where->x;
-	gNewObjectDefinition.coord.z 	= where->z;
-	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(where->x,where->z, CTYPE_MISC|CTYPE_TERRAIN);
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG|STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP;
-	gNewObjectDefinition.slot 		= PLAYER_SLOT;
-	gNewObjectDefinition.moveCall	= MovePlayer_Terrain;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= PLAYER_DEFAULT_SCALE;
-
-	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.type 		= SKELETON_TYPE_SKIP_EXPLORE,
+		.animNum	= PLAYER_ANIM_STAND,
+		.coord.x 	= where->x,
+		.coord.z 	= where->z,
+		.coord.y 	= FindHighestCollisionAtXZ(where->x,where->z, CTYPE_MISC|CTYPE_TERRAIN),
+		.flags 		= STATUS_BIT_NOFOG|STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP,
+		.slot 		= PLAYER_SLOT,
+		.moveCall	= MovePlayer_Terrain,
+		.rot 		= 0,
+		.scale 		= PLAYER_DEFAULT_SCALE,
+	};
+	newObj = MakeNewSkeletonObject(&def);
 
 
 

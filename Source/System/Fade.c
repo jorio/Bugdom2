@@ -25,8 +25,6 @@ static void DrawFadePane(ObjNode *theNode);
 /*    CONSTANTS             */
 /****************************/
 
-#define	FADEPANE_SLOT	(SLOT_OF_DUMB + 4000)
-
 enum
 {
 	kFaderMode_FadeOut,

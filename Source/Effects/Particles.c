@@ -1150,17 +1150,20 @@ ObjNode	*newObj;
 		aim.z = RandomFloat2();
 		FastNormalizeVector(aim.x, aim.y, aim.z, &aim);
 
-		gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
-		gNewObjectDefinition.type 		= modelObjType;
-		gNewObjectDefinition.coord.x	= where->x + aim.x * 25.0f;
-		gNewObjectDefinition.coord.y	= where->y + aim.y * 25.0f;
-		gNewObjectDefinition.coord.z	= where->z + aim.z * 25.0f;
-		gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_USEALIGNMENTMATRIX;
-		gNewObjectDefinition.slot 		= 479;
-		gNewObjectDefinition.moveCall 	= MoveBlobDroplet;
-		gNewObjectDefinition.rot 		= 0;
-		gNewObjectDefinition.scale 		= scale;
-		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		NewObjectDefinitionType def =
+		{
+			.group 		= MODEL_GROUP_GLOBAL,
+			.type 		= modelObjType,
+			.coord.x	= where->x + aim.x * 25.0f,
+			.coord.y	= where->y + aim.y * 25.0f,
+			.coord.z	= where->z + aim.z * 25.0f,
+			.flags 		= gAutoFadeStatusBits|STATUS_BIT_USEALIGNMENTMATRIX,
+			.slot 		= 479,
+			.moveCall 	= MoveBlobDroplet,
+			.rot 		= 0,
+			.scale 		= scale,
+		};
+		newObj = MakeNewDisplayGroupObject(&def);
 
 		newObj->Special[0] = 0;						// init counter
 
@@ -1247,17 +1250,18 @@ ObjNode *MakeSmoker(float  x, float z, int kind)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;
-	gNewObjectDefinition.coord.x 	= x;
-	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER);
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+10;
-	gNewObjectDefinition.moveCall 	= MoveSmoker;
-	newObj = MakeNewObject(&gNewObjectDefinition);
-
+	NewObjectDefinitionType def =
+	{
+		.genre		= EVENT_GENRE,
+		.coord.x 	= x,
+		.coord.z 	= z,
+		.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER),
+		.flags 		= 0,
+		.slot 		= SLOT_OF_DUMB+10,
+		.moveCall 	= MoveSmoker,
+	};
+	newObj = MakeNewObject(&def);
 	newObj->Kind = kind;								// save smoke kind
-
 	return(newObj);
 }
 
@@ -1383,14 +1387,18 @@ Boolean AddBubbler(TerrainItemEntryType *itemPtr, float  x, float z)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;
-	gNewObjectDefinition.coord.x 	= x;
-	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= WATER_SLOT-1;
-	gNewObjectDefinition.moveCall 	= MoveBubbler;
-	newObj = MakeNewObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.genre		= EVENT_GENRE,
+		.coord.x 	= x,
+		.coord.z 	= z,
+		.coord.y 	= GetTerrainY(x,z),
+		.flags 		= 0,
+		.slot 		= WATER_SLOT-1,
+		.moveCall 	= MoveBubbler,
+	};
+
+	newObj = MakeNewObject(&def);
 
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 

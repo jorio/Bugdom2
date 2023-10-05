@@ -44,7 +44,6 @@ static void MoveSquishedBerry(ObjNode *theNode);
 
 #define	SNAIL_SCALE	1.2f
 
-#define	SCARECROW_SLOT	60
 #define	SCARECROW_SCALE	1.1f
 
 enum

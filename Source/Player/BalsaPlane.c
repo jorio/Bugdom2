@@ -791,7 +791,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) + BALSA_PLANE_HOVER_HEIGHT + 150.0f;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_GLOW | STATUS_BIT_DOUBLESIDED |
 								STATUS_BIT_NOLIGHTING | STATUS_BIT_NOZBUFFER;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB + 100;
+	gNewObjectDefinition.slot 		= CLOUD_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
 	gNewObjectDefinition.rot 		= RandomFloat() * PI2;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);

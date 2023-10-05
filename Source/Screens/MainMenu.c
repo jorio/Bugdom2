@@ -217,7 +217,7 @@ int		i;
 	gNewObjectDefinition.coord		= viewDef.camera.from;
 	gNewObjectDefinition.coord.y	+= 50.0f;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOZWRITES;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;					// draw after terrain for better performance since terrain blocks much of the pixels
+	gNewObjectDefinition.slot 		= CYC_SLOT;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= gGameView.yon * .90f / 100.0f;
@@ -681,7 +681,7 @@ static void DoCredits(void)
 	NewObjectDefinitionType def =
 	{
 		.coord = {640/2, 80, 0},
-		.slot = SPRITE_SLOT,
+		.slot = INFOBAR_SLOT,
 		.scale = 0.5f,
 		.group = ATLAS_GROUP_FONT1,
 	};
@@ -908,7 +908,7 @@ ObjNode *MakeDarkenPane(void)
 	{
 		.genre		= CUSTOM_GENRE,
 		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP,
-		.slot		= SLOT_OF_DUMB+100,
+		.slot		= DARKENPANE_SLOT,
 		.moveCall	= MoveDarkenPane,
 		.drawCall	= DrawDarkenPane,
 	};

@@ -183,7 +183,7 @@ int		i;
 		.group		= MODEL_GROUP_LEVELSPECIFIC,
 		.type		= GARDEN_ObjType_Cyclorama,
 		.flags		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
-		.slot		= TERRAIN_SLOT+1,					// draw after terrain for better performance since terrain blocks much of the pixels
+		.slot		= CYC_SLOT,
 		.scale		= gGameView.yon * .995f / 100.0f,
 		.drawCall	= DrawCyclorama,
 	};

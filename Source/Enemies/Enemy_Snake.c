@@ -42,7 +42,6 @@ enum
 #define	SNAKE_ATTACK_DIST	5000.0f
 
 #define	MAX_SNAKES			1
-#define	SNAKE_SLOT			(SLOT_OF_DUMB-3)
 
 #define	MAX_SPLINE_POINTS	150
 

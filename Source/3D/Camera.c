@@ -306,7 +306,7 @@ ObjNode	*playerObj = gPlayerInfo.objNode;
 
 			/* MAKE LENS FLARE MANAGER */
 
-	MakeNewDriverObject(PARTICLE_SLOT+20, DrawLensFlare, NULL);
+	MakeNewDriverObject(LENSFLARE_SLOT, DrawLensFlare, NULL);
 }
 
 

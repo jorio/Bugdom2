@@ -4,21 +4,38 @@
 
 #define INVALID_NODE_FLAG	0xdeadbeef			// put into CType when node is deleted
 
-#define	TERRAIN_SLOT	1
-#define	TRIGGER_SLOT	4						// needs to be early in the collision list
-#define	PLAYER_SLOT		200
-#define	ENEMY_SLOT		(PLAYER_SLOT+10)
-#define	SNAIL_SLOT		(ENEMY_SLOT+50)
-#define LURE_SLOT		(TRIGGER_SLOT + 5)
-#define	SLOT_OF_DUMB	3000
-#define	SPRITE_SLOT		(SLOT_OF_DUMB+100)
-#define	INFOBAR_SLOT	(SPRITE_SLOT+100)
-#define	FENCE_SLOT		4
-#define	PARTICLE_SLOT	(SPRITE_SLOT-2)
-#define	CONFETTI_SLOT	(PARTICLE_SLOT-1)		// do confetti before particles since particles are xparent
-#define	WATER_SLOT		(PARTICLE_SLOT - 1)
-#define	POW_SLOT		87
-#define	SILICONDOOR_SLOT	(SLOT_OF_DUMB - 30)
+enum
+{
+	TERRAIN_SLOT			= 1,
+	CYC_SLOT				= 2,				// draw after terrain for better performance since terrain blocks much of the pixels
+	TRIGGER_SLOT			= 4,				// needs to be early in the collision list
+	FENCE_SLOT				= 4,
+	LURE_SLOT				= 9,
+	SCARECROW_SLOT			= 60,
+	CHIPMUNK_SLOT			= 85,				// must be BEFORE powerup so that chains work correctly!
+	POW_SLOT				= 87,
+	PLAYER_SLOT				= 200,
+	ENEMY_SLOT				= 210,
+	SNAIL_SLOT				= 260,
+	SILICONDOOR_SLOT		= 2970,
+	SNAKE_SLOT				= 2997,
+	SLOT_OF_DUMB			= 3000,				// ============== anything past this slot won't be collided against ===================
+	RIPPLE_SLOT				= 3500,
+	WATER_SLOT				= 3510,
+	SHARDS_SLOT				= 3600, 
+	CONFETTI_SLOT			= 3601,				// do confetti before particles since particles are xparent
+	SPARKLES_SLOT			= 3602,
+	PARTICLE_SLOT			= 3603,
+	WATERPARK_SLOT			= 3604,				// in park, need to do water *after* particles so that bubbles are seen
+	PLAYERWING_SLOT			= 3650,
+	LENSFLARE_SLOT			= 3660,
+	CLOUD_SLOT				= 3660,
+	SPRITE_SLOT				= 3700,
+	DARKENPANE_SLOT			= 3800, 
+	INFOBAR_SLOT			= 3900,
+	MENU_SLOT				= 3950,
+	FADEPANE_SLOT			= 4000,
+};
 
 enum
 {

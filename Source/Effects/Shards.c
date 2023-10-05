@@ -66,7 +66,7 @@ void InitShardSystem(void)
 	GAME_ASSERT(!gShardPool);
 	gShardPool = Pool_New(MAX_SHARDS);
 
-	ObjNode* driver = MakeNewDriverObject(PARTICLE_SLOT-1, DrawShards, MoveShards);
+	ObjNode* driver = MakeNewDriverObject(SHARDS_SLOT, DrawShards, MoveShards);
 	driver->StatusBits |= STATUS_BIT_NOLIGHTING;
 	driver->StatusBits |= STATUS_BIT_DOUBLESIDED;
 }

@@ -137,7 +137,7 @@ int			i,n;
 		.group		= MODEL_GROUP_LEVELSPECIFIC,
 		.type 		= PARK_ObjType_Cyclorama,
 		.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
-		.slot 		= TERRAIN_SLOT+1,
+		.slot 		= CYC_SLOT,
 		.scale 		= gGameView.yon * .995f / 100.0f,
 	};
 	newObj = MakeNewDisplayGroupObject(&def);

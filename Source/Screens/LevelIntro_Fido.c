@@ -143,7 +143,7 @@ static const OGLVector3D	fillDirection1 = { -1.0, -.7, -.7 };
 		.type		= SIDEWALK_ObjType_Cyclorama,
 		.coord		= {0,0,0},
 		.flags		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG,
-		.slot		= TERRAIN_SLOT+1,		// draw after terrain for better performance since terrain blocks much of the pixels
+		.slot		= CYC_SLOT,
 		.drawCall	= DrawCyclorama,
 		.scale		= gGameView.yon * .995f / 100.0f,
 	};

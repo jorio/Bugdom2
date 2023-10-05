@@ -122,7 +122,7 @@ int		anim;
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= POW_SLOT-2;					// must be BEFORE powerup so that chains work correctly!
+	gNewObjectDefinition.slot 		= CHIPMUNK_SLOT;				// must be BEFORE powerup so that chains work correctly!
 	gNewObjectDefinition.moveCall	= MoveChipmunk;
 	gNewObjectDefinition.rot 		= (float)itemPtr->parm[0] * PI2/8;
 	gNewObjectDefinition.scale 		= 3.0;

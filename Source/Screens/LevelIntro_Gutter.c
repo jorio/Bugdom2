@@ -145,7 +145,7 @@ static const OGLVector3D	fillDirection1 = { -1.0, -.6, -.7 };
 		.group		= MODEL_GROUP_LEVELSPECIFIC,
 		.type 		= GUTTER_ObjType_Cyc,
 		.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
-		.slot 		= TERRAIN_SLOT+1,
+		.slot 		= CYC_SLOT,
 		.scale 		= gGameView.yon * .995f / 100.0f,
 		.drawCall	= DrawCyclorama,
 	};

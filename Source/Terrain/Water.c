@@ -297,7 +297,7 @@ float					y,centerX,centerZ;
 	};
 
 	if (gLevelNum == LEVEL_NUM_PARK)						// in park, need to do water *after* particles so that bubbles are seen
-		def.slot += 2;
+		def.slot = WATERPARK_SLOT;
 
 	MakeNewObject(&def);
 }
@@ -939,7 +939,7 @@ static void InitRipples(void)
 	{
 		.genre		= EVENT_GENRE,
 		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING | STATUS_BIT_GLOW | STATUS_BIT_NOFOG,
-		.slot		= SLOT_OF_DUMB+1,
+		.slot		= RIPPLE_SLOT,
 		.moveCall 	= MoveRippleEvent,
 		.drawCall	= DrawRipples,
 	};
