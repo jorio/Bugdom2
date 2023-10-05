@@ -1306,7 +1306,7 @@ static Boolean HurtGlassBottle(ObjNode *bottle, float damage)
 	bottle->Mode++;
 	if (bottle->Mode >= 5)
 	{
-		PlayEffect3D(EFFECT_BOTTLESHATTER, &bottle->Coord);
+		PlayEffect_Parms3D(EFFECT_BOTTLESHATTER, &bottle->Coord, NORMAL_CHANNEL_RATE, .8f);
 		ExplodeGeometry(bottle, 300, SHARD_MODE_FROMORIGIN | SHARD_MODE_BOUNCE, 1, .5);
 		bottle->TerrainItemPtr = nil;							// make sure bottle doesn't come back
 		DeleteObject(bottle);

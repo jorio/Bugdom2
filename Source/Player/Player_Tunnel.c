@@ -1259,7 +1259,7 @@ OGLPoint3D	p[32];
 					{
 						if (SeeIfLineSegmentHitsObject(&p[j], &p[j+1], player))
 						{
-							PlayEffect3D(EFFECT_NAILHIT, &gCoord);
+							PlayEffect_Parms3D(EFFECT_NAILHIT, &gCoord, NORMAL_CHANNEL_RATE, 0.5f);
 							PlayerGotHitInTunnel(player);
 							return;
 						}
@@ -1320,7 +1320,7 @@ OGLPoint3D	p[32];
 					{
 						if (SeeIfLineSegmentHitsObject(&p[j], &p[j+1], player))
 						{
-							PlayEffect3D(EFFECT_NAILHIT, &gCoord);
+							PlayEffect_Parms3D(EFFECT_NAILHIT, &gCoord, NORMAL_CHANNEL_RATE, 0.5f);
 							PlayerGotHitInTunnel(player);
 							return;
 						}

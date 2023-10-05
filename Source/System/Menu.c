@@ -29,9 +29,9 @@ static ObjNode* LayOutCyclerValueText(int row);
 #define MAX_MENU_ROWS	32
 #define MAX_MENU_COLS	5
 
-#define kSfxCycle		EFFECT_FLYGOTKICKED
-#define kSfxError		EFFECT_CHANGESELECT
-#define kSfxDelete		EFFECT_CHANGESELECT
+#define kSfxCycle		EFFECT_ACORNKICKED
+#define kSfxError		EFFECT_SKIPLAND
+#define kSfxDelete		EFFECT_POPACORN
 
 const int16_t kJoystickDeadZone_BindingThreshold = (75 * 32767 / 100);
 

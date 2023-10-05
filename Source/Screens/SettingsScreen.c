@@ -35,7 +35,7 @@ static void cb_ResetKeyBindings(void)
 	}
 
 	MyFlushEvents();
-	PlayEffect(EFFECT_PLANECRASH);
+	PlayEffect(EFFECT_BOTTLECRACK);
 	LayoutCurrentMenuAgain();
 }
 
@@ -47,7 +47,7 @@ static void cb_ResetPadBindings(void)
 	}
 
 	MyFlushEvents();
-	PlayEffect(EFFECT_PLANECRASH);
+	PlayEffect(EFFECT_BOTTLECRACK);
 	LayoutCurrentMenuAgain();
 }
 
@@ -59,7 +59,7 @@ static void cb_ResetMouseBindings(void)
 	}
 
 	MyFlushEvents();
-	PlayEffect(EFFECT_PLANECRASH);
+	PlayEffect(EFFECT_BOTTLECRACK);
 	LayoutCurrentMenuAgain();
 }
 

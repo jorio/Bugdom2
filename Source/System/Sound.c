@@ -45,7 +45,7 @@ typedef struct
 /*     VARIABLES      */
 /**********************/
 
-float						gGlobalVolume = .4;
+float						gGlobalVolume = 0.8f;
 
 static OGLPoint3D			gEarCoords;										// coord of camera plus a tad to get pt in front of camera
 static	OGLVector3D			gEyeVector;

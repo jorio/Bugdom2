@@ -880,7 +880,7 @@ static void MouseTrapGotKickedCallback(ObjNode *player, ObjNode *trap)
 static void SetOffMouseTrap(ObjNode *trap)
 {
 	SetSkeletonAnim(trap->Skeleton, MOUSETRAP_ANIM_THWACK);
-	PlayEffect_Parms3D(EFFECT_MOUSETRAP, &trap->Coord, NORMAL_CHANNEL_RATE, 2.0f);
+	PlayEffect_Parms3D(EFFECT_MOUSETRAP, &trap->Coord, NORMAL_CHANNEL_RATE, 1.5f);
 
 	trap->CType &= ~(CTYPE_TRIGGER|CTYPE_KICKABLE);		// dont ever trigger again
 	trap->TriggerCallback = nil;
@@ -1016,6 +1016,8 @@ OGLPoint2D	pl[4];
 			  		mouse->Speed2D = 200.0f;										// give some initial speed
 					SetSkeletonAnim(thisNode->Skeleton, MOUSETRAP_ANIM_LIFT);
 					MorphToSkeletonAnim(mouse->Skeleton, 1, 10);
+
+					PlayEffect_Parms3D(EFFECT_PULLTRAP, &thisNode->Coord, NORMAL_CHANNEL_RATE, .4f);
 
 			  		gPlayerInfo.numMiceRescued++;
 			  		if (thisNode->Drowning)											// was that a special garbage can drowning mouse?
@@ -1336,7 +1338,7 @@ Boolean isInRange;
 				/* SOUND */
 
 		if (theNode->EffectChannel == -1)
-			theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_VACUUME, &theNode->Coord, NORMAL_CHANNEL_RATE, 1.6);
+			theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_VACUUME, &theNode->Coord, NORMAL_CHANNEL_RATE, .7f);
 		else
 			Update3DSoundChannel(EFFECT_VACUUME, &theNode->EffectChannel, &theNode->Coord);
 

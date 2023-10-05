@@ -270,7 +270,7 @@ static void MoveIntroBottle(ObjNode *theNode)
 		theNode->Mode++;
 		if (theNode->Mode >= 5)
 		{
-			PlayEffect_Parms3D(EFFECT_BOTTLESHATTER, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong() & 0x3ffff), 1.0);
+			PlayEffect_Parms3D(EFFECT_BOTTLESHATTER, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong() & 0x3ffff), 0.7f);
 			ExplodeGeometry(theNode, 300, SHARD_MODE_FROMORIGIN, 1, .5);
 			DeleteObject(theNode);
 			return;

@@ -519,7 +519,7 @@ ObjNode	*bomb;
 
 	AttachShadowToObject(bomb, SHADOW_TYPE_CIRCULAR, 2,2, false);
 
-	PlayEffect(EFFECT_BOMBFALL);
+	PlayEffect_Parms(EFFECT_BOMBFALL, FULL_CHANNEL_VOLUME/4, FULL_CHANNEL_VOLUME/4, NORMAL_CHANNEL_RATE);
 
 	gNumBombs++;
 }

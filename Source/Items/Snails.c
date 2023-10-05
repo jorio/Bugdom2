@@ -1520,7 +1520,7 @@ float			speed;
 		gDelta.x = gMarbleDelta.x += (marbleTravel.x * .3);				// apply some deflection to the real delta
 		gDelta.z = gMarbleDelta.z += (marbleTravel.y * .3);
 
-		PlayEffect3D(EFFECT_BOWLINGHIT, &hitObj->Coord);
+		PlayEffect_Parms3D(EFFECT_BOWLINGHIT, &hitObj->Coord, NORMAL_CHANNEL_RATE, 0.6f);
 
 	}
 
@@ -1579,7 +1579,7 @@ float			speed;
 		hitObj->DeltaRot.x = RandomFloat2() * (speed * .015f);
 		hitObj->DeltaRot.y = RandomFloat2() * (speed * .01f);
 
-		PlayEffect3D(EFFECT_BOWLINGHIT, &hitObj->Coord);
+		PlayEffect_Parms3D(EFFECT_BOWLINGHIT, &hitObj->Coord, NORMAL_CHANNEL_RATE*3/2, 0.6f);
 
 	}
 

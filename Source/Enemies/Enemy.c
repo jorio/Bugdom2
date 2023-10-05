@@ -41,6 +41,7 @@ short	i;
 
 	gNumEnemies = 0;
 
+	// TODO: tweak this for APPSTORE (extended draw distance)...
 	if (gG4)					// tweak based on horsepower
 		gMaxEnemies = 20;
 	else

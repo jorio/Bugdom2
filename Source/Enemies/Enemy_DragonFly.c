@@ -434,7 +434,7 @@ static void UpdateDragonflySound(ObjNode *theNode, OGLPoint3D *p)
 float	v;
 
 	if (gLevelNum == LEVEL_NUM_BALSA)
-		v = .8f;
+		v = .6f;
 	else
 		v = .3f;
 
