@@ -984,6 +984,30 @@ static void CleanupLevel(void)
 }
 
 
+#pragma mark -
+
+void PreloadGlobalSprites(void)
+{
+	static int spritesPreloadedForAnaglyphMode = -1;
+
+	if (gGamePrefs.anaglyph == spritesPreloadedForAnaglyphMode)
+		return;
+
+	spritesPreloadedForAnaglyphMode = gGamePrefs.anaglyph;
+
+	DisposeSpriteGroup(SPRITE_GROUP_PARTICLES);
+	DisposeSpriteGroup(SPRITE_GROUP_SPHEREMAPS);
+	DisposeSpriteGroup(SPRITE_GROUP_GLOBAL);
+	DisposeSpriteAtlas(ATLAS_GROUP_FONT1);
+
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "SphereMap");
+	LoadSpriteGroupFromSeries(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "Global");
+	LoadSpriteAtlas(ATLAS_GROUP_FONT1, ":Sprites:Font:font", kAtlasLoadFont);
+
+	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
+//	BlendASprite(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_Splash);
+}
 
 #pragma mark -
 
@@ -1018,13 +1042,7 @@ unsigned long	someLong;
 	HideRealCursor();
 
 	// Load some global sprites
-	LoadSpriteGroupFromSeries(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "Particle");
-	LoadSpriteGroupFromSeries(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "SphereMap");
-	LoadSpriteGroupFromSeries(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "Global");
-	LoadSpriteAtlas(ATLAS_GROUP_FONT1, ":Sprites:Font:font", kAtlasLoadFont);
-	
-	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-//	BlendASprite(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_Splash);
+	PreloadGlobalSprites();
 
 #if !SKIPFLUFF
 		/* SHOW TITLES */

@@ -224,6 +224,11 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType *outputP
 	OGL_UpdateCameraFromTo(&setupDefPtr->camera.from, &setupDefPtr->camera.to);
 
 	OGL_CheckError();
+
+
+			/* RELOAD GLOBAL SPRITES AT START OF SCENE IF ANAGLYPH MODE CHANGED */
+
+	PreloadGlobalSprites();
 }
 
 

@@ -31,6 +31,7 @@ enum
 //=================================================
 
 OSErr CheckPrefsFolder(bool createIt);
+void PreloadGlobalSprites(void);
 void GameMain(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
