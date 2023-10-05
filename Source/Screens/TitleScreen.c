@@ -270,7 +270,7 @@ ObjNode			*fly;
 	}
 
 
-	PlaySong(EFFECT_SONG_TITLE, true);
+	PlaySong(EFFECT_SONG_TITLE, false);
 }
 
 /****************** MOVE TITLE FLIES ***********************/
