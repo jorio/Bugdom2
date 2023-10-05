@@ -239,13 +239,9 @@ static void PlayArea(void)
 {
 			/* PREP STUFF */
 
-	UpdateInput();
-	CalcFramesPerSecond();
-	CalcFramesPerSecond();
-
 	MakeFadeEvent(true, 1);
-	
 	GrabMouse(true);
+	InvalidateAllInputs();
 
 	/***********************************************/
 	/* PLAY BASED ON THE TYPE OF LEVEL WE'RE DOING */

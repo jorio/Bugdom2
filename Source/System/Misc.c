@@ -19,8 +19,6 @@
 /****************************/
 
 
-
-
 /**********************/
 /*     VARIABLES      */
 /**********************/
@@ -316,15 +314,17 @@ Ptr		p = ptr;
 
 void CalcFramesPerSecond(void)
 {
-static UnsignedWide time;
-UnsignedWide currTime;
-unsigned long deltaTime;
-float		fps;
+float					fps;
+UnsignedWide			currTime;
+static UnsignedWide		time = {0};
+static int				sampleIndex = 0;
+static float			sampleRing[STEADY_FPS_WINDOW] = {0};
+
 
 wait:
 	Microseconds(&currTime);
 
-	deltaTime = currTime.lo - time.lo;
+	unsigned long deltaTime = currTime.lo - time.lo;
 
 	if (deltaTime == 0)
 	{
@@ -334,12 +334,8 @@ wait:
 	{
 		fps = 1000000.0f / deltaTime;
 
-		if (fps < DEFAULT_FPS)					// (avoid divide by 0's later)
-		{
-			fps = DEFAULT_FPS;
-		}
 #if !COOK_GPU
-		else if (fps > MAX_FPS)					// limit to avoid issue
+		if (fps > MAX_FPS)						// limit to avoid issue
 		{
 			if (fps - MAX_FPS > 1000)			// try to sneak in some sleep if we have 1 ms to spare
 			{
@@ -352,15 +348,34 @@ wait:
 
 #if _DEBUG
 	if (GetKeyState(SDL_SCANCODE_BACKSLASH))	// debug speed-up with backslash key
+	{
 		fps = DEFAULT_FPS;
+	}
 #endif
 
-//	SDL_Log("FPS: %f\n", fps);
 
-	gFramesPerSecond = fps;
-	gFramesPerSecondFrac = 1.0f / fps;
+		/* ADD SAMPLE TO RING BUFFER */
 
-	time = currTime;	// reset for next time interval
+	sampleRing[sampleIndex] = fps;
+	sampleIndex++;
+	sampleIndex %= STEADY_FPS_WINDOW;
+
+
+		/* CALC AVERAGE OF ENTIRE RING BUFFER */
+
+	gFramesPerSecond = 0;
+	for (int i = 0; i < STEADY_FPS_WINDOW; i++)
+	{
+		gFramesPerSecond += sampleRing[i];
+	}
+	gFramesPerSecond *= (1.0f / STEADY_FPS_WINDOW);					// average
+	gFramesPerSecond = SDL_max(gFramesPerSecond, DEFAULT_FPS);		// avoid divide by 0's later
+	gFramesPerSecondFrac = 1.0f / gFramesPerSecond;					// calc fractional for multiplication
+
+
+		/* RESET TIME FOR NEXT INTERVAL */
+
+	time = currTime;
 }
 
 

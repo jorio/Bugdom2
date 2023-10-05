@@ -334,9 +334,6 @@ static void DoSkipWalkOn(void)
 			/* WALK SKIP ON */
 			/****************/
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
 	while(gSkip->Coord.x < -150.0f)
 	{
 		const float fps = gFramesPerSecondFrac;
@@ -383,12 +380,8 @@ Boolean	done = false;
 	}
 
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
 	while(!done)
 	{
-
 		CalcFramesPerSecond();
 		UpdateInput();
 

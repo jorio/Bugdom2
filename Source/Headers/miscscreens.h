@@ -63,9 +63,7 @@ ObjNode *MakeDarkenPane(void);
 void KeepTerrainAlive(void);
 void DoPaused(void);
 
-Boolean DoFailedMenu(const Str31	headerString);
 void DoLegalScreen(void);
-void DoGameOptionsDialog(void);
 
 void DoBonusScreen(void);
 void DoTitleScreen(void);

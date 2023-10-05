@@ -386,9 +386,6 @@ float	timer;
 			/* MOVE LOGO INTO PLACE */
 			/************************/
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
 	timer = 3.0f;
 	while(timer > 0.0f)
 	{
@@ -460,9 +457,6 @@ Byte	swatMode = 0;
 			/************************/
 
 	PlayEffect(EFFECT_FLYSWATTER);
-
-	CalcFramesPerSecond();
-	UpdateInput();
 
 	timer = 3.0f;
 	while(timer > 0.0f)
@@ -600,9 +594,6 @@ ObjNode	*newObj;
 			/************************/
 			/* MOVE LOGO INTO PLACE */
 			/************************/
-
-	CalcFramesPerSecond();
-	UpdateInput();
 
 	timer = 22.0f;
 	while(timer > 0.0f)

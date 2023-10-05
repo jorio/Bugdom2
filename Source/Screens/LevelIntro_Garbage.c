@@ -246,15 +246,11 @@ static void FreeLevelIntroScreen(void)
 
 static void ProcessLevelIntro(void)
 {
-float	timer;
 OGLMatrix4x4	m;
 OGLPoint3D		p;
 OGLVector2D		v;
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
-	timer = 9.0f;
+	float timer = 9.0f;
 
 	while(!UserWantsOut())
 	{

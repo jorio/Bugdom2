@@ -274,12 +274,7 @@ static void FreeLevelIntroScreen(void)
 
 static void ProcessLevelIntro(void)
 {
-float	timer;
-
-	CalcFramesPerSecond();
-	UpdateInput();
-
-	timer = 9.0f;
+	float timer = 9.0f;
 
 	while(!UserWantsOut())
 	{

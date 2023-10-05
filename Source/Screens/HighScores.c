@@ -77,12 +77,8 @@ void NewScore(void)
 
 			/* LOOP */
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
 	while(!gExitHighScores)
 	{
-
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();

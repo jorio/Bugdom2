@@ -15,6 +15,7 @@
 #define	TWEAKED_CAM			1		// more pleasant camera turning with twin-stick controls; also disables cam locking near CTYPE_LOOKAT objects
 #define	DEFAULT_FPS			10
 #define	MAX_FPS				300
+#define STEADY_FPS_WINDOW	16
 #define	COOK_GPU			0
 #define	USE_MALLOC			1
 #define ALLOW_GL_LIGHT_MODEL_TWO_SIDE	0		// extremely expensive on some modern GPU drivers!

@@ -282,9 +282,6 @@ static void ProcessLose(void)
 {
 float	timer = 25.0f;
 
-	CalcFramesPerSecond();
-	UpdateInput();
-
 	while(!UserWantsOut())
 	{
 		const float fps = gFramesPerSecondFrac;

@@ -59,14 +59,12 @@ void DoPaused(void)
 
 	PauseAllChannels(true);
 	GrabMouse(false);
+	InvalidateAllInputs();		// flush ESC keypress
 
 
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-
-	CalcFramesPerSecond();
-	UpdateInput();
 
 	while(true)
 	{
