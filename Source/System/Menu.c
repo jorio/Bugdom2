@@ -49,10 +49,10 @@ enum
 #define GS 0.3f
 const MenuStyle kDefaultMenuStyle =
 {
-	.darkenPane			= true,
 	.darkenPaneScaleY	= 480,
 	.darkenPaneOpacity	= .75f,
 	.fadeInSpeed		= 3.0f,
+	.fadeOutSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,
 	.titleColor			= {1.0f, 1.0f, 0.2f, 1.0f},
@@ -66,6 +66,7 @@ const MenuStyle kDefaultMenuStyle =
 	.playMenuChangeSounds	= true,
 	.startButtonExits	= false,
 	.isInteractive		= true,
+	.offset				= {640/2, 480/2},		// Bugdom 2
 };
 
 /*********************/
@@ -91,6 +92,8 @@ static bool					gMouseHoverValidRow = false;
 static int					gMouseHoverColumn = -1;
 //static SDL_Cursor*			gHandCursor = NULL;
 //static SDL_Cursor*			gStandardCursor = NULL;
+
+static float				gMenuAsyncFadeOutSpeed = 2.0f;
 
 /****************************/
 /*    MENU UTILITIES        */
@@ -364,7 +367,7 @@ static void MoveMouseBinding(ObjNode* node)
 
 static void MoveAsyncFadeOutAndDelete(ObjNode *theNode)
 {
-	theNode->ColorFilter.a -= gFramesPerSecondFrac * 3.0f;
+	theNode->ColorFilter.a -= gFramesPerSecondFrac * gMenuAsyncFadeOutSpeed;
 	if (theNode->ColorFilter.a < 0.0f)
 		DeleteObject(theNode);
 }
@@ -1092,7 +1095,7 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 	else
 	{
 		float startX = gMenuStyle->centeredText ? 0 : -170;
-		startX += 320; // Bugdom 2
+		startX += gMenuStyle->offset.x;
 		gNewObjectDefinition.coord = (OGLPoint3D) { startX + gMenuColXs[col], gMenuRowYs[row], 0 };
 		int alignment = gMenuStyle->centeredText? kTextMeshAlignCenter: kTextMeshAlignLeft;
 		node = TextMesh_New(text, alignment, &gNewObjectDefinition);
@@ -1104,7 +1107,7 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 
 	if (!gMenuStyle->centeredText)
 	{
-		int paddedRightOff = ((gMenuColXs[col+1]-170) - node->Coord.x) / node->Scale.x;
+		int paddedRightOff = ((gMenuColXs[col+1]-170+gMenuStyle->offset.x) - node->Coord.x) / node->Scale.x;
 		if (paddedRightOff > node->RightOff)
 			node->RightOff = paddedRightOff;
 	}
@@ -1227,8 +1230,7 @@ static void LayOutMenu(const MenuItem* menu)
 	}
 
 	float y = -totalHeight/2.0f;
-	
-	y += 240;	// Bugdom 2
+	y += gMenuStyle->offset.y;
 
 	float sweepFactor = 0.0f;
 
@@ -1373,8 +1375,8 @@ void LayoutCurrentMenuAgain(void)
 int StartMenu(
 		const MenuItem* menu,
 		const MenuStyle* style,
-		void (*updateRoutine)(void),
-		void (*backgroundDrawRoutine)(void))
+		void (*moveCall)(void),
+		void (*drawCall)(void))
 {
 //	int cursorStateBeforeMenu = SDL_ShowCursor(-1);
 //	gStandardCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -1397,7 +1399,7 @@ int StartMenu(
 
 	ObjNode* cursorDot = MakeMenuCursorDot();
 
-	if (gMenuStyle->darkenPane)
+	if (gMenuStyle->darkenPaneOpacity > 0)
 	{
 		pane = MakeDarkenPane();
 		pane->MoveCall = MoveDarkenPane;
@@ -1433,7 +1435,7 @@ int StartMenu(
 				}
 				else
 				{
-					gMenuFadeAlpha -= gFramesPerSecondFrac * 2.0f;
+					gMenuFadeAlpha -= gFramesPerSecondFrac * gMenuStyle->fadeOutSpeed;
 					if (gMenuFadeAlpha <= 0.0f)
 					{
 						gMenuFadeAlpha = 0.0f;
@@ -1473,9 +1475,9 @@ int StartMenu(
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		if (updateRoutine)
-			updateRoutine();
-		OGL_DrawScene(backgroundDrawRoutine);
+		if (moveCall)
+			moveCall();
+		OGL_DrawScene(drawCall);
 	}
 
 
@@ -1489,6 +1491,8 @@ int StartMenu(
 
 	if (gMenuStyle->asyncFadeOut)
 	{
+		gMenuAsyncFadeOutSpeed = gMenuStyle->fadeOutSpeed;
+
 		if (pane)
 		{
 			pane->MoveCall = MoveAsyncFadeOutAndDelete;

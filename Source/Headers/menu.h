@@ -61,8 +61,8 @@ typedef struct MenuItem
 
 typedef struct MenuStyle
 {
-	bool			darkenPane;
 	float			fadeInSpeed;
+	float			fadeOutSpeed;
 	bool			asyncFadeOut;
 	bool			centeredText;
 	OGLColorRGBA	titleColor;
@@ -78,12 +78,15 @@ typedef struct MenuStyle
 	float			darkenPaneOpacity;
 	bool			startButtonExits;
 	bool			isInteractive;
+	OGLVector2D		offset;
 } MenuStyle;
+
+extern const MenuStyle kDefaultMenuStyle;
 
 int StartMenu(
 		const MenuItem* menu,
 		const MenuStyle* style,
-		void (*updateRoutine)(void),
-		void (*backgroundDrawRoutine)(void));
+		void (*moveCall)(void),
+		void (*drawCall)(void));
 void LayoutCurrentMenuAgain(void);
 void MenuCallback_Back(void);

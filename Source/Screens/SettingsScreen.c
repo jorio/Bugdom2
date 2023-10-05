@@ -480,8 +480,8 @@ static const MenuItem kAnaglyphWarning[] =
 /*                          RUNNER                             */
 /***************************************************************/
 
-void DoSettingsOverlay(void (*updateRoutine)(void),
-					   void (*backgroundDrawRoutine)(void))
+void DoSettingsOverlay(void (*moveCall)(void),
+					   void (*drawCall)(void))
 {
 	gAllowAudioKeys = false;					// don't interfere with keyboard binding
 
@@ -489,7 +489,7 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 
 	PrefsType gPreviousPrefs = gGamePrefs;
 
-	StartMenu(gSettingsMenu, nil, updateRoutine, backgroundDrawRoutine);
+	StartMenu(gSettingsMenu, nil, moveCall, drawCall);
 
 	// Save prefs if any changes
 	if (0 != SDL_memcmp(&gGamePrefs, &gPreviousPrefs, sizeof(gGamePrefs)))
@@ -500,12 +500,12 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 	// If user changed antialiasing setting, show warning
 	if (gPreviousPrefs.antialiasingLevel != gGamePrefs.antialiasingLevel)
 	{
-		StartMenu(kAntialiasingWarning, nil, updateRoutine, backgroundDrawRoutine);
+		StartMenu(kAntialiasingWarning, nil, moveCall, drawCall);
 	}
 
 	// If user changed anaglyph setting, show warning
 	if (gPreviousPrefs.anaglyph != gGamePrefs.anaglyph)
 	{
-		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
+		StartMenu(kAnaglyphWarning, nil, moveCall, drawCall);
 	}
 }

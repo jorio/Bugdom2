@@ -100,8 +100,8 @@ void DoLevelIntro(void);
 
 
 
-void DoSettingsOverlay(void (*updateRoutine)(void),
-					   void (*backgroundDrawRoutine)(void));
+void DoSettingsOverlay(void (*moveCall)(void),
+					   void (*drawCall)(void));
 
 
 bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void));
