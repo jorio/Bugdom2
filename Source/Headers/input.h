@@ -34,8 +34,3 @@ enum
 	kNeed_UIPause,
 	NUM_CONTROL_NEEDS
 };
-
-//============================================================================================
-
-void InitInput(void);
-void UpdateInput(void);

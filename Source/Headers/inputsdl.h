@@ -57,6 +57,7 @@ enum
 //============================================================================================
 
 void InitInput(void);
+void UpdateInput(void);
 void InvalidateAllInputs(void);
 void InvalidateNeedState(int need);
 
@@ -82,8 +83,6 @@ float GetNeedAnalogSteering(int negativeNeedID, int positiveNeedID);
 
 Boolean UserWantsOut(void);
 Boolean IsCheatKeyComboDown(void);
-
-void DoSDLMaintenance(void);
 
 int GetNumControllers(void);
 struct _SDL_GameController* GetController(void);

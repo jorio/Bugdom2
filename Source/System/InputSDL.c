@@ -72,6 +72,7 @@ static void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion);
 static void OnJoystickRemoved(SDL_JoystickID which);
 static SDL_GameController* TryOpenControllerFromJoystick(int joystickIndex);
 static SDL_GameController* TryOpenAnyUnusedController(bool showMessage);
+static void SetPlayerAxisControls(void);
 
 #pragma mark -
 /**********************/
@@ -180,7 +181,7 @@ static void UpdateMouseButtonStates(int mouseWheelDeltaX, int mouseWheelDeltaY)
 	UpdateKeyState(&gMouseButtonStates[SDL_BUTTON_WHEELRIGHT], mouseWheelDeltaY > 0);
 }
 
-static void UpdateInputNeeds(void)
+static void UpdateKeyboardMouseInputNeeds(void)
 {
 	for (int need = 0; need < NUM_CONTROL_NEEDS; need++)
 	{
@@ -203,7 +204,7 @@ static void UpdateInputNeeds(void)
 	}
 }
 
-static void UpdateControllerSpecificInputNeeds(void)
+static void UpdateControllerInputNeeds(void)
 {
 	Controller* controller = &gController;
 
@@ -280,7 +281,7 @@ static void UpdateControllerSpecificInputNeeds(void)
 /* PUBLIC FUNCTIONS   */
 /**********************/
 
-void DoSDLMaintenance(void)
+void UpdateInput(void)		// Also called DoSDLMaintenance in other ports
 {
 	gTextInput[0] = '\0';
 	gMouseMotionNow = false;
@@ -364,18 +365,16 @@ void DoSDLMaintenance(void)
 	UpdateMouseButtonStates(mouseWheelDeltaX, mouseWheelDeltaY);
 
 	// Refresh the state of each input need
-	UpdateInputNeeds();
+	UpdateKeyboardMouseInputNeeds();
+	UpdateControllerInputNeeds();
 
 #if __APPLE__
 	// Check for Cmd-Q (must be after UpdateInputNeeds because it may update kNeed_UIPause)
 	ProcessCmdQ();
 #endif
 
-	//-------------------------------------------------------------------------
-	// Multiplayer gamepad input
-	//-------------------------------------------------------------------------
-
-	UpdateControllerSpecificInputNeeds();
+	// Bugdom 2 player analog controls
+	SetPlayerAxisControls();
 }
 
 #pragma mark - Keyboard states
@@ -853,4 +852,36 @@ SDL_GameController* GetController(void)
 		return gController.controllerInstance;
 	
 	return NULL;
+}
+
+static void SetPlayerAxisControls(void)
+{
+	gPlayerInfo.analogIsMouse = false;
+
+		/* FIRST CHECK ANALOG AXES */
+
+	gPlayerInfo.analogControlX = GetNeedAnalogSteering(kNeed_TurnLeft, kNeed_TurnRight);
+	gPlayerInfo.analogControlZ = GetNeedAnalogSteering(kNeed_Forward, kNeed_Backward);
+
+		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
+	
+	OGLVector2D mouseDelta = GetMouseDelta();
+
+	float mouseDX = mouseDelta.x * 0.015f;						// scale down deltas for our use
+	float mouseDY = mouseDelta.y * 0.015f;
+
+	mouseDX = SDL_clamp(mouseDX, -1.0f, 1.0f);					// keep x values pinned
+	mouseDY = SDL_clamp(mouseDY, -1.0f, 1.0f);					// keep y values pinned
+
+	if (fabs(mouseDX) > fabs(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
+	{
+		gPlayerInfo.analogControlX = mouseDX;
+		gPlayerInfo.analogIsMouse = true;
+	}
+
+	if (fabs(mouseDY) > fabs(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
+	{
+		gPlayerInfo.analogControlZ = mouseDY;
+		gPlayerInfo.analogIsMouse = true;
+	}
 }

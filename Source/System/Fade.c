@@ -66,7 +66,7 @@ void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 	while (fader->Mode != kFaderMode_Done)
 	{
 		CalcFramesPerSecond();
-		DoSDLMaintenance();
+		UpdateInput();
 
 		if (moveCall)
 		{
@@ -86,7 +86,7 @@ void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 	// Draw one more blank frame
 	gGammaFadeFrac = 0;
 	CalcFramesPerSecond();
-	DoSDLMaintenance();
+	UpdateInput();
 	OGL_DrawScene(drawCall);
 
 #if FADE_SOUND
