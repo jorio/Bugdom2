@@ -51,7 +51,7 @@ const MenuStyle kDefaultMenuStyle =
 {
 	.darkenPane			= true,
 	.darkenPaneScaleY	= 480,
-	.darkenPaneOpacity	= .9f,
+	.darkenPaneOpacity	= .75f,
 	.fadeInSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,

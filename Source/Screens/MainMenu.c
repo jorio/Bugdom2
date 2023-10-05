@@ -81,7 +81,7 @@ static Boolean	gPlayNow = false;
 
 static	float	gInactivityTimer;
 
-static 	Boolean	gFadeInText;
+static 	Boolean	gHideFlowerMenu;
 static	Boolean	gDrawHighScores;
 static	float	gScoreFadeAlpha;
 
@@ -234,10 +234,11 @@ int		i;
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT;
-	gNewObjectDefinition.moveCall 	= nil;
+	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 480;
-	MakeSpriteObject(&gNewObjectDefinition);
+	newObj = MakeSpriteObject(&gNewObjectDefinition);
+	newObj->Kind = -1;
 
 
 
@@ -373,6 +374,8 @@ float	charTimer = 2.0f;
 
 static void DoMenuControls(void)
 {
+	gHideFlowerMenu = false;
+
 	if (IsNeedDown(kNeed_UIUp) || IsNeedDown(kNeed_UINext))
 	{
 		gInactivityTimer = 0;
@@ -399,6 +402,8 @@ static void DoMenuControls(void)
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/3,NORMAL_CHANNEL_RATE * 3/2);
 
 		gInactivityTimer = 0;
+		gHideFlowerMenu = true;
+
 		switch(gSelectedIcon)
 		{
 			case	0:
@@ -602,7 +607,17 @@ static void MoveMenuIcon(ObjNode *theNode)
 float	s;
 float	fps = gFramesPerSecondFrac;
 
-	theNode->ColorFilter.a = .9f;
+	if (gHideFlowerMenu)
+	{
+		theNode->ColorFilter.a -= gFramesPerSecondFrac * 2;
+		theNode->ColorFilter.a = SDL_max(0, theNode->ColorFilter.a);
+	}
+	else
+	{
+		float maxAlpha = theNode->Kind == -1? 1.0f: 0.9f;
+		theNode->ColorFilter.a += gFramesPerSecondFrac * 2;
+		theNode->ColorFilter.a = SDL_min(maxAlpha, theNode->ColorFilter.a);
+	}
 
 			/* IS THIS THE SELECTED ICON? */
 
@@ -619,7 +634,7 @@ float	fps = gFramesPerSecondFrac;
 
 		/* NOT SELECTED */
 
-	else
+	else if (theNode->Kind != -1)		// -1 is flower
 	{
 
 		theNode->Scale.x =
@@ -795,7 +810,6 @@ ObjNode	*pane;
 
 	LoadHighScores();
 
-	gFadeInText = true;
 	gDrawHighScores = true;
 	gScoreFadeAlpha = 0;
 
