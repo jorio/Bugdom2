@@ -37,6 +37,13 @@ typedef struct
 	int refDistance;
 }EffectType;
 
+typedef struct
+{
+	float			lowFrequencyStrength;
+	float			highFrequencyStrength;
+	uint16_t		duration;
+} AutoRumbleDef;
+
 
 
 #define	VOLUME_DISTANCE_FACTOR	.004f		// bigger == sound decays FASTER with dist, smaller = louder far away
@@ -260,6 +267,25 @@ static EffectType	gEffectsTable[] =
 
 	[EFFECT_CLOVERBONUS]			= {"Bonus",		"CloverBonus",			400},
 	[EFFECT_MOUSEBONUS]				= {"Bonus",		"MouseBonus",			400},
+};
+
+static const AutoRumbleDef kAutoRumbleTable[NUM_EFFECTS] =
+{
+	[EFFECT_GETPOW]					= {0.0f, 0.7f, 150},
+	[EFFECT_BUTTERFLYBOOM]			= {0.7f, 0.0f, 150},
+	[EFFECT_SMACK]					= {1.0f, 1.0f, 300},
+	[EFFECT_ACORNKICKED]			= {1.0f, 0.0f, 150},
+	[EFFECT_FLYGOTKICKED]			= {1.0f, 0.0f, 150},
+	[EFFECT_GNOMEGOTKICKED]			= {0.0f, 1.0f, 150},
+	[EFFECT_KICKMARBLE]				= {1.0f, 0.0f, 150},
+	[EFFECT_SNAPTRAP]				= {1.0f, 0.0f, 200},
+	[EFFECT_SQUISHBERRY]			= {1.0f, 0.0f, 200},
+	[EFFECT_BALSASHOOT]				= {0.0f, 0.9f, 50},
+	[EFFECT_HILLBOOM]				= {0.5f, 0.0f, 750},
+	[EFFECT_SKIPGLIDE]				= {0.0f, 0.5f,  60},
+	[EFFECT_STOMP]					= {0.0f, 1.0f, 200},
+	[EFFECT_LOGOBOUNCE]				= {0.0f, 0.6f, 150},
+	[EFFECT_FLYSWATTER]				= {0.0f, 1.0f, 150},
 };
 
 
@@ -1084,4 +1110,22 @@ void PauseAllChannels(Boolean pause)
 	}
 
 //	SndDoImmediate(gMusicChannel, &cmd);
+}
+
+
+#pragma mark -
+
+/********************** PLAY RUMBLE EFFECT ***************************/
+
+void PlayRumbleEffect(int effectNum)
+{
+	if (effectNum < 0 || effectNum >= NUM_EFFECTS)
+		return;
+
+	const AutoRumbleDef* rumbleEffect = &kAutoRumbleTable[effectNum];
+
+	if (rumbleEffect->duration > 0)
+	{
+		Rumble(rumbleEffect->lowFrequencyStrength, rumbleEffect->highFrequencyStrength, rumbleEffect->duration);
+	}
 }

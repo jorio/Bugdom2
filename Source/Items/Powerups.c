@@ -254,6 +254,7 @@ ObjNode	*pow;
 	else
 		PlayEffect3D(EFFECT_BUTTERFLYBOOM, &trigger->Coord);
 
+	PlayRumbleEffect(EFFECT_BUTTERFLYBOOM);
 
 
 
@@ -531,6 +532,8 @@ void StartPowerupVanish(ObjNode *pow)
 		PlayEffect(EFFECT_GETPOW);
 	else
 		PlayEffect3D(EFFECT_GETPOW, &pow->Coord);
+
+	PlayRumbleEffect(EFFECT_GETPOW);
 }
 
 

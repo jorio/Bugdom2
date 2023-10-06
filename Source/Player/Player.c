@@ -262,7 +262,7 @@ dodamage:
 	else
 		PlayerLoseHealth(byWhat->Damage, deathType);
 
-
+	PlayRumbleEffect(EFFECT_SMACK);
 }
 
 
@@ -584,6 +584,8 @@ void StartPlayerGliding(ObjNode *player)
 			/* SET SOME VARIABLES */
 
 	gDelta.y = 0;
+
+	gPlayerInfo.glideRumbleCooldown = 0;			// start rumble asap
 
 
 			/***************************/

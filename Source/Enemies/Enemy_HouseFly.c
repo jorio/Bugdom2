@@ -407,7 +407,6 @@ float		fps,angle;
 //				gCurrentMaxSpeed = 600;
 
 				PlayEffect3D(EFFECT_SMACK, &player->Coord);
-
 			}
 		}
 	}
@@ -604,6 +603,7 @@ static void HouseFlyGotKickedCallback(ObjNode *player, ObjNode *kickedObj)
 float	r = player->Rot.y;
 
 	PlayEffect3D(EFFECT_FLYGOTKICKED, &kickedObj->Coord);
+	PlayRumbleEffect(EFFECT_FLYGOTKICKED);
 
 	kickedObj->Delta.x = -sin(r) * 800.0f;
 	kickedObj->Delta.z = -cos(r) * 800.0f;

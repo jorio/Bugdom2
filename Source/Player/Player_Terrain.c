@@ -468,6 +468,8 @@ static void MovePlayer_Gliding(ObjNode *theNode)
 	DoPlayerFrictionAndGravity_Terrain(theNode, PLAYER_AIR_FRICTION);
 	gDelta.y = -60.0f;														// always glide down slowly
 
+
+
 			/* SEE IF END GLIDING */
 
 	if (IsNeedDown(kNeed_Jump) || (theNode->StatusBits & STATUS_BIT_ONGROUND))
@@ -475,7 +477,18 @@ static void MovePlayer_Gliding(ObjNode *theNode)
 
 			/* DO ACTION CONTROL */
 	else
+	{
 		CheckPlayerActionControls(theNode);
+
+			/* FORCE FEEDBACK */
+
+		gPlayerInfo.glideRumbleCooldown -= gFramesPerSecondFrac;
+		if (gPlayerInfo.glideRumbleCooldown <= 0)
+		{
+			PlayRumbleEffect(EFFECT_SKIPGLIDE);
+			gPlayerInfo.glideRumbleCooldown = 0.060f;	// should match duration of rumble effect in sound.c
+		}
+	}
 
 
 	if (DoPlayerMovementAndCollision(theNode, false))

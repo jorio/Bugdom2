@@ -529,6 +529,7 @@ ObjNode		*player = 	gPlayerInfo.objNode;
 	{
 		gCurrentEatingFish = fish;
 		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_EATENBYSNAKE, 7);
+		PlayRumbleEffect(EFFECT_SMACK);
 		player->CType = 0;							// no more collision
 		fish->EatPlayer = true;
 		fish->EatenTimer = 3;									// start timer

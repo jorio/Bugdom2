@@ -585,7 +585,7 @@ void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms
 	#warning Rumble support requires SDL 2.0.18 later
 #else
 	// Don't bother if rumble turned off in prefs
-	if (gGamePrefs.rumbleIntensity == 0)
+	if (!gGamePrefs.gamepadRumble || !gGamePrefs.rumbleIntensity)
 	{
 		return;
 	}

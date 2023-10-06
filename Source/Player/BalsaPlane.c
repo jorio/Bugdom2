@@ -455,6 +455,7 @@ float	r;
 	AttachShadowToObject(bullet, SHADOW_TYPE_CIRCULAR, 2,2, false);
 
 	PlayEffect(EFFECT_BALSASHOOT);
+	PlayRumbleEffect(EFFECT_BALSASHOOT);
 
 	gNumBullets++;
 }
@@ -680,6 +681,7 @@ void BlowUpAntHill(ObjNode *theNode)
 float	x,z;
 
 	PlayEffect3D(EFFECT_HILLBOOM, &theNode->Coord);
+	PlayRumbleEffect(EFFECT_HILLBOOM);
 
 
 	theNode->What = -1;

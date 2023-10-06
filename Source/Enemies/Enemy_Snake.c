@@ -604,6 +604,7 @@ static void SnakeAtePlayer(int snakeNum, ObjNode *head, ObjNode *player)
 		return;
 
 	KillPlayer(PLAYER_DEATH_TYPE_EATENBYSNAKE);
+	PlayRumbleEffect(EFFECT_SMACK);
 
 	player->Coord = head->Coord;
 	player->Rot.y = head->Rot.y;

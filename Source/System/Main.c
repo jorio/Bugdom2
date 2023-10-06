@@ -151,6 +151,8 @@ void InitDefaultPrefs(void)
 	gGamePrefs.fullscreen			= true;
 	gGamePrefs.uiCentering			= false;
 	gGamePrefs.music				= true;
+	gGamePrefs.gamepadRumble		= true;
+	gGamePrefs.rumbleIntensity		= 100;
 
 	_Static_assert(sizeof(gGamePrefs.bindings) == sizeof(kDefaultInputBindings), "input binding size mismatch: prefs vs defaults");
 	SDL_memcpy(&gGamePrefs.bindings, &kDefaultInputBindings, sizeof(kDefaultInputBindings));

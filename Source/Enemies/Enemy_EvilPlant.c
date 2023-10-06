@@ -586,6 +586,7 @@ static void EvilPlantGotKickedCallback(ObjNode *player, ObjNode *enemy)
 float	r = player->Rot.y;
 
 	PlayEffect3D(EFFECT_FLYGOTKICKED, &enemy->Coord);
+	PlayRumbleEffect(EFFECT_FLYGOTKICKED);
 
 	enemy->Delta.x = -sin(r) * 200.0f;
 	enemy->Delta.z = -cos(r) * 200.0f;

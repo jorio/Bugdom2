@@ -1453,6 +1453,8 @@ static void PlayerGotHitInTunnel(ObjNode *player)
 	MorphToSkeletonAnim(player->Skeleton, PLAYER_TUNNEL_ANIM_GOTHIT, 10);
 
 	PlayerLoseHealth(.2, PLAYER_DEATH_TYPE_TUNNEL);
+
+	PlayRumbleEffect(EFFECT_SMACK);
 }
 
 

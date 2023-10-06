@@ -1063,6 +1063,7 @@ static void ScarecrowHeadLandedOnBody(ObjNode *head, ObjNode *body)
 	gCoord.y = body->CollisionBoxes[0].top;
 
 	PlayEffect3D(EFFECT_SQUISHBERRY, &gCoord);
+	PlayRumbleEffect(EFFECT_SQUISHBERRY);
 
 	gHeadOnScarecrow = true;
 }
@@ -1208,6 +1209,7 @@ float	r = player->Rot.y;
 	kickedObj->Activated = true;				// once it's been "touched" it can roll on its own
 
 	PlayEffect3D(EFFECT_KICKMARBLE, &kickedObj->Coord);
+	PlayRumbleEffect(EFFECT_KICKMARBLE);
 }
 
 
@@ -1763,8 +1765,9 @@ static void SquishTheBerry(ObjNode *berry)
 	}
 
 	PlayEffect3D(EFFECT_SQUISHBERRY, &berry->Coord);
-	gNumBerriesSquished++;
+	PlayRumbleEffect(EFFECT_SQUISHBERRY);
 
+	gNumBerriesSquished++;
 }
 
 

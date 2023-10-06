@@ -320,6 +320,7 @@ float	fps;
 
 							case	3:
 									PlayEffect3D(EFFECT_STOMP, &theNode->Coord);
+									PlayRumbleEffect(EFFECT_STOMP);
 									break;
 
 									/* COMPUTERBUG SERVO */
@@ -342,6 +343,7 @@ float	fps;
 
 							case	7:
 									PlayEffect3D(EFFECT_SNAPTRAP, &theNode->Coord);
+									PlayRumbleEffect(EFFECT_SNAPTRAP);
 									break;
 
 									/* OTTO FALL */

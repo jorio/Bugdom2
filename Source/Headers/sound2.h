@@ -271,3 +271,4 @@ void UpdateListenerLocation(void);
 void ChangeChannelRate(short channel, long rateMult);
 Boolean StopAChannelIfEffectNum(short *channelNum, short effectNum);
 void PauseAllChannels(Boolean pause);
+void PlayRumbleEffect(int effectNum);

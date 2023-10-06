@@ -272,6 +272,7 @@ float	r = player->Rot.y;
 	kickedObj->Delta.y = 600.0f;
 
 	PlayEffect3D(EFFECT_ACORNKICKED, &kickedObj->Coord);
+	PlayRumbleEffect(EFFECT_ACORNKICKED);
 }
 
 
@@ -416,6 +417,7 @@ float	r = player->Rot.y;
 	kickedObj->Delta.y = 600.0f;
 
 	PlayEffect3D(EFFECT_ACORNKICKED, &kickedObj->Coord);
+	PlayRumbleEffect(EFFECT_ACORNKICKED);
 
 	kickedObj->Explosive = true;								// it will blow up when it stops
 }
@@ -590,6 +592,7 @@ float	r = player->Rot.y;
 	kickedObj->Delta.y = 600.0f;
 
 	PlayEffect3D(EFFECT_ACORNKICKED, &kickedObj->Coord);
+	PlayRumbleEffect(EFFECT_ACORNKICKED);
 
 	kickedObj->Explosive = true;								// it will blow up when it stops
 }

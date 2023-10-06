@@ -200,6 +200,7 @@ typedef struct
 
 	float				glidePower;
 	float				rammingTimer;
+	float				glideRumbleCooldown;
 
 	Boolean				hasKey[NUM_KEY_TYPES];
 	Boolean				hasMap;

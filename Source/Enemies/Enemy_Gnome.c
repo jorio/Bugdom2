@@ -522,7 +522,7 @@ static void GnomeGotKickedCallback(ObjNode *player, ObjNode *enemy)
 
 
 	PlayEffect3D(EFFECT_GNOMEGOTKICKED, &enemy->Coord);
-
+	PlayRumbleEffect(EFFECT_GNOMEGOTKICKED);
 }
 
 

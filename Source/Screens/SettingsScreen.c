@@ -23,7 +23,7 @@ static void cb_SetRumble(void)
 {
 	if (gGamePrefs.gamepadRumble)
 	{
-		Rumble(1.0f, 1.0f, 500);
+		Rumble(1.0f, 1.0f, 300);
 	}
 }
 
@@ -192,7 +192,6 @@ static const MenuItem gGamepadMenu[] =
 		.action = { .callback = cb_ResetPadBindings },
 	},
 
-#if 0
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -206,7 +205,6 @@ static const MenuItem gGamepadMenu[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-#endif
 
 	{ .type = kMenuItem_Spacer },
 

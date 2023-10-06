@@ -30,9 +30,6 @@ static void MakeTitleSkip(void);
 /*    CONSTANTS             */
 /****************************/
 
-#define	SAVE_TEXT_SIZE		30.0f
-
-
 enum
 {
 	TITLE_ObjType_Cyc
@@ -51,7 +48,6 @@ enum
 };
 
 #define	 BUGDOM_TEXT_SCALE	500.0f
-#define	BUGDOM_SHADOW_YOFF	5.0f
 
 #define	FLY_SCALE	20.0f
 
@@ -410,7 +406,10 @@ float	timer;
 			gText->Coord.y = 200.0f;
 			gText->Delta.y *= -.5f;
 			if (fabs(gText->Delta.y) > 50.0f)
+			{
 				PlayEffect(EFFECT_LOGOBOUNCE);
+				PlayRumbleEffect(EFFECT_LOGOBOUNCE);
+			}
 		}
 
 				/* DRAW */
@@ -458,6 +457,8 @@ Byte	swatMode = 0;
 
 	PlayEffect(EFFECT_FLYSWATTER);
 
+	bool didSwatterRumble = false;
+
 	timer = 3.0f;
 	while(timer > 0.0f)
 	{
@@ -469,6 +470,12 @@ Byte	swatMode = 0;
 		{
 			gAbortTitle = true;
 			break;
+		}
+
+		if (timer < 2.8f && !didSwatterRumble)
+		{
+			PlayRumbleEffect(EFFECT_FLYSWATTER);
+			didSwatterRumble = true;
 		}
 
 				/* MOVE */
@@ -856,6 +863,7 @@ ObjNode *bag, *player;
 					MorphToSkeletonAnim(bag->Skeleton, 2, 4);
 
 					PlayEffect3D(EFFECT_SMACKDOWN, &player->Coord);
+					PlayRumbleEffect(EFFECT_SMACK);
 				}
 				break;
 
