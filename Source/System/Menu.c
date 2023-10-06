@@ -16,6 +16,7 @@
 static ObjNode* MakeTextAtRowCol(const char* text, int row, int col);
 static void LayOutMenu(const MenuItem* menu);
 static ObjNode* LayOutCyclerValueText(int row);
+static void BounceCursorDot(void);
 
 #define SpecialRow					Special[0]
 #define SpecialCol					Special[1]
@@ -87,6 +88,7 @@ static float				gMenuFadeAlpha = 0;
 static int					gMenuState = kMenuStateOff;
 static int					gMenuPick = -1;
 static ObjNode*				gMenuObjects[MAX_MENU_ROWS][MAX_MENU_COLS];
+static ObjNode*				gMenuCursorDot = nil;
 
 static bool					gMouseHoverValidRow = false;
 static int					gMouseHoverColumn = -1;
@@ -535,6 +537,8 @@ static void NavigateSubmenuButton(const MenuItem* entry)
 		if (gMenuStyle->playMenuChangeSounds)
 			PlayMenuChangeEffect();
 
+		BounceCursorDot();
+
 		MyFlushEvents();	// flush keypresses
 
 		LayOutMenu(entry->submenu.menu);
@@ -560,6 +564,8 @@ static void NavigateCycler(const MenuItem* entry)
 	if (delta != 0)
 	{
 		PlayEffect_Parms(kSfxCycle, FULL_CHANNEL_VOLUME, FULL_CHANNEL_VOLUME, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000));
+
+		BounceCursorDot();
 
 		if (entry->cycler.valuePtr && !entry->cycler.callbackSetsValue)
 		{
@@ -615,6 +621,9 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	if (IsKeyDown(SDL_SCANCODE_RETURN)
 		|| (gMouseHoverValidRow && IsClickDown(SDL_BUTTON_LEFT)))
 	{
+		PlayEffect(kSfxCycle);
+		BounceCursorDot();
+
 		gMenuState = kMenuStateAwaitingKeyPress;
 		MakeTextAtRowCol(Localize(STR_PRESS), gMenuRow, gKeyColumn+1);
 
@@ -665,6 +674,9 @@ static void NavigatePadBinding(const MenuItem* entry)
 			SDL_Delay(30);
 		}
 
+		PlayEffect(kSfxCycle);
+		BounceCursorDot();
+
 		gMenuState = kMenuStateAwaitingPadPress;
 		MakeTextAtRowCol(Localize(STR_PRESS), gMenuRow, gPadColumn+1);
 
@@ -695,6 +707,9 @@ static void NavigateMouseBinding(const MenuItem* entry)
 			UpdateInput();
 			SDL_Delay(30);
 		}
+
+		PlayEffect(kSfxCycle);
+		BounceCursorDot();
 
 		gMenuState = kMenuStateAwaitingMouseClick;
 		MakeTextAtRowCol(Localize(STR_CLICK), gMenuRow, 1);
@@ -962,62 +977,85 @@ static void MoveCursorDot(ObjNode* theNode)
 	static float flutterSpeed = 3;
 	static const float trackSpeed = 8.0f;
 
-	if (gMenuRow >= 0)
+	if (gMenuRow < 0)
+		return;
+
+	int column = 0;
+
+	if (gMenu[gMenuRow].type == kMenuItem_KeyBinding)
+		column = 1+gKeyColumn;
+	else if (gMenu[gMenuRow].type == kMenuItem_PadBinding)
+		column = 1+gPadColumn;
+	else
+		column = 0;
+
+	targetPoint = gMenuObjects[gMenuRow][column]->Coord;
+	targetPoint.x -= 16;
+	targetPoint.y += 3;
+
+	if (!theNode->Flag[0])
 	{
-		int column = 0;
+		// Initial position
+		currentPoint = targetPoint;
+		theNode->Flag[0] = true;
+	}
+	else
+	{
+		float diffX = targetPoint.x - currentPoint.x;
+		float diffY = targetPoint.y - currentPoint.y;
 
-		if (gMenu[gMenuRow].type == kMenuItem_KeyBinding)
-			column = 1+gKeyColumn;
-		else if (gMenu[gMenuRow].type == kMenuItem_PadBinding)
-			column = 1+gPadColumn;
+		if (fabsf(diffX) < .5f)
+			currentPoint.x = targetPoint.x;
 		else
-			column = 0;
+			currentPoint.x += gFramesPerSecondFrac * diffX * trackSpeed;
 
-		targetPoint = gMenuObjects[gMenuRow][column]->Coord;
-		targetPoint.x -= 16;
-		targetPoint.y += 3;
-
-		if (!theNode->Flag[0])
+		if (fabsf(diffY) < .5f)
 		{
-			// Initial position
-			currentPoint = targetPoint;
-			theNode->Flag[0] = true;
+			currentPoint.y = targetPoint.y;
+			theNode->Rot.y = diffY * 0;
 		}
 		else
 		{
-			float diffX = targetPoint.x - currentPoint.x;
-			float diffY = targetPoint.y - currentPoint.y;
-
-			if (fabsf(diffX) < .5f)
-				currentPoint.x = targetPoint.x;
-			else
-				currentPoint.x += gFramesPerSecondFrac * diffX * trackSpeed;
-
-			if (fabsf(diffY) < .5f)
-			{
-				currentPoint.y = targetPoint.y;
-				theNode->Rot.y = diffY * 0;
-			}
-			else
-			{
-				currentPoint.y += gFramesPerSecondFrac * diffY * trackSpeed;
-				theNode->Rot.y = diffY * .033f;
-				theNode->Rot.y = SDL_clamp(theNode->Rot.y, -PI / 2, PI / 2);
-			}
+			currentPoint.y += gFramesPerSecondFrac * diffY * trackSpeed;
+			theNode->Rot.y = diffY * .033f;
+			theNode->Rot.y = SDL_clamp(theNode->Rot.y, -PI / 2, PI / 2);
 		}
+	}
 
-		theNode->Coord = currentPoint;
+	theNode->Coord = currentPoint;
 
-		theNode->Coord.x -= 3 * fabsf(sinf(flutter * 2));
+	theNode->Coord.x -= 3 * fabsf(sinf(flutter * 2));
 //		theNode->Coord.x += flutterMag * sinf(-flutter);
-		theNode->Coord.y += flutterMag * cosf(-flutter);
-		theNode->Rot.y += 0.1f * sinf(-flutter);
+	theNode->Coord.y += flutterMag * cosf(-flutter);
+	theNode->Rot.y += 0.1f * sinf(-flutter);
 
-		flutter += gFramesPerSecondFrac * flutterSpeed;
+	flutter += gFramesPerSecondFrac * flutterSpeed;
 //		flutterMag = sinf(flutter * 2);
 
-		UpdateObjectTransforms(theNode);
+
+	float bounce = theNode->SpecialF[0];
+	if (bounce > 0)
+	{
+		const float bounceDuration = 0.25f;
+		float bounceMag = bounce * 16;
+		theNode->Coord.x -= bounceMag * SDL_fabsf(SDL_sinf(PI * bounce));
+		bounce -= gFramesPerSecondFrac * (1.0f / bounceDuration);
+		theNode->SpecialF[0] = bounce;
 	}
+
+
+	UpdateObjectTransforms(theNode);
+}
+
+static void BounceCursorDot(void)
+{
+	if (!gMenuCursorDot)
+	{
+		return;
+	}
+
+	gMenuCursorDot->SpecialF[0] = 1;
+	gMenuCursorDot->Flag[1] = true;
 }
 
 static ObjNode* MakeMenuCursorDot(void)
@@ -1397,7 +1435,7 @@ int StartMenu(
 
 	ObjNode* pane = nil;
 
-	ObjNode* cursorDot = MakeMenuCursorDot();
+	gMenuCursorDot = MakeMenuCursorDot();
 
 	if (gMenuStyle->darkenPaneOpacity > 0)
 	{
@@ -1483,10 +1521,10 @@ int StartMenu(
 
 		/* CLEANUP */
 
-	if (cursorDot)
+	if (gMenuCursorDot)
 	{
-		DeleteObject(cursorDot);
-		cursorDot = NULL;
+		DeleteObject(gMenuCursorDot);
+		gMenuCursorDot = NULL;
 	}
 
 	if (gMenuStyle->asyncFadeOut)

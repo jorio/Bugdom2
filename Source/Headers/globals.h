@@ -42,7 +42,7 @@ int _i;																	\
 }
 
 
-#define	PI					((float)3.1415926535898)
+#define	PI					(3.1415926535898f)
 #define PI2					(2.0f*PI)
 
 
