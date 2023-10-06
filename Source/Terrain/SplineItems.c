@@ -32,7 +32,7 @@ static Boolean NilPrime(int splineNum, SplineItemType *itemPtr);
 SplineDefType	*gSplineList = NULL;
 int				gNumSplines = 0;
 
-static int		gNumSplineObjects = 0;
+int				gNumSplineObjects = 0;
 static ObjNode	*gSplineObjectList[MAX_SPLINE_OBJECTS];
 
 
@@ -357,6 +357,7 @@ Boolean RemoveFromSplineObjectList(ObjNode *theNode)
 
 	if (theNode->SplineObjectIndex != -1)
 	{
+		GAME_DEBUGASSERT(theNode == gSplineObjectList[theNode->SplineObjectIndex]);
 		gSplineObjectList[theNode->SplineObjectIndex] = nil;			// nil out the entry into the list
 		theNode->SplineObjectIndex = -1;
 		theNode->SplineItemPtr = nil;
@@ -381,8 +382,12 @@ void EmptySplineObjectList(void)
 	{
 		ObjNode	*o = gSplineObjectList[i];
 		if (o)
+		{
+			GAME_DEBUGASSERT(o->SplineObjectIndex == i);
 			DeleteObject(o);			// This will dispose of all memory used by the node.
 										// RemoveFromSplineObjectList will be called by it.
+			gSplineObjectList[i] = NULL;
+		}
 	}
 	gNumSplineObjects = 0;
 }

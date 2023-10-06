@@ -970,7 +970,6 @@ static void CleanupLevel(void)
 {
 	StopAllEffectChannels();
 	DisposeTunnelData();
- 	EmptySplineObjectList();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
 	DisposeWater();

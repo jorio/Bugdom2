@@ -671,6 +671,13 @@ do_anaglyph:
 		OGL_DrawInt(gNumObjectNodes, 100,y);
 		y += 15;
 
+		if (gNumSplineObjects)
+		{
+			OGL_DrawString("splobjs:", 20,y);
+			OGL_DrawInt(gNumSplineObjects, 100,y);
+			y += 15;
+		}
+
 		OGL_DrawString("ptrs:", 20,y);
 		OGL_DrawInt(gNumPointers, 100,y);
 		y += 15;

@@ -88,12 +88,12 @@ static Boolean	beenHere = false;
 
 		SavePrefs();									// save prefs before bailing
 
-		EmptySplineObjectList();
 		DisposeObjectManager();
 		DisposeSkeletonManager();
 		DisposeEffects();
 		DisposeTunnelData();
 		DisposeTerrain();								// dispose of any memory allocated by terrain manager
+		DisposeWater();
 		DisposeAllBG3DContainers();						// nuke all models
 		DisposeAllSpriteGroups();						// nuke all sprites
 		DisposeAllSpriteAtlases();						// nuke all atlases

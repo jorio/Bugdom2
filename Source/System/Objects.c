@@ -1145,6 +1145,9 @@ void DeleteAllObjects(void)
 {
 	GAME_ASSERT(gObjectPool);
 
+	// Spline objects have been taken out of the main object list, so delete them now
+	EmptySplineObjectList();
+
 	while (gFirstNodePtr != nil)
 		DeleteObject(gFirstNodePtr);
 

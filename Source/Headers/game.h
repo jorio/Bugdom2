@@ -215,6 +215,7 @@ extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
 extern	int						gNumPointers;
 extern	int						gNumPuzzlePiecesFit;
 extern	int						gNumSplines;
+extern	int						gNumSplineObjects;
 extern	int						gNumSuperTilesDeep;
 extern	int						gNumSuperTilesDrawn;
 extern	int						gNumSuperTilesWide;
