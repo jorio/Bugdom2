@@ -2,8 +2,10 @@
 // 3DMath.h
 //
 
+#pragma once
 
-#define OGLMath_RadiansToDegrees(x)	((float)((x) * 180.0f / PI))
+static inline float OGLMath_RadiansToDegrees(float x) { return x * (180.0f / PI); }
+static inline float OGLMath_DegreesToRadians(float x) { return x * (PI / 180.0f); }
 
 float OGLPoint3D_DistanceToPlane(const OGLPoint3D *point,const OGLPlaneEquation	*plane);
 float OGLPoint2D_LineDistance(OGLPoint2D *point, float p1x, float p1y, float p2x, float p2y, float *t);

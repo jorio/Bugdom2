@@ -854,14 +854,46 @@ SDL_GameController* GetController(void)
 	return NULL;
 }
 
+static float SnapAngle(float angle, float snap)
+{
+	if (angle >= -snap && angle <= snap)							// east (-0...0)
+		return 0;
+	else if (angle >= PI/2 - snap && angle <= PI/2 + snap)			// south
+		return PI/2;
+	else if (angle >= PI - snap || angle <= -PI + snap)				// west (180...-180)
+		return PI;
+	else if (angle >= -PI/2 - snap && angle <= -PI/2 + snap)		// north
+		return -PI/2;
+	else
+		return angle;
+}
+
 static void SetPlayerAxisControls(void)
 {
 	gPlayerInfo.analogIsMouse = false;
 
 		/* FIRST CHECK ANALOG AXES */
 
-	gPlayerInfo.analogControlX = GetNeedAnalogSteering(kNeed_TurnLeft, kNeed_TurnRight);
-	gPlayerInfo.analogControlZ = GetNeedAnalogSteering(kNeed_Forward, kNeed_Backward);
+	float x = GetNeedAnalogSteering(kNeed_TurnLeft, kNeed_TurnRight);
+	float z = GetNeedAnalogSteering(kNeed_Forward, kNeed_Backward);
+
+	float magnitude = sqrtf(x*x + z*z);
+	float angle = atan2f(z, x);
+
+	angle = SnapAngle(angle, OGLMath_DegreesToRadians(10));
+	magnitude = SDL_clamp(magnitude, 0, 1);
+	x = magnitude * cosf(angle);
+	z = magnitude * sinf(angle);
+
+#if 0
+	if (magnitude != 0.0f)
+	{
+		SDL_Log("%f x %d deg", magnitude, (int) OGLMath_RadiansToDegrees(angle));
+	}
+#endif
+
+	gPlayerInfo.analogControlX = x;
+	gPlayerInfo.analogControlZ = z;
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
 	
