@@ -146,10 +146,12 @@ static const char* GetKeyBindingName(int row, int col)
 			return "Left ⇧";
 		case SDL_SCANCODE_RSHIFT:
 			return "Right ⇧";
+#if __APPLE__
 		case SDL_SCANCODE_LALT:
 			return "Left ⌥";
 		case SDL_SCANCODE_RALT:
 			return "Right ⌥";
+#endif
 		default:
 			return SDL_GetScancodeName(scancode);
 	}
