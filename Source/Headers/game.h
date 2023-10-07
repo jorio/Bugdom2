@@ -6,6 +6,16 @@
 #include <SDL_opengl_glext.h>
 #include <stdint.h>
 
+// Compatibility with old SDL versions.
+// Keep these as long as we support Ubuntu 20.04 LTS, which ships with SDL 2.0.10.
+// The next Ubuntu LTS (22.04) ships with SDL 2.0.20, so we can drop those once Ubuntu 20.04 reaches EOL.
+#if !defined(SDL_clamp)  // appeared in SDL 2.0.18 (November 2021)
+#define SDL_clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+#endif
+#if !defined(SDL_zeroa)  // appeared in SDL 2.0.12 (March 2020)
+#define SDL_zeroa(x) SDL_memset((x), 0, sizeof((x)))
+#endif
+
 #if !defined(__LITTLE_ENDIAN__) && !(__BIG_ENDIAN__)
 #define __LITTLE_ENDIAN__ 1
 #endif
