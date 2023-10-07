@@ -32,5 +32,12 @@ enum
 	kNeed_UIStart,
 	kNeed_UIBack,
 	kNeed_UIPause,
+	kNeed_UITextLeft,
+	kNeed_UITextRight,
+	kNeed_UITextRightOrDone,
+	kNeed_UITextBksp,
+	kNeed_UITextDone,
+	kNeed_UITextNextCh,
+	kNeed_UITextPrevCh,
 	NUM_CONTROL_NEEDS
 };

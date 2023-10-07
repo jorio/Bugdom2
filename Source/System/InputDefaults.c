@@ -152,4 +152,12 @@ const InputBinding kDefaultInputBindings[NUM_CONTROL_NEEDS] =
 		.key = { SDL_SCANCODE_ESCAPE },
 		.pad = { CB(START) },
 	},
+
+	[kNeed_UITextLeft]		= { .key = { SDL_SCANCODE_LEFT  }, .pad = { CB(DPAD_LEFT) , CB(LEFTSHOULDER) , CB(B), CAMINUS(LEFTX) }},
+	[kNeed_UITextRight]		= { .key = { SDL_SCANCODE_RIGHT }, .pad = { CB(DPAD_RIGHT), CB(RIGHTSHOULDER), CB(A), CAPLUS(LEFTX) }},
+	[kNeed_UITextRightOrDone]= { .pad = { CB(RIGHTSHOULDER), CB(A) }},
+	[kNeed_UITextBksp]		= { .key = { SDL_SCANCODE_BACKSPACE }, .pad = { CB(X) } },
+	[kNeed_UITextDone]		= { .key = { SDL_SCANCODE_RETURN, SDL_SCANCODE_KP_ENTER }, .pad = { CB(START) } },
+	[kNeed_UITextNextCh]	= { .pad = { CB(DPAD_UP), CAPLUS(LEFTY)} },
+	[kNeed_UITextPrevCh]	= { .pad = { CB(DPAD_DOWN), CAMINUS(LEFTY) } },
 };

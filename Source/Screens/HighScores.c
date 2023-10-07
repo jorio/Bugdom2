@@ -18,6 +18,7 @@
 
 static void SetupScoreScreen(void);
 static void FreeScoreScreen(void);
+static void DoTextEntry(char* myName);
 static void DrawHighScoresCallback(ObjNode* theNode);
 static void DrawScoreVerbage(void);
 static void DrawHighScoresAndCursor(void);
@@ -73,7 +74,11 @@ void NewScore(void)
 	MakeFadeEvent(true, 1);
 
 	MakeNewDriverObject(PARTICLE_SLOT-1, DrawHighScoresCallback, NULL);
-	
+
+			/* CLEAR NAME WITH SPACES */
+
+	SDL_memset(gHighScores[gNewScoreSlot].name, ' ', MAX_NAME_LENGTH);
+	gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = '\0';
 
 			/* LOOP */
 
@@ -90,44 +95,7 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
-			if (IsKeyDown(SDL_SCANCODE_RETURN) || IsKeyDown(SDL_SCANCODE_KP_ENTER))
-			{
-				gExitHighScores = true;
-			}
-			else if (IsKeyDown(SDL_SCANCODE_LEFT))
-			{
-				if (gCursorIndex > 0)
-					gCursorIndex--;
-			}
-			else if (IsKeyDown(SDL_SCANCODE_RIGHT))
-			{
-				if (gCursorIndex < (MAX_NAME_LENGTH-1)
-					&& gHighScores[gNewScoreSlot].name[gCursorIndex])
-				{
-					gCursorIndex++;
-				}
-			}
-			else if (IsKeyDown(SDL_SCANCODE_BACKSPACE))
-			{
-				if (gCursorIndex > 0)
-				{
-					gCursorIndex--;
-					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
-						gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
-					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = '\0';
-				}
-			}
-			else if (gTextInput[0]
-				&& gTextInput[0] >= ' '
-				&& gTextInput[0] <= '~'						// only ASCII to avoid dealing with utf-8
-				&& gCursorIndex < MAX_NAME_LENGTH)			// dont add anything more if maxxed out now
-			{
-				char theChar = gTextInput[0];
-				if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
-					theChar = 'A' + (theChar-'a');
-				gHighScores[gNewScoreSlot].name[gCursorIndex] = theChar;
-				gCursorIndex++;
-			}
+			DoTextEntry(gHighScores[gNewScoreSlot].name);
 		}
 	}
 
@@ -143,6 +111,123 @@ void NewScore(void)
 
 	gAllowAudioKeys = true;
 }
+
+
+
+/********************* DO TEXT ENTRY **********************/
+
+static void DoTextEntry(char* myName)
+{
+	static	float		gTimeSinceKeyRepeat = 0;
+	static const char*	kGamepadTextEntryCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+
+	gTimeSinceKeyRepeat += gFramesPerSecondFrac;
+
+	if (IsNeedDown(kNeed_UITextDone)
+		|| (IsNeedDown(kNeed_UITextRightOrDone) && gCursorIndex == MAX_NAME_LENGTH-1))
+	{
+		PlayEffect(EFFECT_GETPOW);
+		gExitHighScores = true;
+	}
+	else if (IsNeedDown(kNeed_UITextLeft))
+	{
+		if (gCursorIndex > 0)
+			gCursorIndex--;
+	}
+	else if (IsNeedDown(kNeed_UITextRight))
+	{
+		if (gCursorIndex < (MAX_NAME_LENGTH-1))
+		{
+			gCursorIndex++;
+		}
+	}
+	else if (IsNeedDown(kNeed_UITextBksp))
+	{
+		if (gCursorIndex > 0)
+		{
+			gCursorIndex--;
+
+			for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+				myName[i] = myName[i+1];
+
+			myName[MAX_NAME_LENGTH-1] = ' ';
+
+			PlayEffect(EFFECT_FLYGOTKICKED);
+		}
+	}
+	else if (gTextInput[0]
+			 && gTextInput[0] >= ' '
+			 && gTextInput[0] <= '~'						// only ASCII to avoid dealing with utf-8
+			 && gCursorIndex < MAX_NAME_LENGTH)			// dont add anything more if maxxed out now
+	{
+		PlayEffect_Parms(EFFECT_ACORNKICKED, FULL_CHANNEL_VOLUME, FULL_CHANNEL_VOLUME, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000));
+		char theChar = gTextInput[0];
+		if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
+			theChar = 'A' + (theChar-'a');
+		myName[gCursorIndex] = theChar;
+		gCursorIndex++;
+	}
+	else if (IsNeedDown(kNeed_UITextNextCh) ||
+			 (IsNeedHeld(kNeed_UITextNextCh) && gTimeSinceKeyRepeat > .125f))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)
+		{
+			gTimeSinceKeyRepeat = 0;
+
+			char c = myName[gCursorIndex];
+
+			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+
+			if (!posInCharset)
+			{
+				c = kGamepadTextEntryCharset[0];		// fall back to first allowed char
+			}
+			else
+			{
+				c = *(posInCharset + 1);				// advance to next allowed char
+				if (!c)									// reached end of allowed charset
+					c = kGamepadTextEntryCharset[0];	// fall back to first allowed char
+			}
+
+			myName[gCursorIndex] = c;
+			gCursorFlux = -PI/2;
+
+			PlayEffect_Parms(EFFECT_ACORNKICKED, FULL_CHANNEL_VOLUME/2, FULL_CHANNEL_VOLUME/2, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000));
+		}
+	}
+	else if (IsNeedDown(kNeed_UITextPrevCh) ||
+			 (IsNeedHeld(kNeed_UITextPrevCh) && gTimeSinceKeyRepeat > .125f))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)
+		{
+			gTimeSinceKeyRepeat = 0;
+
+			char c = myName[gCursorIndex];
+
+			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+
+			if (!posInCharset)
+			{
+				c = kGamepadTextEntryCharset[0];		// fall back to first allowed char
+			}
+			else
+			{
+				if (posInCharset == kGamepadTextEntryCharset)
+					posInCharset = kGamepadTextEntryCharset + strlen(kGamepadTextEntryCharset) - 1;
+				else
+					posInCharset--;
+
+				c = *posInCharset;
+			}
+
+			myName[gCursorIndex] = c;
+			gCursorFlux = -PI/2;
+
+			PlayEffect_Parms(EFFECT_ACORNKICKED, FULL_CHANNEL_VOLUME/2, FULL_CHANNEL_VOLUME/2, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000));
+		}
+	}
+}
+
 
 
 /********************* SETUP SCORE SCREEN **********************/
@@ -337,7 +422,6 @@ char	s[33];
 		gFinalScoreAlpha = .99f;
 
 
- 	gCursorFlux += gFramesPerSecondFrac * 10.0f;
 
 
 			/****************************/
@@ -399,7 +483,7 @@ char	s[33];
 
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
-		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
+		gGlobalTransparency = (.3f + ((sinf(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
 		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.5f, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_Cursor);
 	}
 
@@ -414,6 +498,8 @@ char	s[33];
 	gGlobalColorFilter.b = 1;
 
 	gGlobalTransparency = 1;
+
+	gCursorFlux += gFramesPerSecondFrac * 10.0f;
 }
 
 
