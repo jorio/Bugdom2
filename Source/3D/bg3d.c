@@ -396,6 +396,42 @@ OSErr			err;
 	int mipmapNum = data->numMipmaps++;					// increment the mipmap count
 	GAME_ASSERT(mipmapNum < MO_MAX_MIPMAPS);
 	data->texturePixels[mipmapNum] = texturePixels;		// set ptr to pixelmap
+
+
+#if 0
+	// Texture dumper
+	static int num = 0;
+	char path[256];
+	SDL_snprintf(path, sizeof(path), "/tmp/bg3d_%d_%d.tga", refNum, num);
+	num++;
+	SDL_RWops* f = SDL_RWFromFile(path, "wb");
+	SDL_WriteU8(f, 0);
+	SDL_WriteU8(f, 0);
+	SDL_WriteU8(f, 2);
+	for (int i = 0; i < 9; i++) SDL_WriteU8(f, 0);
+	SDL_WriteLE16(f, textureHeader.width);
+	SDL_WriteLE16(f, textureHeader.height);
+	SDL_WriteU8(f, textureHeader.srcPixelFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV ? 16 : 32);
+	SDL_WriteU8(f, textureHeader.srcPixelFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV ? 1 : 8);
+	if (textureHeader.srcPixelFormat == GL_RGBA)
+	{
+		for (int i = 0; i < textureHeader.bufferSize; i += 4)
+		{
+			SDL_WriteU8(f, ((uint8_t*)texturePixels)[i+2]);
+			SDL_WriteU8(f, ((uint8_t*)texturePixels)[i+1]);
+			SDL_WriteU8(f, ((uint8_t*)texturePixels)[i+0]);
+			SDL_WriteU8(f, ((uint8_t*)texturePixels)[i+3]);
+		}
+	}
+	else
+	{
+		SDL_RWwrite(f, texturePixels, textureHeader.bufferSize, 1);
+	}
+	const char* footer = "\0\0\0\0\0\0\0\0TRUEVISION-XFILE.\0";
+	SDL_RWwrite(f, footer, sizeof(footer), 1);
+	SDL_RWclose(f);
+	printf("Wrote %s (pixel format 0x%x)\n", path, textureHeader.srcPixelFormat);
+#endif
 }
 
 
