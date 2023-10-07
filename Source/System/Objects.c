@@ -18,7 +18,7 @@
 
 static void FlushObjectDeleteQueue(void);
 static void DrawCollisionBoxes(ObjNode *theNode, Boolean old);
-static void DrawBoundingBoxes(ObjNode *theNode);
+//static void DrawBoundingBoxes(ObjNode *theNode);
 
 
 /****************************/
@@ -920,6 +920,7 @@ float				left,right,top,bottom,front,back;
 	glColor4f(1,1,1,1);
 }
 
+#if 0
 /************************ DRAW BOUNDING BOXES ****************************/
 
 static void DrawBoundingBoxes(ObjNode *theNode)
@@ -1067,6 +1068,7 @@ int		i;
 	glVertex3f(right, top, front);
 	glEnd();
 }
+#endif
 
 
 /********************* MOVE STATIC OBJECT **********************/

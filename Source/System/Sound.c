@@ -19,7 +19,7 @@
 
 static short FindSilentChannel(void);
 static void Calc3DEffectVolume(int effectNum, OGLPoint3D *where, float volAdjust, uint32_t *leftVolOut, uint32_t *rightVolOut);
-static void UpdateGlobalVolume(void);
+//static void UpdateGlobalVolume(void);
 
 
 /****************************/
@@ -975,7 +975,7 @@ uint32_t		lv2,rv2;
 
 #pragma mark -
 
-
+#if 0
 /****************** UPDATE GLOBAL VOLUME ************************/
 //
 // Call this whenever gGlobalVolume is changed.  This will update
@@ -991,6 +991,7 @@ static void UpdateGlobalVolume(void)
 		ChangeChannelVolume(c, gChannelInfo[c].leftVolume, gChannelInfo[c].rightVolume);
 	}
 }
+#endif
 
 /*************** CHANGE CHANNEL VOLUME **************/
 //

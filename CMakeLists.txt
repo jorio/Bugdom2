@@ -147,10 +147,9 @@ if(NOT MSVC)
 		-Wextra
 		-Wshadow
 		-Werror=return-type
-		-Werror=incompatible-pointer-types
+		$<$<COMPILE_LANGUAGE:C>:-Werror=incompatible-pointer-types>
 		-Wno-multichar
 		-Wno-unknown-pragmas
-		#-Wno-unused-function
 		-Wstrict-aliasing=2
 	)
 
