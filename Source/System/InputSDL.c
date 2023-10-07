@@ -1,6 +1,6 @@
 // SDL INPUT
-// (C) 2022 Iliyas Jorio
-// This file is part of Nanosaur 2. https://github.com/jorio/Nanosaur2
+// (C) 2023 Iliyas Jorio
+// This file is part of Bugdom 2. https://github.com/jorio/Bugdom2
 
 #include "game.h"
 
@@ -761,12 +761,17 @@ static void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion)
 
 OGLVector2D GetMouseDelta(void)
 {
+	float sensitivity = (float)(1 + gGamePrefs.mouseSensitivityLevel) / (NUM_MOUSE_SENSITIVITY_LEVELS);
+
+	// Tweak range so that default sensitivity --> 1.0f
+	sensitivity *= NUM_MOUSE_SENSITIVITY_LEVELS / (1.0f + DEFAULT_MOUSE_SENSITIVITY_LEVEL);
+
 #if MOUSE_SMOOTHING
 	struct MouseSmoothingState* state = &gMouseSmoothing;
 
 	GAME_ASSERT(state->ringLength != 0 || (state->dxAccu == 0 && state->dyAccu == 0));
 
-	return (OGLVector2D) {(float) state->dxAccu, (float) state->dyAccu};
+	return (OGLVector2D) {state->dxAccu * sensitivity, state->dyAccu * sensitivity};
 #else
 	static float timeSinceLastCall = 0;
 	static OGLVector2D lastDelta = { 0, 0 };
@@ -780,7 +785,7 @@ OGLVector2D GetMouseDelta(void)
 		int x = 0;
 		int y = 0;
 		SDL_GetRelativeMouseState(&x, &y);
-		lastDelta = (OGLVector2D){ (float)x, (float)y };
+		lastDelta = (OGLVector2D){x * sensitivity, y * sensitivity};
 		timeSinceLastCall = 0;
 	}
 

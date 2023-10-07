@@ -154,6 +154,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.buddyBugBuzz			= true;
 	gGamePrefs.gamepadRumbleLevel	= MAX_GAMEPAD_RUMBLE_LEVEL;
 	gGamePrefs.mouseControlsSkip	= true;
+	gGamePrefs.mouseSensitivityLevel= DEFAULT_MOUSE_SENSITIVITY_LEVEL;
 
 	_Static_assert(sizeof(gGamePrefs.bindings) == sizeof(kDefaultInputBindings), "input binding size mismatch: prefs vs defaults");
 	SDL_memcpy(&gGamePrefs.bindings, &kDefaultInputBindings, sizeof(kDefaultInputBindings));

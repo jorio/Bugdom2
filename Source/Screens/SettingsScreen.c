@@ -340,7 +340,6 @@ static const MenuItem kSettingsMenuTree[] =
 			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_SKIP},
 		},
 	},
-/*
 	{
 		.type = kMICycler,
 		.text = STR_MOUSE_SENSITIVITY,
@@ -361,7 +360,6 @@ static const MenuItem kSettingsMenuTree[] =
 			},
 		},
 	},
-*/
 	{ .type = kMISpacer },
 	{.type = kMIMouseBinding, .kb = kNeed_Jump },
 	{.type = kMIMouseBinding, .kb = kNeed_Kick },
