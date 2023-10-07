@@ -106,6 +106,9 @@ void DoPaused(void)
 		if (pick == 2)
 		{
 			gGameOver = true;
+
+			frame->StatusBits &= ~STATUS_BIT_HIDDEN;
+			OGL_FadeOutScene(drawCall, moveCall);
 		}
 
 		break;
@@ -114,7 +117,12 @@ void DoPaused(void)
 	DeleteObject(frame);
 
 	gGamePaused = false;
-	PauseAllChannels(false);
-	EnforceMusicPausePref();
+
+	if (!gGameOver)
+	{
+		PauseAllChannels(false);
+		EnforceMusicPausePref();
+	}
+
 	GrabMouse(true);
 }
