@@ -144,7 +144,7 @@ ObjNode* MakeFadeEvent(Boolean fadeIn, float fadeSpeed)
 		NewObjectDefinitionType def =
 		{
 			.genre = CUSTOM_GENRE,
-			.flags = STATUS_BIT_DONTCULL,
+			.flags = STATUS_BIT_DONTCULL | STATUS_BIT_MOVEINPAUSE,
 			.slot = FADEPANE_SLOT,
 			.moveCall = MoveFadePane,
 			.drawCall = DrawFadePane,
