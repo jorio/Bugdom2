@@ -8,7 +8,7 @@
 /* CONSTANTS   */
 /***************/
 
-#define MOUSE_SMOOTHING 0
+#define MOUSE_SMOOTHING 1
 
 #define kJoystickDeadZone				(33 * 32767 / 100)
 #define kJoystickDeadZone_UI			(66 * 32767 / 100)
