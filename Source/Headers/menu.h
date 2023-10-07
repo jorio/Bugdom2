@@ -76,3 +76,4 @@ int StartMenu(
 		void (*moveCall)(void),
 		void (*drawCall)(void));
 void LayoutCurrentMenuAgain(void);
+int GetCurrentMenuID(void);

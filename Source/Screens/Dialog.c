@@ -11,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "menu.h"
 
 
 /****************************/
@@ -284,11 +285,12 @@ int		effect;
 	}
 }
 
-
-/************************ DRAW DIALOG MESSAGE ********************/
-
-void DrawDialogMessage(float x, float y)
+/************************ UPDATE DIALOG MESSAGE ********************/
+void UpdateDialogMessage(void)
 {
+	if (gGamePaused)
+		return;
+
 			/* UPDATE ANY CURRENT VOICE */
 
 	if (gDialogSoundChannel != -1)
@@ -310,7 +312,6 @@ void DrawDialogMessage(float x, float y)
 	if (gCurrentDialogKey == STR_NULL)
 		return;
 
-	SetColor4f(1,1,1,1);
 
 		/***********************************/
 		/* MOVE FRAME INTO POSTIONN & DRAW */
@@ -357,7 +358,26 @@ void DrawDialogMessage(float x, float y)
 				break;
 
 	}
+}
 
+/************************ DRAW DIALOG MESSAGE ********************/
+
+void DrawDialogMessage(float x, float y)
+{
+	// Only update fade if game not paused
+	if (!gGamePaused)
+		UpdateDialogMessage();
+
+	// Early out if nothing to say
+	if (gCurrentDialogKey == STR_NULL)
+		return;
+
+	// Allow drawing in pause menu, but not in settings
+	int currentMenu = GetCurrentMenuID();
+	if (currentMenu != 0 && currentMenu != 'paus')
+		return;
+
+	SetColor4f(1,1,1,1);
 
 			/* SET FADE IN/OUT BASED ON DISTANCE FROM STOP POSITION */
 

@@ -1463,12 +1463,11 @@ static void LayOutMenu(int menuID)
 
 void LayoutCurrentMenuAgain(void)
 {
-	GAME_ASSERT(gMenu);
-	GAME_ASSERT(gMenu[-1].type == kMISENTINEL);
-	GAME_ASSERT(gMenu[-1].id != 0);
+	int currentMenu = GetCurrentMenuID();
+	GAME_ASSERT(currentMenu != 0);
 
 	SaveSelectedRowInHistory();
-	LayOutMenu(gMenu[-1].id);
+	LayOutMenu(currentMenu);
 }
 
 #pragma mark - Menu registry
@@ -1678,4 +1677,14 @@ int StartMenu(
 //	SDL_ShowCursor(cursorStateBeforeMenu);
 
 	return gMenuPick;
+}
+
+int GetCurrentMenuID(void)
+{
+	if (gMenu == NULL)
+		return 0;
+
+	GAME_ASSERT(gMenu[-1].type == kMISENTINEL);
+	GAME_ASSERT(gMenu[-1].id != 0);
+	return gMenu[-1].id;
 }
