@@ -431,7 +431,11 @@ Gamepad controls,Commandes manette,Gamepad konfigurieren,Configurar el mando,Con
 "Press a button now, or START to cancel","Appuie sur le bouton de ton choix, ou START pour annuler",,,"Premi un bottone ora, oppure START per annullare","Tryck på valfri knapp nu, eller START för att avbryta",
 Mouse controls,Commandes souris,Maus konfigurieren,Configurar el ratón,Configura il mouse,Konfigurera musen,Muis
 No gamepad detected!,Aucune manette détectée!,Kein Controller erkannt!,,Nessun gamepad rilevato!,Ingen handkontroll hittades!,Geen gamecontroller gedetecteerd!
-Rumble,Vibrations,Vibration,Vibración,Vibrazioni,Vibration,
+Force feedback,Force des vibrations,Vibrationsstärke,Fuerza de vibración,Forza delle vibrazioni,Vibrationsstyrka,
+Off,Aucune
+Low,Faible
+Medium,Moyenne
+High,Élevée
 Restore default configuration,Restaurer la config. par défaut,Standardkonfiguration zurücksetzen,,Ripristina la configurazione predefinita,Återställ standardkonfiguration,
 ,,,,,,
 Turn Left,À gauche,Nach links,,Sinistra,Gå åt vänster,

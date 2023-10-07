@@ -21,10 +21,7 @@ static void cb_SetLanguage(void)
 
 static void cb_SetRumble(void)
 {
-	if (gGamePrefs.gamepadRumble)
-	{
-		Rumble(1.0f, 1.0f, 300);
-	}
+	Rumble(1.0f, 1.0f, 300);
 }
 
 static void cb_ResetKeyBindings(void)
@@ -320,9 +317,9 @@ static const MenuItem kSettingsMenuTree[] =
 		.callback = cb_SetRumble,
 		.cycler =
 		{
-			.valuePtr = &gGamePrefs.gamepadRumble,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
+			.valuePtr = &gGamePrefs.gamepadRumbleLevel,
+			.numChoices = 1 + MAX_GAMEPAD_RUMBLE_LEVEL,
+			.choices = {STR_GAMEPAD_RUMBLE_OFF, STR_GAMEPAD_RUMBLE_LOW, STR_GAMEPAD_RUMBLE_MID, STR_GAMEPAD_RUMBLE_HIGH},
 		},
 	},
 	{.type = kMISpacer },

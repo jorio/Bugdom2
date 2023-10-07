@@ -581,16 +581,28 @@ static SDL_GameController* TryOpenAnyUnusedController(bool showMessage)
 
 void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms)
 {
+	static const float kRumbleIntensities[] =
+	{
+		0.0f,
+		0.33f,
+		0.66f,
+		1.0f,
+	};
+
 #if !(SDL_VERSION_ATLEAST(2,0,18))
 	#warning Rumble support requires SDL 2.0.18 later
 #else
 	// Don't bother if rumble turned off in prefs
-	if (!gGamePrefs.gamepadRumble || !gGamePrefs.rumbleIntensity)
+	if (!gGamePrefs.gamepadRumbleLevel)
 	{
 		return;
 	}
 
-	float rumbleIntensityFrac = ((float) gGamePrefs.rumbleIntensity) * (1.0f / 100.0f);
+	int level = gGamePrefs.gamepadRumbleLevel;
+	_Static_assert(MAX_GAMEPAD_RUMBLE_LEVEL+1 == SDL_arraysize(kRumbleIntensities), "incorrect MAX_GAMEPAD_RUMBLE_LEVEL");
+	level = SDL_clamp(level, 0, MAX_GAMEPAD_RUMBLE_LEVEL);
+
+	float rumbleIntensityFrac = kRumbleIntensities[level];
 	lowFrequencyStrength *= rumbleIntensityFrac;
 	highFrequencyStrength *= rumbleIntensityFrac;
 
@@ -660,7 +672,7 @@ void ResetDefaultGamepadBindings(void)
 		SDL_memcpy(gGamePrefs.bindings[i].pad, kDefaultInputBindings[i].pad, sizeof(gGamePrefs.bindings[i].pad));
 	}
 
-	gGamePrefs.rumbleIntensity = 100;
+	gGamePrefs.gamepadRumbleLevel = MAX_GAMEPAD_RUMBLE_LEVEL;
 }
 
 void ResetDefaultMouseBindings(void)

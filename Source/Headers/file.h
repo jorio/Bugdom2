@@ -68,9 +68,8 @@ typedef struct
 	Boolean	fullscreen;
 	Boolean	uiCentering;
 
-	Byte	rumbleIntensity;
 	Byte	mouseSensitivityLevel;
-	Boolean	gamepadRumble;
+	Byte	gamepadRumbleLevel;
 	InputBinding	bindings[NUM_CONTROL_NEEDS];
 }PrefsType;
 
