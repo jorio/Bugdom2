@@ -58,22 +58,26 @@ void DoLegalScreen(void)
 
 	NewObjectDefinitionType def =
 	{
-		.coord = {320, 240, 0},
+		.coord = {320, 220, 0},
 		.group = SPRITE_GROUP_LEVELSPECIFIC,
 		.type = 0,
-		.scale = 640,
+		.scale = 400,
 		.slot = SPRITE_SLOT,
 	};
-	ObjNode* imageNode = MakeSpriteObject(&def);
-	GAME_ASSERT(imageNode);
+	MakeSpriteObject(&def);
+
+	def.scale = 0.25f;
+	def.coord.y = 320;
+	def.group = ATLAS_GROUP_FONT1;
+	ObjNode* text1 = TextMesh_New("pangeasoft.net\njorio.itch.io/bugdom2", kTextMeshAlignTop, &def);
+	text1->ColorFilter = (OGLColorRGBA) {.61f, .68f, .54f, 1};
 
 	def.scale = 0.18f;
-	def.coord.y = 470;
-	def.group = ATLAS_GROUP_FONT1;
-	ObjNode* widescreenText = TextMesh_New(
-		"© 2002 Pangea Software, Inc. All rights reserved. Bugdom is a registered trademark of Pangea Software, Inc.",
+	def.coord.y = 450;
+	ObjNode* text2 = TextMesh_New(
+		"\xc2\xa9 2002 Pangea Software, Inc. All rights reserved.\nBugdom is a registered trademark of Pangea Software, Inc.",
 		kTextMeshAlignBottom, &def);
-	widescreenText->ColorFilter = (OGLColorRGBA) {.48f, .2f, .15f, 1};
+	text2->ColorFilter = (OGLColorRGBA) {.61f, .68f, .54f, 1};
 
 
 		/***********/
@@ -81,26 +85,13 @@ void DoLegalScreen(void)
 		/***********/
 
 
-	MakeFadeEvent(true, 1);
+	MakeFadeEvent(true, 2);
 
 		/* MAIN LOOP */
 
 	while(!UserWantsOut())
 	{
 		CalcFramesPerSecond();
-
-		imageNode->Coord = (OGLPoint3D) {320,240,0};
-		imageNode->Scale = (OGLVector3D) {640,640,0};
-		if (gCurrentAspectRatio > 1.59f)
-		{
-			imageNode->Scale.x *= 1.33f;
-			imageNode->Scale.y *= 1.33f;
-			imageNode->Coord.y += 20;
-			widescreenText->StatusBits &= ~STATUS_BIT_HIDDEN;
-		}
-		else
-			widescreenText->StatusBits |= STATUS_BIT_HIDDEN;
-		UpdateObjectTransforms(imageNode);
 
 		MoveObjects();
 		OGL_DrawScene(DrawObjects);
