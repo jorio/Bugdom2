@@ -381,6 +381,7 @@ OK,,,,,,
 On,Oui,Ein,Sí,Sì,På,
 Off,Non,Aus,No,No,Av,
 Settings,Préférences,Einstellungen,Preferencias,Impostazioni,Inställningar,Instellingen
+Video settings,Réglages vidéo,Grafikeinstellungen,Ajustes de vídeo,Impostazioni video,Grafikinställningar,Video-instellingen
 Difficulty,Difficulté,Schwierigkeit,Dificultad,Difficoltà,Svårighet,Moeilijkheid
 Normal,Normale,Normal,Normal,Normale,Normal,Normaal
 Kiddie Mode,Mode Gamin,Kindermodus,Mono Niños,Modalità bambino,Barnläge,Kindermodus
@@ -426,7 +427,7 @@ Gamepad controls,Commandes manette,Gamepad konfigurieren,Configurar el mando,Con
 "Press A to assign a new button, or X to clear it","Appuie sur A pour réaffecter un bouton, ou X pour l’effacer",,,"Premi A per assegnare un nuovo bottone, oppure X per rimuoverlo","Tryck på A för att tilldela en ny knapp, eller X för att rensa",
 "Press a button now, or START to cancel","Appuie sur le bouton de ton choix, ou START pour annuler",,,"Premi un bottone ora, oppure START per annullare","Tryck på valfri knapp nu, eller START för att avbryta",
 Mouse controls,Commandes souris,Maus konfigurieren,Configurar el ratón,Configura il mouse,Konfigurera musen,Muis
-No gamepad detected,Aucune manette détectée,Kein Controller erkannt,,Nessun gamepad rilevato,Ingen handkontroll hittades,
+No gamepad detected!,Aucune manette détectée!,Kein Controller erkannt!,,Nessun gamepad rilevato!,Ingen handkontroll hittades!,Geen gamecontroller gedetecteerd!
 Rumble,Vibrations,Vibration,Vibración,Vibrazioni,Vibration,
 Restore default configuration,Restaurer la config. par défaut,Standardkonfiguration zurücksetzen,,Ripristina la configurazione predefinita,Återställ standardkonfiguration,
 ,,,,,,

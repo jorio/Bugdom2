@@ -14,7 +14,8 @@
 /****************************/
 
 static ObjNode* MakeTextAtRowCol(const char* text, int row, int col);
-static void LayOutMenu(const MenuItem* menu);
+static void LayOutMenu(int menuID);
+static const MenuItem* LookUpMenu(int menuID);
 static ObjNode* LayOutCyclerValueText(int row);
 static void BounceCursorDot(void);
 
@@ -29,6 +30,8 @@ static void BounceCursorDot(void);
 
 #define MAX_MENU_ROWS	32
 #define MAX_MENU_COLS	5
+#define MAX_REGISTERED_MENUS	32
+#define MAX_STACK_LENGTH		16		// for history
 
 #define kSfxCycle		EFFECT_ACORNKICKED
 #define kSfxError		EFFECT_SKIPLAND
@@ -67,6 +70,7 @@ const MenuStyle kDefaultMenuStyle =
 	.playMenuChangeSounds	= true,
 	.startButtonExits	= false,
 	.isInteractive		= true,
+	.canBackOutOfRootMenu = true,
 	.offset				= {640/2, 480/2},		// Bugdom 2
 };
 
@@ -75,11 +79,9 @@ const MenuStyle kDefaultMenuStyle =
 /*********************/
 
 static const MenuItem*		gMenu = nil;
-static const MenuItem*		gRootMenu = nil;
 static const MenuStyle*		gMenuStyle = nil;
 static int					gNumMenuEntries;
 static int					gMenuRow = 0;
-static int					gLastRowOnRootMenu = -1;
 static int					gKeyColumn = 0;
 static int					gPadColumn = 0;
 static float				gMenuColXs[MAX_MENU_COLS] = { 0, 190, 300, 430, 560 };
@@ -96,6 +98,12 @@ static int					gMouseHoverColumn = -1;
 //static SDL_Cursor*			gStandardCursor = NULL;
 
 static float				gMenuAsyncFadeOutSpeed = 2.0f;
+
+struct { int menuID, row; }	gMenuHistory[MAX_STACK_LENGTH];
+int							gMenuHistoryPos;
+
+static int gNumMenusRegistered = 0;
+const MenuItem* gMenuRegistry[MAX_REGISTERED_MENUS];
 
 /****************************/
 /*    MENU UTILITIES        */
@@ -234,10 +242,10 @@ static bool IsMenuItemTypeSelectable(int type)
 {
 	switch (type)
 	{
-		case kMenuItem_Spacer:
-		case kMenuItem_Label:
-		case kMenuItem_Title:
-		case kMenuItem_Subtitle:
+		case kMISpacer:
+		case kMILabel:
+		case kMITitle:
+		case kMISubtitle:
 			return false;
 
 		default:
@@ -247,7 +255,7 @@ static bool IsMenuItemTypeSelectable(int type)
 
 static void ReplaceMenuText(LocStrID originalTextInMenuDefinition, LocStrID newText)
 {
-	for (int i = 0; i < MAX_MENU_ROWS && gMenu[i].type != kMenuItem_END_SENTINEL; i++)
+	for (int i = 0; i < MAX_MENU_ROWS && gMenu[i].type != kMISENTINEL; i++)
 	{
 		if (gMenu[i].text == originalTextInMenuDefinition)
 		{
@@ -375,21 +383,36 @@ static void MoveAsyncFadeOutAndDelete(ObjNode *theNode)
 }
 
 /****************************/
-/*    MENU CALLBACKS        */
+/*    MENU HISTORY          */
 /****************************/
-#pragma mark - Callbacks
+#pragma mark - Menu history
 
-void MenuCallback_Back(void)
+static void SaveSelectedRowInHistory(void)
+{
+	gMenuHistory[gMenuHistoryPos].row = gMenuRow;
+}
+
+static void GoBackInHistory(void)
 {
 	MyFlushEvents();
 
-	if (gMenu != gRootMenu)
+	if (gMenuHistoryPos != 0)
 	{
-		LayOutMenu(gRootMenu);
+//		PlayBackEffect();
+		gMenuHistoryPos--;
+
+//		gNav->sweepRTL = true;
+		LayOutMenu(gMenuHistory[gMenuHistoryPos].menuID);
+//		gNav->sweepRTL = false;
+	}
+	else if (gMenuStyle->canBackOutOfRootMenu)
+	{
+//		PlayBackEffect();
+		gMenuState = kMenuStateFadeOut;
 	}
 	else
 	{
-		gMenuState = kMenuStateFadeOut;
+		PlayEffect(kSfxError);
 	}
 }
 
@@ -506,42 +529,53 @@ static void NavigateSettingEntriesMouseHover(void)
 #endif
 }
 
-static void NavigateAction(const MenuItem* entry)
-{
-	if (IsNeedDown(kNeed_UIConfirm) || (gMouseHoverValidRow && IsClickDown(SDL_BUTTON_LEFT)))
-	{
-		if (entry->action.callback != MenuCallback_Back)
-			PlayEffect(kSfxCycle);
-		else if (gMenuStyle->playMenuChangeSounds)
-			PlayMenuChangeEffect();
-
-		if (entry->action.callback)
-			entry->action.callback();
-	}
-}
-
 static void NavigatePick(const MenuItem* entry)
 {
-	if (IsNeedDown(kNeed_UIConfirm) || (gMouseHoverValidRow && IsClickDown(SDL_BUTTON_LEFT)))
+	bool validClick = (gMouseHoverValidRow && IsClickDown(SDL_BUTTON_LEFT));
+
+	if (IsNeedDown(kNeed_UIConfirm) || validClick)
 	{
-		gMenuPick = entry->pick;
+//		if (!validClick)
+//			gNav->mouseState = kMouseOff;		// exit mouse control if didn't get click
 
-		MenuCallback_Back();
-	}
-}
+//		gNav->idleTime = 0;
+		gMenuPick = entry->id;
 
-static void NavigateSubmenuButton(const MenuItem* entry)
-{
-	if (IsNeedDown(kNeed_UIConfirm) || (gMouseHoverValidRow && IsClickDown(SDL_BUTTON_LEFT)))
-	{
-		if (gMenuStyle->playMenuChangeSounds)
-			PlayMenuChangeEffect();
+		if (entry->callback)
+		{
+			entry->callback();
+		}
 
-		BounceCursorDot();
+		switch (entry->next)
+		{
+			case 0:
+			case 'NOOP':
+				PlayEffect(kSfxCycle);
+				BounceCursorDot();
+				break;
 
-		MyFlushEvents();	// flush keypresses
+			case 'EXIT':
+				PlayMenuChangeEffect();
+				gMenuState = kMenuStateFadeOut;
+				break;
 
-		LayOutMenu(entry->submenu.menu);
+			case 'BACK':
+				PlayMenuChangeEffect();
+				GoBackInHistory();
+				break;
+
+			default:
+				SaveSelectedRowInHistory();  // remember which row we were on
+
+				// advance history
+				gMenuHistoryPos++;
+				GAME_ASSERT(gMenuHistoryPos < MAX_STACK_LENGTH);
+				gMenuHistory[gMenuHistoryPos].menuID = entry->next;
+				gMenuHistory[gMenuHistoryPos].row = 0;  // don't reuse stale row value
+
+				PlayMenuChangeEffect();
+				LayOutMenu(entry->next);
+		}
 	}
 }
 
@@ -574,8 +608,8 @@ static void NavigateCycler(const MenuItem* entry)
 			*entry->cycler.valuePtr = value;
 		}
 
-		if (entry->cycler.callback)
-			entry->cycler.callback();
+		if (entry->callback)
+			entry->callback();
 
 		LayOutCyclerValueText(gMenuRow);
 	}
@@ -722,13 +756,23 @@ static void NavigateMenu(void)
 	GAME_ASSERT(gMenuStyle->isInteractive);
 
 	if (IsNeedDown(kNeed_UIBack))
-		MenuCallback_Back();
+	{
+		PlayMenuChangeEffect();
+		GoBackInHistory();
+		return;
+	}
 
 	if (IsNeedDown(kNeed_UIUp))
+	{
 		NavigateSettingEntriesVertically(-1);
+		SaveSelectedRowInHistory();
+	}
 
 	if (IsNeedDown(kNeed_UIDown))
+	{
 		NavigateSettingEntriesVertically(1);
+		SaveSelectedRowInHistory();
+	}
 
 	NavigateSettingEntriesMouseHover();
 
@@ -736,31 +780,23 @@ static void NavigateMenu(void)
 
 	switch (entry->type)
 	{
-		case kMenuItem_Action:
-			NavigateAction(entry);
-			break;
-
-		case kMenuItem_Pick:
+		case kMIPick:
 			NavigatePick(entry);
 			break;
 
-		case kMenuItem_Submenu:
-			NavigateSubmenuButton(entry);
-			break;
-
-		case kMenuItem_Cycler:
+		case kMICycler:
 			NavigateCycler(entry);
 			break;
 
-		case kMenuItem_KeyBinding:
+		case kMIKeyBinding:
 			NavigateKeyBinding(entry);
 			break;
 
-		case kMenuItem_PadBinding:
+		case kMIPadBinding:
 			NavigatePadBinding(entry);
 			break;
 
-		case kMenuItem_MouseBinding:
+		case kMIMouseBinding:
 			NavigateMouseBinding(entry);
 
 		default:
@@ -778,7 +814,7 @@ static void UnbindScancodeFromAllRemappableInputNeeds(int16_t sdlScancode)
 {
 	for (int row = 0; row < gNumMenuEntries; row++)
 	{
-		if (gMenu[row].type != kMenuItem_KeyBinding)
+		if (gMenu[row].type != kMIKeyBinding)
 			continue;
 
 		InputBinding* binding = GetBindingAtRow(row);
@@ -797,7 +833,7 @@ static void UnbindPadButtonFromAllRemappableInputNeeds(int8_t type, int8_t id)
 {
 	for (int row = 0; row < gNumMenuEntries; row++)
 	{
-		if (gMenu[row].type != kMenuItem_PadBinding)
+		if (gMenu[row].type != kMIPadBinding)
 			continue;
 
 		InputBinding* binding = GetBindingAtRow(row);
@@ -818,7 +854,7 @@ static void UnbindMouseButtonFromAllRemappableInputNeeds(int8_t id)
 {
 	for (int row = 0; row < gNumMenuEntries; row++)
 	{
-		if (gMenu[row].type != kMenuItem_MouseBinding)
+		if (gMenu[row].type != kMIMouseBinding)
 			continue;
 
 		InputBinding* binding = GetBindingAtRow(row);
@@ -982,9 +1018,9 @@ static void MoveCursorDot(ObjNode* theNode)
 
 	int column = 0;
 
-	if (gMenu[gMenuRow].type == kMenuItem_KeyBinding)
+	if (gMenu[gMenuRow].type == kMIKeyBinding)
 		column = 1+gKeyColumn;
-	else if (gMenu[gMenuRow].type == kMenuItem_PadBinding)
+	else if (gMenu[gMenuRow].type == kMIPadBinding)
 		column = 1+gPadColumn;
 	else
 		column = 0;
@@ -1161,20 +1197,18 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 	return node;
 }
 
-static const float kMenuItemHeightMultipliers[kMenuItem_NUM_ITEM_TYPES] =
+static const float kMenuItemHeightMultipliers[kMI_COUNT] =
 {
-	[kMenuItem_END_SENTINEL] = 0.0f,
-	[kMenuItem_Title]        = 1.4f,
-	[kMenuItem_Subtitle]     = 0.8f,
-	[kMenuItem_Label]        = 1,
-	[kMenuItem_Action]       = 1,
-	[kMenuItem_Submenu]      = 1,
-	[kMenuItem_Spacer]       = 0.5f,
-	[kMenuItem_Cycler]       = 1,
-	[kMenuItem_Pick]         = 1,
-	[kMenuItem_KeyBinding]   = 1,
-	[kMenuItem_PadBinding]   = 1,
-	[kMenuItem_MouseBinding] = 1,
+	[kMISENTINEL]     = 0.0f,
+	[kMITitle]        = 1.4f,
+	[kMISubtitle]     = 0.8f,
+	[kMILabel]        = 1,
+	[kMISpacer]       = 0.5f,
+	[kMICycler]       = 1,
+	[kMIPick]         = 1,
+	[kMIKeyBinding]   = 1,
+	[kMIPadBinding]   = 1,
+	[kMIMouseBinding] = 1,
 };
 
 static const char* GetMenuItemLabel(const MenuItem* entry)
@@ -1233,26 +1267,38 @@ static void LayOutCycler(int row, float sweepFactor)
 	node2->SpecialSweepTimer = sweepFactor;
 }
 
-static void LayOutMenu(const MenuItem* menu)
+static void LayOutMenu(int menuID)
 {
+	const MenuItem* menuStartSentinel = LookUpMenu(menuID);
+
+	GAME_ASSERT(menuStartSentinel);
+	GAME_ASSERT(menuStartSentinel->id == menuID);
+	GAME_ASSERT(menuStartSentinel->type == kMISENTINEL);
+
 	static char buf[64];
 
-	bool enteringNewMenu = menu != gMenu;
+	// Get first item in menu
+	const MenuItem* menu = menuStartSentinel+1;
 
-	if (gMenu == gRootMenu)				// save position in root menu
-		gLastRowOnRootMenu = gMenuRow;
+	// Remember we've been in this menu
+	gMenuHistory[gMenuHistoryPos].menuID = menuID;
+
+//	bool enteringNewMenu = menu != gMenu;
+//
+//	if (gMenu == gRootMenu)				// save position in root menu
+//		gLastRowOnRootMenu = gMenuRow;
 
 	gMenu			= menu;
 	gNumMenuEntries	= 0;
 	gMenuPick		= -1;
 
-	if (enteringNewMenu)
-	{
-		gMenuRow		= -1;
-
-		if (menu == gRootMenu && gLastRowOnRootMenu >= 0)				// restore position in root menu
-			gMenuRow = gLastRowOnRootMenu;
-	}
+//	if (enteringNewMenu)
+//	{
+//		gMenuRow		= -1;
+//
+//		if (menu == gRootMenu && gLastRowOnRootMenu >= 0)				// restore position in root menu
+//			gMenuRow = gLastRowOnRootMenu;
+//	}
 
 	DeleteAllText();
 
@@ -1262,7 +1308,7 @@ static void LayOutMenu(const MenuItem* menu)
 	gNewObjectDefinition.slot		= MENU_SLOT;
 
 	float totalHeight = 0;
-	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)
+	for (int row = 0; menu[row].type != kMISENTINEL; row++)
 	{
 		totalHeight += kMenuItemHeightMultipliers[menu[row].type] * gMenuStyle->rowHeight;
 	}
@@ -1272,7 +1318,7 @@ static void LayOutMenu(const MenuItem* menu)
 
 	float sweepFactor = 0.0f;
 
-	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)
+	for (int row = 0; menu[row].type != kMISENTINEL; row++)
 	{
 		gMenuRowYs[row] = y;
 
@@ -1282,10 +1328,10 @@ static void LayOutMenu(const MenuItem* menu)
 
 		switch (entry->type)
 		{
-			case kMenuItem_Spacer:
+			case kMISpacer:
 				break;
 
-			case kMenuItem_Title:
+			case kMITitle:
 			{
 				gNewObjectDefinition.scale = gMenuStyle->titleScale;
 				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
@@ -1295,7 +1341,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_Subtitle:
+			case kMISubtitle:
 			{
 				gNewObjectDefinition.scale = gMenuStyle->subtitleScale;
 				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
@@ -1305,7 +1351,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_Label:
+			case kMILabel:
 			{
 				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor;
@@ -1314,9 +1360,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_Action:
-			case kMenuItem_Pick:
-			case kMenuItem_Submenu:
+			case kMIPick:
 			{
 				ObjNode* node = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				node->MoveCall = MoveAction;
@@ -1324,13 +1368,13 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_Cycler:
+			case kMICycler:
 			{
 				LayOutCycler(row, sweepFactor);
 				break;
 			}
 
-			case kMenuItem_KeyBinding:
+			case kMIKeyBinding:
 			{
 				SDL_snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
@@ -1349,7 +1393,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_PadBinding:
+			case kMIPadBinding:
 			{
 				SDL_snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
@@ -1367,7 +1411,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
-			case kMenuItem_MouseBinding:
+			case kMIMouseBinding:
 			{
 				SDL_snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
@@ -1389,26 +1433,81 @@ static void LayOutMenu(const MenuItem* menu)
 
 		y += kMenuItemHeightMultipliers[entry->type] * gMenuStyle->rowHeight;
 
-//		if (entry->type != kMenuItem_Spacer)
+//		if (entry->type != kMISpacer)
 //			sweepFactor -= .2f;
 
 		gNumMenuEntries++;
 		GAME_ASSERT(gNumMenuEntries < MAX_MENU_ROWS);
 	}
 
-	if (gMenuRow < 0)
+	// Restore old focus row from history
+	gMenuRow = gMenuHistory[gMenuHistoryPos].row;
+
+	// If there was no valid focus row in history, fall back to first interactable row
+	if (gMenuRow <= 0)
 	{
 		// Scroll down to first pickable entry
 		gMenuRow = -1;
 		NavigateSettingEntriesVertically(1);
+	}
+
+	// Now that the contents of the menu have been laid out,
+	// call start sentinel's callback, if any
+	if (menuStartSentinel->callback)
+	{
+		menuStartSentinel->callback();
 	}
 }
 
 void LayoutCurrentMenuAgain(void)
 {
 	GAME_ASSERT(gMenu);
-	LayOutMenu(gMenu);
+	GAME_ASSERT(gMenu[-1].type == kMISENTINEL);
+	GAME_ASSERT(gMenu[-1].id != 0);
+
+	SaveSelectedRowInHistory();
+	LayOutMenu(gMenu[-1].id);
 }
+
+#pragma mark - Menu registry
+
+void RegisterMenu(const MenuItem* menuTree)
+{
+	for (const MenuItem* menuItem = menuTree; menuItem->type || menuItem->id; menuItem++)
+	{
+		if (menuItem->type == 0)
+		{
+			if (menuItem->id == 0)			// end sentinel
+			{
+				break;
+			}
+
+			if (LookUpMenu(menuItem->id))	// already registered
+			{
+				continue;
+			}
+
+			GAME_ASSERT(gNumMenusRegistered < MAX_REGISTERED_MENUS);
+			gMenuRegistry[gNumMenusRegistered] = menuItem;
+			gNumMenusRegistered++;
+
+//			printf("Registered menu '%s'\n", FourccToString(menuItem->id));
+		}
+	}
+}
+
+static const MenuItem* LookUpMenu(int menuID)
+{
+	for (int i = 0; i < gNumMenusRegistered; i++)
+	{
+		if (gMenuRegistry[i]->id == menuID)
+			return gMenuRegistry[i];
+	}
+
+	return NULL;
+}
+
+#pragma mark - Start
 
 int StartMenu(
 		const MenuItem* menu,
@@ -1423,13 +1522,17 @@ int StartMenu(
 
 		/* INITIALIZE MENU STATE */
 
-	SDL_memset(gMenuObjects, 0, sizeof(gMenuObjects));
+	SDL_zeroa(gMenuObjects);
 	gMenuStyle			= style? style: &kDefaultMenuStyle;
-	gRootMenu			= menu;
 	gMenuState			= kMenuStateFadeIn;
 	gMenuFadeAlpha		= 0;
 	gMenuRow			= -1;
-	gLastRowOnRootMenu	= -1;
+
+	gNumMenusRegistered = 0;
+	RegisterMenu(menu);
+
+	gMenuHistoryPos		= 0;
+	SDL_zeroa(gMenuHistory);
 
 		/* LAY OUT MENU COMPONENTS */
 
@@ -1444,7 +1547,7 @@ int StartMenu(
 		pane->StatusBits |= STATUS_BIT_MOVEINPAUSE;
 	}
 
-	LayOutMenu(menu);
+	LayOutMenu(menu[0].id);
 
 		/* SHOW IN ANIMATED LOOP */
 
@@ -1489,7 +1592,8 @@ int StartMenu(
 				}
 				else if (UserWantsOut())
 				{
-					MenuCallback_Back();
+					PlayMenuChangeEffect();
+					GoBackInHistory();
 				}
 				break;
 

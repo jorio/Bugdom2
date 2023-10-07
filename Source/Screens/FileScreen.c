@@ -14,21 +14,22 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 	char* labelBuffer = AllocPtrClear(maxLabelLength * (NUM_SAVE_SLOTS + 1));
 	char* labelBufferPos = labelBuffer;
 
-	MenuItem menu[NUM_SAVE_SLOTS+5+1];
+	MenuItem menu[NUM_SAVE_SLOTS+5+2];
 	memset(menu, 0, sizeof(menu));
 
 	int menuIndex = 0;
 
-	menu[menuIndex++] = (MenuItem) { .type=kMenuItem_Title, .text=(isSave ? STR_SAVE_GAME : STR_LOAD_GAME) };
+	menu[menuIndex++] = (MenuItem) { .id='file' };
+	menu[menuIndex++] = (MenuItem) { .type=kMITitle, .text=(isSave ? STR_SAVE_GAME : STR_LOAD_GAME) };
 
 	if (isSave)
 	{
 		LocalizeWithPlaceholder(STR_SAVE_WHERE, labelBufferPos, maxLabelLength, "%d", gLevelNum+2);
-		menu[menuIndex++] = (MenuItem){ .type = kMenuItem_Subtitle, .rawText=labelBufferPos };
+		menu[menuIndex++] = (MenuItem){ .type = kMISubtitle, .rawText=labelBufferPos };
 		labelBufferPos += maxLabelLength;
 	}
 
-	menu[menuIndex++] = (MenuItem) { .type=kMenuItem_Spacer };
+	menu[menuIndex++] = (MenuItem) { .type=kMISpacer };
 
 	for (int i = 0; i < NUM_SAVE_SLOTS; i++)
 	{
@@ -46,12 +47,13 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 
 			if (isSave)
 			{
-				mi->type = kMenuItem_Pick;
-				mi->pick = i;
+				mi->type = kMIPick;
+				mi->id = i;
+				mi->next = 'EXIT';
 			}
 			else
 			{
-				mi->type = kMenuItem_Label;
+				mi->type = kMILabel;
 			}
 		}
 		else
@@ -76,21 +78,22 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 				Localize(STR_LEVEL), saveData.realLevel+1,
 				day, Localize(month + STR_JANUARY), year);
 
-			mi->type = kMenuItem_Pick;
-			mi->pick = i;
+			mi->type = kMIPick;
+			mi->id = i;
 			mi->text = -1;
 			mi->rawText = labelBufferPos;
+			mi->next = 'EXIT';
 
 			labelBufferPos += maxLabelLength;
 		}
 	}
 
-	menu[menuIndex++].type = kMenuItem_Spacer;
+	menu[menuIndex++].type = kMISpacer;
 
-	menu[menuIndex++] = (MenuItem) {.type=kMenuItem_Action, .action.callback = MenuCallback_Back,
+	menu[menuIndex++] = (MenuItem) {.type=kMIPick, .next='EXIT', .id=-1,
 									.text = isSave ? STR_CONTINUE_WITHOUT_SAVING : STR_BACK };
 
-	menu[menuIndex++].type = kMenuItem_END_SENTINEL;
+	menu[menuIndex++] = (MenuItem) {.id=0};
 
 	GAME_ASSERT(menuIndex <= (int) SDL_arraysize(menu));
 

@@ -63,6 +63,11 @@ static void cb_ResetMouseBindings(void)
 	LayoutCurrentMenuAgain();
 }
 
+//static const char* GenerateVideoLabel(void)
+//{
+//	return glGetString(GL_RENDERER);
+//}
+
 static const char* GenerateGamepadLabel(void)
 {
 	SDL_GameController* controller = GetController();
@@ -113,204 +118,19 @@ static void SetFullscreenModeFromPrefs(void)
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
 
-static const MenuItem gKeybindingMenu[] =
+static const MenuItem kSettingsMenuTree[] =
 {
-	{.type = kMenuItem_Title, .text = STR_CONFIGURE_KEYBOARD},
-	{.type = kMenuItem_Subtitle, .text = STR_CONFIGURE_KEYBOARD_HELP},
-	{.type = kMenuItem_Spacer},
-
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Forward },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Backward },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnLeft },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_TurnRight },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_AutoWalk },
-	
-	{ .type = kMenuItem_Spacer },
-
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Jump },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Kick },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_PickupDrop },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_LaunchBuddy },
-
-	{ .type = kMenuItem_Spacer },
-
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_CameraLeft },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_CameraRight },
-	{ .type = kMenuItem_KeyBinding, .kb = kNeed_CameraMode },
-
-	{ .type = kMenuItem_Spacer },
-
+	{.id='sett'},
+	{.type = kMITitle, .text = STR_SETTINGS},
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_VIDEO_SETTINGS, .next = 'vide' },
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_CONFIGURE_KEYBOARD, .next = 'keyb' },
+	{.type = kMIPick, .text = STR_CONFIGURE_MOUSE, .next = 'mous' },
+	{.type = kMIPick, .text = STR_CONFIGURE_GAMEPAD, .next = 'gpad' },
+	{.type = kMISpacer},
 	{
-		.type = kMenuItem_Action,
-		.text = STR_RESET_KEYBINDINGS,
-		.action = { .callback = cb_ResetKeyBindings },
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_BACK,
-		.action = { .callback = MenuCallback_Back },
-	},
-
-	{ .type = kMenuItem_END_SENTINEL }
-};
-
-static const MenuItem gGamepadMenu[] =
-{
-	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
-	{.type = kMenuItem_Subtitle, .generateText = GenerateGamepadLabel },
-	{.type = kMenuItem_Subtitle, .text = STR_CONFIGURE_GAMEPAD_HELP},
-	
-	{.type = kMenuItem_Spacer },
-
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_Forward },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_Backward },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnLeft },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_TurnRight },
-	
-	{.type = kMenuItem_Spacer },
-
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_Jump },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_Kick },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_LaunchBuddy },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_PickupDrop },
-	
-	
-	{ .type = kMenuItem_Spacer },
-
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraLeft },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraRight },
-	{ .type = kMenuItem_PadBinding, .kb = kNeed_CameraMode },
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_RESET_KEYBINDINGS,
-		.action = { .callback = cb_ResetPadBindings },
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_GAMEPAD_RUMBLE,
-		.cycler =
-		{
-			.callback = cb_SetRumble,
-			.valuePtr = &gGamePrefs.gamepadRumble,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_BACK,
-		.action = { .callback = MenuCallback_Back },
-	},
-
-	{ .type = kMenuItem_END_SENTINEL }
-};
-
-static const MenuItem gMouseMenu[] =
-{
-	{.type = kMenuItem_Title, .text = STR_CONFIGURE_MOUSE},
-	{.type = kMenuItem_Spacer},
-
-	/*
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_MOUSE_CONTROL_TYPE,
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.mouseControlsOtto,
-			.numChoices = 2,
-			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_OTTO},
-		},
-	},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_MOUSE_SENSITIVITY,
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.mouseSensitivityLevel,
-			.numChoices = NUM_MOUSE_SENSITIVITY_LEVELS,
-			.choices =
-			{
-				STR_MOUSE_SENSITIVITY_1,
-				STR_MOUSE_SENSITIVITY_2,
-				STR_MOUSE_SENSITIVITY_3,
-				STR_MOUSE_SENSITIVITY_4,
-				STR_MOUSE_SENSITIVITY_5,
-				STR_MOUSE_SENSITIVITY_6,
-				STR_MOUSE_SENSITIVITY_7,
-				STR_MOUSE_SENSITIVITY_8,
-			},
-		},
-	},
-
-	{ .type = kMenuItem_Spacer },
-	 */
-
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_Jump },
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_Kick },
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_PickupDrop },
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_LaunchBuddy },
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_AutoWalk },
-	{ .type = kMenuItem_MouseBinding, .kb = kNeed_CameraMode },
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_RESET_KEYBINDINGS,
-		.action = { .callback = cb_ResetMouseBindings },
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_BACK,
-		.action = { .callback = MenuCallback_Back },
-	},
-
-	{ .type = kMenuItem_END_SENTINEL }
-};
-
-static const MenuItem gSettingsMenu[] =
-{
-	{.type = kMenuItem_Title, .text = STR_SETTINGS},
-	{.type = kMenuItem_Spacer},
-
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_KEYBOARD,
-		.submenu = {.menu = gKeybindingMenu},
-	},
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_MOUSE,
-		.submenu = {.menu = gMouseMenu},
-	},
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_GAMEPAD,
-		.submenu = {.menu = gGamepadMenu},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_DIFFICULTY,
 		.cycler =
 		{
@@ -320,19 +140,18 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_MUSIC,
+		.callback = EnforceMusicPausePref,
 		.cycler =
 		{
-			.callback = EnforceMusicPausePref,
 			.valuePtr = &gGamePrefs.music,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text= STR_UI_SPACING,
 		.cycler =
 		{
@@ -341,9 +160,20 @@ static const MenuItem gSettingsMenu[] =
 			.choices = {STR_UI_SPREAD, STR_UI_CENTERED},
 		},
 	},
+	{
+		.type = kMICycler,
+		.text = STR_LANGUAGE,
+		.callback = cb_SetLanguage,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.language,
+			.numChoices = NUM_LANGUAGES,
+			.generateChoiceString = GenerateCurrentLanguageName,
+		},
+	},
 /*
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_UI_SCALE,
 		.cycler =
 		{
@@ -363,36 +193,38 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 */
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_BACK, .next = 'BACK'},
 
-	{ .type = kMenuItem_Spacer },
-
+	{.id='vide'},
+	{.type = kMITitle, .text = STR_VIDEO_SETTINGS},
+//	{.type = kMISubtitle, .generateText = GenerateVideoLabel},
+	{.type = kMISpacer},
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_FULLSCREEN,
+		.callback = SetFullscreenModeFromPrefs,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
 			.valuePtr = &gGamePrefs.fullscreen,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_VSYNC,
+		.callback = SetFullscreenModeFromPrefs,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
 			.valuePtr = &gGamePrefs.vsync,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-
 #if !(__APPLE__ && __x86_64__)		// On macOS, don't expose AA to old machines
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_ANTIALIASING,
 		.cycler =
 		{
@@ -402,74 +234,159 @@ static const MenuItem gSettingsMenu[] =
 		}
 	},
 #endif
-
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_PREFERRED_DISPLAY,
+		.callback = SetFullscreenModeFromPrefs,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
 			.valuePtr = &gGamePrefs.monitorNum,
 			.generateNumChoices = GenerateNumDisplays,
 			.generateChoiceString = GenerateDisplayName,
 		},
 	},
-
 	{
-		.type = kMenuItem_Cycler,
+		.type = kMICycler,
 		.text = STR_ANAGLYPH,
+		.callback = cb_ChangeAnaglyphMode,
 		.cycler =
 		{
-			.callback = cb_ChangeAnaglyphMode,
 			.valuePtr = &gGamePrefs.anaglyph,
 			.numChoices = 3,
 			.choices = {STR_OFF, STR_ANAGLYPH_COLOR, STR_ANAGLYPH_MONOCHROME},
 		},
 	},
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_BACK, .next = 'BACK'},
 
-	{ .type = kMenuItem_Spacer },
+	{.id='keyb'},
+	{.type = kMITitle, .text = STR_CONFIGURE_KEYBOARD},
+	{.type = kMISubtitle, .text = STR_CONFIGURE_KEYBOARD_HELP},
+	{.type = kMISpacer},
+	{.type = kMIKeyBinding, .kb = kNeed_Forward},
+	{.type = kMIKeyBinding, .kb = kNeed_Backward},
+	{.type = kMIKeyBinding, .kb = kNeed_TurnLeft},
+	{.type = kMIKeyBinding, .kb = kNeed_TurnRight},
+	{.type = kMIKeyBinding, .kb = kNeed_AutoWalk},
+	{.type = kMISpacer},
+	{.type = kMIKeyBinding, .kb = kNeed_Jump},
+	{.type = kMIKeyBinding, .kb = kNeed_Kick},
+	{.type = kMIKeyBinding, .kb = kNeed_PickupDrop},
+	{.type = kMIKeyBinding, .kb = kNeed_LaunchBuddy},
+	{.type = kMISpacer},
+	{.type = kMIKeyBinding, .kb = kNeed_CameraLeft},
+	{.type = kMIKeyBinding, .kb = kNeed_CameraRight},
+	{.type = kMIKeyBinding, .kb = kNeed_CameraMode},
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_RESET_KEYBINDINGS, .callback = cb_ResetKeyBindings},
+	{.type = kMISpacer},
+	{.type = kMIPick, .text = STR_BACK, .next = 'BACK'},
 
+	{.id='gpad'},
+//	{.type = kMITitle, .text = STR_CONFIGURE_GAMEPAD},
+//	{.type = kMISubtitle, .generateText = GenerateGamepadLabel },
+	{.type = kMITitle, .generateText = GenerateGamepadLabel },
+	{.type = kMISubtitle, .text = STR_CONFIGURE_GAMEPAD_HELP},
+	{.type = kMISpacer },
+	{.type = kMIPadBinding, .kb = kNeed_Forward },
+	{.type = kMIPadBinding, .kb = kNeed_Backward },
+	{.type = kMIPadBinding, .kb = kNeed_TurnLeft },
+	{.type = kMIPadBinding, .kb = kNeed_TurnRight },
+	{.type = kMISpacer },
+	{.type = kMIPadBinding, .kb = kNeed_Jump },
+	{.type = kMIPadBinding, .kb = kNeed_Kick },
+	{.type = kMIPadBinding, .kb = kNeed_LaunchBuddy },
+	{.type = kMIPadBinding, .kb = kNeed_PickupDrop },
+	{.type = kMISpacer },
+	{.type = kMIPadBinding, .kb = kNeed_CameraLeft },
+	{.type = kMIPadBinding, .kb = kNeed_CameraRight },
+	{.type = kMIPadBinding, .kb = kNeed_CameraMode },
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_RESET_KEYBINDINGS, .callback = cb_ResetPadBindings},
+	{.type = kMISpacer },
 	{
-		.type = kMenuItem_Cycler,
-		.text = STR_LANGUAGE,
+		.type = kMICycler,
+		.text = STR_GAMEPAD_RUMBLE,
+		.callback = cb_SetRumble,
 		.cycler =
 		{
-			.callback = cb_SetLanguage,
-			.valuePtr = &gGamePrefs.language,
-			.numChoices = NUM_LANGUAGES,
-			.generateChoiceString = GenerateCurrentLanguageName,
+			.valuePtr = &gGamePrefs.gamepadRumble,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
 		},
 	},
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_BACK,  .next = 'BACK'},
 
-
-	{ .type = kMenuItem_Spacer },
+	{.id='mous'},
+	{.type = kMITitle, .text = STR_CONFIGURE_MOUSE},
+	{.type = kMISpacer},
+	/*
 	{
-		.type = kMenuItem_Action,
-		.text = STR_BACK,
-		.action = { .callback = MenuCallback_Back },
+		.type = kMICycler,
+		.text = STR_MOUSE_CONTROL_TYPE,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.mouseControlsOtto,
+			.numChoices = 2,
+			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_OTTO},
+		},
 	},
-
-	{ .type = kMenuItem_END_SENTINEL }
+	{
+		.type = kMICycler,
+		.text = STR_MOUSE_SENSITIVITY,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.mouseSensitivityLevel,
+			.numChoices = NUM_MOUSE_SENSITIVITY_LEVELS,
+			.choices =
+			{
+				STR_MOUSE_SENSITIVITY_1,
+				STR_MOUSE_SENSITIVITY_2,
+				STR_MOUSE_SENSITIVITY_3,
+				STR_MOUSE_SENSITIVITY_4,
+				STR_MOUSE_SENSITIVITY_5,
+				STR_MOUSE_SENSITIVITY_6,
+				STR_MOUSE_SENSITIVITY_7,
+				STR_MOUSE_SENSITIVITY_8,
+			},
+		},
+	},
+	{ .type = kMISpacer },
+	 */
+	{.type = kMIMouseBinding, .kb = kNeed_Jump },
+	{.type = kMIMouseBinding, .kb = kNeed_Kick },
+	{.type = kMIMouseBinding, .kb = kNeed_PickupDrop },
+	{.type = kMIMouseBinding, .kb = kNeed_LaunchBuddy },
+	{.type = kMIMouseBinding, .kb = kNeed_AutoWalk },
+	{.type = kMIMouseBinding, .kb = kNeed_CameraMode },
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_RESET_KEYBINDINGS, .callback = cb_ResetMouseBindings },
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_BACK, .next = 'BACK'},
+	{ .id=0 }		// end of menu tree
 };
 
 static const MenuItem kAntialiasingWarning[] =
 {
-	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
-	{ .type = kMenuItem_END_SENTINEL },
+	{.id='w_aa'},
+	{.type = kMILabel, .text = STR_ANTIALIASING_CHANGE_WARNING },
+	{.type = kMISpacer },
+	{.type = kMISpacer },
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_OK, .next = 'BACK' },
+	{.id = 0 },
 };
 
 static const MenuItem kAnaglyphWarning[] =
 {
-	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Spacer },
-	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
-	{ .type = kMenuItem_END_SENTINEL },
+	{.id='w_ag'},
+	{.type = kMILabel, .text = STR_ANAGLYPH_TOGGLE_WARNING },
+	{.type = kMISpacer },
+	{.type = kMISpacer },
+	{.type = kMISpacer },
+	{.type = kMIPick, .text = STR_OK, .next = 'BACK' },
+	{.id = 0 },
 };
 
 #pragma mark -
@@ -478,8 +395,7 @@ static const MenuItem kAnaglyphWarning[] =
 /*                          RUNNER                             */
 /***************************************************************/
 
-void DoSettingsOverlay(void (*moveCall)(void),
-					   void (*drawCall)(void))
+void DoSettingsOverlay(void (*moveCall)(void), void (*drawCall)(void))
 {
 	gAllowAudioKeys = false;					// don't interfere with keyboard binding
 
@@ -487,7 +403,7 @@ void DoSettingsOverlay(void (*moveCall)(void),
 
 	PrefsType gPreviousPrefs = gGamePrefs;
 
-	StartMenu(gSettingsMenu, nil, moveCall, drawCall);
+	StartMenu(kSettingsMenuTree, nil, moveCall, drawCall);
 
 	// Save prefs if any changes
 	if (0 != SDL_memcmp(&gGamePrefs, &gPreviousPrefs, sizeof(gGamePrefs)))

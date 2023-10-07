@@ -4,46 +4,34 @@
 
 typedef enum
 {
-	kMenuItem_END_SENTINEL,
-	kMenuItem_Title,
-	kMenuItem_Subtitle,
-	kMenuItem_Label,
-	kMenuItem_Action,
-	kMenuItem_Submenu,
-	kMenuItem_Spacer,
-	kMenuItem_Cycler,
-	kMenuItem_Pick,
-	kMenuItem_KeyBinding,
-	kMenuItem_PadBinding,
-	kMenuItem_MouseBinding,
-	kMenuItem_NUM_ITEM_TYPES
+	kMISENTINEL,
+	kMIPick,
+	kMILabel,
+	kMISpacer,
+	kMICycler,
+	kMITitle,
+	kMISubtitle,
+	kMIKeyBinding,
+	kMIPadBinding,
+	kMIMouseBinding,
+	kMI_COUNT,
 } MenuItemType;
 
 typedef struct MenuItem
 {
 	MenuItemType			type;
-
 	LocStrID				text;
 	const char*				rawText;
+	int32_t					id;			// value stored in gMenuOutcome when exiting menu
+	int32_t					next;		// next menu ID, or one of 'EXIT', 'BACK' or 0 (no-op)
 	const char*				(*generateText)(void);
+	void					(*callback)(void);
 
 	union
 	{
 		struct
 		{
-			void			(*callback)(void);
-		} action;
-
-		struct
-		{
-			const struct MenuItem* menu;
-		} submenu;
-
-		struct
-		{
 			Byte*			valuePtr;
-
-			void			(*callback)(void);
 			bool			callbackSetsValue;
 
 			uint8_t			numChoices;
@@ -52,8 +40,6 @@ typedef struct MenuItem
 			uint8_t			(*generateNumChoices)(void);
 			const char*		(*generateChoiceString)(char* buf, int bufSize, Byte value);
 		} cycler;
-
-		int					pick;
 
 		int 				kb;
 	};
@@ -78,6 +64,7 @@ typedef struct MenuStyle
 	float			darkenPaneOpacity;
 	bool			startButtonExits;
 	bool			isInteractive;
+	bool			canBackOutOfRootMenu;
 	OGLVector2D		offset;
 } MenuStyle;
 
@@ -89,4 +76,3 @@ int StartMenu(
 		void (*moveCall)(void),
 		void (*drawCall)(void));
 void LayoutCurrentMenuAgain(void);
-void MenuCallback_Back(void);

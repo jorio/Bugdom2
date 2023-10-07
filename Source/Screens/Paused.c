@@ -29,10 +29,11 @@
 
 static const MenuItem gPauseMenu[] =
 {
-	{.type = kMenuItem_Pick, .pick = 0, .text = STR_RESUME },
-	{.type = kMenuItem_Pick, .pick = 1, .text = STR_SETTINGS },
-	{.type = kMenuItem_Pick, .pick = 2, .text = STR_RETIRE },
-	{ .type = kMenuItem_END_SENTINEL }
+	{.id='paus'},
+	{.type = kMIPick, .id = 0, .next = 'EXIT', .text = STR_RESUME },
+	{.type = kMIPick, .id = 1, .next = 'EXIT', .text = STR_SETTINGS },
+	{.type = kMIPick, .id = 2, .next = 'EXIT', .text = STR_RETIRE },
+	{.id=0},
 };
 
 
