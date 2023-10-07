@@ -360,7 +360,7 @@ static void PlayArea_Terrain(void)
 			gPlayerInfo.hasMap = true;
 		}
 
-		if (IsKeyActive(SDL_SCANCODE_F) && IsKeyActive(SDL_SCANCODE_E) && IsKeyActive(SDL_SCANCODE_N) && IsKeyHeld(SDL_SCANCODE_C))
+		if (IsKeyActive(SDL_SCANCODE_F) && IsKeyActive(SDL_SCANCODE_N) && IsKeyActive(SDL_SCANCODE_C))
 		{
 			gNumFences = -gNumFences;					// toggle fences
 			InvalidateAllInputs();
