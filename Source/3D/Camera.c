@@ -763,6 +763,10 @@ got_target:
 				/* ROTATE BY USER ROT */
 
 	float cameraDelta = GetNeedAnalogSteering(kNeed_CameraLeft, kNeed_CameraRight);
+
+	if (!gGamePrefs.mouseControlsSkip)
+		cameraDelta += GetMouseDelta().x * 0.015f;
+
 	if (cameraDelta != 0)
 	{
 		float r = -cameraDelta * fps * 2.5f;

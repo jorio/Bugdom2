@@ -68,6 +68,7 @@ typedef struct
 	Boolean	fullscreen;
 	Boolean	uiCentering;
 
+	Boolean	mouseControlsSkip;
 	Byte	mouseSensitivityLevel;
 	Byte	gamepadRumbleLevel;
 	InputBinding	bindings[NUM_CONTROL_NEEDS];

@@ -55,6 +55,8 @@ static void cb_ResetMouseBindings(void)
 		gGamePrefs.bindings[i].mouseButton = kDefaultInputBindings[i].mouseButton;
 	}
 
+	gGamePrefs.mouseControlsSkip = true;
+
 	MyFlushEvents();
 	PlayEffect(EFFECT_BOTTLECRACK);
 	LayoutCurrentMenuAgain();
@@ -328,17 +330,17 @@ static const MenuItem kSettingsMenuTree[] =
 	{.id='mous'},
 	{.type = kMITitle, .text = STR_CONFIGURE_MOUSE},
 	{.type = kMISpacer},
-	/*
 	{
 		.type = kMICycler,
 		.text = STR_MOUSE_CONTROL_TYPE,
 		.cycler =
 		{
-			.valuePtr = &gGamePrefs.mouseControlsOtto,
+			.valuePtr = &gGamePrefs.mouseControlsSkip,
 			.numChoices = 2,
-			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_OTTO},
+			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_SKIP},
 		},
 	},
+/*
 	{
 		.type = kMICycler,
 		.text = STR_MOUSE_SENSITIVITY,
@@ -359,8 +361,8 @@ static const MenuItem kSettingsMenuTree[] =
 			},
 		},
 	},
+*/
 	{ .type = kMISpacer },
-	 */
 	{.type = kMIMouseBinding, .kb = kNeed_Jump },
 	{.type = kMIMouseBinding, .kb = kNeed_Kick },
 	{.type = kMIMouseBinding, .kb = kNeed_PickupDrop },

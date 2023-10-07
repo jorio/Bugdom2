@@ -908,7 +908,10 @@ static void SetPlayerAxisControls(void)
 	gPlayerInfo.analogControlZ = z;
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
-	
+
+	if (!gGamePrefs.mouseControlsSkip)
+		return;
+
 	OGLVector2D mouseDelta = GetMouseDelta();
 
 	float mouseDX = mouseDelta.x * 0.015f;						// scale down deltas for our use

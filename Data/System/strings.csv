@@ -436,6 +436,9 @@ Off,Aucune
 Low,Faible
 Medium,Moyenne
 High,Élevée
+Mouse motion,Mouvement souris,,,Movimenti del mouse
+Rotate the camera,La souris contrôle la caméra,,,Orienta videocamera
+Move Skip,La souris déplace Skip,,,Muovi Skip
 Restore default configuration,Restaurer la config. par défaut,Standardkonfiguration zurücksetzen,,Ripristina la configurazione predefinita,Återställ standardkonfiguration,
 ,,,,,,
 Turn Left,À gauche,Nach links,,Sinistra,Gå åt vänster,
