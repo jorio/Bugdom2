@@ -437,8 +437,11 @@ Low,Faible
 Medium,Moyenne
 High,Élevée
 Mouse motion,Mouvement souris,,,Movimenti del mouse
-Rotate the camera,La souris contrôle la caméra,,,Orienta videocamera
-Move Skip,La souris déplace Skip,,,Muovi Skip
+Rotates the camera,Orienter la caméra,,,Orienta videocamera
+Steers the character*,Diriger Skip*,,,Muovi Skip*
+"* We recommend using this setting in conjunction with the “Auto-Walk” key.
+That way you can steer with the mouse and use the shift key to walk forward.","* Nous recommandons d’utiliser ce réglage en combinaison avec la touche “Marcher en continu”.
+La souris vous permettra alors de vous diriger et la touche Majuscule d’avancer."
 Mouse sensitivity,Sensibilité,,,Sensibilità del mouse
 1/8
 2/8

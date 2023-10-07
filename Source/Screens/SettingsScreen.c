@@ -114,6 +114,42 @@ static void SetFullscreenModeFromPrefs(void)
 }
 
 /***************************************************************/
+/*                   MOUSE AUTO-WALK HINT                      */
+/***************************************************************/
+
+static void MoveMouseAutoWalkHint(ObjNode* theNode)
+{
+	if (gGamePrefs.mouseControlsSkip)
+	{
+		theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
+	else
+	{
+		theNode->StatusBits |= STATUS_BIT_HIDDEN;
+	}
+
+	if (GetCurrentMenuID() != 'mous')
+	{
+		DeleteObject(theNode);
+		return;
+	}
+}
+
+static void CreateMouseAutoWalkHint(void)
+{
+	NewObjectDefinitionType def =
+	{
+		.coord = {320, 470, 0},
+		.scale = 0.2f,
+		.group = ATLAS_GROUP_FONT1,
+		.slot = MENU_SLOT,
+		.moveCall = MoveMouseAutoWalkHint,
+		.flags = STATUS_BIT_MOVEINPAUSE,
+	};
+	TextMesh_New(Localize(STR_MOUSE_AUTOWALK_HINT), kTextMeshAlignBottom, &def);
+}
+
+/***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
 
@@ -327,7 +363,7 @@ static const MenuItem kSettingsMenuTree[] =
 	{.type = kMISpacer },
 	{.type = kMIPick, .text = STR_BACK,  .next = 'BACK'},
 
-	{.id='mous'},
+	{.id='mous', .callback=CreateMouseAutoWalkHint},
 	{.type = kMITitle, .text = STR_CONFIGURE_MOUSE},
 	{.type = kMISpacer},
 	{
