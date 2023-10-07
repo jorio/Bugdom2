@@ -105,9 +105,9 @@ static const Boolean gWaterGlow[NUM_WATER_TYPES] =
 
 static const OGLTextureCoord	gWaterScrollUVDeltas[NUM_WATER_TYPES][2] =
 {
-	.05,.07,		.03, .06,			// blue water
-	.03,.04,		.02, .03,			// pool water
-	.06,.08,		.04, .06,			// garbage water
+	{{.05,.07},		{.03, .06}},			// blue water
+	{{.03,.04},		{.02, .03}},			// pool water
+	{{.06,.08},		{.04, .06}},			// garbage water
 };
 
 

@@ -44,9 +44,9 @@ static void SeeIfAttachGliderWheel(ObjNode *glider, ObjNode *wheel);
 
 const OGLPoint3D gAxels[3] =
 {
-	-64, 2, -104,				// left wheel
-	64, 2, -104,				// right wheel
-	0,46,-142,					// prop
+	{-64, 2, -104},				// left wheel
+	{ 64, 2, -104},				// right wheel
+	{  0,46, -142},				// prop
 };
 
 static	ObjNode					*gGliderPart[3] = {nil, nil, nil};

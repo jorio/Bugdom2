@@ -146,8 +146,8 @@ ObjNode	*shadowObj = body->ShadowNode;
 OGLPoint3D offOut[2];
 static const OGLPoint3D off[2] =
 {
-	-5,0,0,
-	5,0,0
+	{-5,0,0},
+	{ 5,0,0},
 };
 
 	if (TrackTerrainItem(body))							// just check to see if it's gone

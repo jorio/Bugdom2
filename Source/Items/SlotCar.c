@@ -207,12 +207,13 @@ int	i,j;
 
 	for (j = 0; j < 4; j++)
 	{
-		const	OGLPoint3D	off[4] = {
-									 	-13, 11 ,75,
-									 	-9, 11 ,75,
-									 	13, 11 ,75,
-									 	9, 11 ,75,
-									 };
+		const	OGLPoint3D	off[4] =
+		{
+			{-13, 11, 75},
+			{ -9, 11, 75},
+			{ 13, 11, 75},
+			{  9, 11, 75},
+		};
 
 		i = car->Sparkles[j] = GetFreeSparkle(car);				// get free sparkle slot
 		if (i != -1)
@@ -241,10 +242,11 @@ int	i,j;
 
 	for (j = 0; j < 2; j++)
 	{
-		const	OGLPoint3D	off[2] = {
-									 	12, 8 ,-21,
-									 	-12, 8 ,-21,
-									 };
+		const	OGLPoint3D	off[2] =
+		{
+			{ 12, 8, -21},
+			{-12, 8, -21},
+		};
 
 		i = car->Sparkles[4+j] = GetFreeSparkle(car);				// get free sparkle slot
 		if (i != -1)
@@ -693,8 +695,8 @@ ObjNode	*frontWheels, *rearWheels;
 OGLPoint3D			off[2];
 const OGLPoint3D	wheelOff[2] =
 {
-	0, 8, -6,						// front wheels
-	0, 8, 54,						// rear wheels
+	{0, 8, -6},						// front wheels
+	{0, 8, 54},						// rear wheels
 };
 
 	frontWheels = car->ChainNode;

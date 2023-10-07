@@ -544,14 +544,14 @@ Boolean AddCrayon(TerrainItemEntryType *itemPtr, float  x, float z)
 ObjNode	*newObj;
 OGLColorRGBA	crayonColors[8] =
 {
-	1,.2,.2,1,
-	.2,1,.2,1,
-	.2,.2,1,1,
-	.9,.9,0,1,
-	0,1,1,1,
-	.3,.3,.3,1,
-	1,.5,0,1,
-	.8,.1,.8,1,
+	{1,.2,.2,1},
+	{.2,1,.2,1},
+	{.2,.2,1,1},
+	{.9,.9,0,1},
+	{0,1,1,1},
+	{.3,.3,.3,1},
+	{1,.5,0,1},
+	{.8,.1,.8,1},
 };
 static const OGLPoint3D	 baseOff = {0, 0, 134};
 static const OGLVector3D toTip = {0,0,-1};
@@ -1076,9 +1076,9 @@ int		i, n = part->Kind - PICKUP_KIND_CHIP1;
 	{
 		const OGLPoint3D ledOffs[3] =
 		{
-			215, 85, 30,
-			260, 70, 30,
-			300, 88, 30
+			{215, 85, 30},
+			{260, 70, 30},
+			{300, 88, 30},
 		};
 
 

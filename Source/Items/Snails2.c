@@ -155,9 +155,9 @@ float	fps = gFramesPerSecondFrac;
 int		i;
 const 	OGLPoint2D	offsets[3] =
 {
-	112.0f * PUZZLE_SCALE, -146.0f * PUZZLE_SCALE,			// corner piece
-	-101.0f * PUZZLE_SCALE, 15.0f * PUZZLE_SCALE,			// side piece
-	40.0f * PUZZLE_SCALE, 101.0 * PUZZLE_SCALE,				// middle piece
+	{112 * PUZZLE_SCALE, -146 * PUZZLE_SCALE},				// corner piece
+	{-101 * PUZZLE_SCALE, 15 * PUZZLE_SCALE},				// side piece
+	{40 * PUZZLE_SCALE, 101 * PUZZLE_SCALE},				// middle piece
 };
 
 

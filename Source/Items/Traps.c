@@ -386,17 +386,17 @@ float	r;
 int		i;
 const OGLPoint3D	bladeOffTable[4][2] =						// offsets to each blades endpoints
 {
-	-180.0f * WINDMILL_SCALE, 960.0f * WINDMILL_SCALE, 0,				// top blade
-	170.0f * WINDMILL_SCALE, 1040.0f * WINDMILL_SCALE, 0,
+	{{-180 * WINDMILL_SCALE, 960 * WINDMILL_SCALE, 0},				// top blade
+	{170 * WINDMILL_SCALE, 1040 * WINDMILL_SCALE, 0}},
 
-	960.0f * WINDMILL_SCALE, 180.0f * WINDMILL_SCALE, 0,				// right blade
-	1040.0f * WINDMILL_SCALE, -170.0f * WINDMILL_SCALE, 0,
+	{{960 * WINDMILL_SCALE, 180 * WINDMILL_SCALE, 0},				// right blade
+	{1040 * WINDMILL_SCALE, -170 * WINDMILL_SCALE, 0}},
 
-	-180.0f * WINDMILL_SCALE, -1040.0f * WINDMILL_SCALE, 0,				// bottom blade
-	180.0f * WINDMILL_SCALE, -960.0f * WINDMILL_SCALE, 0,
+	{{-180 * WINDMILL_SCALE, -1040 * WINDMILL_SCALE, 0},				// bottom blade
+	{180 * WINDMILL_SCALE, -960 * WINDMILL_SCALE, 0}},
 
-	-1040.0f * WINDMILL_SCALE, 180.0f * WINDMILL_SCALE, 0,				// left blade
-	-970.0f * WINDMILL_SCALE, -180.0f * WINDMILL_SCALE, 0
+	{{-1040 * WINDMILL_SCALE, 180 * WINDMILL_SCALE, 0},				// left blade
+	{-970 * WINDMILL_SCALE, -180 * WINDMILL_SCALE, 0}},
 };
 
 OGLPoint3D	bladePts[4][2];
@@ -942,10 +942,10 @@ float	r, ix, iz;
 OGLPoint3D	edge[4];
 const OGLPoint3D corners[4] = 									// offsets to corners on snapping edge of mousetrap
 {
-	-33, 7, 0,
-	-33, 7, 60,
-	33, 7, 60,
-	33, 7, 0,
+	{-33, 7, 0},
+	{-33, 7, 60},
+	{33, 7, 60},
+	{33, 7, 0},
 };
 OGLPoint2D	pl[4];
 

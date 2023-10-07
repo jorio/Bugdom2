@@ -151,7 +151,6 @@ if(NOT MSVC)
 		-Wno-multichar
 		-Wno-unknown-pragmas
 		#-Wno-unused-function
-		-Wno-missing-braces
 		-Wstrict-aliasing=2
 	)
 

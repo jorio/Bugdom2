@@ -731,15 +731,15 @@ float					scale;
 int						foodType;
 const OGLPoint3D foodOff[3] =
 {
-	-20, 45, 10,					// cheese
-	-20, 42, -4,					// cherry
-	-20, 55, 0,					// olive
+	{-20, 45, 10},					// cheese
+	{-20, 42, -4},					// cherry
+	{-20, 55, 0},					// olive
 };
 const OGLVector3D foodRot[3] =
 {
-	4.7, 0.6, 0.0,					// cheese
-	4.7, 0.6, 0.0,					// cherry
-	4.3, 0.6, 0.0,					// olive
+	{4.7f, 0.6f, 0.0f},				// cheese
+	{4.7f, 0.6f, 0.0f},				// cherry
+	{4.3f, 0.6f, 0.0f},				// olive
 };
 			/* VERIFY */
 
@@ -787,15 +787,15 @@ ObjNode		*food;
 int			foodType;
 const OGLPoint3D foodOff[3] =
 {
-	-14, -30, -10,					// cheese
-	-14, -15, -30,					// cherry
-	-14, 45, 0,					// olive
+	{-14, -30, -10},			// cheese
+	{-14, -15, -30},			// cherry
+	{-14, 45, 0},				// olive
 };
 const OGLVector3D foodRot[3] =
 {
-	.9, 0, 0,					// cheese
-	-.5, 0, 0,					// cherry
-	-1.8, 0, 0,					// olive
+	{.9f, 0, 0},				// cheese
+	{-.5f, 0, 0},				// cherry
+	{-1.8f, 0, 0},				// olive
 };
 
 

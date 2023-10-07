@@ -1323,10 +1323,10 @@ int			i;
 ObjNode	*pin,*prev = nil;
 static const OGLPoint2D pinOffTable[10] =
 {
-										0,0,
-						-PIN_SEP/2,PIN_SEP,	PIN_SEP/2,PIN_SEP,
-				-PIN_SEP,PIN_SEP*2,	0,PIN_SEP*2, PIN_SEP,PIN_SEP*2,
-	-PIN_SEP*3/2,PIN_SEP*3, -PIN_SEP/2,PIN_SEP*3,	PIN_SEP/2,PIN_SEP*3, PIN_SEP*3/2,PIN_SEP*3
+													{0,0},
+								{-PIN_SEP/2,PIN_SEP},      {PIN_SEP/2,PIN_SEP},
+					{-PIN_SEP,PIN_SEP*2},       {0,PIN_SEP*2},        {PIN_SEP,PIN_SEP*2},
+	{-PIN_SEP*3/2,PIN_SEP*3},   {-PIN_SEP/2,PIN_SEP*3},   {PIN_SEP/2,PIN_SEP*3},   {PIN_SEP*3/2,PIN_SEP*3}
 };
 
 OGLPoint2D pinOff[10];

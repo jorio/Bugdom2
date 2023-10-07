@@ -372,8 +372,8 @@ static void UpdateComputerBugEyes(ObjNode *theNode)
 {
 short			i, j;
 float			r,aimX,aimZ, dist;
-static const OGLPoint3D	eyeOff[2] = {-12.0, 9.0, -9.0,
-									  12.0, 9.0, -9.0};
+static const OGLPoint3D	eyeOff[2] = {	{-12, 9, -9},
+										{ 12, 9, -9}};
 OGLMatrix4x4	m;
 
 			/*****************/

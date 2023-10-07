@@ -248,13 +248,12 @@ int		i;
 	{
 		const OGLPoint3D iconCoords[6] =
 		{
-			320,	430, 	0,
-			160,	340, 	0,
-			160,	165, 	0,
-
-			325,	60, 	0,
-			470,	165, 	0,
-			470,	330, 	0,
+			{320,	430, 	0},
+			{160,	340, 	0},
+			{160,	165, 	0},
+			{325,	60, 	0},
+			{470,	165, 	0},
+			{470,	330, 	0},
 		};
 
 		gNewObjectDefinition.type 		= MAINMENU_SObjType_PlayIcon + i;
