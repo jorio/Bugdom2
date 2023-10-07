@@ -291,12 +291,13 @@ int		i;
 
 	for (i = 0; i < 180; i++)
 	{
+		float depth = RandomFloat();
 
 		gNewObjectDefinition.group 		= MODEL_GROUP_FOLIAGE;
 		gNewObjectDefinition.type 		= FOLIAGE_ObjType_Grass1 + RandomRange(0,2);
 		gNewObjectDefinition.coord.x	= RandomFloat2() * 1500.0f;
-		gNewObjectDefinition.coord.y 	= -600.0f;
-		gNewObjectDefinition.coord.z 	= -200.0f - RandomFloat() * 1200.0f;
+		gNewObjectDefinition.coord.y 	= -600.0f - SQUARED(depth) * 150.0f;		// the deeper, the lower (mitigate empty patches on floor)
+		gNewObjectDefinition.coord.z 	= -200.0f - depth * 1200.0f;
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOTEXTUREWRAP;
 		gNewObjectDefinition.slot 		= 5;
 		gNewObjectDefinition.moveCall 	= MoveMenuFlower;
