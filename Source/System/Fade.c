@@ -106,6 +106,8 @@ void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 
 ObjNode* MakeFadeEvent(Boolean fadeIn, float fadeSpeed)
 {
+	fadeSpeed *= 1.5f;
+
 	ObjNode	*newObj = NULL;
 
 #if SKIPFLUFF
