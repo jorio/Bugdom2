@@ -110,12 +110,17 @@ static void MoveMyBuddy(ObjNode *theNode)
 		/* UPDATE */
 		/**********/
 
-	if (theNode->EffectChannel == -1)
+	if (gGamePrefs.buddyBugBuzz)
 	{
-		theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_BUDDYBUZZ, &gCoord, NORMAL_CHANNEL_RATE+0x8000+(MyRandomLong()&0x1fff), .08);
+		if (theNode->EffectChannel == -1)
+			theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_BUDDYBUZZ, &gCoord, NORMAL_CHANNEL_RATE+0x8000+(MyRandomLong()&0x1fff), .08);
+		else
+			Update3DSoundChannel(EFFECT_BUDDYBUZZ, &theNode->EffectChannel, &gCoord);
 	}
-	else
-		Update3DSoundChannel(EFFECT_BUDDYBUZZ, &theNode->EffectChannel, &gCoord);
+	else if (theNode->EffectChannel != -1)
+	{
+		StopAChannel(&theNode->EffectChannel);
+	}
 
 
 	UpdateObject(theNode);

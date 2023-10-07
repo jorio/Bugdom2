@@ -60,6 +60,7 @@ typedef struct
 	Boolean	kiddieMode;
 	Byte	anaglyph;
 	Boolean	music;
+	Boolean	buddyBugBuzz;
 
 	Byte	monitorNum;
 	Byte	antialiasingLevel;

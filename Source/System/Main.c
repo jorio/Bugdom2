@@ -151,6 +151,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.fullscreen			= true;
 	gGamePrefs.uiCentering			= false;
 	gGamePrefs.music				= true;
+	gGamePrefs.buddyBugBuzz			= true;
 	gGamePrefs.gamepadRumble		= true;
 	gGamePrefs.rumbleIntensity		= 100;
 

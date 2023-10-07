@@ -152,6 +152,16 @@ static const MenuItem kSettingsMenuTree[] =
 	},
 	{
 		.type = kMICycler,
+		.text = STR_BUDDY_BUG_SOUND,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.buddyBugBuzz,
+			.numChoices = 2,
+			.choices = {STR_BUDDY_BUG_SILENT, STR_BUDDY_BUG_BUZZ},
+		},
+	},
+	{
+		.type = kMICycler,
 		.text= STR_UI_SPACING,
 		.cycler =
 		{
