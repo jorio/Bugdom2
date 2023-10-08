@@ -394,7 +394,7 @@ static void SaveSelectedRowInHistory(void)
 
 static void GoBackInHistory(void)
 {
-	MyFlushEvents();
+	//MyFlushEvents();
 
 	if (gMenuHistoryPos != 0)
 	{
@@ -1643,7 +1643,7 @@ int StartMenu(
 	}
 
 	UpdateInput();
-	MyFlushEvents();
+	//MyFlushEvents();
 
 	gMenu = nil;
 

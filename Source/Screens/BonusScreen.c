@@ -92,7 +92,7 @@ void DoBonusScreen(void)
 
 	SetupBonusScreen();
 	MakeFadeEvent(true, 1);
-
+	ResetFramesPerSecond();
 
 	DoSkipWalkOn();
 	DoSkipThrowClovers();

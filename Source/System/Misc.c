@@ -30,6 +30,8 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 
 int		gNumPointers = 0;
 
+static int gDeltaTimeSampleIndex = -1;
+static int gDeltaTimeSampleRing[STEADY_FPS_WINDOW] = { 0 };
 
 
 /**********************/
@@ -309,17 +311,31 @@ Ptr		p = ptr;
 
 
 /************** CALC FRAMES PER SECOND *****************/
-//
-// This version uses UpTime() which is only available on PCI Macs.
-//
 
 void CalcFramesPerSecond(void)
 {
-float					fps;
+static const int		kMaxDelta = TIME_UNIT / MIN_FPS;
+static const int		kFallbackDelta = TIME_UNIT / DEFAULT_FPS;
+
 UnsignedWide			currTime;
 static UnsignedWide		time = {0};
-static int				sampleIndex = 0;
-static float			sampleRing[STEADY_FPS_WINDOW] = {0};
+
+
+		/* SEE IF RESET */
+
+	if (gDeltaTimeSampleIndex < 0)
+	{
+		// Init sample ring with 60 fps deltas
+		for (size_t i = 0; i < STEADY_FPS_WINDOW; i++)
+		{
+			gDeltaTimeSampleRing[i] = kFallbackDelta;
+		}
+
+		gDeltaTimeSampleIndex = 0;
+
+		// Reset initial time
+		Microseconds(&time);
+	}
 
 
 wait:
@@ -329,18 +345,23 @@ wait:
 
 	if (deltaTime == 0)
 	{
-		fps = DEFAULT_FPS;
+		// First call since reset - Assume default framerate
+		deltaTime = kFallbackDelta;
+	}
+	else if (deltaTime > kMaxDelta)
+	{
+		// Pin to max delta (min FPS)
+		deltaTime = kMaxDelta;
 	}
 	else
 	{
-		fps = 1000000.0f / deltaTime;
-
 #if !COOK_GPU
-		if (fps > MAX_FPS)						// limit to avoid issue
+		float fps = (float)TIME_UNIT / deltaTime;
+		if (fps > MAX_FPS)						// limit framerate to avoid frying the GPU and floating point issues
 		{
-			if (fps - MAX_FPS > 1000)			// try to sneak in some sleep if we have 1 ms to spare
+			if (fps - MAX_FPS > 1000)			// do we have 1 millisecond to spare?
 			{
-				SDL_Delay(1);
+				SDL_Delay(1);					// try to sneak in some sleep to let the CPU breathe
 			}
 			goto wait;
 		}
@@ -350,33 +371,46 @@ wait:
 #if _DEBUG
 	if (GetKeyState(SDL_SCANCODE_BACKSLASH))	// debug speed-up with backslash key
 	{
-		fps = DEFAULT_FPS;
+		deltaTime = kMaxDelta;
 	}
 #endif
 
 
 		/* ADD SAMPLE TO RING BUFFER */
-
-	sampleRing[sampleIndex] = fps;
-	sampleIndex++;
-	sampleIndex %= STEADY_FPS_WINDOW;
+		// For steadiness - Keep the delta, not the fps!
+		// (During a framerate hiccup, the FPS value varies more wildly than the delta)
+		
+	gDeltaTimeSampleRing[gDeltaTimeSampleIndex] = deltaTime;
+	gDeltaTimeSampleIndex++;
+	gDeltaTimeSampleIndex %= STEADY_FPS_WINDOW;
 
 
 		/* CALC AVERAGE OF ENTIRE RING BUFFER */
 
-	gFramesPerSecond = 0;
+	gFramesPerSecondFrac = 0;
 	for (int i = 0; i < STEADY_FPS_WINDOW; i++)
 	{
-		gFramesPerSecond += sampleRing[i];
+		gFramesPerSecondFrac += gDeltaTimeSampleRing[i];
 	}
-	gFramesPerSecond *= (1.0f / STEADY_FPS_WINDOW);					// average
-	gFramesPerSecond = SDL_max(gFramesPerSecond, DEFAULT_FPS);		// avoid divide by 0's later
-	gFramesPerSecondFrac = 1.0f / gFramesPerSecond;					// calc fractional for multiplication
+	gFramesPerSecondFrac *= (1.0f / (TIME_UNIT * STEADY_FPS_WINDOW));	// convert to seconds and average
+
+	GAME_DEBUGASSERT(gFramesPerSecondFrac != 0.0f);
+	gFramesPerSecond = 1.0f / gFramesPerSecondFrac;
 
 
 		/* RESET TIME FOR NEXT INTERVAL */
 
 	time = currTime;
+}
+
+
+/************** RESET FRAMES PER SECOND *****************/
+
+void ResetFramesPerSecond(void)
+{
+	gDeltaTimeSampleIndex = -1;
+	gFramesPerSecond = DEFAULT_FPS;
+	gFramesPerSecondFrac = 1.0f / DEFAULT_FPS;
 }
 
 

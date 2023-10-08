@@ -252,6 +252,8 @@ OGLVector2D		v;
 
 	float timer = 9.0f;
 
+	ResetFramesPerSecond();
+
 	while(!UserWantsOut())
 	{
 		const float fps = gFramesPerSecondFrac;

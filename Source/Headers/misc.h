@@ -13,6 +13,7 @@ extern	void InitMyRandomSeed(void);
 extern	float RandomFloat(void);
 uint16_t	RandomRange(unsigned short min, unsigned short max);
 void CalcFramesPerSecond(void);
+void ResetFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);
 

@@ -246,6 +246,7 @@ static void PlayArea(void)
 	MakeFadeEvent(true, 1);
 	GrabMouse(true);
 	InvalidateAllInputs();
+	ResetFramesPerSecond();
 
 	/***********************************************/
 	/* PLAY BASED ON THE TYPE OF LEVEL WE'RE DOING */

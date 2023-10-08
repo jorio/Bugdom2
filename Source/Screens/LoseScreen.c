@@ -62,6 +62,7 @@ void DoLoseScreen(void)
 
 	SetupLoseScreen();
 	MakeFadeEvent(true, 1);
+	ResetFramesPerSecond();
 
 	ProcessLose();
 

@@ -275,6 +275,8 @@ static void ProcessWin(void)
 {
 float	timer = 0.0f;
 
+	ResetFramesPerSecond();
+
 	while(true)
 	{
 		OGLMatrix4x4	m;

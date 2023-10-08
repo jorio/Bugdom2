@@ -242,6 +242,8 @@ static void ProcessLevelIntro(void)
 {
 	float timer = 11.0f;
 
+	ResetFramesPerSecond();
+
 	while(!UserWantsOut())
 	{
 		const float fps = gFramesPerSecondFrac;

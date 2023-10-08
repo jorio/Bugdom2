@@ -339,8 +339,7 @@ static void ProcessMainMenu(void)
 {
 float	charTimer = 2.0f;
 
-	CalcFramesPerSecond();
-	UpdateInput();
+	ResetFramesPerSecond();
 
 	while(!gPlayNow)
 	{

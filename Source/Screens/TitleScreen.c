@@ -78,6 +78,7 @@ void DoTitleScreen(void)
 
 	SetupTitleScreen();
 	MakeFadeEvent(true, 1);
+	ResetFramesPerSecond();
 
 	gAbortTitle = false;
 

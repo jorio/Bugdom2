@@ -81,6 +81,8 @@ void NewScore(void)
 	gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = '\0';
 
 			/* LOOP */
+	
+	ResetFramesPerSecond();
 
 	while(!gExitHighScores)
 	{

@@ -85,7 +85,8 @@ void DoLegalScreen(void)
 		/***********/
 
 
-	MakeFadeEvent(true, 2);
+	MakeFadeEvent(true, 1);
+	ResetFramesPerSecond();
 
 		/* MAIN LOOP */
 
