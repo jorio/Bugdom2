@@ -92,6 +92,7 @@ extern	Boolean					gHeadOnScarecrow;
 extern	Boolean					gIgnoreBottleKeySnail;
 extern	Boolean					gInGameNow;
 extern	Boolean					gLevelCompleted;
+extern	Boolean					gMouseMotionNow;
 extern	Boolean					gMyState_Lighting;
 extern	Boolean					gNotifyOfSlotCarWin;
 extern	Boolean					gPlayerIsDead;

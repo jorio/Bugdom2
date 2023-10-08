@@ -95,7 +95,7 @@ void ResetDefaultGamepadBindings(void);
 void ResetDefaultMouseBindings(void);
 
 OGLVector2D GetMouseDelta(void);
-OGLPoint2D GetMouseCoords640x480(void);
+OGLPoint2D GetMouseCoordsIn2DLogicalRect(void);
 void GrabMouse(Boolean capture);
 void SetMacLinearMouse(Boolean linear);
 

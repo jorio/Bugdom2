@@ -94,8 +94,8 @@ static ObjNode*				gMenuCursorDot = nil;
 
 static bool					gMouseHoverValidRow = false;
 static int					gMouseHoverColumn = -1;
-//static SDL_Cursor*			gHandCursor = NULL;
-//static SDL_Cursor*			gStandardCursor = NULL;
+static SDL_Cursor*			gHandCursor = NULL;
+static SDL_Cursor*			gStandardCursor = NULL;
 
 static float				gMenuAsyncFadeOutSpeed = 2.0f;
 
@@ -451,23 +451,12 @@ static void NavigateSettingEntriesVertically(int delta)
 
 static void NavigateSettingEntriesMouseHover(void)
 {
-	IMPLEMENT_ME_SOFT();
-#if 0
 	if (!gMouseMotionNow)
 		return;
 
-	int mxRaw, myRaw;
-	SDL_GetMouseState(&mxRaw, &myRaw);
-
-	// On macOS, the mouse position is relative to the window's "point size" on Retina screens.
-	int windowW = 1;
-	int windowH = 1;
-	SDL_GetWindowSize(gSDLWindow, &windowW, &windowH);
-	float dpiScaleX = (float) gGameWindowWidth / (float) windowW;		// gGameWindowWidth is in actual pixels
-	float dpiScaleY = (float) gGameWindowHeight / (float) windowH;		// gGameWindowHeight is in actual pixels
-
-	float mx = (mxRaw*dpiScaleX - gGameWindowWidth*0.5f) * g2DLogicalWidth / gGameWindowWidth;
-	float my = (myRaw*dpiScaleY - gGameWindowHeight*0.5f) * g2DLogicalHeight / gGameWindowHeight;
+	OGLPoint2D mp = GetMouseCoordsIn2DLogicalRect();
+	float mx = mp.x;
+	float my = mp.y;
 
 	gMouseHoverValidRow = false;
 	gMouseHoverColumn = -1;
@@ -528,7 +517,6 @@ static void NavigateSettingEntriesMouseHover(void)
 
 	if (SDL_GetCursor() != gStandardCursor)
 		SDL_SetCursor(gStandardCursor);
-#endif
 }
 
 static void NavigatePick(const MenuItem* entry)
@@ -1516,10 +1504,10 @@ int StartMenu(
 		void (*moveCall)(void),
 		void (*drawCall)(void))
 {
-//	int cursorStateBeforeMenu = SDL_ShowCursor(-1);
-//	gStandardCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-//	gHandCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-//	SDL_ShowCursor(1);
+	int cursorStateBeforeMenu = SDL_ShowCursor(-1);
+	gStandardCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	gHandCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+	SDL_ShowCursor(1);
 
 		/* INITIALIZE MENU STATE */
 
@@ -1668,13 +1656,13 @@ int StartMenu(
 
 	gMenu = nil;
 
-//	SDL_SetCursor(gStandardCursor);
-//	SDL_FreeCursor(gStandardCursor);
-//	SDL_FreeCursor(gHandCursor);
-//	gStandardCursor = nil;
-//	gHandCursor = nil;
-//
-//	SDL_ShowCursor(cursorStateBeforeMenu);
+	SDL_SetCursor(gStandardCursor);
+	SDL_FreeCursor(gStandardCursor);
+	SDL_FreeCursor(gHandCursor);
+	gStandardCursor = nil;
+	gHandCursor = nil;
+
+	SDL_ShowCursor(cursorStateBeforeMenu);
 
 	return gMenuPick;
 }

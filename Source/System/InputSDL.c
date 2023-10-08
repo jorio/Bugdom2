@@ -793,15 +793,16 @@ OGLVector2D GetMouseDelta(void)
 #endif
 }
 
-#if 0
-OGLPoint2D GetMouseCoords640x480(void)
+OGLPoint2D GetMouseCoordsIn2DLogicalRect(void)
 {
+	// On macOS, the mouse position is relative to the window's "point size" on Retina screens.
 	int mx, my;
 	int ww, wh;
 	SDL_GetMouseState(&mx, &my);
 	SDL_GetWindowSize(gSDLWindow, &ww, &wh);
 
-	OGLRect r = Get2DLogicalRect(GetOverlayPaneNumber(), 1);
+//	OGLRect r = Get2DLogicalRect(GetOverlayPaneNumber(), 1);
+	OGLRect r = g2DLogicalRect;
 
 	float screenToPaneX = (r.right - r.left) / (float)ww;
 	float screenToPaneY = (r.bottom - r.top) / (float)wh;
@@ -821,12 +822,16 @@ void BackupRestoreCursorCoord(Boolean backup)
 
 	if (backup)
 	{
-		cursorCoordBackup = gCursorCoord;
+//		cursorCoordBackup = gCursorCoord;
+		cursorCoordBackup = GetMouseCoordsIn2DLogicalRect();
 	}
 	else if (cursorCoordBackup.x >= 0)
 	{
-		gCursorCoord = cursorCoordBackup;
-		OGLRect r = Get2DLogicalRect(GetOverlayPaneNumber(), 1);
+//		gCursorCoord = cursorCoordBackup;
+		OGLPoint2D cursorCoord = cursorCoordBackup;
+
+//		OGLRect r = Get2DLogicalRect(GetOverlayPaneNumber(), 1);
+		OGLRect r = g2DLogicalRect;
 
 		int ww, wh;
 		SDL_GetWindowSize(gSDLWindow, &ww, &wh);
@@ -834,12 +839,11 @@ void BackupRestoreCursorCoord(Boolean backup)
 		float screenToPaneX = (r.right - r.left) / (float)ww;
 		float screenToPaneY = (r.bottom - r.top) / (float)wh;
 
-		int mx = (int) ((gCursorCoord.x - r.left) / screenToPaneX);
-		int my = (int) ((gCursorCoord.y - r.top) / screenToPaneY);
+		int mx = (int) ((cursorCoord.x - r.left) / screenToPaneX);
+		int my = (int) ((cursorCoord.y - r.top) / screenToPaneY);
 		SDL_WarpMouseInWindow(gSDLWindow, mx, my);
 	}
 }
-#endif
 
 void GrabMouse(Boolean capture)
 {
@@ -848,7 +852,7 @@ void GrabMouse(Boolean capture)
 #else
 	if (capture)
 	{
-//		BackupRestoreCursorCoord(true);
+		BackupRestoreCursorCoord(true);
 	}
 
 	SDL_SetWindowGrab(gSDLWindow, capture);
@@ -858,7 +862,7 @@ void GrabMouse(Boolean capture)
 
 	if (!capture)
 	{
-//		BackupRestoreCursorCoord(false);
+		BackupRestoreCursorCoord(false);
 	}
 #endif
 }
