@@ -66,8 +66,8 @@ void InvalidateNeedState(int need);
 int GetKeyState(uint16_t sdlScancode);
 int GetClickState(int mouseButton);
 int GetNeedState(int needID);
-float GetNeedAnalogValue(int needID);
-float GetNeedAnalogSteering(int negativeNeedID, int positiveNeedID);
+float GetNeedAxis1D(int negativeNeedID, int positiveNeedID);
+OGLPolar2D GetNeedAxis2D(int xNegativeNeedID, int xPositiveNeedID, int yNegativeNeedID, int yPositiveNeedID);
 
 #define IsKeyDown(scancode) (KEYSTATE_DOWN == GetKeyState((scancode)))
 #define IsKeyHeld(scancode) (KEYSTATE_HELD == GetKeyState((scancode)))

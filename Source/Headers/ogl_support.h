@@ -103,6 +103,11 @@ typedef struct
 
 typedef struct
 {
+	GLfloat	r,a;
+}OGLPolar2D;
+
+typedef struct
+{
 	GLfloat	u,v;
 }OGLTextureCoord;
 
