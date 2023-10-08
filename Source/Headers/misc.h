@@ -53,13 +53,6 @@ void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v );
 
 char* CSVIterator(char** csvCursor, bool* eolOut);
 
-#if _DEBUG
-#define IMPLEMENT_ME_SOFT() { static int _warnings = 0; if (!_warnings++) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "IMPLEMENT ME: %s:%d\n", __func__, __LINE__); }
-#else
-#define IMPLEMENT_ME_SOFT()
-#endif
-#define IMPLEMENT_ME() DoFatalAlert("IMPLEMENT ME: %s:%d", __func__, __LINE__)
-
 #define GAME_ASSERT(condition) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, #condition); } while(0)
 #define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoFatalAlert("%s:%d: %s", __func__, __LINE__, message); } while(0)
 

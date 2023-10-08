@@ -48,14 +48,6 @@ void InitWindowStuff(void)
 #pragma mark -
 
 
-/**************** GAMMA FADE IN *************************/
-
-void GammaFadeIn(void)
-{
-	IMPLEMENT_ME_SOFT();
-}
-
-
 /************************** ENTER 2D *************************/
 //
 // For OS X - turn off DSp when showing 2D

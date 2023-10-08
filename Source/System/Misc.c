@@ -405,7 +405,7 @@ int		i;
 
 void MyFlushEvents(void)
 {
-	IMPLEMENT_ME_SOFT();
+	InvalidateAllInputs();
 }
 
 
