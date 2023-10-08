@@ -66,6 +66,16 @@ enum
 
 #define	ICON_SCALE		120.0f
 
+const OGLPoint2D kIconCoords[6] =
+{
+	{320,	430},
+	{160,	340},
+	{160,	165},
+	{325,	 60},
+	{470,	165},
+	{470,	330},
+};
+
 /*********************/
 /*    VARIABLES      */
 /*********************/
@@ -76,6 +86,7 @@ static 	ObjNode *gMenuLogo;
 #define	WaveZIndex	SpecialF[1]
 
 static	int		gSelectedIcon = 0;
+static	Boolean	gValidMouseIcon = false;
 
 static Boolean	gPlayNow = false;
 
@@ -244,20 +255,12 @@ int		i;
 
 			/* ICONS */
 
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < (int) SDL_arraysize(kIconCoords); i++)
 	{
-		const OGLPoint3D iconCoords[6] =
-		{
-			{320,	430, 	0},
-			{160,	340, 	0},
-			{160,	165, 	0},
-			{325,	60, 	0},
-			{470,	165, 	0},
-			{470,	330, 	0},
-		};
-
 		gNewObjectDefinition.type 		= MAINMENU_SObjType_PlayIcon + i;
-		gNewObjectDefinition.coord		= iconCoords[i];
+		gNewObjectDefinition.coord.x	= kIconCoords[i].x;
+		gNewObjectDefinition.coord.y	= kIconCoords[i].y;
+		gNewObjectDefinition.coord.z	= 0;
 		gNewObjectDefinition.flags 		= 0;
 		gNewObjectDefinition.slot 		= SPRITE_SLOT;
 		gNewObjectDefinition.moveCall 	= MoveMenuIcon;
@@ -309,6 +312,9 @@ int		i;
 		newObj->WaveZIndex = newObj->Coord.z * .004f;
 	}
 
+	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	gValidMouseIcon = false;
+	gSelectedIcon = 0;
 }
 
 
@@ -376,13 +382,50 @@ static void DoMenuControls(void)
 {
 	gHideFlowerMenu = false;
 
+	if (gMouseMotionNow)
+	{
+		OGLPoint2D mouse = GetMouseCoordsIn2DLogicalRect();
+
+		float minD = ICON_SCALE * 0.6f;
+		int minIcon = -1;
+		for (int i = 0; i < (int) SDL_arraysize(kIconCoords); i++)
+		{
+			float d = OGLPoint2D_Distance(&mouse, &kIconCoords[i]);
+			if (d < minD)
+			{
+				minIcon = i;
+				minD = d;
+			}
+		}
+
+		if (minIcon >= 0)
+		{
+			gValidMouseIcon = true;
+			if (minIcon != gSelectedIcon)
+			{
+				PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
+				gSelectedIcon = minIcon;
+			}
+		}
+		else
+		{
+			gValidMouseIcon = false;
+		}
+
+
+		SetSystemCursor(gValidMouseIcon ? SDL_SYSTEM_CURSOR_HAND : SDL_SYSTEM_CURSOR_ARROW);
+	}
+
+
+
 	if (IsNeedDown(kNeed_UIUp) || IsNeedDown(kNeed_UINext))
 	{
 		gInactivityTimer = 0;
 		gSelectedIcon--;
 		if (gSelectedIcon < 0)
 			gSelectedIcon = 5;
-
+		gValidMouseIcon = false;		// invalidate mouse hover
+		SetSystemCursor(-1);			// not using mouse
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
 	}
 	else if (IsNeedDown(kNeed_UIDown) || IsNeedDown(kNeed_UIPrev))
@@ -391,13 +434,15 @@ static void DoMenuControls(void)
 		gSelectedIcon++;
 		if (gSelectedIcon > 5)
 			gSelectedIcon = 0;
-
+		gValidMouseIcon = false;		// invalidate mouse hover
+		SetSystemCursor(-1);			// not using mouse
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/3,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE);
 	}
 
 			/* SEE IF SELECT */
 
-	else if (IsNeedDown(kNeed_UIConfirm))
+	else if (IsNeedDown(kNeed_UIConfirm)
+			 || (gValidMouseIcon && IsClickDown(SDL_BUTTON_LEFT)))
 	{
 		PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/3,NORMAL_CHANNEL_RATE * 3/2);
 
@@ -458,8 +503,9 @@ static void DoMenuControls(void)
 
 			/* NO ACTIVITY */
 	else
+	{
 		gInactivityTimer += gFramesPerSecondFrac;
-
+	}
 
 }
 

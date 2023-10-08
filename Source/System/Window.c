@@ -27,11 +27,7 @@
 /*     VARIABLES      */
 /**********************/
 
-Boolean				gRealCursorVisible = true;
-
 int				gGameWindowWidth, gGameWindowHeight;
-
-short			g2DStackDepth = 0;
 
 
 /****************  INIT WINDOW STUFF *******************/
@@ -49,48 +45,21 @@ void InitWindowStuff(void)
 
 
 /************************** ENTER 2D *************************/
-//
-// For OS X - turn off DSp when showing 2D
-//
 
 void Enter2D(void)
 {
 	GrabMouse(false);
-	ShowRealCursor();
+	SDL_ShowCursor(SDL_ENABLE);
 	MyFlushEvents();
 }
 
 
 /************************** EXIT 2D *************************/
-//
-// For OS X - turn ON DSp when NOT 2D
-//
 
 void Exit2D(void)
 {
-	HideRealCursor();
 }
 
-
-
-#pragma mark -
-
-/********************* HIDE REAL CURSOR *********************/
-
-void HideRealCursor(void)
-{
-#if !SKIPFLUFF
-	SDL_ShowCursor(0);
-#endif
-}
-
-
-/********************* SHOW REAL CURSOR *********************/
-
-void ShowRealCursor(void)
-{
-	SDL_ShowCursor(1);
-}
 
 
 #pragma mark -

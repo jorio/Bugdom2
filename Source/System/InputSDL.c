@@ -73,6 +73,9 @@ static void OnJoystickRemoved(SDL_JoystickID which);
 static SDL_GameController* TryOpenControllerFromJoystick(int joystickIndex);
 static SDL_GameController* TryOpenAnyUnusedController(bool showMessage);
 static void SetPlayerAxisControls(void);
+static void CloseController(void);
+
+static SDL_Cursor* gSystemCursors[SDL_NUM_SYSTEM_CURSORS];
 
 #pragma mark -
 /**********************/
@@ -80,6 +83,20 @@ static void SetPlayerAxisControls(void);
 void InitInput(void)
 {
 	TryOpenAnyUnusedController(false);
+}
+
+void DisposeInput(void)
+{
+	if (gController.open)
+	{
+		CloseController();
+	}
+
+	for (int i = 0; i < SDL_NUM_SYSTEM_CURSORS; i++)
+	{
+		SDL_FreeCursor(gSystemCursors[i]);
+		gSystemCursors[i] = NULL;
+	}
 }
 
 static inline void UpdateKeyState(KeyState* state, bool downNow)
@@ -865,6 +882,36 @@ void GrabMouse(Boolean capture)
 		BackupRestoreCursorCoord(false);
 	}
 #endif
+}
+
+void SetSystemCursor(int sdlSystemCursor)
+{
+	if (sdlSystemCursor < 0)
+	{
+		SDL_ShowCursor(SDL_DISABLE);
+		return;
+	}
+
+	SDL_ShowCursor(SDL_ENABLE);
+
+	GAME_ASSERT(sdlSystemCursor < SDL_NUM_SYSTEM_CURSORS);
+
+	SDL_Cursor* cursor = gSystemCursors[sdlSystemCursor];
+
+	if (!cursor)
+	{
+		cursor = SDL_CreateSystemCursor(sdlSystemCursor);
+		if (!cursor)
+		{
+			return;
+		}
+		gSystemCursors[sdlSystemCursor] = cursor;
+	}
+
+	if (SDL_GetCursor() != cursor)
+	{
+		SDL_SetCursor(cursor);
+	}
 }
 
 SDL_GameController* GetController(void)

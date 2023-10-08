@@ -505,9 +505,6 @@ static void InitArea(void)
 		default:
 				InitArea_Exploration();
 	}
-
-
-	HideRealCursor();								// do this again to be sure!
 }
 
 
@@ -1041,8 +1038,6 @@ unsigned long	someLong;
 
 	GetDateTime ((unsigned long *)(&someLong));		// init random seed
 	SetMyRandomSeed(someLong);
-
-	HideRealCursor();
 
 	// Load some global sprites
 	PreloadGlobalSprites();

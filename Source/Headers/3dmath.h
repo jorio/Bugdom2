@@ -96,7 +96,7 @@ void OGLVector3D_TransformArray(const OGLVector3D *inVectors, const OGLMatrix4x4
 Boolean OGL_IsBBoxVisible(const OGLBoundingBox *bBox, OGLMatrix4x4	*localToWorld);
 void OGLVector2D_Normalize(const OGLVector2D *vector2D, OGLVector2D	*result);
 float OGLPoint3D_Distance(const OGLPoint3D *p1, const OGLPoint3D *p2);
-float OGLPoint2D_Distance(OGLPoint2D *p1, OGLPoint2D *p2);
+float OGLPoint2D_Distance(const OGLPoint2D *p1, const OGLPoint2D *p2);
 void ApplyFrictionToRotation(float f,OGLVector3D *d);
 void ApplyFrictionToDeltasXZ(float f,OGLVector3D *d);
 

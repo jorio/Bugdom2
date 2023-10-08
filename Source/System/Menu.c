@@ -94,8 +94,6 @@ static ObjNode*				gMenuCursorDot = nil;
 
 static bool					gMouseHoverValidRow = false;
 static int					gMouseHoverColumn = -1;
-static SDL_Cursor*			gHandCursor = NULL;
-static SDL_Cursor*			gStandardCursor = NULL;
 
 static float				gMenuAsyncFadeOutSpeed = 2.0f;
 
@@ -497,11 +495,7 @@ static void NavigateSettingEntriesMouseHover(void)
 			mx <= fullExtents.right + 10)
 		{
 			gMouseHoverValidRow = true;
-
-			if (SDL_GetCursor() != gHandCursor)
-			{
-				SDL_SetCursor(gHandCursor);
-			}
+			SetSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 
 			if (gMenuRow != row)
 			{
@@ -515,8 +509,7 @@ static void NavigateSettingEntriesMouseHover(void)
 
 	GAME_ASSERT(!gMouseHoverValidRow);		// if we got here, we're not hovering over anything
 
-	if (SDL_GetCursor() != gStandardCursor)
-		SDL_SetCursor(gStandardCursor);
+	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 }
 
 static void NavigatePick(const MenuItem* entry)
@@ -1504,10 +1497,8 @@ int StartMenu(
 		void (*moveCall)(void),
 		void (*drawCall)(void))
 {
-	int cursorStateBeforeMenu = SDL_ShowCursor(-1);
-	gStandardCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	gHandCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-	SDL_ShowCursor(1);
+	int cursorStateBeforeMenu = SDL_ShowCursor(SDL_QUERY);
+	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 
 		/* INITIALIZE MENU STATE */
 
@@ -1656,12 +1647,7 @@ int StartMenu(
 
 	gMenu = nil;
 
-	SDL_SetCursor(gStandardCursor);
-	SDL_FreeCursor(gStandardCursor);
-	SDL_FreeCursor(gHandCursor);
-	gStandardCursor = nil;
-	gHandCursor = nil;
-
+	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 	SDL_ShowCursor(cursorStateBeforeMenu);
 
 	return gMenuPick;

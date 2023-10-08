@@ -2093,20 +2093,20 @@ float dx,dy,dz;
 	dy = p1->y - p2->y;
 	dz = p1->z - p2->z;
 
-	return(sqrt(dx*dx + dy*dy + dz*dz));
+	return sqrtf(dx*dx + dy*dy + dz*dz);
 }
 
 
 /****************** POINT 2D DISTANCE ***********************/
 
-float OGLPoint2D_Distance(OGLPoint2D *p1, OGLPoint2D *p2)
+float OGLPoint2D_Distance(const OGLPoint2D *p1, const OGLPoint2D *p2)
 {
 float dx,dy;
 
 	dx = p1->x - p2->x;
 	dy = p1->y - p2->y;
 
-	return(sqrt(dx*dx + dy*dy));
+	return sqrtf(dx*dx + dy*dy);
 }
 
 

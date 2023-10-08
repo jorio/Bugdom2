@@ -194,7 +194,7 @@ static OGLVector3D			fillDirection2 = { -1, -.3, -.3 };
 
 void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType *outputPtr)
 {
-	HideRealCursor();		// do this just as a safety precaution to make sure no cursor lingering around
+	SetSystemCursor(-1);		// do this just as a safety precaution to make sure no cursor lingering around
 
 				/* SETUP */
 

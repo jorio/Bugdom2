@@ -124,5 +124,8 @@ void DoPaused(void)
 		EnforceMusicPausePref();
 	}
 
-	GrabMouse(true);
+	if (!gGameOver)
+	{
+		GrabMouse(true);
+	}
 }

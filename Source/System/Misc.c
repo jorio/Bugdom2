@@ -103,6 +103,7 @@ static Boolean	beenHere = false;
 
 		ShutdownSound();								// cleanup sound stuff
 		DisposeLocalizedStrings();
+		DisposeInput();
 	}
 
 	ExitToShell();

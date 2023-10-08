@@ -58,6 +58,7 @@ enum
 //============================================================================================
 
 void InitInput(void);
+void DisposeInput(void);
 void UpdateInput(void);
 void InvalidateAllInputs(void);
 void InvalidateNeedState(int need);
@@ -97,6 +98,7 @@ void ResetDefaultMouseBindings(void);
 OGLVector2D GetMouseDelta(void);
 OGLPoint2D GetMouseCoordsIn2DLogicalRect(void);
 void GrabMouse(Boolean capture);
+void SetSystemCursor(int sdlSystemCursor);
 void SetMacLinearMouse(Boolean linear);
 
 void BackupRestoreCursorCoord(Boolean backup);
