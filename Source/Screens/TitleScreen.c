@@ -1,7 +1,8 @@
 /****************************/
 /*   	TITLE SCREEN.C		*/
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -54,6 +55,9 @@ enum
 #define	WaveXIndex	SpecialF[0]
 #define	WaveZIndex	SpecialF[1]
 
+#define	FlyTargetVolumeL	Special[0]
+#define	FlyTargetVolumeR	Special[1]
+#define	FlyVolumeFade		SpecialF[0]
 
 
 #define	JOINT_NUM_RIGHTWRIST	25
@@ -233,8 +237,6 @@ ObjNode			*fly;
 
 	for (i = 0; i < 20; i++)
 	{
-		uint32_t	volL,volR;
-
 		gNewObjectDefinition.group 		= SPRITE_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= TITLE_SObjType_Fly;
 		gNewObjectDefinition.coord.x 	= RandomFloat() * 640.0f;
@@ -244,14 +246,10 @@ ObjNode			*fly;
 		gNewObjectDefinition.slot 		= SPRITE_SLOT + 2;
 		gNewObjectDefinition.moveCall 	= MoveTitleFlies;
 		gNewObjectDefinition.rot 		= 0;
-		gNewObjectDefinition.scale 	    = 1;
+		gNewObjectDefinition.scale 	    = FLY_SCALE;
 		fly = MakeSpriteObject(&gNewObjectDefinition);
 
-		fly->Scale.x = FLY_SCALE;
-		fly->Scale.y = fly->Scale.x;
-
 		fly->Rot.y = RandomFloat() * PI2;
-
 		fly->Timer = RandomFloat() * 4.0f;
 
 		fly->TargetOff.x = RandomFloat() * 640.0f;
@@ -259,9 +257,14 @@ ObjNode			*fly;
 
 		if (i & 1)			// do every other
 		{
-			volL = RandomRange(FULL_CHANNEL_VOLUME/20, FULL_CHANNEL_VOLUME/3);
-			volR = (FULL_CHANNEL_VOLUME/3) - volL;
-			fly->EffectChannel = PlayEffect_Parms(EFFECT_TITLEFLYBUZZ, volL, volR, NORMAL_CHANNEL_RATE + (MyRandomLong()&0x7fff));
+			uint32_t volL = RandomRange(FULL_CHANNEL_VOLUME/20, FULL_CHANNEL_VOLUME/3);
+			uint32_t volR = (FULL_CHANNEL_VOLUME/3) - volL;
+
+			fly->FlyTargetVolumeL = volL;
+			fly->FlyTargetVolumeR = volR;
+			fly->FlyVolumeFade = 0.0f;
+
+			fly->EffectChannel = PlayEffect_Parms(EFFECT_TITLEFLYBUZZ, 0, 0, NORMAL_CHANNEL_RATE + (MyRandomLong()&0x7fff));
 		}
 	}
 
@@ -297,6 +300,22 @@ float	r,speed;
 	{
 		TurnObjectTowardTarget2D(fly, fly->Coord.x, fly->Coord.y, fly->TargetOff.x, fly->TargetOff.y, 5.0);
 		speed = 450.0f;
+
+
+		if (fly->EffectChannel != -1)
+		{
+					/* VOLUME CRESCENDO */
+
+			uint32_t targetVolumeL = fly->FlyTargetVolumeL;
+			uint32_t targetVolumeR = fly->FlyTargetVolumeR;
+
+			float volumeFade = fly->FlyVolumeFade;
+			volumeFade += fps;
+			volumeFade = SDL_clamp(volumeFade, 0, 1);
+			fly->FlyVolumeFade = volumeFade;
+
+			ChangeChannelVolume(fly->EffectChannel, targetVolumeL * volumeFade, targetVolumeR * volumeFade);
+		}
 	}
 	else
 	{
