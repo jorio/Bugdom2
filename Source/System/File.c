@@ -1184,6 +1184,8 @@ Str255			saveFilePath;
 		/* DO NAV SERVICES */
 		/*******************/
 
+	CheckPrefsFolder(true);
+
 	SDL_snprintf(saveFilePath, sizeof(saveFilePath), ":" PROJECT_NAME ":Save%c", 'A' + slot);
 
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
