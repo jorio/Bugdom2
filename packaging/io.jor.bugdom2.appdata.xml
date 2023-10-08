@@ -36,6 +36,16 @@
   </provides>
 
   <screenshots>
+    <screenshot type="default"><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NjIzNS5qcGc=/original/qMzYIG.jpg</image></screenshot> <!-- food ants -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4OC5qcGc=/original/GjjJj0.jpg</image></screenshot> <!-- fighting flies -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4Ny5qcGc=/original/Uwj1yZ.jpg</image></screenshot> <!-- gutter -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4Ni5qcGc=/original/A0rQVK.jpg</image></screenshot> <!-- evil plants -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4My5qcGc=/original/%2FMMHgE.jpg</image></screenshot> <!-- baseball -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4OS5qcGc=/original/xqUH%2Bw.jpg</image></screenshot> <!-- talking to sam -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE5MC5qcGc=/original/8tB6cG.jpg</image></screenshot> <!-- fighting otto -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4NS5qcGc=/original/sUW8eX.jpg</image></screenshot> <!-- balsa -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE5MS5qcGc=/original/NIxnPA.jpg</image></screenshot> <!-- slot cars -->
+    <screenshot><image>https://img.itch.zone/aW1hZ2UvMjMwMjU1MS8xMzY0NTE4Mi5qcGc=/original/bCsOHp.jpg</image></screenshot> <!-- gutter -->
   </screenshots>
 
   <url type="homepage">https://jorio.itch.io/bugdom2</url>
@@ -44,5 +54,18 @@
   <url type="bugtracker">https://github.com/jorio/Bugdom2/issues</url>
 
   <releases>
+    <release version="4.0.0" date="2023-10-08">
+      <url>https://github.com/jorio/Bugdom2/releases/tag/v4.0.0</url>
+      <description>
+        <p>Initial release of the modern version.</p>
+        <p>Compared to the last Mac release by Pangea, this version introduces the following improvements:</p>
+        <ul>
+          <li>Widescreen support</li>
+          <li>Improved mouse and controller support</li>
+          <li>Seamless terrain texturing</li>
+          <li>Minor gameplay bugfixes</li>
+        </ul>
+      </description>
+    </release>
   </releases>
 </component>
