@@ -185,6 +185,7 @@ typedef struct
 	float				analogControlX;
 	float				analogControlZ;
 	Boolean				analogIsMouse;
+	Boolean				analogControlLocked;
 
 	float				tunnelAngle;
 	float				tunnelDeltaRot;

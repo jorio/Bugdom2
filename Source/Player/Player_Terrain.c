@@ -233,6 +233,8 @@ void MovePlayer_Terrain(ObjNode *theNode)
 
 			/* JUMP TO HANDLER */
 
+	gPlayerInfo.analogControlLocked = false;
+
 	if (myMoveTable[theNode->Skeleton->AnimNum] != nil)
 		myMoveTable[theNode->Skeleton->AnimNum](theNode);
 
@@ -424,6 +426,7 @@ static void MovePlayer_Landing(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	DoPlayerFrictionAndGravity_Terrain(theNode, PLAYER_LANDING_FRICTION);
@@ -511,6 +514,7 @@ static void MovePlayer_Pickup(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	if (gPlayerInfo.heldObject == nil)							// turn toward target
@@ -553,6 +557,7 @@ static void MovePlayer_DropObject(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	DoPlayerFrictionAndGravity_Terrain(theNode, PLAYER_DEFAULT_FRICTION);
@@ -591,6 +596,7 @@ static void MovePlayer_Kick(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	TurnPlayerTowardKickable(theNode);
@@ -677,6 +683,7 @@ static void MovePlayer_GotHit(ObjNode *theNode)
 {
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)
@@ -727,6 +734,7 @@ static void MovePlayer_GetUpFromHit(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	DoPlayerFrictionAndGravity_Terrain(theNode, PLAYER_DEFAULT_FRICTION);
@@ -757,6 +765,7 @@ static void MovePlayer_Death(ObjNode *theNode)
 
 			/* MOVE PLAYER */
 
+	gPlayerInfo.analogControlLocked = true;
 	gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;			// no control during this anim
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)
@@ -1368,7 +1377,7 @@ Boolean				killed = false;
 
 				/* SEE IF ALSO APPLY KEY THRUST */
 
-	if (IsNeedActive(kNeed_AutoWalk))										// see if forward thrust
+	if (!gPlayerInfo.analogControlLocked && IsNeedActive(kNeed_AutoWalk))				// see if forward thrust
 	{
 		float	rot = theNode->Rot.y;
 		gDelta.x += sin(rot) * (fps * -KEY_THRUST);
