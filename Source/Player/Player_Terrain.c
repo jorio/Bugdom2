@@ -1218,6 +1218,20 @@ const float fps = gFramesPerSecondFrac;
 		{
 			gCurrentMaxSpeed = theNode->Speed2D;
 		}
+		else
+		{
+			// Decelerate toward target (Analog control)
+
+			float friction;
+			if (theNode->Skeleton->AnimNum == PLAYER_ANIM_SWIM)
+				friction = PLAYER_WATER_FRICTION;
+			else if (!(theNode->StatusBits & STATUS_BIT_ONGROUND))
+				friction = PLAYER_AIR_FRICTION;
+			else
+				friction = PLAYER_DEFAULT_FRICTION;
+
+			gCurrentMaxSpeed -= fps * friction;
+		}
 	}
 
 	theNode->Speed3D = CalcVectorLength(&gDelta);
