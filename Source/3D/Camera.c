@@ -762,8 +762,15 @@ got_target:
 #if TWEAKED_CAM
 				/* ROTATE BY USER ROT */
 
-	float cameraDelta = GetNeedAnalogSteering(kNeed_CameraLeft, kNeed_CameraRight);
+	float cameraDelta = 0;
 
+	// Keyboard: Fast camera motion
+	cameraDelta += 2.0f * GetNeedAxis1D(kNeed_CameraLeft, kNeed_CameraRight);
+
+	// Analog gamepad: Precise camera motion (for twin-stick controls)
+	cameraDelta += GetNeedAxis1D(kNeed_CameraLeftPrecise, kNeed_CameraRightPrecise);
+
+	// Mouse-driven camera motion
 	if (!gGamePrefs.mouseControlsSkip)
 		cameraDelta += GetMouseDelta().x * 0.015f;
 

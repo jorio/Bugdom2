@@ -19,8 +19,10 @@ enum
 	kNeed_Jump,
 	kNeed_LaunchBuddy,
 	kNeed_CameraMode,
-	kNeed_CameraLeft,
-	kNeed_CameraRight,
+	kNeed_CameraLeft,			// keyboard only
+	kNeed_CameraRight,			// keyboard only
+	kNeed_CameraLeftPrecise,	// gamepad only
+	kNeed_CameraRightPrecise,	// gamepad only
 	NUM_REMAPPABLE_NEEDS,
 
 	kNeed_UIUp,

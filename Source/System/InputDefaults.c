@@ -84,17 +84,11 @@ const InputBinding kDefaultInputBindings[NUM_CONTROL_NEEDS] =
 		.mouseButton = SDL_BUTTON_X2,
 	},
 
-	[kNeed_CameraLeft] =
-	{
-		.key = { SDL_SCANCODE_COMMA },
-		.pad = { CAMINUS(RIGHTX) },
-	},
+	[kNeed_CameraLeft] = { .key = { SDL_SCANCODE_COMMA } },
+	[kNeed_CameraRight] = { .key = { SDL_SCANCODE_PERIOD } },
 
-	[kNeed_CameraRight] =
-	{
-		.key = { SDL_SCANCODE_PERIOD },
-		.pad = { CAPLUS(RIGHTX) },
-	},
+	[kNeed_CameraLeftPrecise] = { .pad = { CAMINUS(RIGHTX) } },
+	[kNeed_CameraRightPrecise] = { .pad = { CAPLUS(RIGHTX) } },
 
 	// -----------------------------------------------------------
 	// Non-remappable UI bindings below
