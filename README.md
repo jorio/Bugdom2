@@ -12,13 +12,13 @@ This is a port of Pangea Software’s 2002 game **Bugdom 2** (the sequel to [Bug
 
 - Original instruction manual:
   [English](Instructions/Instructions-EN.pdf) -
-  [Dutch](docs/Instructions-NL.pdf) -
-  [French](docs/Instructions-FR.pdf) -
-  [German](docs/Instructions-DE.pdf) -
-  [Italian](docs/Instructions-IT.pdf) -
-  [Japanese](docs/Instructions-JA.pdf) -
-  [Spanish](docs/Instructions-ES.pdf) -
-  [Swedish](docs/Instructions-SV.pdf)
+  [Dutch](Instructions/Instructions-NL.pdf) -
+  [French](Instructions/Instructions-FR.pdf) -
+  [German](Instructions/Instructions-DE.pdf) -
+  [Italian](Instructions/Instructions-IT.pdf) -
+  [Japanese](Instructions/Instructions-JA.pdf) -
+  [Spanish](Instructions/Instructions-ES.pdf) -
+  [Swedish](Instructions/Instructions-SV.pdf)
 - [BUILD](BUILD.md) - How to build the game from source
 - [CHANGELOG](CHANGELOG.md) - Bugdom 2 version history
 - [LICENSE](LICENSE.md) (CC-BY-NC-SA 4.0)
