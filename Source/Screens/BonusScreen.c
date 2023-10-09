@@ -42,8 +42,7 @@ static void DrawSave(void);
 #define	POINTS_GOLDCLOVER	250000
 #define	POINTS_MOUSE		425
 
-
-#define	SAVE_TEXT_SIZE		30.0f
+static const OGLPoint2D kSaveIconPos[2] = {{320-80, 300}, {320+80, 300}};
 
 
 enum
@@ -626,6 +625,20 @@ float	r;
 
 #pragma mark -
 
+static void SelectIcon(int iconNum)
+{
+	bool wantSave = iconNum == 0;
+
+	if (wantSave != gSaveGame)
+	{
+		gSaveGame = wantSave;
+		gSaveWobble = 0;
+
+		int lv = wantSave? FULL_CHANNEL_VOLUME/3: FULL_CHANNEL_VOLUME/5;
+		int rv = wantSave? FULL_CHANNEL_VOLUME/5: FULL_CHANNEL_VOLUME/3;
+		PlayEffect_Parms(EFFECT_CHANGESELECT, lv, rv, NORMAL_CHANNEL_RATE);
+	}
+}
 
 /**************** DO SAVE SELECT ********************/
 
@@ -634,7 +647,10 @@ static void DoSaveSelect(void)
 	gSaveGame = true;
 	MakeDarkenPane();
 
-	while (!IsNeedDown(kNeed_UIConfirm))
+	bool validMouse = false;
+
+	while (!IsNeedDown(kNeed_UIConfirm)
+		&& !(IsClickDown(SDL_BUTTON_LEFT) && validMouse))
 	{
 		CalcFramesPerSecond();
 		UpdateInput();
@@ -643,13 +659,33 @@ static void DoSaveSelect(void)
 
 		if (IsNeedDown(kNeed_UIPrev) && !gSaveGame)
 		{
-			gSaveGame = true;
-			gSaveWobble = 0;
+			SelectIcon(0);
+			SetSystemCursor(-1);
+			validMouse = false;
 		}
 		else if (IsNeedDown(kNeed_UINext) && gSaveGame)
 		{
-			gSaveGame = false;
-			gSaveWobble = 0;
+			SelectIcon(1);
+			SetSystemCursor(-1);
+			validMouse = false;
+		}
+		else if (gMouseMotionNow)
+		{
+			OGLPoint2D mouse = GetMouseCoordsIn2DLogicalRect();
+			float d0 = OGLPoint2D_Distance(&mouse, &kSaveIconPos[0]);
+			float d1 = OGLPoint2D_Distance(&mouse, &kSaveIconPos[1]);
+
+			if (SDL_min(d0, d1) < 60)
+			{
+				SelectIcon(d0 < d1 ? 0: 1);
+				SetSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+				validMouse = true;
+			}
+			else
+			{
+				SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+				validMouse = false;
+			}
 		}
 
 
@@ -667,6 +703,7 @@ static void DoSaveSelect(void)
 		gSaveWobble += gFramesPerSecondFrac * 10.0f;
 	}
 
+	PlayEffect_Parms(EFFECT_CHANGESELECT,FULL_CHANNEL_VOLUME/4,FULL_CHANNEL_VOLUME/4,NORMAL_CHANNEL_RATE*3/2);
 
 		/* SAVE GAME */
 
@@ -752,38 +789,28 @@ bail:
 
 static void DrawSave(void)
 {
-float	s;
+float	s, s0, s1;
 
 	if (gSaveAlpha <= 0.0f)
 		return;
 
 	gGlobalTransparency = gSaveAlpha;
 
-	s = 100 + (sin(gSaveWobble) + 1.0f) * 20.0f;
+	s = 100 + (sinf(gSaveWobble) + 1.0f) * 20.0f;
 
 	if (gSaveGame)
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, s, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_SaveIcon);
-		DrawInfobarSprite2_Centered(320+75, 300, 100, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_NoSaveIcon);
+		s0 = s;
+		s1 = 100;
 	}
 	else
 	{
-		DrawInfobarSprite2_Centered(320-75, 300, 100, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_SaveIcon);
-		DrawInfobarSprite2_Centered(320+75, 300, s, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_NoSaveIcon);
+		s0 = 100;
+		s1 = s;
 	}
+
+	DrawInfobarSprite2_Centered(kSaveIconPos[0].x, kSaveIconPos[0].y, s0, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_SaveIcon);
+	DrawInfobarSprite2_Centered(kSaveIconPos[1].x, kSaveIconPos[1].y, s1, SPRITE_GROUP_LEVELSPECIFIC, BONUS_SObjType_NoSaveIcon);
 
 	gGlobalTransparency = 1.0f;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
