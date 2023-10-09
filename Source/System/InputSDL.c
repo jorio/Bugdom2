@@ -925,8 +925,6 @@ void SetSystemCursor(int sdlSystemCursor)
 		return;
 	}
 
-	SDL_ShowCursor(SDL_ENABLE);
-
 	GAME_ASSERT(sdlSystemCursor < SDL_NUM_SYSTEM_CURSORS);
 
 	SDL_Cursor* cursor = gSystemCursors[sdlSystemCursor];
@@ -934,17 +932,15 @@ void SetSystemCursor(int sdlSystemCursor)
 	if (!cursor)
 	{
 		cursor = SDL_CreateSystemCursor(sdlSystemCursor);
-		if (!cursor)
-		{
-			return;
-		}
 		gSystemCursors[sdlSystemCursor] = cursor;
 	}
 
-	if (SDL_GetCursor() != cursor)
+	if (cursor != NULL && SDL_GetCursor() != cursor)
 	{
 		SDL_SetCursor(cursor);
 	}
+
+	SDL_ShowCursor(SDL_ENABLE);
 }
 
 SDL_GameController* GetController(void)

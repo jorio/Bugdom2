@@ -968,6 +968,8 @@ void StartLevelCompletion(float coolDownTimer)
 
 static void CleanupLevel(void)
 {
+	GrabMouse(false);
+
 	StopAllEffectChannels();
 	DisposeTunnelData();
 	DeleteAllObjects();
