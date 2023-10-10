@@ -66,7 +66,7 @@ pressing your Pickup button.","Skip, cette bestiole a l’air coincée. Essaie d
 avec le bouton “Ramasser”.","Skip, dieses Wesen scheint festzustecken. Schau, ob Du durch
 Drücken des Aufheben-Knopfes die Klammer hochheben kannst.","Skip, este bicho está atrapado. Intenta levantar la barra
 pulsando el botón Coger.","Skip, questo topolino sembra intrappolato. Vedi se puoi alzare
-la barra usando il tasto di presa.","Skip, denna stackare ser ut att sitta fast. Se om du kan lyfta
+la barra usando il tasto Raccogli.","Skip, denna stackare ser ut att sitta fast. Se om du kan lyfta
 stången genom att
 trycka på plocka upplockningsknappen.","Skip, volgens mij zit dit beestje vast. Probeer de val open
 te maken door op de ‘Oppak’ knop te drukken."
@@ -433,9 +433,9 @@ Mouse controls,Commandes souris,Maus konfigurieren,Configurar el ratón,Configur
 No gamepad detected!,Aucune manette détectée!,Kein Controller erkannt!,,Nessun gamepad rilevato!,Ingen handkontroll hittades!,Geen gamecontroller gedetecteerd!
 Force feedback,Force des vibrations,Vibrationsstärke,Fuerza de vibración,Forza delle vibrazioni,Vibrationsstyrka,
 Off,Aucune
-Low,Faible,,,Basso
-Medium,Moyenne,,,Medio
-High,Élevée,,,Alto
+Low,Faible,,,Bassa
+Medium,Moyenne,,,Media
+High,Élevée,,,Alta
 Mouse motion,Mouvement souris,,,Movimenti del mouse
 Rotates the camera,Orienter la caméra,,,Orienta videocamera
 Steers the character*,Diriger Skip*,,,Muovi Skip*
