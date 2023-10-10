@@ -66,7 +66,7 @@ pressing your Pickup button.","Skip, cette bestiole a l’air coincée. Essaie d
 avec le bouton “Ramasser”.","Skip, dieses Wesen scheint festzustecken. Schau, ob Du durch
 Drücken des Aufheben-Knopfes die Klammer hochheben kannst.","Skip, este bicho está atrapado. Intenta levantar la barra
 pulsando el botón Coger.","Skip, questo topolino sembra intrappolato. Vedi se puoi alzare
-la barra usando il tasto di presa.","Skip, denna stackare ser ut att sitta fast. Se om du kan lyfta
+la barra usando il tasto Raccogli.","Skip, denna stackare ser ut att sitta fast. Se om du kan lyfta
 stången genom att
 trycka på plocka upplockningsknappen.","Skip, volgens mij zit dit beestje vast. Probeer de val open
 te maken door op de ‘Oppak’ knop te drukken."
@@ -341,7 +341,7 @@ MAX DIALOG STRINGS,,,,,,
 ,,,,,,
 Resume,Continuer,Fortsetzen,Reanudar,Riprendi,Återuppta,Hervat spel
 End Game,Abandonner,Abbrechen,Retirarse,Abbandona,Ge up,Stop spel
-Quit Application,Quitter,Beenden,Cerrar el juego,Esci dal gioco,Avsluta,Stop programma
+Quit Application,Quitter,Beenden,Cerrar el juego,Esci dal programma,Avsluta,Stop programma
 ,,,,,,
 Load Saved Game,Charger une partie,Spiel laden,Cargar una partida,Carica una partita,Ladda spel,Opgeslagen spel laden
 Save Game,Enregistrer la partie,Spiel speichern,Guardar el juego,Salva la partita,Spara spelet,Spel opslaan
@@ -364,16 +364,16 @@ Oct.,Oct.,Okt,Oct.,ott.,Okt.,Okt.
 Nov.,Nov.,Nov,Nov.,nov.,Nov.,Nov.
 Dec.,Déc.,Dez,Dic.,dic.,Dec.,Dec.
 ,,,,,,
--The Front Yard,Le jardinet,,,,,
--The Back Yard,Le grand jardin,,,,,
--Fido’s Fur,La fourrure de Fido,,,,,
--The Sewer,L’égoût,,,,,
--The Playroom,La salle de jeux,,,,,
--The Closet,Le placard,,,,,
--The Gutter,La gouttière,,,,,
--The Garbage Can,La poubelle,,,,,
--Flight of the Grasshopper,L’envol de la sauterelle,,,,,
--The Park,Le parc,,,,,
+-The Front Yard,Le jardinet,,,Il giardino,,
+-The Back Yard,Le grand jardin,,,Il cortile sul retro,,
+-Fido’s Fur,La fourrure de Fido,,,La pelliccia di Fido,,
+-The Sewer,L’égoût,,,La fogna,,
+-The Playroom,La salle de jeux,,,La stanza dei giochi,,
+-The Closet,Le placard,,,Lo sgabuzzino,,
+-The Gutter,La gouttière,,,La grondaia,,
+-The Garbage Can,La poubelle,,,Il bidone della spazzatura,,
+-Flight of the Grasshopper,L’envol de la sauterelle,,,Il volo della cavalletta,,
+-The Park,Le parc,,,Il parco,,
 ,,,,,,
 English,Français,Deutsch,Español,Italiano,Svenska,Nederlands
 OK,,,,,,
@@ -409,9 +409,9 @@ Monochrome,Monochrome,,,Monocromatico,,
 when you start a new level.","Les couleurs seront recalibrées pour le nouveau mode de
 3D anaglyphe lorsque tu commenceras un nouveau niveau.",,,"Hai modificato la modalità anaglifica 3D. I colori
 verranno ricalibrati quando inizierai un nuovo livello.",,
-Buddy Bug sound,Bruit p’tites abeilles,Kumpelkäfer-Ton,Sonido bichoamigos,Suono Buddy Bugs,Buddy Bug-ljud,Buddy Bug geluid
+Buddy Bug sound,Bruit p’tites abeilles,Kumpelkäfer-Ton,Sonido bichoamigos,Suono ape compagna,Buddy Bug-ljud,Buddy Bug geluid
 Buzz,Bourdonnement,Summen,Zumbido,Ronzio
-Silent,Silence,Still,Silencio,Silenzio,Tyst,Stil
+Silent,Silence,Still,Silencio,Muto,Tyst,Stil
 ---,,,,,,
 Press!,Appuie!,Drück!,,Premi!,Tryck!,Druk!
 Click!,Clique!,,,Fai click!,,
@@ -433,15 +433,16 @@ Mouse controls,Commandes souris,Maus konfigurieren,Configurar el ratón,Configur
 No gamepad detected!,Aucune manette détectée!,Kein Controller erkannt!,,Nessun gamepad rilevato!,Ingen handkontroll hittades!,Geen gamecontroller gedetecteerd!
 Force feedback,Force des vibrations,Vibrationsstärke,Fuerza de vibración,Forza delle vibrazioni,Vibrationsstyrka,
 Off,Aucune
-Low,Faible
-Medium,Moyenne
-High,Élevée
+Low,Faible,,,Bassa
+Medium,Moyenne,,,Media
+High,Élevée,,,Alta
 Mouse motion,Mouvement souris,,,Movimenti del mouse
 Rotates the camera,Orienter la caméra,,,Orienta videocamera
 Steers the character*,Diriger Skip*,,,Muovi Skip*
 "* We recommend using this setting in conjunction with the “Auto-Walk” key.
 That way you can steer with the mouse and use the shift key to walk forward.","* Nous recommandons d’utiliser ce réglage en combinaison avec la touche “Marcher en continu”.
-La souris vous permettra alors de vous diriger et la touche Majuscule d’avancer."
+La souris vous permettra alors de vous diriger et la touche Majuscule d’avancer.",,,"* Consigliamo di utilizzare questa impostazione in combinazione con il tasto “Cammina automaticamente”.
+In questo modo puoi sterzare col mouse e tenere premuto il tasto Maiuscolo per avanzare."
 Mouse sensitivity,Sensibilité,,,Sensibilità del mouse
 1/8
 2/8
@@ -457,11 +458,11 @@ Turn Left,À gauche,Nach links,,Sinistra,Gå åt vänster,
 Turn Right,À droite,Nach rechts,,Destra,Gå åt höger,
 Forward,En avant,Vorwärts,,Avanti,Gå framåt,
 Backward,En arrière,Rückwärts,,Indietro,Gå bakåt,
-Kick,Coup de pied,Treten,Patada,Calcio,Sparka,Schoppen
-Pickup/Drop,Ramasser/Lâcher,Aufheben/Fallenlassen,Coger/Soltar,Prendi,Plocka upp/Släppa,Oppakken/Loslaten
-Auto-Walk,Marcher en continu,Automatisch laufen,Caminar auto.,Camminare auto.,Autogå,Auto-loop
+Kick,Coup de pied,Treten,Patada,Calcia,Sparka,Schoppen
+Pickup/Drop,Ramasser/Lâcher,Aufheben/Fallenlassen,Coger/Soltar,Raccogli/Lascia,Plocka upp/Släppa,Oppakken/Loslaten
+Auto-Walk,Marcher en continu,Automatisch laufen,Caminar auto.,Cammina auto.,Autogå,Auto-loop
 Jump,Sauter,Hüpfen,Saltar,Salta,Hoppa,Spring
-Launch Buddy Bug,Lancer p’tite abeille,Kumpel-Käfer,Ataque bichoamigo,Lanciare Buddy Bug,Skicka ut Buddy Bug,Lanceer Buddy Bug
+Launch Buddy Bug,Lancer p’tite abeille,Kumpel-Käfer,Ataque bichoamigo,Lancia ape compagna,Skicka ut Buddy Bug,Lanceer Buddy Bug
 Camera Mode,Mode caméra,Kamera-Modus,,Modalità camera,Kameraläge,Camera modus
 Camera Left,Caméra gauche,Kamera links,,Ruota camera a sx.,Kamera vänster,
 Camera Right,Caméra droite,Kamera rechts,,Ruota camera a dx.,Kamera höger,
