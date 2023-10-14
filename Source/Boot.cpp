@@ -158,6 +158,9 @@ retryVideo:
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, PROJECT_FULL_NAME, "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
 		}
 	}
+
+	// Set fullscreen mode from prefs
+	SetFullscreenMode(true);
 }
 
 static void Shutdown()
