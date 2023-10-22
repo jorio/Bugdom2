@@ -303,13 +303,15 @@ int	i;
 	{
 		for (i = 0; i < gNumSplines; i++)
 		{
-//			SafeDisposePtr((Ptr) gSplineList[i].nubList);		// nuke nub list
+			SafeDisposePtr((Ptr) gSplineList[i].nubList);		// nuke nub list
 			SafeDisposePtr((Ptr) gSplineList[i].pointList);		// nuke point list
 			SafeDisposePtr((Ptr) gSplineList[i].itemList);		// nuke item list
 		}
 		SafeDisposePtr((Ptr) gSplineList);
 		gSplineList = nil;
 	}
+	gNumSplines = 0;
+
 
 				/* NUKE WATER PATCH */
 

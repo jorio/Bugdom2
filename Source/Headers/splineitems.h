@@ -18,18 +18,4 @@ void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*));
 void SetSplineAim(ObjNode *theNode);
 void GetObjectCoordOnSpline(ObjNode *theNode);
 void GetObjectCoordOnSpline2(ObjNode *theNode, float *x, float *z);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void DrawSplines(void);

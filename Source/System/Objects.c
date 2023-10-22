@@ -668,6 +668,7 @@ float			cameraX, cameraZ;
 		{
 			DrawCollisionBoxes(theNode,false);
 //			DrawBoundingBoxes(theNode);
+			DrawSplines();
 		}
 
 

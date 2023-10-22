@@ -779,6 +779,29 @@ OSErr					iErr;
 	}
 
 
+			/* READ SPLINE NUB LIST */
+
+	for (int i = 0; i < gNumSplines; i++)
+	{
+		SplineDefType	*spline = &gSplineList[i];									// point to Nth spline
+
+		hand = GetResource('SpNb',1000+i);
+		GAME_ASSERT(hand);
+
+		const SplinePointType *nubList = (SplinePointType *)*hand;
+
+		gSplineList[i].nubList = AllocPtrClear(spline->numNubs * sizeof(spline->nubList[0]));
+
+		for (int j = 0; j < spline->numNubs; j++)			// swizzle
+		{
+			spline->nubList[j].x = SwizzleFloat(&nubList[j].x);
+			spline->nubList[j].z = SwizzleFloat(&nubList[j].z);
+		}
+
+		ReleaseResource(hand);
+	}
+
+
 			/* READ SPLINE ITEM LIST */
 
 	for (int i = 0; i < gNumSplines; i++)

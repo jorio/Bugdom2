@@ -67,7 +67,7 @@ typedef struct
 	int				numPoints;			// # points in spline
 	int				numItems;			// # items on the spline
 
-//	SplinePointType	*nubList;			// list of nubs
+	SplinePointType	*nubList;			// list of nubs
 	SplinePointType	*pointList;			// list of calculated spline points
 	SplineItemType	*itemList;			// list of spline items
 
