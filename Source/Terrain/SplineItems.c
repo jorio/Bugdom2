@@ -481,10 +481,10 @@ float			numPointsInSpline;
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 
 	theNode->SplinePlacement += speed / numPointsInSpline;
-	if (theNode->SplinePlacement > .999f)
+	if (theNode->SplinePlacement > 1.0f)
 	{
-		theNode->SplinePlacement -= .999f;
-		if (theNode->SplinePlacement > .999f)			// see if it wrapped somehow
+		theNode->SplinePlacement -= 1.0f;
+		if (theNode->SplinePlacement > 1.0f)			// see if it wrapped somehow
 			theNode->SplinePlacement = 0;
 		return(true);
 	}
