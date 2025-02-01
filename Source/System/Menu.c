@@ -167,49 +167,49 @@ static const char* GetPadBindingName(int row, int col)
 		case kInputTypeButton:
 			switch (kb->pad[col].id)
 			{
-				case SDL_CONTROLLER_BUTTON_INVALID:			return Localize(STR_UNBOUND_PLACEHOLDER);
-				case SDL_CONTROLLER_BUTTON_A:				return "Ⓐ";
-				case SDL_CONTROLLER_BUTTON_B:				return "Ⓑ";
-				case SDL_CONTROLLER_BUTTON_X:				return "Ⓧ";
-				case SDL_CONTROLLER_BUTTON_Y:				return "Ⓨ";
-				case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:	return "LB";
-				case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:	return "RB";
-				case SDL_CONTROLLER_BUTTON_LEFTSTICK:		return "Push LS";
-				case SDL_CONTROLLER_BUTTON_RIGHTSTICK:		return "Push RS";
-				case SDL_CONTROLLER_BUTTON_DPAD_UP:			return "D-pad up";
-				case SDL_CONTROLLER_BUTTON_DPAD_DOWN:		return "D-pad down";
-				case SDL_CONTROLLER_BUTTON_DPAD_LEFT:		return "D-pad left";
-				case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:		return "D-pad right";
+				case SDL_GAMEPAD_BUTTON_INVALID:		return Localize(STR_UNBOUND_PLACEHOLDER);
+				case SDL_GAMEPAD_BUTTON_SOUTH:			return "Ⓐ";
+				case SDL_GAMEPAD_BUTTON_EAST:			return "Ⓑ";
+				case SDL_GAMEPAD_BUTTON_WEST:			return "Ⓧ";
+				case SDL_GAMEPAD_BUTTON_NORTH:			return "Ⓨ";
+				case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:	return "LB";
+				case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:	return "RB";
+				case SDL_GAMEPAD_BUTTON_LEFT_STICK:		return "Push LS";
+				case SDL_GAMEPAD_BUTTON_RIGHT_STICK:	return "Push RS";
+				case SDL_GAMEPAD_BUTTON_DPAD_UP:		return "D-pad up";
+				case SDL_GAMEPAD_BUTTON_DPAD_DOWN:		return "D-pad down";
+				case SDL_GAMEPAD_BUTTON_DPAD_LEFT:		return "D-pad left";
+				case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:		return "D-pad right";
 				default:
-					return SDL_GameControllerGetStringForButton(kb->pad[col].id);
+					return SDL_GetGamepadStringForButton(kb->pad[col].id);
 			}
 			break;
 
 		case kInputTypeAxisPlus:
 			switch (kb->pad[col].id)
 			{
-				case SDL_CONTROLLER_AXIS_LEFTX:				return "LS right";
-				case SDL_CONTROLLER_AXIS_LEFTY:				return "LS down";
-				case SDL_CONTROLLER_AXIS_RIGHTX:			return "RS right";
-				case SDL_CONTROLLER_AXIS_RIGHTY:			return "RS down";
-				case SDL_CONTROLLER_AXIS_TRIGGERLEFT:		return "LT";
-				case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:		return "RT";
+				case SDL_GAMEPAD_AXIS_LEFTX:			return "LS right";
+				case SDL_GAMEPAD_AXIS_LEFTY:			return "LS down";
+				case SDL_GAMEPAD_AXIS_RIGHTX:			return "RS right";
+				case SDL_GAMEPAD_AXIS_RIGHTY:			return "RS down";
+				case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:		return "LT";
+				case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:	return "RT";
 				default:
-					return SDL_GameControllerGetStringForAxis(kb->pad[col].id);
+					return SDL_GetGamepadStringForAxis(kb->pad[col].id);
 			}
 			break;
 
 		case kInputTypeAxisMinus:
 			switch (kb->pad[col].id)
 			{
-				case SDL_CONTROLLER_AXIS_LEFTX:				return "LS left";
-				case SDL_CONTROLLER_AXIS_LEFTY:				return "LS up";
-				case SDL_CONTROLLER_AXIS_RIGHTX:			return "RS left";
-				case SDL_CONTROLLER_AXIS_RIGHTY:			return "RS up";
-				case SDL_CONTROLLER_AXIS_TRIGGERLEFT:		return "LT";
-				case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:		return "RT";
+				case SDL_GAMEPAD_AXIS_LEFTX:			return "LS left";
+				case SDL_GAMEPAD_AXIS_LEFTY:			return "LS up";
+				case SDL_GAMEPAD_AXIS_RIGHTX:			return "RS left";
+				case SDL_GAMEPAD_AXIS_RIGHTY:			return "RS up";
+				case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:		return "LT";
+				case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:	return "RT";
 				default:
-					return SDL_GameControllerGetStringForAxis(kb->pad[col].id);
+					return SDL_GetGamepadStringForAxis(kb->pad[col].id);
 			}
 			break;
 
@@ -495,7 +495,7 @@ static void NavigateSettingEntriesMouseHover(void)
 			mx <= fullExtents.right + 10)
 		{
 			gMouseHoverValidRow = true;
-			SetSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+			SetSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
 
 			if (gMenuRow != row)
 			{
@@ -509,7 +509,7 @@ static void NavigateSettingEntriesMouseHover(void)
 
 	GAME_ASSERT(!gMouseHoverValidRow);		// if we got here, we're not hovering over anything
 
-	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	SetSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
 }
 
 static void NavigatePick(const MenuItem* entry)
@@ -863,7 +863,7 @@ static void AwaitKeyPress(void)
 
 	InputBinding* kb = GetBindingAtRow(gMenuRow);
 
-	for (int16_t scancode = 0; scancode < SDL_NUM_SCANCODES; scancode++)
+	for (int16_t scancode = 0; scancode < SDL_SCANCODE_COUNT; scancode++)
 	{
 		if (IsKeyDown(scancode))
 		{
@@ -881,10 +881,10 @@ static void AwaitKeyPress(void)
 
 static void AwaitPadPress(void)
 {
-	SDL_GameController* gSDLController = GetController();
+	SDL_Gamepad* sdlGamepad = GetGamepad();
 
 	if (IsKeyDown(SDL_SCANCODE_ESCAPE)
-		|| (gSDLController && SDL_GameControllerGetButton(gSDLController, SDL_CONTROLLER_BUTTON_START)))
+		|| (sdlGamepad && SDL_GetGamepadButton(sdlGamepad, SDL_GAMEPAD_BUTTON_START)))
 	{
 		MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, 1 + gPadColumn);
 		gMenuState = kMenuStateReady;
@@ -895,23 +895,23 @@ static void AwaitPadPress(void)
 
 	InputBinding* kb = GetBindingAtRow(gMenuRow);
 
-	if (!gSDLController)
+	if (!sdlGamepad)
 		return;
 
-	for (int8_t button = 0; button < SDL_CONTROLLER_BUTTON_MAX; button++)
+	for (int8_t button = 0; button < SDL_GAMEPAD_BUTTON_COUNT; button++)
 	{
 #if 0
 		switch (button)
 		{
-			case SDL_CONTROLLER_BUTTON_DPAD_UP:			// prevent binding those
-			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+			case SDL_GAMEPAD_BUTTON_DPAD_UP:			// prevent binding those
+			case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
+			case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
+			case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 				continue;
 		}
 #endif
 
-		if (SDL_GameControllerGetButton(gSDLController, button))
+		if (SDL_GetGamepadButton(sdlGamepad, button))
 		{
 			UnbindPadButtonFromAllRemappableInputNeeds(kInputTypeButton, button);
 			kb->pad[gPadColumn].type = kInputTypeButton;
@@ -925,21 +925,21 @@ static void AwaitPadPress(void)
 		}
 	}
 
-	for (int8_t axis = 0; axis < SDL_CONTROLLER_AXIS_MAX; axis++)
+	for (int8_t axis = 0; axis < SDL_GAMEPAD_AXIS_COUNT; axis++)
 	{
 #if 0
 		switch (axis)
 		{
-			case SDL_CONTROLLER_AXIS_LEFTX:				// prevent binding those
-			case SDL_CONTROLLER_AXIS_LEFTY:
-			case SDL_CONTROLLER_AXIS_RIGHTX:
-			case SDL_CONTROLLER_AXIS_RIGHTY:
+			case SDL_GAMEPAD_AXIS_LEFTX:				// prevent binding those
+			case SDL_GAMEPAD_AXIS_LEFTY:
+			case SDL_GAMEPAD_AXIS_RIGHTX:
+			case SDL_GAMEPAD_AXIS_RIGHTY:
 				continue;
 		}
 #endif
 
-		int16_t axisValue = SDL_GameControllerGetAxis(gSDLController, axis);
-		if (abs(axisValue) > kJoystickDeadZone_BindingThreshold)
+		int16_t axisValue = SDL_GetGamepadAxis(sdlGamepad, axis);
+		if (SDL_abs(axisValue) > kJoystickDeadZone_BindingThreshold)
 		{
 			int axisType = axisValue < 0 ? kInputTypeAxisMinus : kInputTypeAxisPlus;
 			UnbindPadButtonFromAllRemappableInputNeeds(axisType, axis);
@@ -1473,7 +1473,7 @@ void RegisterMenu(const MenuItem* menuTree)
 			gMenuRegistry[gNumMenusRegistered] = menuItem;
 			gNumMenusRegistered++;
 
-//			printf("Registered menu '%s'\n", FourccToString(menuItem->id));
+//			SDL_Log("Registered menu '%s'", FourccToString(menuItem->id));
 		}
 	}
 }
@@ -1497,8 +1497,8 @@ int StartMenu(
 		void (*moveCall)(void),
 		void (*drawCall)(void))
 {
-	int cursorStateBeforeMenu = SDL_ShowCursor(SDL_QUERY);
-	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	bool cursorStateBeforeMenu = SDL_CursorVisible();
+	SetSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
 
 		/* INITIALIZE MENU STATE */
 
@@ -1647,8 +1647,11 @@ int StartMenu(
 
 	gMenu = nil;
 
-	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	SDL_ShowCursor(cursorStateBeforeMenu);
+	SetSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
+	if (cursorStateBeforeMenu)
+		SDL_ShowCursor();
+	else
+		SDL_HideCursor();
 
 	return gMenuPick;
 }

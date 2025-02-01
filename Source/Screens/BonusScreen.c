@@ -678,12 +678,12 @@ static void DoSaveSelect(void)
 			if (SDL_min(d0, d1) < 60)
 			{
 				SelectIcon(d0 < d1 ? 0: 1);
-				SetSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+				SetSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
 				validMouse = true;
 			}
 			else
 			{
-				SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+				SetSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
 				validMouse = false;
 			}
 		}

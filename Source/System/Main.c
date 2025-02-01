@@ -128,7 +128,7 @@ long		createdDirID;
 
 	if (createIt)
 	{
-		iErr = DirCreate(gPrefsFolderVRefNum, gPrefsFolderDirID, PROJECT_NAME, &createdDirID);		// make folder in there
+		iErr = DirCreate(gPrefsFolderVRefNum, gPrefsFolderDirID, GAME_NAME, &createdDirID);		// make folder in there
 	}
 
 	return iErr;
@@ -145,7 +145,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.version				= CURRENT_PREFS_VERS;
 	gGamePrefs.kiddieMode			= false;
 	gGamePrefs.anaglyph				= ANAGLYPH_OFF;
-	gGamePrefs.monitorNum			= 0;
+	gGamePrefs.displayNumMinus1		= 0;
 	gGamePrefs.antialiasingLevel	= 0;
 	gGamePrefs.vsync				= true;
 	gGamePrefs.fullscreen			= true;
@@ -1023,6 +1023,11 @@ void GameMain(void)
 {
 unsigned long	someLong;
 
+				/* INIT PREFERENCES */
+
+	LoadPrefs();
+	MoveToPreferredDisplay();
+	SetFullscreenMode(true);
 
 				/**************/
 				/* BOOT STUFF */

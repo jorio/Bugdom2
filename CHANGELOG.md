@@ -1,5 +1,10 @@
 # Bugdom 2 Changelog
 
+## v4.0.1 (NOT RELEASED YET)
+
+- Ported to SDL 3
+- **NOTE:** The Mac version now requires macOS 10.13.
+
 ## v4.0.0 (October 8, 2023)
 
 Initial release of the modern version.

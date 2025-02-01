@@ -36,7 +36,7 @@ void InitWindowStuff(void)
 {
 	gGameWindowWidth = 640;
 	gGameWindowHeight = 480;
-	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+	SDL_GetWindowSizeInPixels(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
 }
 
 
@@ -49,7 +49,7 @@ void InitWindowStuff(void)
 void Enter2D(void)
 {
 	GrabMouse(false);
-	SDL_ShowCursor(SDL_ENABLE);
+	SDL_ShowCursor();
 	MyFlushEvents();
 }
 
@@ -67,7 +67,7 @@ void Exit2D(void)
 
 /******************** GET DEFAULT WINDOW SIZE *******************/
 
-void GetDefaultWindowSize(int display, int* width, int* height)
+void GetDefaultWindowSize(SDL_DisplayID display, int* width, int* height)
 {
 	const float aspectRatio = 16.0 / 9.0f;
 	const float screenCoverage = .8f;
@@ -87,28 +87,40 @@ void GetDefaultWindowSize(int display, int* width, int* height)
 	}
 }
 
+/******************** GET NUM DISPLAYS *******************/
+
+int GetNumDisplays(void)
+{
+	int numDisplays = 0;
+	SDL_DisplayID* displays = SDL_GetDisplays(&numDisplays);
+	SDL_free(displays);
+	return numDisplays;
+}
+
 /******************** MOVE WINDOW TO PREFERRED DISPLAY *******************/
 //
 // This works best in windowed mode.
 // Turn off fullscreen before calling this!
 //
 
-static void MoveToPreferredDisplay(void)
+void MoveToPreferredDisplay(void)
 {
-	int currentDisplay = SDL_GetWindowDisplayIndex(gSDLWindow);
-
-	if (currentDisplay != gGamePrefs.monitorNum)
+	if (gGamePrefs.displayNumMinus1 >= GetNumDisplays())
 	{
-		int w = 640;
-		int h = 480;
-		GetDefaultWindowSize(gGamePrefs.monitorNum, &w, &h);
-		SDL_SetWindowSize(gSDLWindow, w, h);
-
-		SDL_SetWindowPosition(
-			gSDLWindow,
-			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.monitorNum),
-			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.monitorNum));
+		gGamePrefs.displayNumMinus1 = 0;
 	}
+
+	SDL_DisplayID display = gGamePrefs.displayNumMinus1 + 1;
+
+	int w = 640;
+	int h = 480;
+	GetDefaultWindowSize(display, &w, &h);
+	SDL_SetWindowSize(gSDLWindow, w, h);
+	SDL_SyncWindow(gSDLWindow);
+
+	int centered = SDL_WINDOWPOS_CENTERED_DISPLAY(display);
+	SDL_SetWindowPosition(gSDLWindow, centered, centered);
+	SDL_SyncWindow(gSDLWindow);
 }
 
 /*********************** SET FULLSCREEN MODE **********************/
@@ -118,6 +130,7 @@ void SetFullscreenMode(bool enforceDisplayPref)
 	if (!gGamePrefs.fullscreen)
 	{
 		SDL_SetWindowFullscreen(gSDLWindow, 0);
+		SDL_SyncWindow(gSDLWindow);
 
 		if (enforceDisplayPref)
 		{
@@ -128,18 +141,21 @@ void SetFullscreenMode(bool enforceDisplayPref)
 	{
 		if (enforceDisplayPref)
 		{
-			int currentDisplay = SDL_GetWindowDisplayIndex(gSDLWindow);
+			SDL_DisplayID currentDisplay = SDL_GetDisplayForWindow(gSDLWindow);
+			SDL_DisplayID desiredDisplay = gGamePrefs.displayNumMinus1 + 1;
 
-			if (currentDisplay != gGamePrefs.monitorNum)
+			if (currentDisplay != desiredDisplay)
 			{
 				// We must switch back to windowed mode for the preferred monitor to take effect
-				SDL_SetWindowFullscreen(gSDLWindow, 0);
+				SDL_SetWindowFullscreen(gSDLWindow, false);
+				SDL_SyncWindow(gSDLWindow);
 				MoveToPreferredDisplay();
 			}
 		}
 
 		// Enter fullscreen mode
-		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		SDL_SetWindowFullscreen(gSDLWindow, true);
+		SDL_SyncWindow(gSDLWindow);
 	}
 
 	SDL_GL_SetSwapInterval(gGamePrefs.vsync);

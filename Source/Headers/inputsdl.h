@@ -87,7 +87,7 @@ Boolean UserWantsOut(void);
 Boolean IsCheatKeyComboDown(void);
 
 int GetNumControllers(void);
-struct _SDL_GameController* GetController(void);
+SDL_Gamepad* GetGamepad(void);
 void SetMainController(int oldControllerSlot);
 void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms);
 

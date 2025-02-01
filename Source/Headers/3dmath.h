@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <math.h>
+
 static inline float OGLMath_RadiansToDegrees(float x) { return x * (180.0f / PI); }
 static inline float OGLMath_DegreesToRadians(float x) { return x * (PI / 180.0f); }
 

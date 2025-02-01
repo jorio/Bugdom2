@@ -47,7 +47,7 @@ enum
 /*    VARIABLES            */
 /***************************/
 
-static const char*	gHighScoresFileName = ":" PROJECT_NAME ":HighScores4";
+static const char*	gHighScoresFileName = ":" GAME_NAME ":HighScores4";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -83,6 +83,7 @@ void NewScore(void)
 			/* LOOP */
 	
 	ResetFramesPerSecond();
+	SDL_StartTextInput(gSDLWindow);
 
 	while(!gExitHighScores)
 	{
@@ -103,6 +104,8 @@ void NewScore(void)
 
 
 		/* CLEANUP */
+
+	SDL_StopTextInput(gSDLWindow);
 
 	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file
 		SaveHighScores();
@@ -178,7 +181,7 @@ static void DoTextEntry(char* myName)
 
 			char c = myName[gCursorIndex];
 
-			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+			const char* posInCharset = SDL_strchr(kGamepadTextEntryCharset, c);
 
 			if (!posInCharset)
 			{
@@ -206,7 +209,7 @@ static void DoTextEntry(char* myName)
 
 			char c = myName[gCursorIndex];
 
-			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+			const char* posInCharset = SDL_strchr(kGamepadTextEntryCharset, c);
 
 			if (!posInCharset)
 			{
@@ -215,7 +218,7 @@ static void DoTextEntry(char* myName)
 			else
 			{
 				if (posInCharset == kGamepadTextEntryCharset)
-					posInCharset = kGamepadTextEntryCharset + strlen(kGamepadTextEntryCharset) - 1;
+					posInCharset = kGamepadTextEntryCharset + SDL_strlen(kGamepadTextEntryCharset) - 1;
 				else
 					posInCharset--;
 

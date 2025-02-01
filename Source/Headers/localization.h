@@ -215,5 +215,4 @@ void DisposeLocalizedStrings(void);
 const char* Localize(LocStrID stringID);
 int LocalizeWithPlaceholder(LocStrID stringID, char* buf, size_t bufSize, const char* format, ...);
 
-bool IsNativeEnglishSystem(void);
 GameLanguageID GetBestLanguageIDFromSystemLocale(void);

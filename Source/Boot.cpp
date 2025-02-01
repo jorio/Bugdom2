@@ -1,14 +1,13 @@
 // BUGDOM 2 ENTRY POINT
-// (C) 2023 Iliyas Jorio
+// (C) 2025 Iliyas Jorio
 // This file is part of Bugdom 2. https://github.com/jorio/bugdom2
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+
 #include "Pomme.h"
 #include "PommeInit.h"
 #include "PommeFiles.h"
-
-#include <iostream>
-#include <cstring>
 
 extern "C"
 {
@@ -17,14 +16,6 @@ extern "C"
 	SDL_Window* gSDLWindow = nullptr;
 	FSSpec gDataSpec;
 	int gCurrentAntialiasingLevel;
-
-/*
-#if _WIN32
-	// Tell Windows graphics driver that we prefer running on a dedicated GPU if available
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-	__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
-#endif
-*/
 }
 
 static fs::path FindGameData(const char* executablePath)
@@ -66,10 +57,10 @@ tryAgain:
 	dataPath = dataPath.lexically_normal();
 
 	// Set data spec -- Lets the game know where to find its asset files
-	gDataSpec = Pomme::Files::HostPathToFSSpec(dataPath / "Skeletons");
+	gDataSpec = Pomme::Files::HostPathToFSSpec(dataPath / "System");
 
 	FSSpec someDataFileSpec;
-	OSErr iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Skeletons:Grasshopper.bg3d", &someDataFileSpec);
+	OSErr iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":System:gamecontrollerdb.txt", &someDataFileSpec);
 	if (iErr)
 	{
 		goto tryAgain;
@@ -80,19 +71,26 @@ tryAgain:
 
 static void Boot(int argc, char** argv)
 {
-	const char* executablePath = argc > 0 ? argv[0] : NULL;
-
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
+	SDL_SetAppMetadata(GAME_FULL_NAME, GAME_VERSION, GAME_IDENTIFIER);
+#if _DEBUG
+	SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
+#else
+	SDL_SetLogPriorities(SDL_LOG_PRIORITY_INFO);
+#endif
 
 	// Start our "machine"
 	Pomme::Init();
+
+	// Find path to game data folder
+	const char* executablePath = argc > 0 ? argv[0] : NULL;
+	fs::path dataPath = FindGameData(executablePath);
 
 	// Load game prefs before starting
 	LoadPrefs();
 
 retryVideo:
 	// Initialize SDL video subsystem
-	if (0 != SDL_Init(SDL_INIT_VIDEO))
+	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
 		throw std::runtime_error("Couldn't initialize SDL video subsystem.");
 	}
@@ -109,31 +107,15 @@ retryVideo:
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 1 << gCurrentAntialiasingLevel);
 	}
 
-	// Determine display
-	int display = gGamePrefs.monitorNum;
-	if (display >= SDL_GetNumVideoDisplays())
-	{
-		display = 0;
-	}
-
-	// Determine initial window size
-	int initialWidth = 640;
-	int initialHeight = 480;
-	GetDefaultWindowSize(display, &initialWidth, &initialHeight);
-
 	gSDLWindow = SDL_CreateWindow(
-			PROJECT_FULL_NAME " (" PROJECT_VERSION ")",
-			SDL_WINDOWPOS_UNDEFINED_DISPLAY(display),
-			SDL_WINDOWPOS_UNDEFINED_DISPLAY(display),
-			initialWidth,
-			initialHeight,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+		GAME_FULL_NAME " (" GAME_VERSION ")", 640, 480,
+		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 
 	if (!gSDLWindow)
 	{
 		if (gCurrentAntialiasingLevel != 0)
 		{
-			printf("Couldn't create SDL window with the requested MSAA level. Retrying without MSAA...\n");
+			SDL_Log("Couldn't create SDL window with the requested MSAA level. Retrying without MSAA...");
 
 			// retry without MSAA
 			gGamePrefs.antialiasingLevel = 0;
@@ -146,25 +128,18 @@ retryVideo:
 		}
 	}
 
-	// Find path to game data folder
-	fs::path dataPath = FindGameData(executablePath);
-
-	// Init joystick subsystem
+	// Init gamepad subsystem
+	SDL_Init(SDL_INIT_GAMEPAD);
+	auto gamecontrollerdbPath8 = (dataPath / "System" / "gamecontrollerdb.txt").u8string();
+	if (-1 == SDL_AddGamepadMappingsFromFile((const char*)gamecontrollerdbPath8.c_str()))
 	{
-		SDL_Init(SDL_INIT_GAMECONTROLLER);
-		auto gamecontrollerdbPath8 = (dataPath / "System" / "gamecontrollerdb.txt").u8string();
-		if (-1 == SDL_GameControllerAddMappingsFromFile((const char*)gamecontrollerdbPath8.c_str()))
-		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, PROJECT_FULL_NAME, "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
-		}
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, GAME_FULL_NAME, "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
 	}
-
-	// Set fullscreen mode from prefs
-	SetFullscreenMode(true);
 }
 
 static void Shutdown()
 {
+	// Always restore the user's mouse acceleration before exiting.
 	SetMacLinearMouse(false);
 
 	Pomme::Shutdown();
@@ -180,9 +155,8 @@ static void Shutdown()
 
 int main(int argc, char** argv)
 {
-	int				returnCode				= 0;
-	std::string		finalErrorMessage		= "";
-	bool			showFinalErrorMessage	= false;
+	bool success = true;
+	std::string uncaught = "";
 
 	try
 	{
@@ -198,25 +172,23 @@ int main(int argc, char** argv)
 	// so we can show an error dialog to the user.
 	catch (std::exception& ex)		// Last-resort catch
 	{
-		returnCode = 1;
-		finalErrorMessage = ex.what();
-		showFinalErrorMessage = true;
+		success = false;
+		uncaught = ex.what();
 	}
 	catch (...)						// Last-resort catch
 	{
-		returnCode = 1;
-		finalErrorMessage = "unknown";
-		showFinalErrorMessage = true;
+		success = false;
+		uncaught = "unknown";
 	}
 #endif
 
 	Shutdown();
 
-	if (showFinalErrorMessage)
+	if (!success)
 	{
-		std::cerr << "Uncaught exception: " << finalErrorMessage << "\n";
-		SDL_ShowSimpleMessageBox(0, PROJECT_FULL_NAME, finalErrorMessage.c_str(), nullptr);
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Uncaught exception: %s", uncaught.c_str());
+		SDL_ShowSimpleMessageBox(0, GAME_FULL_NAME, uncaught.c_str(), nullptr);
 	}
 
-	return returnCode;
+	return success ? 0 : 1;
 }

@@ -1609,8 +1609,8 @@ static const Byte gridMask3[3*2][3*2] =
 
 				/* SEE IF ROW/COLUMN HAVE CHANGED */
 
-	deltaRow = abs(gCurrentSuperTileRow - gPreviousSuperTileRow);
-	deltaCol = abs(gCurrentSuperTileCol - gPreviousSuperTileCol);
+	deltaRow = SDL_abs(gCurrentSuperTileRow - gPreviousSuperTileRow);
+	deltaCol = SDL_abs(gCurrentSuperTileCol - gPreviousSuperTileCol);
 
 	if (deltaRow || deltaCol)
 	{

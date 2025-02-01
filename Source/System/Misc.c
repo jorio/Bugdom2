@@ -10,7 +10,6 @@
 /* EXTERNALS   */
 /***************/
 
-#include <stdarg.h>
 #include "game.h"
 
 
@@ -51,8 +50,8 @@ void DoAlert(const char* format, ...)
 	SDL_vsnprintf(message, sizeof(message), format, args);
 	va_end(args);
 
-	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, PROJECT_FULL_NAME " Alert: %s\n", message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, PROJECT_FULL_NAME, message, gSDLWindow);
+	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Game Alert: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GAME_FULL_NAME, message, gSDLWindow);
 
 	Exit2D();
 }
@@ -70,8 +69,8 @@ void DoFatalAlert(const char* format, ...)
 	SDL_vsnprintf(message, sizeof(message), format, args);
 	va_end(args);
 
-	SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, PROJECT_FULL_NAME " Fatal Alert: %s\n", message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, PROJECT_FULL_NAME, message, gSDLWindow);
+	SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Game Fatal Alert: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GAME_FULL_NAME, message, gSDLWindow);
 
 	Exit2D();
 	CleanQuit();

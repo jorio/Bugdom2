@@ -312,7 +312,7 @@ int		i;
 		newObj->WaveZIndex = newObj->Coord.z * .004f;
 	}
 
-	SetSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	SetSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
 	gValidMouseIcon = false;
 	gSelectedIcon = 0;
 }
@@ -412,7 +412,7 @@ static void DoMenuControls(void)
 		}
 
 
-		SetSystemCursor(gValidMouseIcon ? SDL_SYSTEM_CURSOR_HAND : SDL_SYSTEM_CURSOR_ARROW);
+		SetSystemCursor(gValidMouseIcon ? SDL_SYSTEM_CURSOR_POINTER : SDL_SYSTEM_CURSOR_DEFAULT);
 	}
 
 
@@ -786,9 +786,9 @@ static void DoCredits(void)
 	n++;
 
 	char systemInfo[512];
-	SDL_snprintf(systemInfo, sizeof(systemInfo), "%s v%s - %s (%s)\nOpenGL %s (%s)",
-		PROJECT_NAME,
-		PROJECT_VERSION,
+	SDL_snprintf(systemInfo, sizeof(systemInfo), "%s v%s - SDL %s (%s)\nOpenGL %s (%s)",
+		GAME_NAME,
+		GAME_VERSION,
 		SDL_GetRevision(),
 		SDL_GetCurrentVideoDriver(),
 		(const char*)glGetString(GL_VERSION),

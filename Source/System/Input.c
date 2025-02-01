@@ -14,7 +14,7 @@
 #define kJoystickDeadZoneFrac_UI		(.66f)
 
 #if MOUSE_SMOOTHING
-static const int kMouseSmoothingAccumulatorWindowTicks = 10;
+static const int kMouseSmoothingAccumulatorWindowNanoseconds = 10 * 1e6;  // 10 milliseconds
 #define DELTA_MOUSE_MAX_SNAPSHOTS 64
 #endif
 
@@ -24,28 +24,27 @@ static const int kMouseSmoothingAccumulatorWindowTicks = 10;
 
 typedef uint8_t KeyState;
 
-typedef struct Controller
+typedef struct Gamepad
 {
 	bool					open;
 	bool					fallbackToKeyboard;
 	bool					hasRumble;
-	SDL_GameController*		controllerInstance;
-	SDL_JoystickID			joystickInstance;
+	SDL_Gamepad*			sdlGamepad;
 	KeyState				needStates[NUM_CONTROL_NEEDS];
 	float					needAnalog[NUM_CONTROL_NEEDS];
 	float					needAnalogRaw[NUM_CONTROL_NEEDS];		// no dead zone
-} Controller;
+} Gamepad;
 
 Boolean				gUserPrefersGamepad = false;
 
-Controller			gController = {0};
+Gamepad				gGamepad = {0};
 
-static KeyState		gKeyboardStates[SDL_NUM_SCANCODES];
+static KeyState		gKeyboardStates[SDL_SCANCODE_COUNT];
 static KeyState		gMouseButtonStates[NUM_SUPPORTED_MOUSE_BUTTONS];
 static KeyState		gNeedStates[NUM_CONTROL_NEEDS];
 
 Boolean				gMouseMotionNow = false;
-char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+char				gTextInput[64];
 
 #if MOUSE_SMOOTHING
 static struct MouseSmoothingState
@@ -53,14 +52,14 @@ static struct MouseSmoothingState
 	bool initialized;
 	struct
 	{
-		uint32_t timestamp;
-		int dx;
-		int dy;
+		uint64_t timestamp;	// nanoseconds
+		float dx;
+		float dy;
 	} snapshots[DELTA_MOUSE_MAX_SNAPSHOTS];
 	int ringStart;
 	int ringLength;
-	int dxAccu;
-	int dyAccu;
+	float dxAccu;
+	float dyAccu;
 } gMouseSmoothing = {0};
 
 static void MouseSmoothing_ResetState(void);
@@ -69,31 +68,31 @@ static void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion);
 #endif
 
 static void OnJoystickRemoved(SDL_JoystickID which);
-static SDL_GameController* TryOpenControllerFromJoystick(int joystickIndex);
-static SDL_GameController* TryOpenAnyUnusedController(bool showMessage);
+static SDL_Gamepad* TryOpenGamepadFromJoystick(SDL_JoystickID joystickID);
+static SDL_Gamepad* TryOpenAnyUnusedGamepad(bool showMessage);
 static void SetPlayerAxisControls(void);
-static void CloseController(void);
+static void CloseGamepad(void);
 
-static SDL_Cursor* gSystemCursors[SDL_NUM_SYSTEM_CURSORS];
+static SDL_Cursor* gSystemCursors[SDL_SYSTEM_CURSOR_COUNT];
 
 #pragma mark -
 /**********************/
 
 void InitInput(void)
 {
-	TryOpenAnyUnusedController(false);
+	TryOpenAnyUnusedGamepad(false);
 }
 
 void DisposeInput(void)
 {
-	if (gController.open)
+	if (gGamepad.open)
 	{
-		CloseController();
+		CloseGamepad();
 	}
 
-	for (int i = 0; i < SDL_NUM_SYSTEM_CURSORS; i++)
+	for (int i = 0; i < SDL_SYSTEM_CURSOR_COUNT; i++)
 	{
-		SDL_FreeCursor(gSystemCursors[i]);
+		SDL_DestroyCursor(gSystemCursors[i]);
 		gSystemCursors[i] = NULL;
 	}
 }
@@ -129,24 +128,24 @@ void InvalidateAllInputs(void)
 	_Static_assert(1 == sizeof(KeyState), "sizeof(KeyState) has changed -- Rewrite this function without memset()!");
 
 	SDL_memset(gNeedStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
-	SDL_memset(gKeyboardStates, KEYSTATE_IGNOREHELD, SDL_NUM_SCANCODES);
+	SDL_memset(gKeyboardStates, KEYSTATE_IGNOREHELD, SDL_SCANCODE_COUNT);
 	SDL_memset(gMouseButtonStates, KEYSTATE_IGNOREHELD, NUM_SUPPORTED_MOUSE_BUTTONS);
 
-	SDL_memset(gController.needStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
+	SDL_memset(gGamepad.needStates, KEYSTATE_IGNOREHELD, NUM_CONTROL_NEEDS);
 }
 
 static void UpdateRawKeyboardStates(void)
 {
 	int numkeys = 0;
-	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
+	const bool* keystate = SDL_GetKeyboardState(&numkeys);
 
-	int minNumKeys = SDL_min(numkeys, SDL_NUM_SCANCODES);
+	int minNumKeys = SDL_min(numkeys, SDL_SCANCODE_COUNT);
 
 	for (int i = 0; i < minNumKeys; i++)
 		UpdateKeyState(&gKeyboardStates[i], keystate[i]);
 
 	// fill out the rest
-	for (int i = minNumKeys; i < SDL_NUM_SCANCODES; i++)
+	for (int i = minNumKeys; i < SDL_SCANCODE_COUNT; i++)
 		UpdateKeyState(&gKeyboardStates[i], false);
 }
 
@@ -166,7 +165,7 @@ static void ProcessAltEnter(void)
 static void ProcessCmdQ(void)
 {
 	if ((IsKeyHeld(SDL_SCANCODE_LGUI) || IsKeyHeld(SDL_SCANCODE_RGUI))
-		&& IsKeyDown(SDL_GetScancodeFromKey(SDLK_q)))
+		&& IsKeyDown(SDL_GetScancodeFromKey(SDLK_Q, NULL)))
 	{
 		if (gInGameNow && !gGamePaused)
 		{
@@ -186,7 +185,7 @@ static void UpdateMouseButtonStates(int mouseWheelDeltaX, int mouseWheelDeltaY)
 
 	for (int i = 1; i < NUM_SUPPORTED_MOUSE_BUTTONS_PURESDL; i++)	// SDL buttons start at 1!
 	{
-		bool buttonBit = 0 != (mouseButtons & SDL_BUTTON(i));
+		bool buttonBit = 0 != (mouseButtons & SDL_BUTTON_MASK(i));
 		UpdateKeyState(&gMouseButtonStates[i], buttonBit);
 	}
 
@@ -208,7 +207,7 @@ static void UpdateKeyboardMouseInputNeeds(void)
 		for (int j = 0; j < MAX_BINDINGS_PER_NEED; j++)
 		{
 			int16_t scancode = kb->key[j];
-			if (scancode && scancode < SDL_NUM_SCANCODES)
+			if (scancode && scancode < SDL_SCANCODE_COUNT)
 			{
 				pressed |= gKeyboardStates[scancode] & KEYSTATE_ACTIVE_BIT;
 			}
@@ -222,14 +221,14 @@ static void UpdateKeyboardMouseInputNeeds(void)
 
 static void UpdateControllerInputNeeds(void)
 {
-	Controller* controller = &gController;
+	Gamepad* controller = &gGamepad;
 
 	if (!controller->open)
 	{
 		return;
 	}
 
-	SDL_GameController* controllerInstance = controller->controllerInstance;
+	SDL_Gamepad* sdlGamepad = controller->sdlGamepad;
 
 	for (int needNum = 0; needNum < NUM_CONTROL_NEEDS; needNum++)
 	{
@@ -250,7 +249,7 @@ static void UpdateControllerInputNeeds(void)
 
 			if (type == kInputTypeButton)
 			{
-				if (0 != SDL_GameControllerGetButton(controllerInstance, pb->id))
+				if (0 != SDL_GetGamepadButton(sdlGamepad, pb->id))
 				{
 					pressed = true;
 					actuation = 1;
@@ -258,7 +257,7 @@ static void UpdateControllerInputNeeds(void)
 			}
 			else if (type == kInputTypeAxisPlus || type == kInputTypeAxisMinus)
 			{
-				int16_t axis = SDL_GameControllerGetAxis(controllerInstance, pb->id);
+				int16_t axis = SDL_GetGamepadAxis(sdlGamepad, pb->id);
 				if (type == kInputTypeAxisPlus)
 					analogRaw = axis * (1.0f / 32767.0f);
 				else
@@ -312,27 +311,20 @@ void UpdateInput(void)		// Also called DoSDLMaintenance in other ports
 	{
 		switch (event.type)
 		{
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 				CleanQuit();			// throws Pomme::QuitRequest
 				return;
 
-			case SDL_WINDOWEVENT:
-				if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				{
-					CleanQuit();		// throws Pomme::QuitRequest
-				}
-				break;
-
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				gUserPrefersGamepad = false;
 				break;
 
-			case SDL_TEXTINPUT:
-				SDL_memcpy(gTextInput, event.text.text, sizeof(gTextInput));
-				_Static_assert(sizeof(gTextInput) == sizeof(event.text.text), "size mismatch: gTextInput/event.text.text");
+			case SDL_EVENT_TEXT_INPUT:
+				SDL_snprintf(gTextInput, sizeof(gTextInput), "%s", event.text.text);
 				break;
 
-			case SDL_MOUSEMOTION:
+			case SDL_EVENT_MOUSE_MOTION:
 				gMouseMotionNow = true;
 				gUserPrefersGamepad = false;
 #if MOUSE_SMOOTHING
@@ -340,25 +332,22 @@ void UpdateInput(void)		// Also called DoSDLMaintenance in other ports
 #endif
 				break;
 
-			case SDL_MOUSEWHEEL:
+			case SDL_EVENT_MOUSE_WHEEL:
 				gUserPrefersGamepad = false;
 				mouseWheelDeltaX += event.wheel.y;
 				mouseWheelDeltaY += event.wheel.x;
 				break;
 
-			case SDL_CONTROLLERDEVICEADDED:
-				// event.cdevice.which is the joystick's DEVICE INDEX (not an instance id!)
-				TryOpenControllerFromJoystick(event.cdevice.which);
+			case SDL_EVENT_GAMEPAD_ADDED:
+				TryOpenGamepadFromJoystick(event.gdevice.which);
 				break;
 
-			case SDL_CONTROLLERDEVICEREMOVED:
-				// event.cdevice.which is the joystick's UNIQUE INSTANCE ID (not an index!)
-				OnJoystickRemoved(event.cdevice.which);
+			case SDL_EVENT_GAMEPAD_REMOVED:
+				OnJoystickRemoved(event.gdevice.which);
 				break;
 
-			case SDL_CONTROLLERBUTTONDOWN:
-			case SDL_CONTROLLERBUTTONUP:
-			case SDL_JOYBUTTONDOWN:
+			case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+			case SDL_EVENT_GAMEPAD_BUTTON_UP:
 				gUserPrefersGamepad = true;
 				break;
 		}
@@ -391,7 +380,7 @@ void UpdateInput(void)		// Also called DoSDLMaintenance in other ports
 
 int GetKeyState(uint16_t sdlScancode)
 {
-	if (sdlScancode >= SDL_NUM_SCANCODES)
+	if (sdlScancode >= SDL_SCANCODE_COUNT)
 		return KEYSTATE_OFF;
 	return gKeyboardStates[sdlScancode];
 }
@@ -412,7 +401,7 @@ int GetNeedState(int needID)
 	GAME_ASSERT(needID >= 0);
 	GAME_ASSERT(needID < NUM_CONTROL_NEEDS);
 
-	const Controller* controller = &gController;
+	const Gamepad* controller = &gGamepad;
 
 	if (controller->open && controller->needStates[needID])
 	{
@@ -436,7 +425,7 @@ static float GetAnalogValue(int needID, bool raw)
 		return 1;
 	}
 
-	const Controller* controller = &gController;
+	const Gamepad* controller = &gGamepad;
 
 	if (controller->open && controller->needAnalogRaw[needID] != 0.0f)
 	{
@@ -523,110 +512,113 @@ Boolean IsCheatKeyComboDown(void)
 
 int GetNumControllers(void)
 {
-	return gController.open? 1: 0;
+	return gGamepad.open? 1: 0;
 }
 
-static SDL_GameController* TryOpenControllerFromJoystick(int joystickIndex)
+static SDL_Gamepad* TryOpenGamepadFromJoystick(SDL_JoystickID joystickID)
 {
 	// First, check that it's not in use already
-	if (gController.open && gController.joystickInstance == joystickIndex)
+	if (gGamepad.open && SDL_GetGamepadID(gGamepad.sdlGamepad) == joystickID)
 	{
-		return gController.controllerInstance;
+		return gGamepad.sdlGamepad;
 	}
 
-	// Don't open if we already have a controller
-	if (gController.open)
+	// Don't open if we already have a gamepad
+	if (gGamepad.open)
 	{
 		return NULL;
 	}
 
-	// If we can't get an SDL_GameController from that joystick, don't bother
-	if (!SDL_IsGameController(joystickIndex))
+	// If we can't get an SDL_Gamepad from that joystick, don't bother
+	if (!SDL_IsGamepad(joystickID))
 	{
 		return NULL;
 	}
 
 	// Use this one
-	SDL_GameController* controllerInstance = SDL_GameControllerOpen(joystickIndex);
+	SDL_Gamepad* sdlGamepad = SDL_OpenGamepad(joystickID);
 
-	gController = (Controller)
+	SDL_PropertiesID props = SDL_GetGamepadProperties(sdlGamepad);
+
+	gGamepad = (Gamepad)
 	{
 		.open = true,
-		.controllerInstance = controllerInstance,
-		.joystickInstance = SDL_JoystickGetDeviceInstanceID(joystickIndex),
-#if SDL_VERSION_ATLEAST(2,0,18)
-		.hasRumble = SDL_GameControllerHasRumble(controllerInstance),
-#else
-		#warning Rumble support requires SDL 2.0.18 later
-		.hasRumble = false,
-#endif
+		.sdlGamepad = sdlGamepad,
+		.hasRumble = SDL_GetBooleanProperty(props, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false),
 	};
 
-	SDL_Log("Opened joystick %d as controller: \"%s\" - Rumble support: %d\n",
-		gController.joystickInstance,
-		SDL_GameControllerName(gController.controllerInstance),
-		gController.hasRumble);
+	SDL_Log("Opened joystick %d as gamepad: \"%s\" - Rumble support: %d",
+		joystickID,
+		SDL_GetGamepadName(gGamepad.sdlGamepad),
+		gGamepad.hasRumble);
 
 	gUserPrefersGamepad = true;
 
-	return gController.controllerInstance;
+	return gGamepad.sdlGamepad;
 }
 
-static SDL_GameController* TryOpenAnyUnusedController(bool showMessage)
+static SDL_Gamepad* TryOpenAnyUnusedGamepad(bool showMessage)
 {
-	int numJoysticks = SDL_NumJoysticks();
+	int numJoysticks = 0;
 	int numJoysticksAlreadyInUse = 0;
 
-	if (numJoysticks == 0)
-	{
-		return NULL;
-	}
+	SDL_JoystickID* joysticks = SDL_GetJoysticks(&numJoysticks);
+	SDL_Gamepad* newGamepad = NULL;
 
 	for (int i = 0; i < numJoysticks; ++i)
 	{
-		// Usable as an SDL GameController?
-		if (!SDL_IsGameController(i))
+		SDL_JoystickID joystickID = joysticks[i];
+
+		// Usable as an SDL_Gamepad?
+		if (!SDL_IsGamepad(joystickID))
 		{
 			continue;
 		}
 
 		// Already in use?
-		if (gController.open && gController.joystickInstance == i)
+		if (gGamepad.open && SDL_GetGamepadID(gGamepad.sdlGamepad) == joystickID)
 		{
 			numJoysticksAlreadyInUse++;
 			continue;
 		}
 
 		// Use this one
-		SDL_GameController* newController = TryOpenControllerFromJoystick(i);
-		if (newController)
+		newGamepad = TryOpenGamepadFromJoystick(joystickID);
+		if (newGamepad)
 		{
-			return newController;
+			break;
 		}
 	}
 
-	if (numJoysticksAlreadyInUse == numJoysticks)
+	if (newGamepad)
 	{
-		// All joysticks already in use
-		return NULL;
+		// OK
 	}
-
-	SDL_Log("Joystick(s) found, but none is suitable as an SDL_GameController.\n");
-	if (showMessage)
+	else if (numJoysticksAlreadyInUse == numJoysticks)
 	{
-		char messageBuf[1024];
-		SDL_snprintf(messageBuf, sizeof(messageBuf),
-					"The game does not support your controller yet (\"%s\").\n\n"
-					"You can play with the keyboard and mouse instead. Sorry!",
-					SDL_JoystickNameForIndex(0));
-		SDL_ShowSimpleMessageBox(
+		// No-op; All joysticks already in use (or there might be zero joysticks)
+	}
+	else
+	{
+		SDL_Log("%d joysticks found, but none is suitable as an SDL_Gamepad.", numJoysticks);
+		if (showMessage)
+		{
+			char messageBuf[1024];
+			SDL_snprintf(messageBuf, sizeof(messageBuf),
+						 "The game does not support your controller yet (\"%s\").\n\n"
+						 "You can play with the keyboard and mouse instead. Sorry!",
+						 SDL_GetJoystickNameForID(joysticks[0]));
+			SDL_ShowSimpleMessageBox(
 				SDL_MESSAGEBOX_WARNING,
 				"Controller not supported",
 				messageBuf,
 				gSDLWindow);
+		}
 	}
 
-	return NULL;
+	SDL_free(joysticks);
+
+	return newGamepad;
 }
 
 void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms)
@@ -639,9 +631,6 @@ void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms
 		1.0f,
 	};
 
-#if !(SDL_VERSION_ATLEAST(2,0,18))
-	#warning Rumble support requires SDL 2.0.18 later
-#else
 	// Don't bother if rumble turned off in prefs
 	if (!gGamePrefs.gamepadRumbleLevel)
 	{
@@ -656,49 +645,47 @@ void Rumble(float lowFrequencyStrength, float highFrequencyStrength, uint32_t ms
 	lowFrequencyStrength *= rumbleIntensityFrac;
 	highFrequencyStrength *= rumbleIntensityFrac;
 
-	const Controller* controller = &gController;
+	const Gamepad* gamepad = &gGamepad;
 
-	// Gotta have a valid SDL controller instance
-	if (!controller->hasRumble || !controller->controllerInstance)
+	// Gotta have a valid SDL_Gamepad instance
+	if (!gamepad->hasRumble || !gamepad->sdlGamepad)
 	{
 		return;
 	}
 
-	SDL_GameControllerRumble(
-		controller->controllerInstance,
+	SDL_RumbleGamepad(
+		gamepad->sdlGamepad,
 		(Uint16)(lowFrequencyStrength * 65535),
 		(Uint16)(highFrequencyStrength * 65535),
 		(Uint32)((float)ms * rumbleIntensityFrac));
 
 	// Prevent jetpack effect from kicking in while we're playing this
 //	gPlayerInfo[playerID].jetpackRumbleCooldown = ms * (1.0f / 1000.0f);
-#endif
 }
 
-static void CloseController(void)
+static void CloseGamepad(void)
 {
-	GAME_ASSERT(gController.open);
-	GAME_ASSERT(gController.controllerInstance);
+	GAME_ASSERT(gGamepad.open);
+	GAME_ASSERT(gGamepad.sdlGamepad);
 
-	SDL_GameControllerClose(gController.controllerInstance);
-	gController.open = false;
-	gController.controllerInstance = NULL;
-	gController.joystickInstance = -1;
-	gController.hasRumble = false;
+	SDL_CloseGamepad(gGamepad.sdlGamepad);
+	gGamepad.open = false;
+	gGamepad.sdlGamepad = NULL;
+	gGamepad.hasRumble = false;
 }
 
-static void OnJoystickRemoved(SDL_JoystickID joystickInstanceID)
+static void OnJoystickRemoved(SDL_JoystickID joystickID)
 {
-	if (gController.open && gController.joystickInstance == joystickInstanceID)		// we're using this joystick
+	if (gGamepad.open && SDL_GetGamepadID(gGamepad.sdlGamepad) == joystickID)		// we're using this joystick
 	{
-		SDL_Log("Joystick %d was removed, was in use by game\n", joystickInstanceID);
+		SDL_Log("Joystick %d was removed, was in use by game", joystickID);
 
-		// Nuke reference to this controller+joystick
-		CloseController();
+		// Nuke reference to this SDL_Gamepad
+		CloseGamepad();
 	}
 
 	// Fill up any controller slots that are vacant
-	TryOpenAnyUnusedController(false);
+	TryOpenAnyUnusedGamepad(false);
 
 	// Disable gUserPrefersGamepad if there are no controllers connected
 	if (0 == GetNumControllers())
@@ -770,8 +757,8 @@ static void MouseSmoothing_StartFrame(void)
 		state->initialized = true;
 	}
 
-	uint32_t now = SDL_GetTicks();
-	uint32_t cutoffTimestamp = now - kMouseSmoothingAccumulatorWindowTicks;
+	uint64_t now = SDL_GetTicksNS();
+	uint64_t cutoffTimestamp = now - kMouseSmoothingAccumulatorWindowNanoseconds;
 
 	// Purge old snapshots
 	while (state->ringLength > 0 &&
@@ -793,7 +780,7 @@ static void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion)
 
 	if (state->ringLength == DELTA_MOUSE_MAX_SNAPSHOTS)
 	{
-//		printf("%s: buffer full!!\n", __func__);
+//		SDL_Log("%s: buffer full!!", __func__);
 		MouseSmoothing_PopOldestSnapshot();				// make room at start of ring buffer
 	}
 
@@ -832,8 +819,8 @@ OGLVector2D GetMouseDelta(void)
 	// so we mustn't poll GetRelativeMouseState any faster than 60 Hz.
 	if (timeSinceLastCall >= (1.0f / 60.0f))
 	{
-		int x = 0;
-		int y = 0;
+		float x = 0;
+		float y = 0;
 		SDL_GetRelativeMouseState(&x, &y);
 		lastDelta = (OGLVector2D){x * sensitivity, y * sensitivity};
 		timeSinceLastCall = 0;
@@ -846,10 +833,10 @@ OGLVector2D GetMouseDelta(void)
 OGLPoint2D GetMouseCoordsIn2DLogicalRect(void)
 {
 	// On macOS, the mouse position is relative to the window's "point size" on Retina screens.
-	int mx, my;
+	float mx, my;
 	int ww, wh;
 	SDL_GetMouseState(&mx, &my);
-	SDL_GetWindowSize(gSDLWindow, &ww, &wh);
+	SDL_GetWindowSize(gSDLWindow, &ww, &wh);		// IMPORTANT: Do NOT use SDL_GetWindowSizeInPixels here
 
 //	OGLRect r = Get2DLogicalRect(GetOverlayPaneNumber(), 1);
 	OGLRect r = g2DLogicalRect;
@@ -859,8 +846,8 @@ OGLPoint2D GetMouseCoordsIn2DLogicalRect(void)
 
 	OGLPoint2D p =
 	{
-		(float) mx * screenToPaneX + r.left,
-		(float) my * screenToPaneY + r.top
+		mx * screenToPaneX + r.left,
+		my * screenToPaneY + r.top
 	};
 
 	return p;
@@ -884,13 +871,13 @@ void BackupRestoreCursorCoord(Boolean backup)
 		OGLRect r = g2DLogicalRect;
 
 		int ww, wh;
-		SDL_GetWindowSize(gSDLWindow, &ww, &wh);
+		SDL_GetWindowSize(gSDLWindow, &ww, &wh);		// IMPORTANT: Do NOT use SDL_GetWindowSizeInPixels here!
 
 		float screenToPaneX = (r.right - r.left) / (float)ww;
 		float screenToPaneY = (r.bottom - r.top) / (float)wh;
 
-		int mx = (int) ((cursorCoord.x - r.left) / screenToPaneX);
-		int my = (int) ((cursorCoord.y - r.top) / screenToPaneY);
+		float mx = (cursorCoord.x - r.left) / screenToPaneX;
+		float my = (cursorCoord.y - r.top) / screenToPaneY;
 		SDL_WarpMouseInWindow(gSDLWindow, mx, my);
 	}
 }
@@ -905,9 +892,8 @@ void GrabMouse(Boolean capture)
 		BackupRestoreCursorCoord(true);
 	}
 
-	SDL_SetWindowGrab(gSDLWindow, capture);
-	SDL_SetRelativeMouseMode(capture? SDL_TRUE: SDL_FALSE);
-//	SDL_ShowCursor(capture? 0: 1);
+	SDL_SetWindowMouseGrab(gSDLWindow, capture);
+	SDL_SetWindowRelativeMouseMode(gSDLWindow, capture);
 	SetMacLinearMouse(capture);
 
 	if (!capture)
@@ -921,11 +907,11 @@ void SetSystemCursor(int sdlSystemCursor)
 {
 	if (sdlSystemCursor < 0)
 	{
-		SDL_ShowCursor(SDL_DISABLE);
+		SDL_HideCursor();
 		return;
 	}
 
-	GAME_ASSERT(sdlSystemCursor < SDL_NUM_SYSTEM_CURSORS);
+	GAME_ASSERT(sdlSystemCursor < SDL_SYSTEM_CURSOR_COUNT);
 
 	SDL_Cursor* cursor = gSystemCursors[sdlSystemCursor];
 
@@ -940,13 +926,13 @@ void SetSystemCursor(int sdlSystemCursor)
 		SDL_SetCursor(cursor);
 	}
 
-	SDL_ShowCursor(SDL_ENABLE);
+	SDL_ShowCursor();
 }
 
-SDL_GameController* GetController(void)
+SDL_Gamepad* GetGamepad(void)
 {
-	if (gController.open)
-		return gController.controllerInstance;
+	if (gGamepad.open)
+		return gGamepad.sdlGamepad;
 	
 	return NULL;
 }

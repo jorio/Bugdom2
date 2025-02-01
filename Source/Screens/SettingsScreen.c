@@ -62,23 +62,18 @@ static void cb_ResetMouseBindings(void)
 	LayoutCurrentMenuAgain();
 }
 
-//static const char* GenerateVideoLabel(void)
-//{
-//	return glGetString(GL_RENDERER);
-//}
-
 static const char* GenerateGamepadLabel(void)
 {
-	SDL_GameController* controller = GetController();
-	if (controller)
-		return SDL_GameControllerName(controller);
+	SDL_Gamepad* gamepad = GetGamepad();
+	if (gamepad)
+		return SDL_GetGamepadName(gamepad);
 	else
 		return Localize(STR_NO_GAMEPAD_DETECTED);
 }
 
 static uint8_t GenerateNumDisplays(void)
 {
-	int numDisplays = SDL_GetNumVideoDisplays();
+	int numDisplays = GetNumDisplays();
 	return SDL_clamp(numDisplays, 1, 255);
 }
 
@@ -267,7 +262,6 @@ static const MenuItem kSettingsMenuTree[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-#if !(__APPLE__ && __x86_64__)		// On macOS, don't expose AA to old machines
 	{
 		.type = kMICycler,
 		.text = STR_ANTIALIASING,
@@ -278,14 +272,13 @@ static const MenuItem kSettingsMenuTree[] =
 			.choices = {STR_OFF, STR_MSAA_2X, STR_MSAA_4X, STR_MSAA_8X},
 		}
 	},
-#endif
 	{
 		.type = kMICycler,
 		.text = STR_PREFERRED_DISPLAY,
 		.callback = SetFullscreenModeFromPrefs,
 		.cycler =
 		{
-			.valuePtr = &gGamePrefs.monitorNum,
+			.valuePtr = &gGamePrefs.displayNumMinus1,
 			.generateNumChoices = GenerateNumDisplays,
 			.generateChoiceString = GenerateDisplayName,
 		},

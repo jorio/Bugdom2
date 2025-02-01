@@ -50,7 +50,7 @@ typedef struct
 
 #define	CURRENT_PREFS_VERS	0xA0E2
 #define PREFS_FILE_NAME		"Preferences4"
-#define PREFS_FILE_PATH		(":" PROJECT_NAME ":" PREFS_FILE_NAME)
+#define PREFS_FILE_PATH		(":" GAME_NAME ":" PREFS_FILE_NAME)
 
 typedef struct
 {
@@ -62,7 +62,7 @@ typedef struct
 	Boolean	music;
 	Boolean	buddyBugBuzz;
 
-	Byte	monitorNum;
+	Byte	displayNumMinus1;
 	Byte	antialiasingLevel;
 	Boolean	vsync;
 	Boolean	fullscreen;

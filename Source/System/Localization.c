@@ -1,9 +1,8 @@
 // LOCALIZATION.C
-// (C) 2022 Iliyas Jorio
-// This file is part of Nanosaur 2. https://github.com/jorio/nanosaur2
+// (C) 2025 Iliyas Jorio
+// This file is part of Bugdom 2. https://github.com/jorio/bugdom2
 
 #include "game.h"
-#include <SDL.h>
 
 #define CSV_PATH ":System:strings.csv"
 
@@ -138,44 +137,22 @@ fail:
 	return SDL_snprintf(buf, bufSize, "%s", localizedString);
 }
 
-bool IsNativeEnglishSystem(void)
-{
-	bool prefersEnglish = true;
-
-#if SDL_VERSION_ATLEAST(2,0,14)
-	SDL_Locale* localeList = SDL_GetPreferredLocales();
-
-	if (NULL != localeList
-		&& 0 != localeList[0].language
-		&& (0 != SDL_strncmp(localeList[0].language, kLanguageCodesISO639_1[LANGUAGE_ENGLISH], 2)))
-	{
-		prefersEnglish = false;
-	}
-
-	SDL_free(localeList);
-#endif
-
-	return prefersEnglish;
-}
-
 GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 {
 	GameLanguageID languageID = LANGUAGE_ENGLISH;
 
-#if !(SDL_VERSION_ATLEAST(2,0,14))
-	#warning Please upgrade to SDL 2.0.14 or later for SDL_GetPreferredLocales. Will default to English for now.
-#else
-	SDL_Locale* localeList = SDL_GetPreferredLocales();
-	if (!localeList)
-		return languageID;
+	int numLocales = 0;
+	SDL_Locale** localeList = SDL_GetPreferredLocales(&numLocales);
 
-	for (SDL_Locale* locale = localeList; locale->language; locale++)
+	for (int locale = 0; locale < numLocales; locale++)
 	{
-		for (int i = 0; i < NUM_LANGUAGES; i++)
+		const char* localeLanguage = localeList[locale]->language;
+
+		for (int language = 0; language < NUM_LANGUAGES; language++)
 		{
-			if (0 == SDL_strncmp(locale->language, kLanguageCodesISO639_1[i], 2))
+			if (0 == SDL_strncmp(localeLanguage, kLanguageCodesISO639_1[language], 2))
 			{
-				languageID = i;
+				languageID = language;
 				goto foundLocale;
 			}
 		}
@@ -183,7 +160,6 @@ GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 
 foundLocale:
 	SDL_free(localeList);
-#endif
 
 	return languageID;
 }

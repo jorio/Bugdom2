@@ -430,7 +430,7 @@ OSErr			err;
 	const char* footer = "\0\0\0\0\0\0\0\0TRUEVISION-XFILE.\0";
 	SDL_RWwrite(f, footer, sizeof(footer), 1);
 	SDL_RWclose(f);
-	printf("Wrote %s (pixel format 0x%x)\n", path, textureHeader.srcPixelFormat);
+	SDL_Log("Wrote %s (pixel format 0x%x)\n", path, textureHeader.srcPixelFormat);
 #endif
 }
 

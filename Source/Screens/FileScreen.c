@@ -15,7 +15,7 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 	char* labelBufferPos = labelBuffer;
 
 	MenuItem menu[NUM_SAVE_SLOTS+5+2];
-	memset(menu, 0, sizeof(menu));
+	SDL_memset(menu, 0, sizeof(menu));
 
 	int menuIndex = 0;
 

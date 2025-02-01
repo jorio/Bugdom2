@@ -114,8 +114,8 @@ void OGL_Boot(void)
 
 			/* ACTIVATE CONTEXT */
 
-	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
-	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
+	bool didMakeCurrent = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(didMakeCurrent, SDL_GetError());
 	
 	
 			/* SEE IF SUPPORT 1024x1024 TEXTURES */
@@ -241,7 +241,7 @@ void OGL_DisposeWindowSetup(OGLSetupOutputType *outputPtr)
 {
 	if (gAGLContext)
 	{
-		SDL_GL_DeleteContext(gAGLContext);						// nuke the AGL context
+		SDL_GL_DestroyContext(gAGLContext);						// nuke the AGL context
 		gAGLContext = NULL;
 	}
 
@@ -452,7 +452,7 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 
 			/* REFRESH DIMENSIONS */
 
-	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+	SDL_GetWindowSizeInPixels(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
 
 	g2DLogicalRect = Get2DLogicalRect(1);
 
