@@ -11,7 +11,6 @@
 /***************/
 
 #include "game.h"
-#include <time.h>
 
 
 /****************************/
@@ -1192,12 +1191,17 @@ short			fRefNum;
 FSSpec			spec;
 OSErr			err;
 Str255			saveFilePath;
+SDL_Time		timestampNanoseconds = 0;
+
+			/* GET TIMESTAMP */
+
+	SDL_GetCurrentTime(&timestampNanoseconds);
 
 			/*************************/
 			/* CREATE SAVE GAME DATA */
 			/*************************/
 
-	saveData.timestamp		= time(NULL);
+	saveData.timestamp		= timestampNanoseconds / 1e9;
 	saveData.version		= SAVE_GAME_VERSION;				// save file version #
 	saveData.score 			= gScore;
 	saveData.health			= gPlayerInfo.health;

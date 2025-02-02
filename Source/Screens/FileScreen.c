@@ -4,7 +4,6 @@
 
 #include "game.h"
 #include "menu.h"
-#include <time.h>
 
 bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 {
@@ -58,25 +57,31 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 		}
 		else
 		{
-			int month = 0;
-			int day = 0;
-			int year = 0;
+			char dateBuf[64];
+			SDL_DateTime dt = {0};
+			SDL_TimeToDateTime(saveData.timestamp * 1e9, &dt, true);
+			const char* month = Localize(dt.month - 1 + STR_JANUARY);
+			int day = dt.day;
+			int year = dt.year;
 
-			time_t timestamp = (time_t) saveData.timestamp;
-			struct tm *timeinfo = localtime(&timestamp);
-
-			if (timeinfo)
+			switch (gGamePrefs.language)
 			{
-				month = timeinfo->tm_mon;
-				day = timeinfo->tm_mday;
-				year = 1900 + timeinfo->tm_year;
+				case LANGUAGE_ENGLISH:
+					SDL_snprintf(dateBuf, sizeof(dateBuf), "%s %d, %d", month, day, year);
+					break;
+				case LANGUAGE_GERMAN:
+					SDL_snprintf(dateBuf, sizeof(dateBuf), "%d. %s %d", day, month, year);
+					break;
+				default:
+					SDL_snprintf(dateBuf, sizeof(dateBuf), "%d %s %d", day, month, year);
+					break;
 			}
 
 			SDL_snprintf(labelBufferPos, maxLabelLength,
-				"%s %c:\t\t%s %d\t\t%d %s %d",
+				"%s %c:\t\t%s %d\t\t%s",
 				Localize(STR_FILE), 'A' + i,
 				Localize(STR_LEVEL), saveData.realLevel+1,
-				day, Localize(month + STR_JANUARY), year);
+				dateBuf);
 
 			mi->type = kMIPick;
 			mi->id = i;
