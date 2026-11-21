@@ -423,6 +423,12 @@ void UpdateCamera(void)
 
 static void UpdateCamera_Terrain(void)
 {
+#ifdef __EMSCRIPTEN__
+    float webYaw, webPitch, webZoom;
+    WebConsumeCamera(&webYaw, &webPitch, &webZoom);
+    gCameraDistFromMe = fminf(1200, fmaxf(CAMERA_CLOSEST, gCameraDistFromMe + webZoom));
+    gCameraHeightFactor = fminf(1.5f, fmaxf(.05f, gCameraHeightFactor + webPitch));
+#endif
 float	fps = gFramesPerSecondFrac;
 OGLPoint3D	from,to,target;
 float		distX,distZ,distY,dist;
@@ -763,6 +769,9 @@ got_target:
 				/* ROTATE BY USER ROT */
 
 	float cameraDelta = 0;
+#ifdef __EMSCRIPTEN__
+	cameraDelta -= webYaw / fmaxf(.001f, fps * 2.5f);
+#endif
 
 	// Keyboard: Fast camera motion
 	cameraDelta += 2.0f * GetNeedAxis1D(kNeed_CameraLeft, kNeed_CameraRight);

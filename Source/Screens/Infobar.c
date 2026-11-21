@@ -260,6 +260,15 @@ static void DrawInfobar(ObjNode* theNode)
 	}
 
 
+#ifdef __EMSCRIPTEN__
+    float wt, wr, wb, wl;
+    WebGetHUDInsets(g2DLogicalRect.right-g2DLogicalRect.left, g2DLogicalRect.bottom-g2DLogicalRect.top, &wt, &wr, &wb, &wl);
+    gUIAnchors.left = fmaxf(gUIAnchors.left, g2DLogicalRect.left + wl);
+    gUIAnchors.right = fminf(gUIAnchors.right, g2DLogicalRect.right - wr);
+    gUIAnchors.top = fmaxf(gUIAnchors.top, g2DLogicalRect.top + wt);
+    gUIAnchors.bottom = fminf(gUIAnchors.bottom, g2DLogicalRect.bottom - wb);
+#endif
+
 		/************/
 		/* SET TAGS */
 		/************/

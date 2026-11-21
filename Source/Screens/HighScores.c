@@ -598,6 +598,9 @@ err:
 	count = sizeof(HighScoreType) * NUM_SCORES;
 	FSWrite(refNum, &count, (Ptr) gHighScores);
 	FSClose(refNum);
+#ifdef __EMSCRIPTEN__
+	WebSyncFiles();
+#endif
 
 }
 
