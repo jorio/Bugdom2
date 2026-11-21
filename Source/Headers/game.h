@@ -252,3 +252,7 @@ extern	uint32_t				gGameFrameNum;
 extern	uint32_t				gGlobalMaterialFlags;
 extern	uint32_t				gLoadedScore;
 extern	uint32_t				gScore;
+
+#ifdef __EMSCRIPTEN__
+#include "web.h"
+#endif

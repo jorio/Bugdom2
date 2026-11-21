@@ -546,6 +546,9 @@ long				count;
 	count = sizeof(PrefsType);
 	FSWrite(refNum, &count, (Ptr) &gGamePrefs);
 	FSClose(refNum);
+#ifdef __EMSCRIPTEN__
+	WebSyncFiles();
+#endif
 }
 
 
@@ -1242,6 +1245,9 @@ SDL_Time		timestampNanoseconds = 0;
 	long count = sizeof(SaveGameType);
 	err = FSWrite(fRefNum, &count, (Ptr)&saveData);
 	FSClose(fRefNum);
+#ifdef __EMSCRIPTEN__
+	WebSyncFiles();
+#endif
 
 	if (count != sizeof(SaveGameType) || err != noErr)
 	{

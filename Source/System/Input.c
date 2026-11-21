@@ -203,6 +203,9 @@ static void UpdateKeyboardMouseInputNeeds(void)
 		const InputBinding* kb = &gGamePrefs.bindings[need];
 
 		bool pressed = false;
+#ifdef __EMSCRIPTEN__
+		pressed = WebGetKey(need) || WebGetAnalog(need) > .15f;
+#endif
 
 		for (int j = 0; j < MAX_BINDINGS_PER_NEED; j++)
 		{
@@ -365,6 +368,9 @@ void UpdateInput(void)		// Also called DoSDLMaintenance in other ports
 
 	// Refresh the state of each input need
 	UpdateKeyboardMouseInputNeeds();
+#ifdef __EMSCRIPTEN__
+	WebClearPresses();
+#endif
 	UpdateControllerInputNeeds();
 
 #if __APPLE__
@@ -978,6 +984,14 @@ static void SetPlayerAxisControls(void)
 
 	gPlayerInfo.analogControlX = x;
 	gPlayerInfo.analogControlZ = z;
+#ifdef __EMSCRIPTEN__
+    float webX, webY; WebGetMovement(&webX, &webY);
+    if (webX != 0 || webY != 0) {
+        gPlayerInfo.analogControlX = webX;
+        gPlayerInfo.analogControlZ = webY;
+        return;
+    }
+#endif
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
 

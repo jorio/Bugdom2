@@ -241,6 +241,9 @@ static void PlayGame(void)
 
 static void PlayArea(void)
 {
+#ifdef __EMSCRIPTEN__
+	WebSetGameplayActive(true);
+#endif
 			/* PREP STUFF */
 
 	MakeFadeEvent(true, 1);
@@ -318,7 +321,11 @@ static void PlayArea_Terrain(void)
 
 			/* SEE IF PAUSED */
 
-		if (IsNeedDown(kNeed_UIPause))
+		if (IsNeedDown(kNeed_UIPause)
+#ifdef __EMSCRIPTEN__
+			|| WebConsumePauseRequest()
+#endif
+		)
 			DoPaused();
 
 #if 0
@@ -968,6 +975,9 @@ void StartLevelCompletion(float coolDownTimer)
 
 static void CleanupLevel(void)
 {
+#ifdef __EMSCRIPTEN__
+	WebSetGameplayActive(false);
+#endif
 	GrabMouse(false);
 
 	StopAllEffectChannels();
